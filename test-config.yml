@@ -1,0 +1,93 @@
+# Configure the matching service adapter's server settings here.
+# See http://www.dropwizard.io/1.0.5/docs/manual/configuration.html#servers 
+# for more information.
+server:
+  # Ports on which to listen for normal connections.
+  # See http://www.dropwizard.io/1.0.5/docs/manual/configuration.html#connectors
+  # for information on HTTPS and TLS connections.
+  applicationConnectors:
+    - type: http
+      port: 8080
+  # Ports on which to listen for admin tasks.
+  # This can probably be set to the above port+1.
+  adminConnectors:
+    - type: http
+      port: 8081
+
+# Add information about your matching service adapter (MSA) here.
+matchingServiceAdapter:
+  # The entityId is used for SAML communication with Verify.
+  entityId: my-entity-id
+  # The externalUrl is the internet-facing URL for your MSA.
+  externalUrl: http://service.gov.uk/matching-service/POST
+
+# Configure the URLs for your local matching service here.
+localMatchingService:
+  # The matchUrl is where the MSA should post user attributes on a successful match
+  matchUrl: http://service.gov.uk/local-matching/match
+  # The accountCreationUrl is where the MSA should post attributes for unknown users
+  accountCreationUrl: http://service.gov.uk/local-matching/create-account
+
+# Configure the key pairs used by your MSA for signing SAML messages here.
+signingKeys:
+  # The primary signing key is used to sign all messages to Verify.
+  primary:
+    publicKey:
+      # The certificate (.crt) containing the primary public signing key:
+      certFile: test_primary_signing.crt
+      # The common name (CN) of that certificate:
+      name: Test MSA Signing
+    privateKey:
+      # The PK8 (.pk8) containing the primary private signing key:
+      keyFile: test_primary_signing.pk8
+  # The public part of the secondary signing key is published in the MSA's metadata 
+  # during key rollovers but is otherwise unused by the MSA.
+  secondary:
+    publicKey:
+      certFile: test_secondary_signing.crt
+      name: Test Another MSA Signing
+    privateKey:
+      keyFile: test_secondary_signing.pk8
+
+# Configure the key pairs used by your MSA for encrypting and decrypting SAML
+# messages here. You can configure up to 2 encryption keys at a time and the MSA
+# will attempt decryption with both. Only the first key will be used for encryption.
+encryptionKeys:
+  - publicKey:
+      certFile: test_msa_encryption_1.crt
+      name: Test MSA Encryption 1
+    privateKey:
+      keyFile: test_msa_encryption_1.pk8
+  - publicKey:
+      certFile: test_msa_encryption_2.crt
+      name: Test MSA Encryption 2
+    privateKey:
+      keyFile: test_msa_encryption_2.pk8
+
+# Settings for connecting with the hub can be configured here
+# if necessary.
+hub:
+  ssoUrl: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
+  trustStore:
+    path: test_ida_hub.ts
+    password: puppet
+
+# Settings for obtaining Verify's metadata can be configured here.
+metadata:
+  url: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation
+  trustStore:
+    path: test_ida_metadata.ts
+    password: puppet
+
+## Options to add additional logging. By default, logs will be output to console.
+## See http://www.dropwizard.io/1.0.5/docs/manual/configuration.html#logging
+## for more information.
+#logging:
+#  level: INFO
+#  appenders:
+#    - type: file
+#      currentLogFilename: apps-home/test-rp-msa.log
+#      archivedLogFilenamePattern: apps-home/test-rp-msa.log.%d.gz
+#      logFormat: '%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'
+#    - type: console
+#      logFormat: '%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'

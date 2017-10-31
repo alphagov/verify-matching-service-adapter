@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/usr/sbin/service test-rp-msa restart

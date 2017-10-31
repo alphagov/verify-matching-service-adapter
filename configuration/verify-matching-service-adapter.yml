@@ -1,0 +1,50 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: ${TEST_RP_MSA_PORT:-50210}
+  adminConnectors:
+    - type: http
+      port: 50211
+
+matchingServiceAdapter:
+  entityId: http://www.test-rp-ms.gov.uk/SAML2/MD
+  externalUrl: http://localhost:${TEST_RP_MSA_PORT:-50210}/matching-service/POST
+
+localMatchingService:
+  matchUrl: http://localhost:${TEST_RP_PORT:-50130}/test-rp/matching-service/POST
+  accountCreationUrl: http://localhost:${TEST_RP_PORT:-50130}/test-rp/unknown-user/POST
+
+hub:
+  ssoUrl: http://localhost:${FRONTEND_PORT:-50300}/SAML2/SSO
+  trustStore:
+    type: encoded
+    store: ${HUB_TRUST_STORE}
+    password: marshmallow
+
+metadata:
+  url: ${METADATA_URL:-http://localhost:55000/metadata.xml}
+  trustStore:
+    type: encoded
+    store: ${METADATA_TRUST_STORE}
+    password: marshmallow
+
+signingKeys:
+  primary:
+    publicKey:
+      cert: ${MSA_SIGNING_CERT_PRIMARY:-encoded-cert}
+      name: signing.primary.crt
+    privateKey:
+      key: ${MSA_SIGNING_KEY_PRIMARY:-encoded-key}
+  secondary:
+    publicKey:
+      cert: ${MSA_SIGNING_CERT_SECONDARY:-encoded-cert}
+      name: signing.secondary.crt
+    privateKey:
+      key: ${MSA_SIGNING_KEY_SECONDARY:-encoded-key}
+  
+encryptionKeys:
+  - publicKey:
+      cert: ${MSA_ENCRYPTION_CERT_PRIMARY:-encoded-cert}
+      name: encryption.primary.crt
+    privateKey:
+      key: ${MSA_ENCRYPTION_KEY_PRIMARY:-encoded-key}

@@ -1,0 +1,25 @@
+apply plugin: 'maven-publish'
+
+def build_number = System.getProperty('IDA_MSA_VERSION')
+
+publishing {
+    publications {
+        tar(MavenPublication) {
+            artifactId "matching-service-adapter-tar"
+            version "$build_number"
+            groupId "uk.gov.ida"
+            artifact file('verify-matching-service-adapter-' + "$build_number" + '.tar.gz')
+        }
+        deb(MavenPublication) {
+            artifactId "matching-service-adapter-deb"
+            version "$build_number"
+            groupId "uk.gov.ida"
+            artifact file('test-rp-msa_' + "$build_number" + '_amd64.deb')
+        }
+    }
+    repositories {
+        maven {
+            url "/srv/maven"
+        }
+    }
+}

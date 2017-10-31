@@ -1,0 +1,76 @@
+{
+  "matchingDataset": {
+    "firstName": {
+      "value": "walker",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true
+    },
+    "middleNames": {
+      "value": "walker",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true
+    },
+    "surnames": [
+      {
+        "value": "smith",
+        "from": "2014-02-01T01:02:03.567Z",
+        "to": "2014-02-01T01:02:03.567Z",
+        "verified": true
+      },
+      {
+        "value": "walker",
+        "from": "2014-02-01T01:02:03.567Z",
+        "to": "2014-02-01T01:02:03.567Z",
+        "verified": true
+      }
+    ],
+    "gender": {
+      "value": "FEMALE",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true
+    },
+    "dateOfBirth": {
+      "value": "2014-02-01",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true
+    },
+    "addresses": [
+      {
+        "verified": true,
+        "fromDate": "2014-02-01T01:02:03.567Z",
+        "toDate": "2014-02-01T01:02:03.567Z",
+        "postCode": "EC2",
+        "lines": [
+          "a",
+          "b"
+        ],
+        "internationalPostCode": "123",
+        "uprn": "urpn"
+      },
+      {
+        "verified": true,
+        "fromDate": "2014-02-01T01:02:03.567Z",
+        "toDate": "2014-02-01T01:02:03.567Z",
+        "postCode": "WC1",
+        "lines": [
+          "a",
+          "b"
+        ],
+        "internationalPostCode": "123",
+        "uprn": "urpn"
+      }
+    ]
+  },
+  "cycle3Dataset": {
+    "attributes": {
+      "NI": "1234"
+    }
+  },
+  "hashedPid": "8f2f8c23-f767-4590-aee9-0842f7f1e36d",
+  "matchId": "cda6126c-9695-4051-ba6f-27a8938a0b03",
+  "levelOfAssurance": "LEVEL_1"
+}

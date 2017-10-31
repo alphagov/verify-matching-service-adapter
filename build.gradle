@@ -1,0 +1,185 @@
+buildscript {
+    repositories {
+        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+    }
+    dependencies {
+        classpath 'uk.gov.ida:ida-gradle:1.1.0-15',
+	        'com.github.ben-manes:gradle-versions-plugin:0.11.3'
+
+    }
+}
+
+plugins {
+      id "org.sonarqube" version "2.2.1"
+}
+
+apply plugin: "java"
+apply plugin: "jacoco"
+apply plugin: 'idaSonar'
+apply plugin: 'application'
+apply plugin: 'com.github.ben-manes.versions'
+
+idaSonar {
+    name = 'verify-matching-service-adapter-sonar'
+}
+
+group = "uk.gov.ida"
+ext.version = "$version"
+
+ext {
+  opensaml = '3.3.0'
+}
+
+def dependencyVersions = [
+        opensaml:"$opensaml",
+        dropwizard: '1.1.4',
+        ida_utils: '317',
+        ida_test_utils: '31',
+        saml_extensions:"$opensaml-1.2a-33",
+        saml_serializers:"$opensaml-24",
+        saml_security:"$opensaml-46",
+        saml_metadata_bindings:"$opensaml-56",
+        saml_utils: "$opensaml-46",
+        saml_test_utils:"$opensaml-24",
+        saml_domain_objects: "$opensaml-37",
+        hub_saml: "$opensaml-87",
+        dev_pki: '1.1.0-19',
+]
+
+apply plugin: "idaJar"
+
+repositories {
+    maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+}
+
+configurations {
+    dropwizard
+    saml
+    ida
+    ida_test
+}
+
+configurations.all {
+    resolutionStrategy {
+        // dropwizard-testing uses 2.2.0 but our libraries currently only work with 1.6.0.
+        force "org.assertj:assertj-core:1.6.0"
+    }
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencies {
+    dropwizard "io.dropwizard:dropwizard-core:$dependencyVersions.dropwizard",
+        "io.dropwizard:dropwizard-util:$dependencyVersions.dropwizard",
+        'io.dropwizard.metrics:metrics-healthchecks:3.1.2',
+        "io.dropwizard:dropwizard-jersey:$dependencyVersions.dropwizard",
+        'io.dropwizard.metrics:metrics-annotation:3.1.2',
+        "io.dropwizard:dropwizard-client:$dependencyVersions.dropwizard",
+        'com.hubspot.dropwizard:dropwizard-guicier:1.0.0.6',
+        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
+
+    saml "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
+        "org.opensaml:opensaml-security-api:$dependencyVersions.opensaml",
+        "org.opensaml:opensaml-saml-api:$dependencyVersions.opensaml",
+        "org.opensaml:opensaml-xmlsec-api:$dependencyVersions.opensaml",
+        "org.opensaml:opensaml-saml-impl:$dependencyVersions.opensaml",
+        "org.opensaml:opensaml-xmlsec-impl:$dependencyVersions.opensaml",
+        'net.shibboleth.utilities:java-support:7.2.0'
+
+    ida "uk.gov.ida:dropwizard-saml:$dependencyVersions.opensaml-353",
+        "uk.gov.ida:saml-metadata-bindings:$dependencyVersions.saml_metadata_bindings",
+        "uk.gov.ida:common-utils:2.0.0-$dependencyVersions.ida_utils",
+        "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
+        "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
+        "uk.gov.ida:saml-security:$dependencyVersions.saml_security",
+        "uk.gov.ida:ida-saml-extensions:$dependencyVersions.saml_extensions",
+        "uk.gov.ida:saml-serializers:$dependencyVersions.saml_serializers",
+        "uk.gov.verify:saml-domain-objects:$dependencyVersions.saml_domain_objects",
+        "uk.gov.verify:saml-utils:$dependencyVersions.saml_utils",
+        "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml"
+
+    compile configurations.dropwizard,
+        configurations.saml,
+        configurations.ida,
+        'javax.inject:javax.inject:1',
+        'javax.validation:validation-api:1.1.0.Final',
+        'com.fasterxml.jackson.core:jackson-annotations:2.6.0',
+        'com.fasterxml.jackson.core:jackson-databind:2.6.7',
+        'com.google.guava:guava:18.0',
+        'com.google.inject:guice:3.0',
+        'joda-time:joda-time:2.9',
+        'org.slf4j:slf4j-api:1.7.21',
+        'javax.ws.rs:javax.ws.rs-api:2.0.1',
+        'commons-codec:commons-codec:1.10',
+        'commons-lang:commons-lang:2.6',
+        'org.apache.ws.commons:ws-commons-util:1.0.1',
+        'com.google.code.findbugs:annotations:3.0.0',
+        'xml-apis:xml-apis:1.0.b2'
+
+    runtime "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
+
+    ida_test "uk.gov.ida:saml-metadata-bindings-test:$dependencyVersions.saml_metadata_bindings",
+        "uk.gov.ida:ida-dev-pki:$dependencyVersions.dev_pki",
+        "uk.gov.ida:ida-saml-extensions-test:$dependencyVersions.saml_extensions",
+        "uk.gov.verify:saml-test-utils:$dependencyVersions.saml_test_utils"
+
+    testCompile configurations.ida_test,
+        'junit:junit:4.11',
+        "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
+        "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
+        'org.mockito:mockito-core:1.10.19',
+        'org.assertj:assertj-core:1.6.0',
+        'org.assertj:assertj-joda-time:1.1.0',
+        'com.google.code.findbugs:jsr305:3.0.1',
+        "uk.gov.ida:hub-saml-test-utils:$dependencyVersions.hub_saml",
+        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
+}
+
+sourceSets {
+    intTest {
+        java {
+            srcDir 'src/integration-test/java'
+        }
+        resources {
+            srcDir 'src/integration-test/resources'
+            srcDir 'configuration'
+        }
+        compileClasspath += sourceSets.main.runtimeClasspath
+        compileClasspath += sourceSets.test.runtimeClasspath
+        compileClasspath += sourceSets.test.output
+    }
+}
+
+ext.mainclass = 'uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterApplication'
+mainClassName = ext.mainclass
+
+task copyToLib(dependsOn: jar, type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
+
+task zip(dependsOn: copyToLib, type: Zip) {
+    from("$buildDir/output").into('./')
+    from('RELEASE_NOTES.md', 'USAGE_README.md', 'prod-config.yml', 'test-config.yml').into('./')
+    rename('USAGE_README\\.md', 'README\\.md')
+}
+
+task intTest(type: Test) {
+    String maxParallelForksEnvVarValue = 1
+    println "Overriding maxParallelForks value (value: \'${maxParallelForksEnvVarValue}\')"
+    maxParallelForks = Integer.parseInt("${maxParallelForksEnvVarValue}")
+    testClassesDir = sourceSets.intTest.output.classesDir
+    classpath += sourceSets.intTest.runtimeClasspath
+}
+
+run {
+    int debug_port = System.getenv("TEST_RP_MSA_PORT") != null ? Integer.parseInt(System.getenv("TEST_RP_MSA_PORT")) + 2 : 50212
+    String debug = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$debug_port" 
+    applicationDefaultJvmArgs = [debug]
+    args = ["server", "configuration/verify-matching-service-adapter.yml"]
+}
+
+task(outputDependencies) << {
+    println "ida_utils=$dependencyVersions.ida_utils"
+}
+
+task sonar(dependsOn: [':clean', ':test', intTest, 'sonarqube'])

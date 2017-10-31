@@ -1,0 +1,2 @@
+Note: All java classes within this package are sent to external services.  Please ensure that any changes are backwards
+compatible or that plans are in place for the change without causing service outages.
