@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.common.shared.security.IdGenerator;
@@ -9,6 +8,7 @@ import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.MatchingServiceAuthnStatement;
 import uk.gov.ida.saml.core.domain.PersistentId;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class MatchingServiceAssertionFactory {

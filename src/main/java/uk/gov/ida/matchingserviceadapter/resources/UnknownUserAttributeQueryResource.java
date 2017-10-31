@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -14,6 +13,7 @@ import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

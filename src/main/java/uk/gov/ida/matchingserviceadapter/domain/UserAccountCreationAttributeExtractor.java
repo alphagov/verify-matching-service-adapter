@@ -2,7 +2,6 @@ package uk.gov.ida.matchingserviceadapter.domain;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
 import org.joda.time.LocalDate;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.saml.factories.UserAccountCreationAttributeFactory;
@@ -12,6 +11,7 @@ import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.text.MessageFormat;

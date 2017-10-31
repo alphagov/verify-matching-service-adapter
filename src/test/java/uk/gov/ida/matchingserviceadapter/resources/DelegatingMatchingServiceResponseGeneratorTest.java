@@ -20,17 +20,19 @@ public class DelegatingMatchingServiceResponseGeneratorTest {
 
     @Test
     public void shouldSaveDelegatesList() {
-        ImmutableMap<Class<?>, MatchingServiceResponseGenerator> delegates = ImmutableMap.of();
+        ImmutableMap<Class<? extends MatchingServiceResponse>, MatchingServiceResponseGenerator<? extends MatchingServiceResponse>> delegates = ImmutableMap.of();
         DelegatingMatchingServiceResponseGenerator generator = new DelegatingMatchingServiceResponseGenerator(delegates);
 
         assertThat(generator.getDelegates(), sameInstance(delegates));
     }
 
+    public static class MatchingServiceResponseTestClass implements MatchingServiceResponse {}
+
     @Test
     public void shouldThrowExceptionWhenNoDelegateIsFound() {
         exception.expectMessage("No delegate found for matching service response");
 
-        ImmutableMap<Class<?>, MatchingServiceResponseGenerator> delegates = ImmutableMap.of(DelegatingMatchingServiceResponseGeneratorTest.class, mock(MatchingServiceResponseGenerator.class));
+        ImmutableMap<Class<? extends MatchingServiceResponse>, MatchingServiceResponseGenerator<? extends MatchingServiceResponse>> delegates = ImmutableMap.of(MatchingServiceResponseTestClass.class, mock(MatchingServiceResponseGenerator.class));
         DelegatingMatchingServiceResponseGenerator generator = new DelegatingMatchingServiceResponseGenerator(delegates);
 
         generator.generateResponse(mock(MatchingServiceResponse.class));
@@ -40,7 +42,7 @@ public class DelegatingMatchingServiceResponseGeneratorTest {
     public void shouldCallCorrectResponseGeneratorByResponseType() {
         MatchingServiceResponseGenerator notSelectedGenerator = mock(MatchingServiceResponseGenerator.class);
         MatchingServiceResponseGenerator selectedGenerator = mock(MatchingServiceResponseGenerator.class);
-        ImmutableMap<Class<?>, MatchingServiceResponseGenerator> delegates = ImmutableMap.of(
+        ImmutableMap<Class<? extends MatchingServiceResponse>, MatchingServiceResponseGenerator<? extends MatchingServiceResponse>> delegates = ImmutableMap.of(
             MatchingServiceResponse.class, notSelectedGenerator,
             VerifyMatchingServiceResponse.class, selectedGenerator);
         VerifyMatchingServiceResponse response = new VerifyMatchingServiceResponse(mock(OutboundResponseFromMatchingService.class));

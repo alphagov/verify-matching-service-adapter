@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.repositories;
 
-import com.google.inject.Inject;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.joda.time.DateTime;
@@ -28,12 +27,16 @@ import uk.gov.ida.matchingserviceadapter.exceptions.FederationMetadataLoadingExc
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static uk.gov.ida.matchingserviceadapter.binders.MatchingServiceAdapterMetadataBinder.VERIFY_METADATA_RESOLVER;
+import static uk.gov.ida.matchingserviceadapter.binders.MatchingServiceAdapterSamlBinder.HUB_ENTITY_ID;
 
 public class MatchingServiceAdapterMetadataRepository {
 
@@ -51,9 +54,9 @@ public class MatchingServiceAdapterMetadataRepository {
             KeyDescriptorsUnmarshaller keyDescriptorsUnmarshaller,
             Function<EntitiesDescriptor, Element> entitiesDescriptorElementTransformer,
             CertificateStore certificateStore,
-            @Named("VerifyMetadataResolver") MetadataResolver metadataResolver,
+            @Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver,
             MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-            @Named("HubEntityId") String hubEntityId) {
+            @Named(HUB_ENTITY_ID) String hubEntityId) {
 
         this.msaConfiguration = msaConfiguration;
         this.keyDescriptorsUnmarshaller = keyDescriptorsUnmarshaller;

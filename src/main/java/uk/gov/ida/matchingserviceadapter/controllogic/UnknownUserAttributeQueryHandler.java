@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.controllogic;
 
 import com.google.common.base.Optional;
-import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.slf4j.Logger;
@@ -25,6 +24,7 @@ import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.PersistentId;
 
+import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.List;
 

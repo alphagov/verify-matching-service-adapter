@@ -1,7 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
 import com.google.common.base.Optional;
-import com.google.inject.Inject;
+import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
@@ -14,6 +14,8 @@ import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.Optional.absent;
 

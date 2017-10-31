@@ -14,16 +14,18 @@ import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class DelegatingMatchingService implements MatchingService {
-    private ServiceLocator<MatchingServiceRequestContext, MatchingService> matchingServiceLocator;
+    private final ServiceLocator<MatchingServiceRequestContext, MatchingService> matchingServiceLocator;
     private final SoapMessageManager soapMessageManager;
     private final ElementToOpenSamlXMLObjectTransformer<AttributeQuery> attributeQueryUnmarshaller;
     private final AssertionDecrypter assertionDecrypter;
 
+    @Inject
     public DelegatingMatchingService(ServiceLocator<MatchingServiceRequestContext, MatchingService> matchingServiceLocator, SoapMessageManager soapMessageManager, ElementToOpenSamlXMLObjectTransformer<AttributeQuery> attributeQueryUnmarshaller, AssertionDecrypter assertionDecrypter) {
         this.matchingServiceLocator = matchingServiceLocator;
         this.soapMessageManager = soapMessageManager;

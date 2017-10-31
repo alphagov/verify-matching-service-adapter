@@ -1,12 +1,12 @@
 package uk.gov.ida.matchingserviceadapter.rest;
 
-import com.google.inject.Inject;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.saml.security.EncryptionKeyStore;
 import uk.gov.ida.saml.security.SigningKeyStore;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.security.PublicKey;
 import java.util.Collections;
@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.text.MessageFormat.format;
+import static uk.gov.ida.matchingserviceadapter.binders.MatchingServiceAdapterSamlBinder.HUB_ENTITY_ID;
 
 public class MetadataPublicKeyStore implements EncryptionKeyStore, SigningKeyStore {
 
@@ -25,7 +26,7 @@ public class MetadataPublicKeyStore implements EncryptionKeyStore, SigningKeySto
     public MetadataPublicKeyStore(
             MetadataCertificatesRepository metadataRepository,
             PublicKeyFactory publicKeyFactory,
-            @Named("HubEntityId") String hubEntityId) {
+            @Named(HUB_ENTITY_ID) String hubEntityId) {
         this.metadataRepository = metadataRepository;
         this.publicKeyFactory = publicKeyFactory;
         this.hubEntityId = hubEntityId;

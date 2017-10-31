@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.repositories;
 
-import com.google.inject.Inject;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.opensaml.core.criterion.EntityIdCriterion;
@@ -9,8 +8,12 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.matchingserviceadapter.exceptions.InvalidSamlMetadataException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.function.Function;
+
+import static uk.gov.ida.matchingserviceadapter.binders.MatchingServiceAdapterPKIBinder.VERIFY_CERTIFICATE_VALIDATOR;
 
 /**
  * @deprecated
@@ -25,7 +28,7 @@ public class MetadataCertificatesRepository {
     @Inject
     public MetadataCertificatesRepository(
             MetadataResolver metadataResolver,
-            CertificateValidator certificateValidator,
+            @Named(VERIFY_CERTIFICATE_VALIDATOR) CertificateValidator certificateValidator,
             CertificateExtractor certificateExtractor) {
         this.metadataResolver = metadataResolver;
         this.certificateValidator = certificateValidator;
