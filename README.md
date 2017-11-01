@@ -26,3 +26,10 @@ Deploying
 The MSA is distributed as a zip file. We zip the generated jar and all of its dependencies. There is a gradle task for this:
 
 `gradle zip`
+
+Support and raising issues
+--------------------------
+
+If you think you have discovered a security issue in this code please email [disclosure@digital.cabinet-office.gov.uk](mailto:disclosure@digital.cabinet-office.gov.uk) with details.
+
+For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-matching-service-adapter/issues/new) in the GitHub issue tracker.
