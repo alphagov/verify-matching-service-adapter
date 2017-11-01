@@ -14,18 +14,35 @@ The MSA works by receiving a signed XML SAML-SOAP AttributeQuery from the hub as
 Testing
 -------
 
-gradle is used as a build tool.
+`gradle` is used as a build tool.
 There are two sets of tests.
 
-`gradle test`
-`gradle intTest`
+`./gradlew test`
+
+`./gradlew intTest`
 
 Deploying
 ---------
 
 The MSA is distributed as a zip file. We zip the generated jar and all of its dependencies. There is a gradle task for this:
 
-`gradle zip`
+`./gradlew zip`
+
+Running locally
+---------------
+To run the matching service adapter locally, generate a `local.env` file either using [verify-local-startup](https://github.com/alphagov/verify-local-startup) or `openssl` and `keytool`
+
+To run from terminal, run `./startup.sh`
+
+To run in IntelliJ, create a run configuration with the following properties:
+```
+Main class: uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterApplication
+Program arguments: server configuration/verify-matching-service-adapter.yml
+Use classpath of module: verify-matching-service-adapter_main
+```
+
+The environment variables from `local.env` can be added to this configuration by running `env-for-intellij.sh` to copy them to the clipboard before pasting them into the environment variable window in the run configuration
+
 
 Support and raising issues
 --------------------------

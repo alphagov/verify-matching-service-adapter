@@ -6,14 +6,6 @@
 ##
 ##############################################################################
 
-# Use the local environment if one exists
-if test -e local.env; then
-    printf "$(tput setaf 2)Running with local environment...\n$(tput sgr0)"
-    source local.env
-else
-    printf "$(tput setaf 1)No local environment set - either use verify-local-startup to generate a local.env file or modify configuration/verify-matching-service-adapter.yml\n$(tput sgr0)"
-fi
-
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS=""
 

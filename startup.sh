@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 
 # Use the local environment if one exists
@@ -5,7 +6,8 @@ if test -e local.env; then
     source local.env
     port=$TEST_RP_MSA_PORT
 else
-    port=50210
+    printf "$(tput setaf 1)No local environment found. Use verify-local-startup or openssl to generate a local.env file\n$(tput sgr0)"
+    exit
 fi
 
 # Kill existing instances
