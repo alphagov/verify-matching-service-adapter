@@ -141,7 +141,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named("HubFederationId")
     public String getHubFederationId(MatchingServiceAdapterConfiguration configuration) {
-        return "VERIFY-FEDERATION";
+        return configuration.getMetadataConfiguration().getHubFederationId();
     }
 
     @Provides
