@@ -301,6 +301,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     private Function<AttributeQuery, InboundMatchingServiceRequest> getAttributeQueryToInboundMatchingServiceRequestTransformer(
             @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
+            @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
             IdaKeyStore eidasKeystore,
             VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer,
             CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
@@ -313,8 +314,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
             EidasAttributeQueryToInboundMatchingServiceRequestTransformer eidasTransformer =
                     new MsaTransformersFactory().getEidasAttributeQueryToInboundMatchingServiceRequestTransformer(
-
-                countryMetadataResolver.get(),
+                        verifyMetadataResolver,
                 certificateChainEvaluableCriterion
             );
 

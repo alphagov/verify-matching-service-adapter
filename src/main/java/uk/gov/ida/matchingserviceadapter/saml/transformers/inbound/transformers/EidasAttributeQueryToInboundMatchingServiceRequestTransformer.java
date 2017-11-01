@@ -27,7 +27,7 @@ public class EidasAttributeQueryToInboundMatchingServiceRequestTransformer imple
         samlAttributeQueryValidator.validate(attributeQuery);
         attributeQuerySignatureValidator.validate(attributeQuery);
 
-        // TODO - EID-XXX handle attributes and fill out the nulls below
+        // TODO - EID-202 handle attributes and fill out the nulls below
         throw new RuntimeException("TODO: Signature valid. Next stage of eIDAS MSA development is to validate the AQR");
     }
 }
