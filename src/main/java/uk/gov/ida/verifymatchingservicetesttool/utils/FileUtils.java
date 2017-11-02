@@ -1,16 +1,14 @@
 package uk.gov.ida.verifymatchingservicetesttool.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 public class FileUtils {
 
-    public String readFromResources(String fileName) throws IOException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(fileName).getFile());
-        return new String(Files.readAllBytes(file.toPath()));
+    public String readFromResources(String fileName) {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        return new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(fileName)))
+                .lines().collect(Collectors.joining("\n"));
     }
-
-
 }
