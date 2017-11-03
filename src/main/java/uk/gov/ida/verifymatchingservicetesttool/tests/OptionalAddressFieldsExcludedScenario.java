@@ -1,6 +1,6 @@
 package uk.gov.ida.verifymatchingservicetesttool.tests;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Client;
@@ -9,11 +9,9 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Map;
 
-import static java.time.temporal.ChronoUnit.DAYS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;

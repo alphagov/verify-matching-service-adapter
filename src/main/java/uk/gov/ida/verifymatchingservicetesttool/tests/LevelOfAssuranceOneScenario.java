@@ -1,6 +1,6 @@
 package uk.gov.ida.verifymatchingservicetesttool.tests;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Client;
