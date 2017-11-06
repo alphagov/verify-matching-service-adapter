@@ -35,4 +35,21 @@ dependencies {
     runtime("org.junit.jupiter:junit-jupiter-engine:5.0.1")
 }
 
+applicationDistribution.from("examples") {
+    into "examples"
+}
+
+task copyClasses(type: Copy) {
+    ['build/examples', 'out/examples'].each { dest ->
+        copy {
+            from projectDir.getPath() + "/examples"
+            into dest
+        }
+    }
+}
+
+compileJava{
+    dependsOn copyClasses
+}
+
 mainClassName = 'uk.gov.ida.verifymatchingservicetesttool.Application'
