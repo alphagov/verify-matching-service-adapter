@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
@@ -57,7 +58,9 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckR
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.utils.manifest.ManifestReader;
+import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
+import uk.gov.ida.matchingserviceadapter.validators.TimeRestrictionValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
@@ -363,6 +366,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                             countryCertificateValidator.get(),
                             new CertificateExtractor(),
                             x509CertificateFactory,
+                            new TimeRestrictionValidator(new DateTimeComparator(Duration.ZERO)),
                             new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(eidasKeystore), new EncryptionAlgorithmValidator(), new DecrypterFactory())
                         )
                     );

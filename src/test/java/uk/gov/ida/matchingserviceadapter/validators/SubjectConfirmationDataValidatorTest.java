@@ -13,7 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.CONFIRMATION_DATA_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.IN_RESPONSE_TO_NOT_PRESENT;
-import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.IN_RESPONSE_TO_NOT_WHAT_WAS_EXPECTED;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_BEFORE_INVALID;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_INVALID;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_NOT_PRESENT;
@@ -30,7 +29,7 @@ public class SubjectConfirmationDataValidatorTest {
 
     @Before
     public void setup() {
-        validator = new SubjectConfirmationDataValidator<>(identity(), timeRestrictionValidator, DEFAULT_REQUEST_ID);
+        validator = new SubjectConfirmationDataValidator<>(identity(), timeRestrictionValidator);
         IdaSamlBootstrap.bootstrap();
     }
 
@@ -75,15 +74,6 @@ public class SubjectConfirmationDataValidatorTest {
         Messages messages = validator.validate(subjectConfirmationData, messages());
 
         assertThat(messages.hasErrorLike(IN_RESPONSE_TO_NOT_PRESENT)).isTrue();
-    }
-
-    @Test
-    public void shouldGenerateErrorWhenInResponseToRequestIdDoesNotMatchTheRequestId() throws Exception {
-        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withInResponseTo("foo").build();
-
-        Messages messages = validator.validate(subjectConfirmationData, messages());
-
-        assertThat(messages.hasErrorLike(IN_RESPONSE_TO_NOT_WHAT_WAS_EXPECTED)).isTrue();
     }
 
     @Test
