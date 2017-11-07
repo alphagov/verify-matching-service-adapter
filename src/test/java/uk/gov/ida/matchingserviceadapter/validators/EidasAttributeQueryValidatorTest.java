@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.validators;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.beanplanet.messages.domain.Messages;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,6 +88,7 @@ public class EidasAttributeQueryValidatorTest {
             countryCertificateValidator,
             certificateExtractor,
             x509CertificateFactory,
+            new DateTimeComparator(Duration.ZERO),
             assertionDecrypter);
 
         when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
