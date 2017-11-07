@@ -5,9 +5,7 @@ import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 
 import static java.util.function.Function.identity;
