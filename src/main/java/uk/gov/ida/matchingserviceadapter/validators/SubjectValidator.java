@@ -17,8 +17,8 @@ import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
 public class SubjectValidator<T> extends CompositeValidator<T> {
 
     public static final MessageImpl SUBJECT_NOT_PRESENT = globalMessage("subject", "Subject not present");
-    public static final MessageImpl WRONG_NUMBER_OF_SUBJECT_CONFIRMATIONS = fieldMessage("subjectConfirmations", "subject.subjectConfirmations.wrong.size", "Must have exactly 1 subject confirmation");
-    public static final MessageImpl NAME_ID_NOT_PRESENT = fieldMessage("subject.nameId", "subject.nameId.absent", "NameID not present");
+    public static final MessageImpl WRONG_NUMBER_OF_SUBJECT_CONFIRMATIONS = fieldMessage("subject.subjectConfirmations", "subject.subjectConfirmations.wrong.size", "Must have exactly 1 subject confirmation");
+    public static final MessageImpl NAME_ID_NOT_PRESENT = fieldMessage("subject.nameId", "subject.nameId.absent", "NameID must be present");
     public static final MessageImpl NAME_ID_IN_WRONG_FORMAT = fieldMessage("subject.nameId", "subject.nameId.wrong.format", "NameID not in valid format");
 
     public static final Set<String> VALID_IDENTIFIERS = ImmutableSet.of(NameID.PERSISTENT);

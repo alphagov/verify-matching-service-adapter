@@ -3,12 +3,8 @@ package uk.gov.ida.matchingserviceadapter.validators;
 import org.beanplanet.messages.domain.Message;
 import org.beanplanet.validation.PredicatedValidator;
 import org.joda.time.DateTime;
-import uk.gov.ida.matchingserviceadapter.validators.exceptions.SamlResponseValidationException;
 
 import java.util.function.Function;
-
-import static org.joda.time.DateTimeZone.UTC;
-import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
 
 public class TimeRestrictionValidators {
 

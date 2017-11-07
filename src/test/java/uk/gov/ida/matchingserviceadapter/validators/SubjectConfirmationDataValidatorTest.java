@@ -29,6 +29,15 @@ public class SubjectConfirmationDataValidatorTest {
     }
 
     @Test
+    public void shouldGenerateNoErrorsWhenSubjectConfirmationDataIsValid() {
+        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().build();
+
+        Messages messages = validator.validate(subjectConfirmationData, messages());
+
+        assertThat(messages.hasErrors()).isFalse();
+    }
+
+    @Test
     public void shouldGenerateErrorWhenSubjectConfirmationDataMissing() throws Exception {
         Messages messages = validator.validate(null, messages());
 
