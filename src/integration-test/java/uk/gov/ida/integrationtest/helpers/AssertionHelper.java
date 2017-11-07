@@ -3,7 +3,6 @@ package uk.gov.ida.integrationtest.helpers;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
-import org.opensaml.saml.saml2.core.AuthnContext;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
@@ -12,9 +11,9 @@ import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
+import uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
-import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
 
 import java.util.List;
 
@@ -31,8 +30,6 @@ import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnCont
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPAddress;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
@@ -132,6 +129,7 @@ public class AssertionHelper {
 
     public static EncryptedAssertion anEidasEncryptedAssertion(String issuerId) {
         return anAssertion()
+                .addAuthnStatement(AuthnStatementBuilder.anAuthnStatement().build())
                 .withIssuer(
                         anIssuer()
                                 .withIssuerId(issuerId)

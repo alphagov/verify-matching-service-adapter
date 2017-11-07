@@ -11,6 +11,7 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.FixedErrorValidator;
 
 import java.time.Duration;
 import java.util.stream.Collectors;
@@ -57,6 +58,11 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 Assertion::getIssueInstant,
                 ttl,
                 clockDelta
+            ),
+            new CompositeValidator<>(
+                true,
+                new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
+                new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
             )
         );
     }
@@ -71,5 +77,9 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
 
     public static MessageImpl generateInvalidSignatureMessage(final String typeOfAssertion) {
         return globalMessage("invalid.signature", typeOfAssertion + " Assertion's signature was invalid.");
+    }
+
+    public static MessageImpl generateWrongNumberOfAuthnStatementsMessage(final String typeOfAssertion) {
+        return fieldMessage("issuer.authnStatements", "issuer.authnStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of authn statements.");
     }
 }
