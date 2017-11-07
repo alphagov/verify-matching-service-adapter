@@ -14,7 +14,7 @@ public class Application {
 
     public static void main(String[] args) {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-            .selectors(selectPackage("uk.gov.ida.verifymatchingservicetesttool.tests"))
+            .selectors(selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"))
             .build();
 
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
