@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +18,7 @@ import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationVa
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(OpenSAMLMockitoRunner.class)
 public class SubjectConfirmationValidatorTest {
 
     private SubjectConfirmationValidator<SubjectConfirmation> validator;
@@ -25,7 +26,6 @@ public class SubjectConfirmationValidatorTest {
     @Before
     public void setup() {
         validator = new SubjectConfirmationValidator<>(identity(), new DateTimeComparator(Duration.ZERO));
-        IdaSamlBootstrap.bootstrap();
     }
 
     @Test

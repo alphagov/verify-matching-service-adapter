@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.builders.NameIdBuilder;
 
 import static java.util.function.Function.identity;
@@ -24,13 +25,12 @@ import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(OpenSAMLMockitoRunner.class)
 public class SubjectValidatorTest {
     private SubjectValidator<Subject> subjectValidator;
 
     @Before
     public void setUp() {
-        IdaSamlBootstrap.bootstrap();
         subjectValidator = new SubjectValidator(identity(), new DateTimeComparator(Duration.ZERO));
     }
 
