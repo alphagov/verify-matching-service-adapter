@@ -21,6 +21,7 @@ import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
+import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.security.AssertionDecrypter;
@@ -78,6 +79,7 @@ public class EidasAttributeQueryValidatorTest {
 
     @Before
     public void setUp() throws Exception {
+        IdaSamlBootstrap.bootstrap();
         validator = new EidasAttributeQueryValidator(
             verifyMetadataResolver,
             countryMetadataResolver,
