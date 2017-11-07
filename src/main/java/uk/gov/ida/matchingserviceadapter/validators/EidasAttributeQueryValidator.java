@@ -36,7 +36,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                                         CertificateValidator countryMetadataCertificateValidator,
                                         CertificateExtractor certificateExtractor,
                                         X509CertificateFactory x509CertificateFactory,
-                                        TimeRestrictionValidator timeRestrictionValidator,
+                                        DateTimeComparator dateTimeComparator,
                                         AssertionDecrypter assertionDecrypter) {
         super(
             false,
@@ -65,7 +65,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                         countryMetadataCertificateValidator,
                         certificateExtractor,
                         x509CertificateFactory,
-                        timeRestrictionValidator,
+                        dateTimeComparator,
                         IDENTITY_ASSERTION)
                 )
             )

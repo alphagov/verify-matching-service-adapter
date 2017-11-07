@@ -60,7 +60,6 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResp
 import uk.gov.ida.matchingserviceadapter.utils.manifest.ManifestReader;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
-import uk.gov.ida.matchingserviceadapter.validators.TimeRestrictionValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
@@ -366,7 +365,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                             countryCertificateValidator.get(),
                             new CertificateExtractor(),
                             x509CertificateFactory,
-                            new TimeRestrictionValidator(new DateTimeComparator(Duration.ZERO)),
+                            new DateTimeComparator(Duration.ZERO),
                             new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(eidasKeystore), new EncryptionAlgorithmValidator(), new DecrypterFactory())
                         )
                     );
