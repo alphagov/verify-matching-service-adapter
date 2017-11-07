@@ -1,8 +1,10 @@
-package uk.gov.ida.verifymatchingservicetesttool.tests;
+package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.Executable;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.utils.DynamicScenariosFilesLocator;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
@@ -12,6 +14,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -28,6 +31,7 @@ public class DynamicScenarios {
     private FileUtils fileUtils = new FileUtils();
     private DynamicScenariosFilesLocator filesLocator = new DynamicScenariosFilesLocator();
     private Client client = ClientBuilder.newClient();
+    private ApplicationConfiguration configuration = ConfigurationReader.getConfiguration();
 
     @TestFactory
     public Stream<DynamicTest> dynamicMatchTests() throws Exception {
@@ -43,11 +47,9 @@ public class DynamicScenarios {
 
     private Executable getExecutable(File file, boolean isMatch) {
         return () -> {
-            String jsonString = fileUtils.read(file);
-
-            Response response = client.target("http://localhost:50130/local-matching/match")
+            Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
                 .request("application/json")
-                .post(Entity.json(jsonString));
+                .post(Entity.json(fileUtils.read(file)));
 
             Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
 

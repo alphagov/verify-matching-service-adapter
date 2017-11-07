@@ -1,6 +1,8 @@
-package uk.gov.ida.verifymatchingservicetesttool.tests;
+package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Client;
@@ -22,11 +24,12 @@ public class LevelOfAssuranceOneScenario {
 
     private FileUtils fileUtils = new FileUtils();
     private Client client = ClientBuilder.newClient();
+    private ApplicationConfiguration configuration = ConfigurationReader.getConfiguration();
 
     @Test
     public void runForSimpleCase() throws IOException {
         String jsonString = fileUtils.readFromResources("LoA1-simple-case.json");
-        Response response = client.target("http://localhost:50130/local-matching/match")
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request("application/json")
             .post(Entity.json(jsonString));
 
@@ -44,7 +47,7 @@ public class LevelOfAssuranceOneScenario {
             .replace("%within405days-101days%", Instant.now().minus(405-101, DAYS).toString())
             .replace("%within405days-200days%", Instant.now().minus(405-200, DAYS).toString());
 
-        Response response = client.target("http://localhost:50130/local-matching/match")
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request("application/json")
             .post(Entity.json(jsonString));
 

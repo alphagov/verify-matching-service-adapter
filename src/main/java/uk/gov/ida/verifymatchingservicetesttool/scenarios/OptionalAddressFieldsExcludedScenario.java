@@ -1,6 +1,8 @@
-package uk.gov.ida.verifymatchingservicetesttool.tests;
+package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Client;
@@ -20,11 +22,12 @@ public class OptionalAddressFieldsExcludedScenario {
 
     private FileUtils fileUtils = new FileUtils();
     private Client client = ClientBuilder.newClient();
+    private ApplicationConfiguration configuration = ConfigurationReader.getConfiguration();
 
     @Test
     public void runCase() throws IOException {
         String jsonString = fileUtils.readFromResources("simple-case-excluding-optional-address-fields.json");
-        Response response = client.target("http://localhost:50130/local-matching/match")
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request("application/json")
             .post(Entity.json(jsonString));
 

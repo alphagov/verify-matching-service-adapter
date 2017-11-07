@@ -1,6 +1,8 @@
-package uk.gov.ida.verifymatchingservicetesttool.tests;
+package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Client;
@@ -22,10 +24,11 @@ public class LevelOfAssuranceTwoScenario {
 
     private FileUtils fileUtils = new FileUtils();
     private Client client = ClientBuilder.newClient();
+    private ApplicationConfiguration configuration = ConfigurationReader.getConfiguration();
 
     @Test
     public void runForWhenAllElementsAreVerifiedAndNoMultipleValues() throws IOException {
-        Response response = client.target("http://localhost:50130/local-matching/match")
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request("application/json")
             .post(Entity.json(fileUtils.readFromResources("LoA2-simple-case.json")));
 
@@ -46,7 +49,7 @@ public class LevelOfAssuranceTwoScenario {
             .replace("%within180days-101days%", Instant.now().minus(105-101, DAYS).toString())
             .replace("%within180days-150days%", Instant.now().minus(105-150, DAYS).toString());
 
-        Response response = client.target("http://localhost:50130/local-matching/match")
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request("application/json")
             .post(Entity.json(jsonString));
 
