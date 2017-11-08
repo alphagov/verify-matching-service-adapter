@@ -40,7 +40,6 @@ public class TestStatusPrintingListener implements TestExecutionListener {
 
     private void printFailureMessage(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult, Color color) {
         if (testExecutionResult.getStatus().equals(Status.FAILED)) {
-            testIdentifier.getSource().ifPresent(source -> printMessage(color, source.toString()));
             testExecutionResult.getThrowable()
                     .ifPresent(throwable -> printMessage(color, throwable.toString()));
         }
