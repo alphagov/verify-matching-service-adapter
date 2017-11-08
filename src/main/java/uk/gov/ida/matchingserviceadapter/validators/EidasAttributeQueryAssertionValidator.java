@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import org.beanplanet.messages.domain.MessageImpl;
 import org.beanplanet.validation.CompositeValidator;
+import org.beanplanet.validation.FixedErrorValidator;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
@@ -42,7 +43,9 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 Assertion::getIssuer,
                 IDPSSODescriptor.DEFAULT_ELEMENT_NAME
             ),
-            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator)
+            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
+            new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
+            new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
         );
     }
 
@@ -56,5 +59,9 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
 
     public static MessageImpl generateInvalidSignatureMessage(final String typeOfAssertion) {
         return globalMessage("invalid.signature", typeOfAssertion + " Assertion's signature was invalid.");
+    }
+
+    public static MessageImpl generateWrongNumberOfAuthnStatementsMessage(final String typeOfAssertion) {
+        return fieldMessage("issuer.authnStatements", "issuer.authnStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of authn statements.");
     }
 }
