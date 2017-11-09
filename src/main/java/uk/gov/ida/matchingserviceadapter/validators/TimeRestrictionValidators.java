@@ -6,8 +6,7 @@ import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import java.util.function.Function;
 
-public class TimeRestrictionValidators {
-
+public final class TimeRestrictionValidators {
     public static <T> PredicatedValidator<T> notInFutureValidator(DateTimeComparator dateTimeComparator, Function<T, DateTime> valueProvider, Message message) {
         return new PredicatedValidator<T>(null, valueProvider, message, (DateTime dateTime) -> dateTimeComparator.isBeforeNow(dateTime)) {};
     }

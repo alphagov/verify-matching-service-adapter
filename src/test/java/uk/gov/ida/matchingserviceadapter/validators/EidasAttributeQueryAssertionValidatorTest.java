@@ -36,11 +36,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.validators.AuthnStatementValidator.AUTHN_INSTANT_IN_FUTURE;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateEmptyIssuerMessage;
+import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateWrongNumberOfAttributeStatementsMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateWrongNumberOfAuthnStatementsMessage;
+import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.SUBJECT_NOT_PRESENT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
@@ -81,8 +84,9 @@ public class EidasAttributeQueryAssertionValidatorTest {
     }
 
     @Test
-    public void shouldValidateIssuer() {
-        Assertion assertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
+    public void shouldValidateIssuer() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anEidasAssertion().withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
@@ -100,6 +104,30 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         assertThat(messages.hasErrorLike(SUBJECT_NOT_PRESENT)).isTrue();
     }
+
+    public void shouldGenerateErrorIfWrongNumberOfAttributeStatements() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anEidasAssertion().addAttributeStatement(anAttributeStatement().build()).withConditions(aConditions()).buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(messages.size()).isEqualTo(1);
+        assertThat(messages.hasErrorLike(generateWrongNumberOfAttributeStatementsMessage(TYPE_OF_ASSERTION))).isTrue();
+    }
+
+    @Test
+    public void shouldValidateAttributeStatement() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anAssertion()
+            .addAttributeStatement(anAttributeStatement()
+                .build())
+            .addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+    }
+
 
     @Test
     public void shouldValidateSignature() throws Exception {
