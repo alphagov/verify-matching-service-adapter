@@ -38,10 +38,14 @@ import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.validators.AuthnStatementValidator.AUTHN_INSTANT_IN_FUTURE;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_REQUIRED_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateEmptyIssuerMessage;
+import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateWrongNumberOfAttributeStatementsMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateWrongNumberOfAuthnStatementsMessage;
+import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.SUBJECT_NOT_PRESENT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 
@@ -83,7 +87,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Test
     public void shouldValidateIssuer() throws Exception {
         setUpCertificateValidation();
-        Assertion assertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
+        Assertion assertion = anEidasAssertion().withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
@@ -93,7 +97,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Test
     public void shouldValidateSubject() throws Exception {
         setUpCertificateValidation();
-        Assertion assertion = anAssertion().withSubject(null).buildUnencrypted();
+        Assertion assertion = anEidasAssertion().withSubject(null).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
@@ -103,7 +107,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Test
     public void shouldValidateSignature() throws Exception {
         setUpCertificateValidation();
-        Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
+        Assertion assertion = anEidasAssertion().withConditions(aConditions()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
@@ -113,10 +117,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Test
     public void shouldGenerateErrorIfThereIsMoreThanOneAuthnStatement() throws Exception {
         setUpCertificateValidation();
-        Assertion assertion = anAssertion()
-            .addAuthnStatement(anAuthnStatement().build())
-            .addAuthnStatement(anAuthnStatement().build())
-            .buildUnencrypted();
+        Assertion assertion = anEidasAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
@@ -160,7 +161,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
         assertThat(validator.isStopOnFirstError()).isFalse();
         List<IssueInstantValidator<Object>> issueInstantValidators = Arrays.stream(validator.getValidators())
             .filter(v -> v instanceof IssueInstantValidator)
-            .map(v -> (IssueInstantValidator<Object>)v)
+            .map(v -> (IssueInstantValidator<Object>) v)
             .collect(Collectors.toList());
         assertThat(issueInstantValidators.size()).isEqualTo(1);
         assertThat(issueInstantValidators.get(0).getValidators().length).isEqualTo(2);
@@ -177,13 +178,38 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Test
     public void shouldValidateConditions() throws Exception {
         setUpCertificateValidation();
-        Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(null).buildUnencrypted();
+        Assertion assertion = anEidasAssertion().withConditions(null).buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(messages.hasErrorLike(DEFAULT_REQUIRED_MESSAGE)).isTrue();
+    }
+
+
+    @Test
+    public void shouldGenerateErrorIfWrongNumberOfAttributeStatements() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anEidasAssertion().addAttributeStatement(anAttributeStatement().build()).withConditions(aConditions()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
         assertThat(messages.size()).isEqualTo(1);
-        assertThat(messages.hasErrorLike(DEFAULT_REQUIRED_MESSAGE)).isTrue();
+        assertThat(messages.hasErrorLike(generateWrongNumberOfAttributeStatementsMessage(TYPE_OF_ASSERTION))).isTrue();
     }
+
+    @Test
+    public void shouldValidateAttributeStatement() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anAssertion()
+            .addAttributeStatement(anAttributeStatement()
+                .build())
+            .addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+    }
+
 
     private void setUpCertificateValidation() throws Exception {
         when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
@@ -195,7 +221,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(DateTime.now());
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
         audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
         audienceRestriction.getAudiences().add(audience);
