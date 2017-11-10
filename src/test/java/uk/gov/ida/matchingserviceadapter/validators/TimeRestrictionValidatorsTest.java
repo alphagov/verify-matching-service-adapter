@@ -25,6 +25,11 @@ public class TimeRestrictionValidatorsTest {
     private Message message;
 
     @Test
+    public void ctorForTestCoverageOnly() {
+        new TimeRestrictionValidators();
+    }
+
+    @Test
     public void shouldGenerateErrorWhenDateTimeIsInThePast() {
         when(dateTimeComparator.isBeforeNow(any(DateTime.class))).thenReturn(true);
         PredicatedValidator<DateTime> validator = TimeRestrictionValidators.notInPastValidator(dateTimeComparator, identity(), message);
