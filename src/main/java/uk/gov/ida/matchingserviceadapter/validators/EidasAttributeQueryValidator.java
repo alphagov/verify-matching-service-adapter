@@ -15,6 +15,7 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
 
     public static final MessageImpl DEFAULT_ISSUER_REQUIRED_MESSAGE = fieldMessage("issuer", "issuer.empty", "Eidas Attribute Query issuer was not provided.");
     public static final MessageImpl DEFAULT_ISSUER_EMPTY_MESSAGE = fieldMessage("issuer", "issuer.empty", "Eidas Attribute Query issuer value was empty.");
-    public static final MessageImpl DEFAULT_ENCRYPTED_ASSERTIONS_MISSING_MESSAGE = globalMessage("encrypted.assertions.cardinatlity", "There must be 1 EncryptedAssertion for eIDAS.");
+    public static final MessageImpl DEFAULT_ENCRYPTED_ASSERTIONS_MISSING_MESSAGE = globalMessage("encrypted.assertions.cardinality", "There must be 1 EncryptedAssertion for eIDAS.");
     public static final MessageImpl DEFAULT_INVALID_SIGNATURE_MESSAGE = globalMessage("invalid.signature", "Eidas Attribute Query's signature was invalid.");
     public static final String IDENTITY_ASSERTION = "Identity";
 
@@ -64,7 +65,9 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                         countryMetadataCertificateValidator,
                         certificateExtractor,
                         x509CertificateFactory,
-                        IDENTITY_ASSERTION)
+                        IDENTITY_ASSERTION,
+                        Duration.parse("PT20M"),
+                        Duration.parse("PT1M"))
                 )
             )
         );

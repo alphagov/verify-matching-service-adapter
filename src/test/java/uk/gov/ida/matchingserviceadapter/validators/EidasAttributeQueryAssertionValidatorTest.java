@@ -2,7 +2,12 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import org.beanplanet.messages.domain.Message;
 import org.beanplanet.messages.domain.Messages;
+import org.beanplanet.validation.AbstractValidator;
+import org.beanplanet.validation.Validator;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,9 +20,14 @@ import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
+import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.beanplanet.messages.domain.MessagesImpl.messages;
@@ -28,7 +38,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryAssertionValidatorTest {
 
     public static final String TYPE_OF_ASSERTION = "Identity";
@@ -46,6 +56,8 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryAssertionValidator validator;
+    private static final Duration TTL = Duration.parse("PT999M");
+    private static final Duration CLOCK_DELTA = Duration.parse("PT9M");
 
     @Before
     public void setUp() throws Exception {
@@ -54,7 +66,9 @@ public class EidasAttributeQueryAssertionValidatorTest {
             certificateValidator,
             certificateExtractor,
             x509CertificateFactory,
-            TYPE_OF_ASSERTION);
+            TYPE_OF_ASSERTION,
+            TTL,
+            CLOCK_DELTA);
     }
 
     @Test
@@ -79,5 +93,34 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         assertThat(messages.size()).isEqualTo(0);
         assertThat(messages.hasErrors()).isFalse();
+    }
+
+    @Test
+    public void shouldValidateIssueInstant() {
+        Assertion assertion = anAssertion()
+            .withIssueInstant(
+                DateTime.now(DateTimeZone.UTC)
+                .plus(TTL.toMillis())
+                .plus(CLOCK_DELTA.toMillis())
+                .plusMillis(10000))
+            .buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(validator.isStopOnFirstError()).isFalse();
+        List<IssueInstantValidator<Object>> issueInstantValidators = Arrays.stream(validator.getValidators())
+            .filter(v -> v instanceof IssueInstantValidator)
+            .map(v -> (IssueInstantValidator<Object>)v)
+            .collect(Collectors.toList());
+        assertThat(issueInstantValidators.size()).isEqualTo(1);
+        assertThat(issueInstantValidators.get(0).getValidators().length).isEqualTo(2);
+
+        List<Message> issueInstantMessages = Arrays.stream(issueInstantValidators.get(0).getValidators())
+            .filter(v -> v instanceof AbstractValidator)
+            .map(v -> ((AbstractValidator) v).getMessage())
+            .collect(Collectors.toList());
+        assertThat(issueInstantMessages.size()).isEqualTo(2);
+        assertThat(messages.hasErrorLike(issueInstantMessages.get(0))).isTrue();
+        assertThat(messages.hasErrorLike(issueInstantMessages.get(1))).isTrue();
     }
 }

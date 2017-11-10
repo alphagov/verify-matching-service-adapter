@@ -22,6 +22,7 @@ import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.security.AssertionDecrypter;
@@ -51,7 +52,7 @@ import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryValidatorTest {
     @Mock
     private MetadataResolver verifyMetadataResolver;
