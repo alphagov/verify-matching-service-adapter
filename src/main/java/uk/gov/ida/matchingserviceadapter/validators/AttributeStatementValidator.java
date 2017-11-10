@@ -11,6 +11,7 @@ import uk.gov.ida.saml.core.IdaConstants.Eidas_Attributes;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentFamilyName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
 import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
+import uk.gov.ida.saml.core.extensions.eidas.Gender;
 import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
 
 import java.util.function.Function;
@@ -33,13 +34,19 @@ public class AttributeStatementValidator<T> extends CompositeValidator<T> {
             attributeValidator(Eidas_Attributes.PersonIdentifier.NAME, PersonIdentifier.class, StringValidators.isNonEmpty(PersonIdentifier::getPersonIdentifier)),
             attributeValidator(Eidas_Attributes.DateOfBirth.NAME,
                 DateOfBirth.class,
-                TimeRestrictionValidators.notInFutureValidator(new DateTimeComparator(Duration.ZERO), dob -> dob.getDateOfBirth().toDateTimeAtStartOfDay(), DATE_OF_BIRTH_IN_FUTURE))
+                TimeRestrictionValidators.notInFutureValidator(new DateTimeComparator(Duration.ZERO), dob -> dob.getDateOfBirth().toDateTimeAtStartOfDay(), DATE_OF_BIRTH_IN_FUTURE)),
+            optionalAttributeValidator(Eidas_Attributes.Gender.NAME, Gender.class, StringValidators.isOneOf(Gender::getValue, "Male", "Female", "Not Specified"))
         );
     }
 
     private static <R extends XMLObject> Validator<AttributeStatement> attributeValidator(String attributeName, Class<R> attributeClass, Validator<R> valueValidator) {
-        return new MatchingElementValidator<>(
-            (AttributeStatement as) -> as.getAttributes(),
+        return MatchingElementValidator.failOnMatchError((AttributeStatement as) -> as.getAttributes(),
+            a -> a.getName().equals(attributeName),
+            new AttributeValidator<>(identity(), attributeClass, valueValidator));
+    }
+
+    private static <R extends XMLObject> Validator<AttributeStatement> optionalAttributeValidator(String attributeName, Class<R> attributeClass, Validator<R> valueValidator) {
+        return MatchingElementValidator.succeedOnMatchError((AttributeStatement as) -> as.getAttributes(),
             a -> a.getName().equals(attributeName),
             new AttributeValidator<>(identity(), attributeClass, valueValidator));
     }

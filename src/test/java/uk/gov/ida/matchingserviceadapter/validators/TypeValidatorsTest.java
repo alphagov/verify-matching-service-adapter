@@ -18,7 +18,7 @@ public class TypeValidatorsTest {
     public static class D extends B {}
 
     @Test
-    public void shouldGenerateNoErrorWhenTypesMatchExactly() {
+    public void shouldGenerateNoErrorsWhenTypesMatchExactly() {
         Validator<A> validator = TypeValidators.isInstanceOf(A.class);
 
         Messages messages = validator.validate(new A(), messages());
@@ -27,7 +27,7 @@ public class TypeValidatorsTest {
     }
 
     @Test
-    public void shouldGenerateNoErrorWhenTypesMatchUpToInheritance() throws Exception {
+    public void shouldGenerateNoErrorsWhenTypesMatchUpToInheritance() throws Exception {
         Validator<A> validator = TypeValidators.isInstanceOf(A.class);
 
         Messages messages = validator.validate(new B(), messages());
@@ -61,7 +61,7 @@ public class TypeValidatorsTest {
     }
 
     @Test
-    public void shouldGenerateErrorWhenTypesMatchAndProvidedValidationSucceeds() {
+    public void shouldGenerateNoErrorsWhenTypesMatchAndProvidedValidationSucceeds() {
         Validator<B> bValidator = new AbstractValueProvidedValidator<B>() {
             @Override
             protected Messages doValidate(B b, Messages messages) {
