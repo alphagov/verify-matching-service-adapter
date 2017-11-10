@@ -22,11 +22,12 @@ public class MatchingElementValidatorTest {
 
     private Validator<Collection<String>> validator;
 
-    private Validator<String> lengthMoreThan3Validator = new PredicatedValidator<String>(null, identity(), message, (String s) -> s.length() > 3) {};
+    private Validator<String> lengthMoreThan3Validator = new PredicatedValidator<String>(null, identity(), message, (String s) -> s.length() > 3) {
+    };
 
     @Before
     public void setup() {
-        validator = new MatchingElementValidator<>(identity(), s -> s.contains("foo"), lengthMoreThan3Validator);
+        validator = MatchingElementValidator.failOnMatchError(identity(), s -> s.contains("foo"), lengthMoreThan3Validator);
     }
 
     @Test
@@ -45,6 +46,33 @@ public class MatchingElementValidatorTest {
 
     @Test
     public void shouldGenerateErrorIfElementMatchesFilterButFailsValidation() {
+        Messages messages = validator.validate(ImmutableList.of("foo"), messages());
+
+        assertThat(messages.hasErrorLike(message)).isTrue();
+    }
+
+    @Test
+    public void shouldGenerateNoErrorsIfErrorOnMatchFailureAndElementMatchesFilterAndIsValid() {
+        validator = MatchingElementValidator.succeedOnMatchError(identity(), s -> s.contains("foo"), lengthMoreThan3Validator);
+
+        Messages messages = validator.validate(ImmutableList.of("bar", "foofoo"), messages());
+
+        assertThat(messages.hasErrors()).isFalse();
+    }
+
+    @Test
+    public void shouldGenerateNoErrorsIfNotErrorOnMatchFailure() {
+        validator = MatchingElementValidator.succeedOnMatchError(identity(), s -> s.contains("foo"), lengthMoreThan3Validator);
+
+        Messages messages = validator.validate(ImmutableList.of("bar"), messages());
+
+        assertThat(messages.hasErrors()).isFalse();
+    }
+
+    @Test
+    public void shouldGenerateErrorIfErrorOnMatchFailureAndElementMatchesFilterButFailsValidation() {
+        validator = MatchingElementValidator.succeedOnMatchError(identity(), s -> s.contains("foo"), lengthMoreThan3Validator);
+
         Messages messages = validator.validate(ImmutableList.of("foo"), messages());
 
         assertThat(messages.hasErrorLike(message)).isTrue();

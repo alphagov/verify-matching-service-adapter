@@ -18,15 +18,25 @@ import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
  */
 public class MatchingElementValidator<T, R> extends AbstractValueProvidedValidator<T> {
 
-    public static final MessageImpl NO_VALUE_MATCHING_FILTER = globalMessage("subject", "No value matching filter");
+    public static final MessageImpl NO_VALUE_MATCHING_FILTER = globalMessage("matching.element", "No value matching filter");
 
     private final Predicate<R> filter;
     private final Validator<R> validator;
+    private boolean errorOnMatchFailure = true;
 
-    public MatchingElementValidator(Function<T, Collection<R>> valueProvider, Predicate<R> matchingFilter, Validator<R> validator) {
+    private MatchingElementValidator(Function<T, Collection<R>> valueProvider, Predicate<R> matchingFilter, Validator<R> validator, boolean errorOnMatchFailure) {
         super(valueProvider);
         this.filter = matchingFilter;
         this.validator = validator;
+        this.errorOnMatchFailure = errorOnMatchFailure;
+    }
+
+    public static <T, R> MatchingElementValidator<T, R> failOnMatchError(Function<T, Collection<R>> valueProvider, Predicate<R> matchingFilter, Validator<R> validator) {
+        return new MatchingElementValidator<>(valueProvider, matchingFilter, validator, true);
+    }
+
+    public static <T, R> MatchingElementValidator<T, R> succeedOnMatchError(Function<T, Collection<R>> valueProvider, Predicate<R> matchingFilter, Validator<R> validator) {
+        return new MatchingElementValidator<>(valueProvider, matchingFilter, validator, false);
     }
 
     @Override
@@ -34,7 +44,11 @@ public class MatchingElementValidator<T, R> extends AbstractValueProvidedValidat
         Collection<R> toFilter = getValidationValue(t);
         Optional<R> maybeFirst = toFilter.stream().filter(filter).findFirst();
         if (!maybeFirst.isPresent()) {
-            return messages.addError(NO_VALUE_MATCHING_FILTER);
+            if (errorOnMatchFailure) {
+                return messages.addError(NO_VALUE_MATCHING_FILTER);
+            } else {
+                return messages;
+            }
         }
         return validator.validate(maybeFirst.get(), messages);
     }
