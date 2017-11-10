@@ -38,7 +38,8 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                                         CertificateExtractor certificateExtractor,
                                         X509CertificateFactory x509CertificateFactory,
                                         DateTimeComparator dateTimeComparator,
-                                        AssertionDecrypter assertionDecrypter) {
+                                        AssertionDecrypter assertionDecrypter,
+                                        final String hubConnectorEntityId) {
         super(
             false,
             new CompositeValidator<>(
@@ -68,6 +69,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                         x509CertificateFactory,
                         dateTimeComparator,
                         IDENTITY_ASSERTION,
+                        hubConnectorEntityId,
                         Duration.parse("PT20M"),
                         Duration.parse("PT1M"))
                 )

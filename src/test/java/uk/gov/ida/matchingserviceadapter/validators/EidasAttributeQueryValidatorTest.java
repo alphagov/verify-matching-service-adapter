@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,11 +11,17 @@ import org.mockito.Mock;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
@@ -42,6 +49,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
@@ -54,6 +62,7 @@ import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryValidatorTest {
+    public static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
     @Mock
     private MetadataResolver verifyMetadataResolver;
 
@@ -88,7 +97,8 @@ public class EidasAttributeQueryValidatorTest {
             certificateExtractor,
             x509CertificateFactory,
             new DateTimeComparator(Duration.ZERO),
-            assertionDecrypter);
+            assertionDecrypter,
+            HUB_CONNECTOR_ENTITY_ID);
 
         when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
         when(countryMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn((entityDescriptor));
@@ -100,8 +110,7 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldValidateAttributeQuerySuccessfully() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+        final EncryptedAssertion encryptedAssertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).build();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -117,7 +126,7 @@ public class EidasAttributeQueryValidatorTest {
             .withId(requestId)
             .withSubject(aSubjectWithEncryptedAssertion(encryptedAssertion, requestId, HUB_ENTITY_ID))
             .build();
-        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(assertion));
+        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(anEidasAssertion().withConditions(aConditions()).buildUnencrypted()));
 
         Messages messages = validator.validate(attributeQuery, messages());
 
@@ -148,7 +157,6 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(DEFAULT_ISSUER_EMPTY_MESSAGE)).isTrue();
     }
 
@@ -175,7 +183,6 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(DEFAULT_INVALID_SIGNATURE_MESSAGE)).isTrue();
     }
 
@@ -203,7 +210,6 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateEmptyIssuerMessage(IDENTITY_ASSERTION))).isTrue();
     }
 
@@ -275,7 +281,6 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
-        assertThat(messages.size()).isEqualTo(2);
         assertThat(messages.hasErrorLike(DEFAULT_ISSUER_EMPTY_MESSAGE)).isTrue();
         assertThat(messages.hasErrorLike(generateEmptyIssuerMessage(IDENTITY_ASSERTION))).isTrue();
     }
@@ -288,5 +293,17 @@ public class EidasAttributeQueryValidatorTest {
         final SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(subjectConfirmationData).build();
 
         return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
+    }
+
+    private Conditions aConditions() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(DateTime.now());
+        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
+        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        Audience audience = new AudienceBuilder().buildObject();
+        audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+        return conditions;
     }
 }

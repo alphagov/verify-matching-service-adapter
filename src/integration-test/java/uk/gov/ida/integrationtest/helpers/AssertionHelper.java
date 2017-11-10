@@ -3,11 +3,17 @@ package uk.gov.ida.integrationtest.helpers;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
@@ -23,6 +29,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVAT
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
@@ -135,6 +142,7 @@ public class AssertionHelper {
                                 .withIssuerId(issuerId)
                                 .build())
                 .withSignature(aValidSignature())
+                .withConditions(aConditions())
                 .buildWithEncrypterCredential(
                         new TestCredentialFactory(
                                 TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
@@ -181,5 +189,17 @@ public class AssertionHelper {
                                                 .build()
                                 ).build()
                 ).build();
+    }
+
+    private static Conditions aConditions() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(DateTime.now());
+        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
+        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        Audience audience = new AudienceBuilder().buildObject();
+        audience.setAudienceURI(HUB_SECONDARY_ENTITY_ID);
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+        return conditions;
     }
 }

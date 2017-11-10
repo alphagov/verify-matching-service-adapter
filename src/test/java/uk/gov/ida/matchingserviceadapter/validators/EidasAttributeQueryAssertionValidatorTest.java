@@ -9,6 +9,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
@@ -34,14 +40,13 @@ import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAs
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.SUBJECT_NOT_PRESENT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryAssertionValidatorTest {
-
-    public static final String TYPE_OF_ASSERTION = "Identity";
     @Mock
     private MetadataResolver metadataResolver;
 
@@ -54,6 +59,8 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Mock
     private EntityDescriptor entityDescriptor;
 
+    private static final String TYPE_OF_ASSERTION = "Identity";
+    private static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryAssertionValidator validator;
     private static final Duration TTL = Duration.parse("PT999M");
@@ -68,6 +75,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
             x509CertificateFactory,
             new DateTimeComparator(org.joda.time.Duration.ZERO),
             TYPE_OF_ASSERTION,
+            HUB_CONNECTOR_ENTITY_ID,
             TTL,
             CLOCK_DELTA);
     }
@@ -95,15 +103,11 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     @Test
     public void shouldValidateSignature() throws Exception {
-        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
-
-        Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+        setUpCertificateValidation();
+        Assertion assertion = anEidasAssertion().withConditions(aConditions()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(0);
         assertThat(messages.hasErrors()).isFalse();
     }
 
@@ -149,7 +153,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateWrongNumberOfAuthnStatementsMessage(TYPE_OF_ASSERTION))).isTrue();
     }
 
@@ -163,7 +166,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateWrongNumberOfAuthnStatementsMessage(TYPE_OF_ASSERTION))).isTrue();
     }
 
@@ -179,7 +181,34 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(AUTHN_INSTANT_IN_FUTURE)).isTrue();
+    }
+
+    @Test
+    public void shouldValidateConditions() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anAssertion().withConditions(null).buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(messages.hasErrorLike(ConditionsValidator.DEFAULT_REQUIRED_MESSAGE)).isTrue();
+    }
+
+    private void setUpCertificateValidation() throws Exception {
+        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
+        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
+            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
+    }
+
+    private Conditions aConditions() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(DateTime.now());
+        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
+        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        Audience audience = new AudienceBuilder().buildObject();
+        audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+        return conditions;
     }
 }

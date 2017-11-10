@@ -6,10 +6,18 @@ import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import io.dropwizard.util.Duration;
 import org.apache.http.HttpStatus;
+import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
+import org.opensaml.xmlsec.signature.Signature;
 import org.w3c.dom.Document;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
@@ -40,10 +48,20 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PRIVA
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
+import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
+import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
+import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
 public class CountryEnabledIntegrationTest {
 
@@ -70,25 +88,8 @@ public class CountryEnabledIntegrationTest {
     }
 
     @Test
-    public void shouldProcessEidasAttributeQueryRequest() {
-        String issuerId = HUB_ENTITY_ID;
-        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-                .withId(REQUEST_ID)
-                .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(
-                    aSubjectWithEncryptedAssertions(
-                        singletonList(anEidasEncryptedAssertion(STUB_IDP_ONE)), REQUEST_ID, HUB_ENTITY_ID)
-                )
-                .withSignature(
-                    aSignature()
-                        .withSigningCredential(
-                            new TestCredentialFactory(
-                                HUB_TEST_PUBLIC_SIGNING_CERT,
-                                HUB_TEST_PRIVATE_SIGNING_KEY
-                            ).getSigningCredential()
-                        ).build()
-                )
-                .build();
+    public void shouldProcessEidasAttributeQueryRequestSuccessfully() {
+        AttributeQuery attributeQuery = aValidAttributeQuery();
 
         Response response = postResponse(MSA_MATCHING_URL, attributeQuery);
 
@@ -159,5 +160,75 @@ public class CountryEnabledIntegrationTest {
                 .target(uri.toASCIIString())
                 .request()
                 .post(Entity.entity(xmlString, MediaType.TEXT_XML));
+    }
+
+    private AttributeQuery aValidAttributeQuery() {
+        return AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(
+                aSubjectWithEncryptedAssertions(
+                    singletonList(
+                        anAssertion()
+                            .withSubject(
+                                aSubject().withSubjectConfirmation(
+                                    aSubjectConfirmation().withSubjectConfirmationData(
+                                        aSubjectConfirmationData()
+                                            .withInResponseTo(REQUEST_ID)
+                                            .build())
+                                        .build())
+                                    .build()
+                            )
+                            .withIssuer(
+                                anIssuer()
+                                    .withIssuerId(STUB_IDP_ONE)
+                                    .build())
+                            .addAttributeStatement(anEidasAttributeStatement().build())
+                            .addAuthnStatement(anEidasAuthnStatement().build())
+                            .withSignature(anIdpSignature())
+                            .withConditions(aConditions())
+                            .buildWithEncrypterCredential(
+                                new TestCredentialFactory(
+                                    TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+                                    TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
+                                ).getEncryptingCredential()
+                            )
+                    ),
+                    REQUEST_ID, HUB_ENTITY_ID)
+            )
+            .withSignature(aHubSignature())
+            .build();
+    }
+
+    private static Signature aHubSignature() {
+        return aSignature()
+            .withSigningCredential(
+                new TestCredentialFactory(
+                    HUB_TEST_PUBLIC_SIGNING_CERT,
+                    HUB_TEST_PRIVATE_SIGNING_KEY
+                ).getSigningCredential()
+            ).build();
+    }
+
+    private static Signature anIdpSignature() {
+        return aSignature()
+            .withSigningCredential(
+                new TestCredentialFactory(
+                    STUB_IDP_PUBLIC_PRIMARY_CERT,
+                    STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
+                ).getSigningCredential()
+            ).build();
+    }
+
+    private static Conditions aConditions() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(DateTime.now());
+        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
+        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
+        Audience audience = new AudienceBuilder().buildObject();
+        audience.setAudienceURI(HUB_ENTITY_ID);
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+        return conditions;
     }
 }

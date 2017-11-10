@@ -27,6 +27,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.getPrimaryPublicEncryptionCert;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 
 public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingServiceAdapterConfiguration> {
 
@@ -111,7 +112,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         if (isCountryEnabled) {
             List<ConfigOverride> countryOverrides = Stream.of(
                     ConfigOverride.config("returnStackTraceInResponse", "true"),  // Until eiDAS happy-path through MSA is complete (EID-270)
-                    ConfigOverride.config("country.hubConnectorEntityId", HUB_ENTITY_ID),
+                    ConfigOverride.config("country.hubConnectorEntityId", HUB_SECONDARY_ENTITY_ID),
 
                     ConfigOverride.config("country.metadata.uri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
                     ConfigOverride.config("country.metadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
