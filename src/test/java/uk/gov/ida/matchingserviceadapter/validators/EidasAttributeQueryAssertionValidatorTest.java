@@ -12,6 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
@@ -30,6 +36,7 @@ import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.validators.AuthnStatementValidator.AUTHN_INSTANT_IN_FUTURE;
+import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_REQUIRED_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateEmptyIssuerMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateWrongNumberOfAuthnStatementsMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.SUBJECT_NOT_PRESENT;
@@ -40,8 +47,6 @@ import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryAssertionValidatorTest {
-
-    public static final String TYPE_OF_ASSERTION = "Identity";
     @Mock
     private MetadataResolver metadataResolver;
 
@@ -54,6 +59,8 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Mock
     private EntityDescriptor entityDescriptor;
 
+    private static final String TYPE_OF_ASSERTION = "Identity";
+    private static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryAssertionValidator validator;
     private static final Duration TTL = Duration.parse("PT999M");
@@ -69,7 +76,8 @@ public class EidasAttributeQueryAssertionValidatorTest {
             new DateTimeComparator(org.joda.time.Duration.ZERO),
             TYPE_OF_ASSERTION,
             TTL,
-            CLOCK_DELTA);
+            CLOCK_DELTA,
+            HUB_CONNECTOR_ENTITY_ID);
     }
 
     @Test
@@ -95,7 +103,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Test
     public void shouldValidateSignature() throws Exception {
         setUpCertificateValidation();
-        Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+        Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
 
@@ -112,7 +120,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateWrongNumberOfAuthnStatementsMessage(TYPE_OF_ASSERTION))).isTrue();
     }
 
@@ -123,7 +130,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateWrongNumberOfAuthnStatementsMessage(TYPE_OF_ASSERTION))).isTrue();
     }
 
@@ -168,9 +174,32 @@ public class EidasAttributeQueryAssertionValidatorTest {
         assertThat(messages.hasErrorLike(issueInstantMessages.get(1))).isTrue();
     }
 
+    @Test
+    public void shouldValidateConditions() throws Exception {
+        setUpCertificateValidation();
+        Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(null).buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(messages.size()).isEqualTo(1);
+        assertThat(messages.hasErrorLike(DEFAULT_REQUIRED_MESSAGE)).isTrue();
+    }
+
     private void setUpCertificateValidation() throws Exception {
         when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
         when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
             .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
+    }
+
+    private Conditions aConditions() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(DateTime.now());
+        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
+        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        Audience audience = new AudienceBuilder().buildObject();
+        audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+        return conditions;
     }
 }

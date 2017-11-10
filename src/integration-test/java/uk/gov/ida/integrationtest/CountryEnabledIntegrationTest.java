@@ -70,7 +70,7 @@ public class CountryEnabledIntegrationTest {
     }
 
     @Test
-    public void shouldProcessEidasAttributeQueryRequest() {
+    public void shouldProcessEidasAttributeQueryRequestSuccessfully() {
         String issuerId = HUB_ENTITY_ID;
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
                 .withId(REQUEST_ID)

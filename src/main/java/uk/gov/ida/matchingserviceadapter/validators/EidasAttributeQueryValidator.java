@@ -31,14 +31,16 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
     public static final MessageImpl DEFAULT_INVALID_SIGNATURE_MESSAGE = globalMessage("invalid.signature", "Eidas Attribute Query's signature was invalid.");
     public static final String IDENTITY_ASSERTION = "Identity";
 
-    public EidasAttributeQueryValidator(MetadataResolver verifyMetadataResolver,
-                                        MetadataResolver countryMetadataResolver,
-                                        CertificateValidator verifyHubCertificateValidator,
-                                        CertificateValidator countryMetadataCertificateValidator,
-                                        CertificateExtractor certificateExtractor,
-                                        X509CertificateFactory x509CertificateFactory,
-                                        DateTimeComparator dateTimeComparator,
-                                        AssertionDecrypter assertionDecrypter) {
+    public EidasAttributeQueryValidator(
+        final MetadataResolver verifyMetadataResolver,
+        final MetadataResolver countryMetadataResolver,
+        final CertificateValidator verifyHubCertificateValidator,
+        final CertificateValidator countryMetadataCertificateValidator,
+        final CertificateExtractor certificateExtractor,
+        final X509CertificateFactory x509CertificateFactory,
+        final DateTimeComparator dateTimeComparator,
+        final AssertionDecrypter assertionDecrypter,
+        final String hubConnectorEntityId) {
         super(
             false,
             new CompositeValidator<>(
@@ -69,7 +71,8 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                         dateTimeComparator,
                         IDENTITY_ASSERTION,
                         Duration.parse("PT20M"),
-                        Duration.parse("PT1M"))
+                        Duration.parse("PT1M"),
+                        hubConnectorEntityId)
                 )
             )
         );
