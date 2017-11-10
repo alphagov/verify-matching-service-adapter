@@ -1,9 +1,11 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
+import org.beanplanet.messages.domain.Message;
 import org.beanplanet.messages.domain.Messages;
+import org.beanplanet.validation.AbstractValidator;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +20,10 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.beanplanet.messages.domain.MessagesImpl.messages;
@@ -51,6 +56,8 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryAssertionValidator validator;
+    private static final Duration TTL = Duration.parse("PT999M");
+    private static final Duration CLOCK_DELTA = Duration.parse("PT9M");
 
     @Before
     public void setUp() throws Exception {
@@ -59,8 +66,10 @@ public class EidasAttributeQueryAssertionValidatorTest {
             certificateValidator,
             certificateExtractor,
             x509CertificateFactory,
-            new DateTimeComparator(Duration.ZERO),
-            TYPE_OF_ASSERTION);
+            new DateTimeComparator(org.joda.time.Duration.ZERO),
+            TYPE_OF_ASSERTION,
+            TTL,
+            CLOCK_DELTA);
     }
 
     @Test
@@ -70,7 +79,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateEmptyIssuerMessage(TYPE_OF_ASSERTION))).isTrue();
     }
 
@@ -81,7 +89,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(SUBJECT_NOT_PRESENT)).isTrue();
     }
 
@@ -92,7 +99,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(0);
         assertThat(messages.hasErrors()).isFalse();
     }
 
@@ -130,8 +136,36 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
         Messages messages = validator.validate(assertion, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(AUTHN_INSTANT_IN_FUTURE)).isTrue();
+    }
+
+    @Test
+    public void shouldValidateIssueInstant() {
+        Assertion assertion = anAssertion()
+            .withIssueInstant(
+                DateTime.now(DateTimeZone.UTC)
+                    .plus(TTL.toMillis())
+                    .plus(CLOCK_DELTA.toMillis())
+                    .plusMillis(10000))
+            .buildUnencrypted();
+
+        Messages messages = validator.validate(assertion, messages());
+
+        assertThat(validator.isStopOnFirstError()).isFalse();
+        List<IssueInstantValidator<Object>> issueInstantValidators = Arrays.stream(validator.getValidators())
+            .filter(v -> v instanceof IssueInstantValidator)
+            .map(v -> (IssueInstantValidator<Object>)v)
+            .collect(Collectors.toList());
+        assertThat(issueInstantValidators.size()).isEqualTo(1);
+        assertThat(issueInstantValidators.get(0).getValidators().length).isEqualTo(2);
+
+        List<Message> issueInstantMessages = Arrays.stream(issueInstantValidators.get(0).getValidators())
+            .filter(v -> v instanceof AbstractValidator)
+            .map(v -> ((AbstractValidator) v).getMessage())
+            .collect(Collectors.toList());
+        assertThat(issueInstantMessages.size()).isEqualTo(2);
+        assertThat(messages.hasErrorLike(issueInstantMessages.get(0))).isTrue();
+        assertThat(messages.hasErrorLike(issueInstantMessages.get(1))).isTrue();
     }
 
     private void setUpCertificateValidation() throws Exception {

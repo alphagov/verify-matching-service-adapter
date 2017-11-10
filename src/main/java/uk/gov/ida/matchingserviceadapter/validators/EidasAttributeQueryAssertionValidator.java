@@ -13,10 +13,12 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 import static org.beanplanet.messages.domain.MessageImpl.fieldMessage;
 import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.matchingserviceadapter.validators.IssueInstantValidator.IssueInstantJodaDateTimeValidator;
 
 public class EidasAttributeQueryAssertionValidator extends CompositeValidator<Assertion> {
 
@@ -25,27 +27,41 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                                                  final CertificateExtractor certificateExtractor,
                                                  final X509CertificateFactory x509CertificateFactory,
                                                  final DateTimeComparator dateTimeComparator,
-                                                 final String typeOfAssertion) {
+                                                 final String typeOfAssertion,
+                                                 final Duration ttl,
+                                                 final Duration clockDelta) {
         super(
-            true,
-            new IssuerValidator<>(
-                generateMissingIssuerMessage(typeOfAssertion),
-                generateEmptyIssuerMessage(typeOfAssertion),
-                Assertion::getIssuer),
-            new SamlDigitalSignatureValidator<>(
-                generateInvalidSignatureMessage(typeOfAssertion),
-                assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)
-                    .getIdpSigningCertificates(assertion.getIssuer().getValue()).stream()
-                    .map(Certificate::getCertificate)
-                    .map(x509CertificateFactory::createCertificate)
-                    .map(BasicX509Credential::new)
-                    .collect(Collectors.toList()),
-                Assertion::getIssuer,
-                IDPSSODescriptor.DEFAULT_ELEMENT_NAME
+            new CompositeValidator<>(
+                true,
+                new IssuerValidator<>(
+                    generateMissingIssuerMessage(typeOfAssertion),
+                    generateEmptyIssuerMessage(typeOfAssertion),
+                    Assertion::getIssuer),
+                new SamlDigitalSignatureValidator<>(
+                    generateInvalidSignatureMessage(typeOfAssertion),
+                    assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)
+                        .getIdpSigningCertificates(assertion.getIssuer().getValue()).stream()
+                        .map(Certificate::getCertificate)
+                        .map(x509CertificateFactory::createCertificate)
+                        .map(BasicX509Credential::new)
+                        .collect(Collectors.toList()),
+                    Assertion::getIssuer,
+                    IDPSSODescriptor.DEFAULT_ELEMENT_NAME
+                )
+            ),
+            IssueInstantJodaDateTimeValidator(
+                globalMessage("expired.message", "Issue Instant time-to-live has been exceeded"),
+                globalMessage("issue.instance.in.future", "Issue Instant is in the future"),
+                Assertion::getIssueInstant,
+                ttl,
+                clockDelta
             ),
             new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
-            new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
-            new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
+            new CompositeValidator<>(
+                true,
+                new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
+                new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
+            )
         );
     }
 
