@@ -12,10 +12,12 @@ import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesReposi
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
 
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
+import static uk.gov.ida.matchingserviceadapter.validators.IssueInstantValidator.IssueInstantJodaDateTimeValidator;
 
 public class EidasAttributeQueryAssertionValidator extends CompositeValidator<Assertion> {
 
@@ -23,23 +25,34 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                                                  final CertificateValidator certificateValidator,
                                                  final CertificateExtractor certificateExtractor,
                                                  final X509CertificateFactory x509CertificateFactory,
-                                                 final String typeOfAssertion) {
+                                                 final String typeOfAssertion,
+                                                 final Duration ttl,
+                                                 final Duration clockDelta) {
         super(
-            true,
-            new IssuerValidator<>(
-                generateMissingIssuerMessage(typeOfAssertion),
-                generateEmptyIssuerMessage(typeOfAssertion),
-                Assertion::getIssuer),
-            new SamlDigitalSignatureValidator<>(
-                generateInvalidSignatureMessage(typeOfAssertion),
-                assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)
-                    .getIdpSigningCertificates(assertion.getIssuer().getValue()).stream()
-                    .map(Certificate::getCertificate)
-                    .map(x509CertificateFactory::createCertificate)
-                    .map(BasicX509Credential::new)
-                    .collect(Collectors.toList()),
-                Assertion::getIssuer,
-                IDPSSODescriptor.DEFAULT_ELEMENT_NAME
+            new CompositeValidator<>(
+                true,
+                new IssuerValidator<>(
+                    generateMissingIssuerMessage(typeOfAssertion),
+                    generateEmptyIssuerMessage(typeOfAssertion),
+                    Assertion::getIssuer),
+                new SamlDigitalSignatureValidator<>(
+                    generateInvalidSignatureMessage(typeOfAssertion),
+                    assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)
+                        .getIdpSigningCertificates(assertion.getIssuer().getValue()).stream()
+                        .map(Certificate::getCertificate)
+                        .map(x509CertificateFactory::createCertificate)
+                        .map(BasicX509Credential::new)
+                        .collect(Collectors.toList()),
+                    Assertion::getIssuer,
+                    IDPSSODescriptor.DEFAULT_ELEMENT_NAME
+                )
+            ),
+            IssueInstantJodaDateTimeValidator(
+                globalMessage("expired.message", "Issue Instant time-to-live has been exceeded"),
+                globalMessage("issue.instance.in.future", "Issue Instant is in the future"),
+                Assertion::getIssueInstant,
+                ttl,
+                clockDelta
             )
         );
     }
