@@ -37,6 +37,7 @@ public class AllExistingScenariosExecutionFeatureTest {
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+            .withLocalMatchingServiceAccountCreationUrl(localMatchingService.getAccountCreationUrl())
             .build();
 
         Application application = new Application() {{

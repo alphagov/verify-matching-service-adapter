@@ -47,7 +47,7 @@ public class LevelOfAssuranceOneScenario {
     }
 
     @Test
-    public void runForExtensiveCaseRRR() throws IOException {
+    public void runForExtensiveCase() throws IOException {
         String jsonString = fileUtils.readFromResources("LoA1-extensive-case.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
             .replace("%within405days-100days%", Instant.now().minus(405-100, DAYS).toString())
