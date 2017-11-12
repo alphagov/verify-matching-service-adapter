@@ -1,6 +1,5 @@
 package uk.gov.ida.verifymatchingservicetesttool.utils;
 
-import org.junit.platform.commons.util.ExceptionUtils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
@@ -14,10 +13,12 @@ public class TestStatusPrintingListener implements TestExecutionListener {
     private static final String RUNNING_TEST = "Running test : ";
     private static final String STATUS = "Status : ";
 
+    private boolean hasFailedTests = false;
+
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
         long tests = testPlan.countTestIdentifiers(TestIdentifier::isTest);
-        System.out.println("Test execution finished. Number of all tests : " + tests);
+        System.out.println("Test execution finished. Number of all tests: " + tests);
     }
 
     @Override
@@ -38,10 +39,15 @@ public class TestStatusPrintingListener implements TestExecutionListener {
         }
     }
 
+    public boolean hasFailures() {
+        return hasFailedTests;
+    }
+
     private void printFailureMessage(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult, Color color) {
         if (testExecutionResult.getStatus().equals(Status.FAILED)) {
+            hasFailedTests = true;
             testExecutionResult.getThrowable()
-                    .ifPresent(throwable -> printMessage(color, throwable.toString()));
+                .ifPresent(throwable -> printMessage(color, throwable.toString()));
         }
     }
 

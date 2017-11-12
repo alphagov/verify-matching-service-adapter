@@ -1,5 +1,6 @@
 package uk.gov.ida.verifymatchingservicetesttool.configurations;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -20,7 +21,14 @@ public class LocalMatchingServiceConfiguration {
     @JsonProperty
     private URI accountCreationUrl;
 
-    protected LocalMatchingServiceConfiguration() {}
+    @JsonCreator
+    public LocalMatchingServiceConfiguration(
+        @JsonProperty("matchUrl") URI matchUrl,
+        @JsonProperty("accountCreationUrl") URI accountCreationUrl
+    ) {
+        this.matchUrl = matchUrl;
+        this.accountCreationUrl = accountCreationUrl;
+    }
 
     public URI getMatchUrl() {
         return matchUrl;
