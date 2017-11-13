@@ -1,11 +1,14 @@
 package uk.gov.ida.verifymatchingservicetesttool.configurations;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplicationConfiguration {
 
     @NotNull
@@ -13,7 +16,11 @@ public class ApplicationConfiguration {
     @JsonProperty
     private LocalMatchingServiceConfiguration localMatchingService;
 
-    protected ApplicationConfiguration() {
+    @JsonCreator
+    public ApplicationConfiguration(
+        @JsonProperty("localMatchingService") LocalMatchingServiceConfiguration localMatchingService
+    ) {
+        this.localMatchingService = localMatchingService;
     }
 
     public URI getLocalMatchingServiceMatchUrl() {
