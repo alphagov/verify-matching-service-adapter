@@ -8,10 +8,10 @@ import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
 import uk.gov.ida.verifymatchingservicetesttool.utils.TestStatusPrintingListener;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,10 +22,19 @@ public class Application {
     public static void main(String[] args) {
         TestExecutionListener listener = new TestStatusPrintingListener();
         PackageSelector packageSelector = selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios");
-        new Application().execute(listener, Arrays.asList(packageSelector));
+        new Application().execute(
+            listener,
+            Arrays.asList(packageSelector),
+            ConfigurationReader.getConfiguration()
+        );
     }
 
-    public void execute(TestExecutionListener listener, List<DiscoverySelector> selectors) {
+    public void execute(
+        TestExecutionListener listener,
+        List<DiscoverySelector> selectors,
+        ApplicationConfiguration applicationConfiguration
+    ) {
+        ApplicationConfigurationResolver.setConfiguration(applicationConfiguration);
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectors)
             .build();
@@ -33,9 +42,5 @@ public class Application {
         Launcher launcher = LauncherFactory.create();
         launcher.registerTestExecutionListeners(listener);
         launcher.execute(request);
-    }
-
-    public void setApplicationConfiguration(ApplicationConfiguration applicationConfiguration) {
-        ApplicationConfigurationResolver.setConfiguration(applicationConfiguration);
     }
 }

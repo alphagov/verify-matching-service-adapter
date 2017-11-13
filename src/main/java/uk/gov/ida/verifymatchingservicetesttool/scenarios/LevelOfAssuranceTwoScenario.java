@@ -23,18 +23,14 @@ import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
-public class LevelOfAssuranceTwoScenario {
-
-    private FileUtils fileUtils = new FileUtils();
-    private Client client = ClientBuilder.newClient();
-    private ApplicationConfiguration configuration;
+public class LevelOfAssuranceTwoScenario extends ScenarioBase {
 
     public LevelOfAssuranceTwoScenario(ApplicationConfiguration configuration) {
-        this.configuration = configuration;
+        super(configuration);
     }
 
     @Test
-    public void runForWhenAllElementsAreVerifiedAndNoMultipleValues() throws IOException {
+    public void runForWhenAllElementsAreVerifiedAndNoMultipleValues() {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("LoA2-simple-case.json")));
@@ -46,7 +42,7 @@ public class LevelOfAssuranceTwoScenario {
     }
 
     @Test
-    public void runForExtensiveCase() throws IOException {
+    public void runForExtensiveCase() {
         String jsonString = fileUtils.readFromResources("LoA2-extensive-case.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
             .replace("%within405days-100days%", Instant.now().minus(405-100, DAYS).toString())

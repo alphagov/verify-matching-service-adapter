@@ -28,15 +28,12 @@ import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.MATCH_FO
 import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.NO_MATCH_FOLDER_NAME;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
-public class DynamicScenarios {
+public class DynamicScenarios extends ScenarioBase {
 
-    private FileUtils fileUtils = new FileUtils();
     private DynamicScenariosFilesLocator filesLocator = new DynamicScenariosFilesLocator();
-    private Client client = ClientBuilder.newClient();
-    private ApplicationConfiguration configuration;
 
     public DynamicScenarios(ApplicationConfiguration configuration) {
-        this.configuration = configuration;
+        super(configuration);
     }
 
     @TestFactory

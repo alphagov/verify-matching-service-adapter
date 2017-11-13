@@ -21,22 +21,17 @@ import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
-public class OptionalAddressFieldsExcludedScenario {
-
-    private FileUtils fileUtils = new FileUtils();
-    private Client client = ClientBuilder.newClient();
-    private ApplicationConfiguration configuration;
+public class OptionalAddressFieldsExcludedScenario extends ScenarioBase {
 
     public OptionalAddressFieldsExcludedScenario(ApplicationConfiguration configuration) {
-        this.configuration = configuration;
+        super(configuration);
     }
 
     @Test
-    public void runCase() throws IOException {
-        String jsonString = fileUtils.readFromResources("simple-case-excluding-optional-address-fields.json");
+    public void runCase() {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
-            .post(Entity.json(jsonString));
+            .post(Entity.json(fileUtils.readFromResources("simple-case-excluding-optional-address-fields.json")));
 
         Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
 

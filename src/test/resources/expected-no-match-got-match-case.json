@@ -1,0 +1,42 @@
+  {
+    "hashedPid": "8a5db0ad424efe4e09622cc4a876cc4c338558384752b483ff69dda4dca1ef04",
+    "levelOfAssurance": "LEVEL_1",
+    "matchId": "expected-no-match-got-match-case-id",
+    "matchingDataset": {
+      "addresses": [
+        {
+          "fromDate": "2005-05-14T00:00:00.000Z",
+          "internationalPostCode": "GB1 2PF",
+          "lines": [
+            "10 George Street"
+          ],
+          "postCode": "GB1 2PF",
+          "uprn": "833F1187-9F33-A7E27B3F211E",
+          "verified": true
+        }
+      ],
+      "dateOfBirth": {
+        "value": "1980-05-24",
+        "verified": true
+      },
+      "firstName": {
+        "value": "Joe",
+        "verified": true
+      },
+      "gender": {
+        "value": "MALE",
+        "verified": true
+      },
+      "middleNames": {
+        "value": "Bob Rob",
+        "verified": true
+      },
+      "surnames": [
+        {
+          "from": "2015-05-14T00:00:00.000Z",
+          "value": "Dou",
+          "verified": true
+        }
+      ]
+    }
+  }

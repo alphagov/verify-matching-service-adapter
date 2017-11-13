@@ -23,22 +23,17 @@ import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
-public class LevelOfAssuranceOneScenario {
-
-    private FileUtils fileUtils = new FileUtils();
-    private Client client = ClientBuilder.newClient();
-    private ApplicationConfiguration configuration;
+public class LevelOfAssuranceOneScenario extends ScenarioBase {
 
     public LevelOfAssuranceOneScenario(ApplicationConfiguration configuration) {
-        this.configuration = configuration;
+        super(configuration);
     }
 
     @Test
-    public void runForSimpleCase() throws IOException {
-        String jsonString = fileUtils.readFromResources("LoA1-simple-case.json");
+    public void runForSimpleCase() {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
-            .post(Entity.json(jsonString));
+            .post(Entity.json(fileUtils.readFromResources("LoA1-simple-case.json")));
 
         Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
 
@@ -47,7 +42,7 @@ public class LevelOfAssuranceOneScenario {
     }
 
     @Test
-    public void runForExtensiveCase() throws IOException {
+    public void runForExtensiveCase() {
         String jsonString = fileUtils.readFromResources("LoA1-extensive-case.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
             .replace("%within405days-100days%", Instant.now().minus(405-100, DAYS).toString())
