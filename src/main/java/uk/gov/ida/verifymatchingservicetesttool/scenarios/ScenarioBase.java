@@ -51,7 +51,7 @@ public abstract class ScenarioBase {
 
         Map<String, String> result = readEntityAsMap(response);
 
-        assertThat(result.keySet(), CoreMatchers.is(new HashSet<String>() {{ add("result"); }}));
-        assertThat(result.get("result"), CoreMatchers.anyOf(CoreMatchers.is("success"), CoreMatchers.is("failure")));
+        assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
+        assertThat(result.get("result"), anyOf(CoreMatchers.is("success"), is("failure")));
     }
 }
