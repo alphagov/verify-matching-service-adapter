@@ -4,17 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
-import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -35,10 +28,7 @@ public class LevelOfAssuranceOneScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("LoA1-simple-case.json")));
 
-        Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
-
-        assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
-        assertThat(result.get("result"), anyOf(is("match"), is("no-match")));
+        validateMatchNoMatch(response);
     }
 
     @Test
@@ -53,9 +43,6 @@ public class LevelOfAssuranceOneScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(jsonString));
 
-        Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
-
-        assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
-        assertThat(result.get("result"), anyOf(is("match"), is("no-match")));
+        validateMatchNoMatch(response);
     }
 }

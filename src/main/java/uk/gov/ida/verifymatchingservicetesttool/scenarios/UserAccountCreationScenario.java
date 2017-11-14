@@ -1,5 +1,6 @@
 package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
+import org.hamcrest.core.Is;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
@@ -12,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,9 +37,6 @@ public class UserAccountCreationScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("user-account-creation.json")));
 
-        Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
-
-        assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
-        assertThat(result.get("result"), anyOf(is("success"), is("failure")));
+        validateSuccessFailure(response);
     }
 }
