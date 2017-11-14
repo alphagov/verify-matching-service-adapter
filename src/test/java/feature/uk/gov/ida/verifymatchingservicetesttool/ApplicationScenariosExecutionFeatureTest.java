@@ -1,8 +1,8 @@
 package feature.uk.gov.ida.verifymatchingservicetesttool;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.ida.verifymatchingservicetesttool.Application;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.utils.TestStatusPrintingListener;
 
 import java.util.Arrays;
 
@@ -22,13 +22,11 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
             .withLocalMatchingServiceAccountCreationUrl(localMatchingService.getAccountCreationUrl())
             .build();
 
-        Application application = new Application();
-
+        listener = new TestStatusPrintingListener();
         application.execute(
             listener,
             Arrays.asList(
-                selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-                selectPackage("common.uk.gov.ida.verifymatchingservicetesttool.scenarios")
+                selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios")
             ),
             applicationConfiguration
         );

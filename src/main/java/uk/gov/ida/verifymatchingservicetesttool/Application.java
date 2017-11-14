@@ -7,6 +7,7 @@ import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
@@ -20,7 +21,7 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 public class Application {
 
     public static void main(String[] args) {
-        TestExecutionListener listener = new TestStatusPrintingListener();
+        SummaryGeneratingListener listener = new TestStatusPrintingListener();
         PackageSelector packageSelector = selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios");
         new Application().execute(
             listener,
@@ -30,7 +31,7 @@ public class Application {
     }
 
     public void execute(
-        TestExecutionListener listener,
+        SummaryGeneratingListener listener,
         List<DiscoverySelector> selectors,
         ApplicationConfiguration applicationConfiguration
     ) {

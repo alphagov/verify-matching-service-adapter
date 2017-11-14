@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
@@ -54,7 +55,10 @@ public class DynamicScenarios extends ScenarioBase {
                 .request(APPLICATION_JSON)
                 .post(Entity.json(fileUtils.read(file)));
 
-            Map<String, String> result = response.readEntity(new GenericType<Map<String, String>>() {{ }});
+            assertThat(response.getHeaderString("Content-Type"), is(APPLICATION_JSON));
+            assertThat(response.getStatus(), is(OK.getStatusCode()));
+
+            Map<String, String> result = readEntityAsMap(response);
 
             assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
             assertThat(result.get("result"), is(isMatch ? "match" : "no-match"));
