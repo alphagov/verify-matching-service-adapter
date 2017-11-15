@@ -144,7 +144,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(AdapterToMatchingServiceProxy.class).to(AdapterToMatchingServiceHttpProxy.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
-        bind(UserIdHashFactory.class).toInstance(new UserIdHashFactory());
+    }
+
+    @Provides
+    @Singleton
+    private UserIdHashFactory getUserIdHashFactory(MatchingServiceAdapterConfiguration configuration) {
+        return new UserIdHashFactory(configuration.getEntityId());
     }
 
     @Provides

@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers
 
 import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
