@@ -21,6 +21,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchi
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.saml.core.domain.AssertionRestrictions;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
+import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.PersistentId;
 
@@ -39,12 +40,11 @@ public class UnknownUserAttributeQueryHandler {
 
     @Inject
     public UnknownUserAttributeQueryHandler(
-            UserIdHashFactory userIdHashFactory,
-            MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-            MatchingServiceAssertionFactory matchingServiceAssertionFactory,
-            AssertionLifetimeConfiguration assertionLifetimeConfiguration,
-            AdapterToMatchingServiceProxy adapterToMatchingServiceProxy,
-            UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor) {
+        UserIdHashFactory userIdHashFactory, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+        MatchingServiceAssertionFactory matchingServiceAssertionFactory,
+        AssertionLifetimeConfiguration assertionLifetimeConfiguration,
+        AdapterToMatchingServiceProxy adapterToMatchingServiceProxy,
+        UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor) {
         this.userIdHashFactory = userIdHashFactory;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
         this.matchingServiceAssertionFactory = matchingServiceAssertionFactory;
@@ -56,7 +56,9 @@ public class UnknownUserAttributeQueryHandler {
     public OutboundResponseFromUnknownUserCreationService handle(InboundMatchingServiceRequest attributeQuery) {
         IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
-        final String hashedPid = userIdHashFactory.createHashedId(matchingDatasetAssertion.getIssuerId(), matchingServiceAdapterConfiguration.getEntityId(), matchingDatasetAssertion.getPersistentId().getNameId(), authnStatementAssertion.getAuthnStatement());
+        final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
+            matchingDatasetAssertion.getPersistentId().getNameId(),
+            authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
 
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext());
         UnknownUserCreationResponseDto unknownUserCreationResponseDto = adapterToMatchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssurance));
