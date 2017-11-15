@@ -18,11 +18,17 @@ import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.saml.core.domain.AuthnContext;
+import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.UnknownUserCreationIdaStatus;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.builders.SimpleMdsValueBuilder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.builders.InboundMatchingServiceRequestBuilder.anInboundMatchingServiceRequest;
 import static uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto.FAILURE;
@@ -39,9 +45,6 @@ public class UnknownUserAttributeQueryHandlerTest {
     private MatchingServiceAdapterConfiguration configuration;
 
     @Mock
-    UserIdHashFactory hashFactory;
-
-    @Mock
     private MatchingServiceAssertionFactory assertionFactory;
 
     @Mock
@@ -49,6 +52,9 @@ public class UnknownUserAttributeQueryHandlerTest {
 
     @Mock
     private AdapterToMatchingServiceProxy adapterToMatchingServiceProxy;
+
+    @Mock
+    private UserIdHashFactory userIdHashFactory;
 
     private UnknownUserAttributeQueryHandler unknownUserAttributeQueryHandler;
 
@@ -58,12 +64,12 @@ public class UnknownUserAttributeQueryHandlerTest {
     public void setup() {
         when(assertionLifetimeConfiguration.getAssertionLifetime()).thenReturn(Duration.days(2));
         unknownUserAttributeQueryHandler = new UnknownUserAttributeQueryHandler(
-                hashFactory,
-                configuration,
+            userIdHashFactory, configuration,
                 assertionFactory,
                 assertionLifetimeConfiguration,
                 adapterToMatchingServiceProxy,
                 new UserAccountCreationAttributeExtractor());
+        when(userIdHashFactory.hashId(anyString(), anyString(), anyObject())).thenReturn(hashedPid);
     }
 
     @Test
@@ -88,11 +94,6 @@ public class UnknownUserAttributeQueryHandlerTest {
                                 .build()
                 )
                 .build();
-        when(hashFactory.createHashedId(
-                inboundMatchingServiceRequest.getMatchingDatasetAssertion().getIssuerId(),
-                configuration.getEntityId(),
-                inboundMatchingServiceRequest.getMatchingDatasetAssertion().getPersistentId().getNameId(),
-                inboundMatchingServiceRequest.getAuthnStatementAssertion().getAuthnStatement())).thenReturn(hashedPid);
         when(adapterToMatchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, LevelOfAssuranceDto.LEVEL_1)))
                 .thenReturn(new UnknownUserCreationResponseDto(SUCCESS));
 
@@ -109,11 +110,6 @@ public class UnknownUserAttributeQueryHandlerTest {
                                 .build()
                 )
                 .build();
-        when(hashFactory.createHashedId(
-                inboundMatchingServiceRequest.getMatchingDatasetAssertion().getIssuerId(),
-                configuration.getEntityId(),
-                inboundMatchingServiceRequest.getMatchingDatasetAssertion().getPersistentId().getNameId(),
-                inboundMatchingServiceRequest.getAuthnStatementAssertion().getAuthnStatement())).thenReturn(hashedPid);
         when(adapterToMatchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, LevelOfAssuranceDto.LEVEL_2)))
                 .thenReturn(new UnknownUserCreationResponseDto(FAILURE));
 

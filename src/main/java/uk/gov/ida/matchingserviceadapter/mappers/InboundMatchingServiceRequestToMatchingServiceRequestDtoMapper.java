@@ -13,6 +13,7 @@ import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
 import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
+import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 
 import static com.google.common.base.Optional.absent;
@@ -20,17 +21,13 @@ import static com.google.common.base.Optional.absent;
 public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
     private final UserIdHashFactory userIdHashFactory;
-    private final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
     private final MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
 
     @Inject
     public InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
-            UserIdHashFactory userIdHashFactory,
-            MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-            MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper) {
-
+        UserIdHashFactory userIdHashFactory, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+        MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper) {
         this.userIdHashFactory = userIdHashFactory;
-        this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
         this.matchingDatasetToMatchingDatasetDtoMapper = matchingDatasetToMatchingDatasetDtoMapper;
     }
 
@@ -39,7 +36,9 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         MatchingDataset matchingDataset = matchingDatasetAssertion.getMatchingDataset().get();
 
-        final String hashedPid = userIdHashFactory.createHashedId(matchingDatasetAssertion.getIssuerId(), matchingServiceAdapterConfiguration.getEntityId(), matchingDatasetAssertion.getPersistentId().getNameId(), authnStatementAssertion.getAuthnStatement());
+        final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
+            matchingDatasetAssertion.getPersistentId().getNameId(),
+            authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
 
         Optional<HubAssertion> cycle3AttributeAssertion = attributeQuery.getCycle3AttributeAssertion();
         Optional<Cycle3Dataset> cycle3Dataset = absent();

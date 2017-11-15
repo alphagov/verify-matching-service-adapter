@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.beanplanet.messages.domain.Messages;
 import org.beanplanet.validation.Validator;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 
 import java.util.function.Function;
