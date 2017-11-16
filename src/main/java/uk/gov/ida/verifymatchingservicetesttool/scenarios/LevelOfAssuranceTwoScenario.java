@@ -1,5 +1,6 @@
 package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
@@ -11,9 +12,6 @@ import java.time.Instant;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.AnyOf.anyOf;
-import static org.hamcrest.core.Is.is;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
 public class LevelOfAssuranceTwoScenario extends ScenarioBase {
@@ -23,6 +21,7 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
     }
 
     @Test
+    @DisplayName("Simple request with level of assurance 2")
     public void runForWhenAllElementsAreVerifiedAndNoMultipleValues() {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
@@ -32,7 +31,8 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
     }
 
     @Test
-    public void runForExtensiveCase() {
+    @DisplayName("Complex request with level of assurance 2")
+    public void runForComplexCase() {
         String jsonString = fileUtils.readFromResources("LoA2-extensive-case.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
             .replace("%within405days-100days%", Instant.now().minus(405-100, DAYS).toString())

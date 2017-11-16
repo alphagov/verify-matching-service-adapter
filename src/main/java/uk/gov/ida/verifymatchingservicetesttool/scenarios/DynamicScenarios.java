@@ -7,13 +7,8 @@ import org.junit.jupiter.api.function.Executable;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
 import uk.gov.ida.verifymatchingservicetesttool.utils.DynamicScenariosFilesLocator;
-import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.util.HashSet;
