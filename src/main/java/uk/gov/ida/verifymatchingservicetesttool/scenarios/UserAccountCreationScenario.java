@@ -1,22 +1,15 @@
 package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 
-import org.hamcrest.core.Is;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
-import java.util.HashSet;
-import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.Response.Status.OK;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
@@ -27,6 +20,11 @@ public class UserAccountCreationScenario extends ScenarioBase {
     }
 
     @Test
+    @DisplayName(
+        "Simple user account creation request\n" +
+        "(remove accountCreationUrl from verify-matching-service-test-tool.yml " +
+        "to skip this if you don't need to test account creation)"
+    )
     public void runForUserAccountCreation() {
         assumeTrue(
             configuration.getLocalMatchingServiceAccountCreationUrl() != null,
