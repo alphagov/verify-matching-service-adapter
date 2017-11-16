@@ -31,16 +31,14 @@ This command will run a series of test scenarios.
 
 ## Test scenarios
 
-:question: Could we add a list of default scenarios and what they test for?
+The tool will run 6 default test scenarios:
 
-| Scenario | Description |
-| -------- | ----------- |
-|          |             |
-|          |             |
-|          |             |
-|          |             |
-|          |             |
-|          |             |
+* Simple request with level of assurance 1 
+* Complex request with level of assurance 1
+* Simple request with level of assurance 2
+* Complex request with level of assurance 2
+* Simple request with address missing optional fields
+* Simple user account creation request
 
 ### Adding additional scenarios
 
