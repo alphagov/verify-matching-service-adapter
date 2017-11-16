@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.scenarios.DynamicScenarios;
-import uk.gov.ida.verifymatchingservicetesttool.scenarios.OptionalAddressFieldsExcludedScenario;
-
-import java.util.Arrays;
 
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
 import static common.uk.gov.ida.verifymatchingservicetesttool.services.LocalMatchingServiceStub.MatchingResult.MATCH;
@@ -32,11 +29,7 @@ public class MatchingFeatureTest extends FeatureTestBase {
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
             .build();
 
-        application.execute(
-            listener,
-            Arrays.asList(selectClass(DynamicScenarios.class)),
-            applicationConfiguration
-        );
+        application.execute(listener, selectClass(DynamicScenarios.class), applicationConfiguration, fileLocator);
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
 
@@ -61,11 +54,7 @@ public class MatchingFeatureTest extends FeatureTestBase {
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
             .build();
 
-        application.execute(
-            listener,
-            Arrays.asList(selectClass(DynamicScenarios.class)),
-            applicationConfiguration
-        );
+        application.execute(listener, selectClass(DynamicScenarios.class), applicationConfiguration, fileLocator);
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
 

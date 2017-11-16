@@ -5,8 +5,6 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.scenarios.OptionalAddressFieldsExcludedScenario;
 
-import java.util.Arrays;
-
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
 import static common.uk.gov.ida.verifymatchingservicetesttool.services.LocalMatchingServiceStub.RELATIVE_MATCH_URL;
 import static javax.ws.rs.core.MediaType.APPLICATION_XHTML_XML_TYPE;
@@ -27,8 +25,9 @@ public class WrongContentTypeFeatureTest extends FeatureTestBase {
 
         application.execute(
             listener,
-            Arrays.asList(selectClass(OptionalAddressFieldsExcludedScenario.class)),
-            applicationConfiguration
+            selectClass(OptionalAddressFieldsExcludedScenario.class),
+            applicationConfiguration,
+            fileLocator
         );
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);

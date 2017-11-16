@@ -6,7 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
-import uk.gov.ida.verifymatchingservicetesttool.utils.DynamicScenariosFilesLocator;
+import uk.gov.ida.verifymatchingservicetesttool.resolvers.FilesLocatorResolver;
+import uk.gov.ida.verifymatchingservicetesttool.resolvers.JsonValidatorResolver;
+import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
+import uk.gov.ida.verifymatchingservicetesttool.validators.JsonValidator;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -24,12 +27,21 @@ import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.MATCH_FO
 import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.NO_MATCH_FOLDER_NAME;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
+@ExtendWith(FilesLocatorResolver.class)
+@ExtendWith(JsonValidatorResolver.class)
 public class DynamicScenarios extends ScenarioBase {
 
-    private DynamicScenariosFilesLocator filesLocator = new DynamicScenariosFilesLocator();
+    private FilesLocator filesLocator;
+    private JsonValidator jsonValidator;
 
-    public DynamicScenarios(ApplicationConfiguration configuration) {
+    public DynamicScenarios(
+        ApplicationConfiguration configuration,
+        FilesLocator filesLocator,
+        JsonValidator jsonValidator
+    ) {
         super(configuration);
+        this.filesLocator = filesLocator;
+        this.jsonValidator = jsonValidator;
     }
 
     @TestFactory
@@ -46,9 +58,13 @@ public class DynamicScenarios extends ScenarioBase {
 
     private Executable getExecutable(File file, boolean isMatch) {
         return () -> {
+            String jsonString = fileUtils.read(file);
+
+            jsonValidator.validate(String.format("Invalid JSON in file '%s'.", file.getName()), jsonString);
+
             Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
                 .request(APPLICATION_JSON)
-                .post(Entity.json(fileUtils.read(file)));
+                .post(Entity.json(jsonString));
 
             assertThat(response.getHeaderString("Content-Type"), is(APPLICATION_JSON));
             assertThat(response.getStatus(), is(OK.getStatusCode()));
