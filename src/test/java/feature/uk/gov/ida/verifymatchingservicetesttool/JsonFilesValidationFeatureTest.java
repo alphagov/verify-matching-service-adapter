@@ -52,4 +52,37 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
             )
         );
     }
+
+    @Test
+    public void givenWellFormedJsonWithWrongSchemaThenShowRelevantError(){
+        localMatchingService.ensureDefaultMatchScenariosExist();
+
+        ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
+            .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+            .build();
+
+        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{
+            put(MATCH_FOLDER_NAME, Arrays.asList("well-formed-wrong-schema.json"));
+        }};
+
+        application.execute(
+            listener,
+            selectClass(DynamicScenarios.class),
+            applicationConfiguration,
+            new TestsFilesLocator(testFiles)
+        );
+
+        Failure firstFailure = listener.getSummary().getFailures().get(0);
+
+        assertThat(
+            firstFailure.getException().getMessage(),
+            allOf(
+                containsString(String.format("Invalid JSON in file '%s'. JSON schema validation failed. Reason: ", "well-formed-wrong-schema.json")),
+                containsString("required key [matchId] not found"),
+                containsString("required key [levelOfAssurance] not found"),
+                containsString("required key [hashedPid] not found"),
+                containsString("required key [matchingDataset] not found")
+            )
+        );
+    }
 }

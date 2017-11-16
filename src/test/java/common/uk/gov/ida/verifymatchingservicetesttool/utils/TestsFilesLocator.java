@@ -23,7 +23,7 @@ public class TestsFilesLocator implements FilesLocator {
     @Override
     public Stream<File> getFiles(FolderName folderName) {
         return testFileNames.get(folderName).stream()
-            .map(fileName -> getFile(fileName));
+            .map(this::getFile);
     }
 
     private File getFile(String fileName) {
