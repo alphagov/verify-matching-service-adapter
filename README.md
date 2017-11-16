@@ -27,9 +27,7 @@ Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you crea
 
 Run `bin/verify-matching-service-test-tool` to start the test tool.
 
-This command will run a series of test scenarios. Successful results will return in green text. Failed results will return in red text with error messages.
-
-:question: Is this necessary to document?
+This command will run a series of test scenarios. 
 
 ## Test scenarios
 
@@ -59,8 +57,6 @@ For example, to match the identity of a user with the first name `Sam`, you coul
   "value": "Sam",
   "verified": true
 ```
-
-:question: Is this a clear enough example?
 
 ## Support and feedback
 
