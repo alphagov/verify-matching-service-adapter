@@ -2,9 +2,8 @@ package feature.uk.gov.ida.verifymatchingservicetesttool;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.utils.DefaultFilesLocator;
 import uk.gov.ida.verifymatchingservicetesttool.utils.TestStatusPrintingListener;
-
-import java.util.Arrays;
 
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,10 +24,9 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         listener = new TestStatusPrintingListener();
         application.execute(
             listener,
-            Arrays.asList(
-                selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios")
-            ),
-            applicationConfiguration
+            selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
+            applicationConfiguration,
+            fileLocator
         );
 
         assertThat(

@@ -8,13 +8,17 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-public class DynamicScenariosFilesLocator {
+public class DefaultFilesLocator implements FilesLocator {
 
     private final static String EXAMPLES_FOLDER_NAME = "examples";
 
-    public Stream<File> getFiles(FolderName folderName) throws IOException {
-        return Files.list(Paths.get(getFolder(folderName.getValue()).toURI()))
+    public Stream<File> getFiles(FolderName folderName) {
+        try {
+            return Files.list(Paths.get(getFolder(folderName.getValue()).toURI()))
                 .map(item -> new File(item.toUri()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private File getFolder(String folderName) {
@@ -24,8 +28,8 @@ public class DynamicScenariosFilesLocator {
 
     private String getExamplesFolderLocation(String path) {
         return new File(path)
-                    .getParentFile()
-                    .getParentFile()
-                    .getAbsolutePath() + File.separator + EXAMPLES_FOLDER_NAME;
+            .getParentFile()
+            .getParentFile()
+            .getAbsolutePath() + File.separator + EXAMPLES_FOLDER_NAME;
     }
 }
