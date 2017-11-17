@@ -16,7 +16,7 @@ import static uk.gov.ida.matchingserviceadapter.validators.datetime.JodaAndJavaD
 
 public class JodaAndJavaDateTimeConvertersTest {
     @Test
-    public void ctorForTestCoverageOnly() {
+    public void constructorForTestCoverageOnly() {
         new JodaAndJavaDateTimeConverters();
     }
 

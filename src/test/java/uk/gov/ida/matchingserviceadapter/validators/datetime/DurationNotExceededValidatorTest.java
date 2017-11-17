@@ -23,7 +23,7 @@ public class DurationNotExceededValidatorTest {
     public static final MessageImpl DEFAULT_MESSAGE = globalMessage("theCode", "theMessage");
 
     @Test
-    public void ctorMessageFromToAndMaximum() {
+    public void constructorMessageFromToAndMaximum() {
         Message message = globalMessage("theCode", "theMessage");
         Function<Object, Instant> from = c -> Instant.now();
         Function<Object, Instant> to = c -> Instant.now();
@@ -41,7 +41,7 @@ public class DurationNotExceededValidatorTest {
     }
 
     @Test
-    public void ctorMessageFromAndMaximum() {
+    public void constructorMessageFromAndMaximum() {
         Message message = globalMessage("theCode", "theMessage");
         Function<Object, Instant> from = c -> Instant.now();
         Duration max = Duration.parse("PT10S");

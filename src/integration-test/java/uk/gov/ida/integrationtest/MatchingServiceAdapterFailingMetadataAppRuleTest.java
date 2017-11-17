@@ -22,6 +22,7 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.Constants;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
+import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder;
@@ -35,8 +36,11 @@ import java.io.IOException;
 import java.util.Collections;
 
 import static com.google.common.base.Throwables.propagate;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.opensaml.saml.saml2.core.StatusCode.REQUESTER;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
@@ -67,7 +71,8 @@ public class MatchingServiceAdapterFailingMetadataAppRuleTest {
 
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-                .build();
+            .withSubject(aSubjectWithAssertions(asList(anAuthnStatementAssertion()), "request-id", "hub-entity-id"))
+            .build();
 
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
