@@ -1,7 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.utils.manifest;
 
-import com.google.common.base.Throwables;
-
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URL;
@@ -19,7 +17,7 @@ public class ManifestReader {
             URL url = cl.findResource("META-INF/MANIFEST.MF");
             manifest = new Manifest(url.openStream());
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
         return manifest.getMainAttributes();
     }

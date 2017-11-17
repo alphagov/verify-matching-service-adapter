@@ -78,6 +78,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
         );
     }
 
+    //TODO this hsould be removed and the validator should take the assertions from the context object
     private static List<EncryptedAssertion> getEncryptedAssertions(AttributeQuery attributeQuery) {
         if (attributeQuery.getSubject() == null
             || attributeQuery.getSubject().getSubjectConfirmations().isEmpty()) {
