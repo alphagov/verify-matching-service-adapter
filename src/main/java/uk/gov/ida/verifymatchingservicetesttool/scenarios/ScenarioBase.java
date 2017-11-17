@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import java.util.HashSet;
 import java.util.Map;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,7 +37,7 @@ public abstract class ScenarioBase {
     }
 
     protected void validateMatchNoMatch(Response response) {
-        assertThat(response.getHeaderString("Content-Type"), is(APPLICATION_JSON));
+        assertThat(response.getHeaderString("Content-Type"), containsString(APPLICATION_JSON));
         assertThat(response.getStatus(), is(OK.getStatusCode()));
 
         Map<String, String> result = readEntityAsMap(response);
@@ -46,7 +47,7 @@ public abstract class ScenarioBase {
     }
 
     public void validateSuccessFailure(Response response){
-        assertThat(response.getHeaderString("Content-Type"), Is.is(APPLICATION_JSON));
+        assertThat(response.getHeaderString("Content-Type"), containsString(APPLICATION_JSON));
         assertThat(response.getStatus(), Is.is(OK.getStatusCode()));
 
         Map<String, String> result = readEntityAsMap(response);
