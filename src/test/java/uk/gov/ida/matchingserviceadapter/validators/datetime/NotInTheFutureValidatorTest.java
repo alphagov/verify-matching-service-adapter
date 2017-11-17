@@ -21,7 +21,7 @@ public class NotInTheFutureValidatorTest {
     public static final MessageImpl DEFAULT_MESSAGE = globalMessage("theCode", "theMessage");
 
     @Test
-    public void ctorMessageAndAtProvider() {
+    public void constructorMessageAndAtProvider() {
         Object context = new Object();
         Messages messages = messages();
         Function<Object, Instant> atInstantProvider = c -> Instant.now();
