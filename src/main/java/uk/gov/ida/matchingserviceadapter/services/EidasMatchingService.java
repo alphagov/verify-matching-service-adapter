@@ -19,6 +19,10 @@ public class EidasMatchingService implements MatchingService {
         this.validator = validator;
     }
 
+    public Validator<AttributeQuery> getValidator() {
+        return validator;
+    }
+
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
         Messages validationMessages = validator.validate(request.getAttributeQuery(), messages());

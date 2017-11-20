@@ -13,8 +13,17 @@ public class DelegatingMatchingServiceResponseRenderer implements MatchingServic
         this.delegates = delegates;
     }
 
+    public Map<Class<?>, MatchingServiceResponseRenderer> getDelegates() {
+        return delegates;
+    }
+
     @Override
     public Response render(MatchingServiceResponse matchingServiceResponse) {
-        return delegates.get(matchingServiceResponse.getClass()).render(matchingServiceResponse);
+        MatchingServiceResponseRenderer delegateRenderer = delegates.get(matchingServiceResponse.getClass());
+        if (delegateRenderer == null) {
+            throw new IllegalStateException(String.format("No delegate found for matching service response [%s]", matchingServiceResponse.getClass()));
+        }
+
+        return delegateRenderer.render(matchingServiceResponse);
     }
 }
