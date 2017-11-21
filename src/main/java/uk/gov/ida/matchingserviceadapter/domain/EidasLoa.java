@@ -1,8 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 import static java.util.Arrays.stream;
 
 public enum EidasLoa {

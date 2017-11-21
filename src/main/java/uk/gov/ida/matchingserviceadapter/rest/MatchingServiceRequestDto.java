@@ -73,6 +73,10 @@ public class MatchingServiceRequestDto {
         return levelOfAssurance;
     }
 
+    public EidasMatchingDataset getEidasDataset() {
+        return eidasDataset;
+    }
+
     @Override
     public boolean equals(Object o) {
         return EqualsBuilder.reflectionEquals(this, o);
