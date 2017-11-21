@@ -176,7 +176,6 @@ public class UserAccountCreationAppRuleTest {
                         AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value")), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 
-
         Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
         List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
 

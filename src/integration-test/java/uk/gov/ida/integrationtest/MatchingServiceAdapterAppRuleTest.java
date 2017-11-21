@@ -47,11 +47,17 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
+import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.aCycle3DatasetAssertion;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPAddress;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.aPersonName_1_1;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
+import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
 
 public class MatchingServiceAdapterAppRuleTest {
@@ -192,6 +198,39 @@ public class MatchingServiceAdapterAppRuleTest {
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
         assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Bearer subject confirmation datas NotOnOrAfter timestamp");
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    @Test
+    public void shouldReturnErrorResponseWhenAnAttributeQueryContainsIdpAssertionsWithDifferentPids() {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(aSubjectWithAssertions(asList(
+                anAssertion()
+                    .addAuthnStatement(anAuthnStatement().build())
+                    .withIssuer(anIssuer().withIssuerId(STUB_IDP_ONE).build())
+                    .addAttributeStatement(anAttributeStatement().addAttribute(anIPAddress().build()).build())
+                    .withSubject(aSubject().withPersistentId("pid-one").build())
+                .buildUnencrypted(),
+                anAssertion()
+                    .withId("mds-assertion")
+                    .withIssuer(anIssuer().withIssuerId(STUB_IDP_ONE).build())
+                    .withSubject(
+                        aSubject().withPersistentId("pid-two").build()
+                    )
+                    .addAttributeStatement(
+                        anAttributeStatement()
+                            .addAllAttributes(Collections.emptyList())
+                            .build()
+                    )
+                .buildUnencrypted()
+            ), REQUEST_ID, HUB_ENTITY_ID))
+            .build();
+
+        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("assertions do not contain matching persistent identifiers");
     }
 
     @Test

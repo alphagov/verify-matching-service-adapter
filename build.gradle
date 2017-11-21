@@ -40,9 +40,9 @@ def dependencyVersions = [
         saml_security:"$opensaml-46",
         saml_metadata_bindings:"$opensaml-58",
         saml_utils: "$opensaml-46",
-        saml_test_utils:"$opensaml-24",
+        saml_test_utils:"$opensaml-31",
         saml_domain_objects: "$opensaml-37",
-        hub_saml: "$opensaml-87",
+        hub_saml: "$opensaml-93",
         dev_pki: '1.1.0-19',
 ]
 
