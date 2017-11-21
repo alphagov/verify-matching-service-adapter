@@ -13,7 +13,6 @@ import uk.gov.ida.matchingserviceadapter.services.MatchingService;
 
 import java.util.function.Predicate;
 
-import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
