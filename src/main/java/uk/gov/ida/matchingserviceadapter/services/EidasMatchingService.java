@@ -31,6 +31,8 @@ public class EidasMatchingService implements MatchingService {
             throw new AttributeQueryValidationException("Eidas Attribute Query was invalid: " + validationMessages);
         }
 
+        // Call transform function to map to outbound LMS DTO ...
+
         // TODO - EID-202 handle attributes and fill out the nulls below
         throw new RuntimeException(TODO_MESSAGE);
     }
