@@ -8,10 +8,8 @@ import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
-import uk.gov.ida.saml.core.extensions.StringBasedMdsAttributeValue;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
-import uk.gov.ida.saml.core.test.builders.DateAttributeBuilder_1_1;
 import uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder;
 
 import static java.util.function.Function.identity;
@@ -20,7 +18,6 @@ import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeValidator.ATTRIBUTE_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeValidator.WRONG_NUMBER_OF_ATTRIBUTE_VALUES;
 import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_IS_EMPTY;
-import static uk.gov.ida.saml.core.test.builders.DateAttributeValueBuilder.aDateValue;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class AttributeValidatorTest {

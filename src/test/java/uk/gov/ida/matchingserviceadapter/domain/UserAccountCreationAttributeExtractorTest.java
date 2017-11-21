@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.Attribute;
+import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
@@ -20,7 +21,6 @@ import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
 import uk.gov.ida.saml.core.extensions.impl.PersonNameImpl;
 import uk.gov.ida.saml.core.test.OpenSAMLRunner;
 import uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder;
-import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,11 @@ import static com.google.common.base.Optional.absent;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.*;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.ADDRESS_HISTORY;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.CYCLE_3;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.FIRST_NAME;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.SURNAME;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.SURNAME_VERIFIED;
 
 @RunWith(OpenSAMLRunner.class)
 public class UserAccountCreationAttributeExtractorTest {

@@ -16,7 +16,6 @@ import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
-import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
 
@@ -38,6 +37,7 @@ import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPA
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
+import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
@@ -69,7 +69,7 @@ public class AssertionHelper {
         final SubjectConfirmation subjectConfirmation = SubjectConfirmationBuilder.aSubjectConfirmation()
                 .withSubjectConfirmationData(subjectConfirmationData).build();
 
-        return SubjectBuilder.aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
+        return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
     }
 
     public static Subject aSubjectWithEncryptedAssertions(List<EncryptedAssertion> assertions, String requestId, String hubEntityId) {
@@ -82,7 +82,7 @@ public class AssertionHelper {
         final SubjectConfirmation subjectConfirmation = SubjectConfirmationBuilder.aSubjectConfirmation()
                 .withSubjectConfirmationData(subjectConfirmationData).build();
 
-        return SubjectBuilder.aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
+        return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
     }
 
     public static Assertion aMatchingDatasetAssertion(List<Attribute> attributes, boolean shouldBeExpired, String requestId) {
@@ -148,7 +148,7 @@ public class AssertionHelper {
         } else {
             notOnOrAfter = DateTime.now().plus(1000000);
         }
-        return SubjectBuilder.aSubject()
+        return aSubject()
                 .withSubjectConfirmation(
                         aSubjectConfirmation()
                                 .withSubjectConfirmationData(
