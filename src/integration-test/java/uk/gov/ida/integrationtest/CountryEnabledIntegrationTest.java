@@ -21,6 +21,7 @@ import org.opensaml.xmlsec.signature.Signature;
 import org.w3c.dom.Document;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
+import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
@@ -57,12 +58,11 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
-import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
+import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
-import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
-import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
-import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
 public class CountryEnabledIntegrationTest {
 
@@ -90,7 +90,53 @@ public class CountryEnabledIntegrationTest {
 
     @Test
     public void shouldProcessEidasAttributeQueryRequestSuccessfully() {
-        AttributeQuery attributeQuery = aValidAttributeQuery();
+        String issuerId = HUB_ENTITY_ID;
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(issuerId).build())
+            .withSubject(
+                    aSubjectWithEncryptedAssertions(
+                        singletonList(
+                            anAssertion()
+                                .withIssuer(
+                                    anIssuer()
+                                        .withIssuerId(STUB_IDP_ONE)
+                                        .build())
+                                .addAttributeStatement(anEidasAttributeStatement().build())
+                                .addAuthnStatement(
+                                    anAuthnStatement()
+                                    .withAuthnContext(
+                                        anAuthnContext()
+                                            .withAuthnContextClassRef(
+                                                anAuthnContextClassRef()
+                                                .withAuthnContextClasRefValue(EidasLoa.HIGH.getValueUri())
+                                                .build()
+                                            )
+                                        .build()
+
+                                    )
+                                        .build())
+                                .withSignature(aValidSignature())
+                                .withConditions(aConditions())
+                                .buildWithEncrypterCredential(
+                                    new TestCredentialFactory(
+                                        TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+                                        TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
+                                    ).getEncryptingCredential()
+                                )
+                        ),
+                        REQUEST_ID, HUB_ENTITY_ID)
+                )
+                .withSignature(
+                    aSignature()
+                        .withSigningCredential(
+                            new TestCredentialFactory(
+                                HUB_TEST_PUBLIC_SIGNING_CERT,
+                                HUB_TEST_PRIVATE_SIGNING_KEY
+                            ).getSigningCredential()
+                        ).build()
+                )
+                .build();
 
         Response response = postResponse(MSA_MATCHING_URL, attributeQuery);
 
@@ -163,55 +209,7 @@ public class CountryEnabledIntegrationTest {
                 .post(Entity.entity(xmlString, MediaType.TEXT_XML));
     }
 
-    private AttributeQuery aValidAttributeQuery() {
-        return AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
-            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(
-                aSubjectWithEncryptedAssertions(
-                    singletonList(
-                        anAssertion()
-                            .withSubject(
-                                aSubject().withSubjectConfirmation(
-                                    aSubjectConfirmation().withSubjectConfirmationData(
-                                        aSubjectConfirmationData()
-                                            .withInResponseTo(REQUEST_ID)
-                                            .build())
-                                        .build())
-                                    .build()
-                            )
-                            .withIssuer(
-                                anIssuer()
-                                    .withIssuerId(STUB_IDP_ONE)
-                                    .build())
-                            .addAttributeStatement(anEidasAttributeStatement().build())
-                            .addAuthnStatement(anEidasAuthnStatement().build())
-                            .withSignature(anIdpSignature())
-                            .withConditions(aConditions())
-                            .buildWithEncrypterCredential(
-                                new TestCredentialFactory(
-                                    TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
-                                    TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
-                                ).getEncryptingCredential()
-                            )
-                    ),
-                    REQUEST_ID, HUB_ENTITY_ID)
-            )
-            .withSignature(aHubSignature())
-            .build();
-    }
-
-    private static Signature aHubSignature() {
-        return aSignature()
-            .withSigningCredential(
-                new TestCredentialFactory(
-                    HUB_TEST_PUBLIC_SIGNING_CERT,
-                    HUB_TEST_PRIVATE_SIGNING_KEY
-                ).getSigningCredential()
-            ).build();
-    }
-
-    private static Signature anIdpSignature() {
+    private static Signature aValidSignature() {
         return aSignature()
             .withSigningCredential(
                 new TestCredentialFactory(
@@ -225,11 +223,12 @@ public class CountryEnabledIntegrationTest {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(DateTime.now());
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
+        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
         audience.setAudienceURI(HUB_SECONDARY_ENTITY_ID);
         audienceRestriction.getAudiences().add(audience);
         conditions.getAudienceRestrictions().add(audienceRestriction);
         return conditions;
     }
+
 }

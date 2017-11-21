@@ -66,6 +66,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckR
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.services.DelegatingMatchingService;
+import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToLMSRequestTransform;
 import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
@@ -224,7 +225,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     new DateTimeComparator(Duration.ZERO),
                     assertionDecrypter,
                     configuration.getCountry().getHubConnectorEntityId()
-                )
+                ),
+                new EidasMatchingRequestToLMSRequestTransform()
             ));
     }
 
