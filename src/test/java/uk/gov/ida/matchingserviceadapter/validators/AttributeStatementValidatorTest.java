@@ -6,29 +6,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
-import uk.gov.ida.saml.core.IdaConstants;
-import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
-import uk.gov.ida.saml.core.extensions.eidas.CurrentFamilyName;
-import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
-import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
-import uk.gov.ida.saml.core.extensions.eidas.Gender;
-import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
-import uk.gov.ida.saml.core.extensions.eidas.impl.CurrentFamilyNameBuilder;
-import uk.gov.ida.saml.core.extensions.eidas.impl.CurrentGivenNameBuilder;
-import uk.gov.ida.saml.core.extensions.eidas.impl.DateOfBirthBuilder;
-import uk.gov.ida.saml.core.extensions.eidas.impl.GenderBuilder;
-import uk.gov.ida.saml.core.extensions.eidas.impl.PersonIdentifierBuilder;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentGivenNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aDateOfBirthAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aGenderAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aPersonIdentifierAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeStatementValidator.ATTRIBUTE_STATEMENT_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeStatementValidator.DATE_OF_BIRTH_IN_FUTURE;
 import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
 import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_NOT_ENUMERATED;
-import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
@@ -51,7 +44,7 @@ public class AttributeStatementValidatorTest {
 
     @Test
     public void shouldGenerateNoErrorsIfAttributeStatementIsValidAndHasGenderAttribute() {
-        Messages messages = validator.validate(anEidasAttributeStatement().addAttribute(genderAttribute("Male")).build(), messages());
+        Messages messages = validator.validate(anEidasAttributeStatement().addAttribute(aGenderAttribute("Male")).build(), messages());
 
         assertThat(messages.hasErrors()).isFalse();
     }
@@ -136,7 +129,7 @@ public class AttributeStatementValidatorTest {
             .addAttribute(familyNameAttribute())
             .addAttribute(personIdentifierAttribute())
             .addAttribute(dateOfBirthAttribute())
-            .addAttribute(genderAttribute("foo"))
+            .addAttribute(aGenderAttribute("foo"))
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
@@ -145,53 +138,22 @@ public class AttributeStatementValidatorTest {
     }
 
     private Attribute firstNameAttribute() {
-        Attribute firstName =  anAttribute(IdaConstants.Eidas_Attributes.FirstName.NAME);
-        CurrentGivenName firstNameValue = new CurrentGivenNameBuilder().buildObject();
-        firstNameValue.setFirstName("Joe");
-        firstName.getAttributeValues().add(firstNameValue);
-        return firstName;
+        return aCurrentGivenNameAttribute("Joe");
     }
 
     private Attribute familyNameAttribute() {
-        Attribute familyName =  anAttribute(IdaConstants.Eidas_Attributes.FamilyName.NAME);
-        CurrentFamilyName familyNameValue = new CurrentFamilyNameBuilder().buildObject();
-        familyNameValue.setFamilyName("Bloggs");
-        familyName.getAttributeValues().add(familyNameValue);
-        return familyName;
+        return aCurrentFamilyNameAttribute("Bloggs");
     }
 
     private Attribute personIdentifierAttribute() {
-        Attribute personIdentifier =  anAttribute(IdaConstants.Eidas_Attributes.PersonIdentifier.NAME);
-        PersonIdentifier personIdentifierValue = new PersonIdentifierBuilder().buildObject();
-        personIdentifierValue.setPersonIdentifier("JB12345");
-        personIdentifier.getAttributeValues().add(personIdentifierValue);
-        return personIdentifier;
+        return aPersonIdentifierAttribute("JB12345");
     }
 
     private Attribute dateOfBirthAttribute(LocalDate dob) {
-        Attribute dateOfBirth =  anAttribute(IdaConstants.Eidas_Attributes.DateOfBirth.NAME);
-        DateOfBirth dateOfBirthValue = new DateOfBirthBuilder().buildObject();
-        dateOfBirthValue.setDateOfBirth(dob);
-        dateOfBirth.getAttributeValues().add(dateOfBirthValue);
-        return dateOfBirth;
-    }
-
-    private Attribute genderAttribute(String genderType) {
-        Attribute gender =  anAttribute(IdaConstants.Eidas_Attributes.Gender.NAME);
-        Gender genderValue = new GenderBuilder().buildObject();
-        genderValue.setValue(genderType);
-        gender.getAttributeValues().add(genderValue);
-        return gender;
+        return aDateOfBirthAttribute(dob);
     }
 
     private Attribute dateOfBirthAttribute() {
         return dateOfBirthAttribute(LocalDate.now());
     }
-
-    private Attribute anAttribute(String name) {
-        Attribute attribute = new OpenSamlXmlObjectFactory().createAttribute();
-        attribute.setName(name);
-        return attribute;
-    }
-
 }
