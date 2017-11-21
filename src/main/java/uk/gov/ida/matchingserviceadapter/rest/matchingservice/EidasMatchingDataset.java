@@ -1,15 +1,18 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
+import com.google.common.base.Optional;
+import org.joda.time.LocalDate;
+
 public class EidasMatchingDataset {
     private final Address address;
-    private final String dateOfBirth;
+    private final LocalDate dateOfBirth;
     private final String firstName;
     private final String gender;
     private final String familyName;
     private final String birthName;
     private final String placeOfBirth;
 
-    public EidasMatchingDataset(Address address, String dateOfBirth, String firstName, String gender, String familyName, String birthName, String placeOfBirth) {
+    public EidasMatchingDataset(Address address, LocalDate dateOfBirth, String firstName, String familyName, String birthName, String gender, String placeOfBirth) {
         this.address = address;
         this.dateOfBirth = dateOfBirth;
         this.firstName = firstName;
@@ -23,7 +26,7 @@ public class EidasMatchingDataset {
         return address;
     }
 
-    public String getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
