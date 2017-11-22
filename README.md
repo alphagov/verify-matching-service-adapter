@@ -47,13 +47,14 @@ You can add or amend existing test scenarios in the `examples/match` and
 
 Add any additional test scenarios as new JSON files within these folders.
 
-For example, to match the identity of a user with the first name `Sam`, you could amend the `example-match.json` file to include:
+For example, to match the identity of a user with the first name `Sam`, you could amend the `example-match.json` as below:
 
-```
-},
+```diff
 "firstName": {
-  "value": "Sam",
+- "value": "Joe",
++ "value": "Sam",
   "verified": true
+},
 ```
 
 ## Support and feedback
