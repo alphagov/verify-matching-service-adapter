@@ -40,7 +40,7 @@ def dependencyVersions = [
         saml_security:"$opensaml-46",
         saml_metadata_bindings:"$opensaml-58",
         saml_utils: "$opensaml-46",
-        saml_test_utils:"$opensaml-30",
+        saml_test_utils:"$opensaml-SNAPSHOT",
         saml_domain_objects: "$opensaml-37",
         hub_saml: "$opensaml-87",
         dev_pki: '1.1.0-19',
@@ -49,6 +49,7 @@ def dependencyVersions = [
 apply plugin: "idaJar"
 
 repositories {
+    mavenLocal()
     maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
 }
 
@@ -63,6 +64,7 @@ configurations.all {
     resolutionStrategy {
         // dropwizard-testing uses 2.2.0 but our libraries currently only work with 1.6.0.
         force "org.assertj:assertj-core:1.6.0"
+        force "uk.gov.verify:saml-test-utils:$dependencyVersions.saml_test_utils"
     }
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
