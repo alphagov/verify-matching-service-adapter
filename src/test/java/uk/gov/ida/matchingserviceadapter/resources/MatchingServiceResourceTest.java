@@ -3,7 +3,6 @@ package uk.gov.ida.matchingserviceadapter.resources;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
@@ -11,14 +10,11 @@ import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.builders.InboundMatchingServiceRequestBuilder;
 import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
-import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
-import uk.gov.ida.matchingserviceadapter.services.MatchingService;
 import uk.gov.ida.matchingserviceadapter.utils.manifest.ManifestReader;
 import uk.gov.ida.shared.utils.xml.XmlUtils;
 
@@ -28,9 +24,7 @@ import java.util.function.Function;
 import java.util.jar.Attributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,32 +33,59 @@ import static org.mockito.Mockito.when;
 public class MatchingServiceResourceTest {
 
     @Mock
-    private MatchingService matchingService;
+    private MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
     @Mock
-    private MatchingServiceResponseRenderer<MatchingServiceResponse> responseRenderer;
+    private SoapMessageManager soapMessageManager;
     @Mock
-    private Document attributeQueryDocument;
+    private Function<OutboundResponseFromMatchingService, Element> responseElementTransformer;
     @Mock
-    private MatchingServiceResponse matchingServiceResponse;
+    private Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
+    @Mock
+    private MatchingServiceAttributeQueryHandler attributeQueryHandler;
+    @Mock
+    private DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper;
+    @Mock
+    private ManifestReader manifestReader;
 
-    private MatchingServiceResource matchingServiceResource;
+    MatchingServiceResource matchingServiceResource;
 
     @Before
     public void setUp() {
-        matchingServiceResource = new MatchingServiceResource(
-            matchingService,
-            responseRenderer);
+        matchingServiceResource = new MatchingServiceResource(matchingServiceAdapterConfiguration, soapMessageManager, responseElementTransformer, healthCheckResponseTransformer, attributeQueryHandler, documentToInboundMatchingServiceRequestMapper, manifestReader);
     }
 
     @Test
     public void testMatching() throws ParserConfigurationException {
-        when(matchingService.handle(any())).thenReturn(matchingServiceResponse);
-        matchingServiceResource.receiveSoapRequest(attributeQueryDocument);
+        final Document inDocument = XmlUtils.newDocumentBuilder().newDocument();
+        final InboundMatchingServiceRequest inboundMatchingServiceRequest = InboundMatchingServiceRequestBuilder
+                .anInboundMatchingServiceRequest()
+                .build();
+        when(documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(inDocument)).thenReturn(inboundMatchingServiceRequest);
 
-        ArgumentCaptor<MatchingServiceRequestContext> requestContextArgumentCaptor = ArgumentCaptor.forClass(MatchingServiceRequestContext.class);
-        verify(matchingService).handle(requestContextArgumentCaptor.capture());
-        verify(responseRenderer).render(matchingServiceResponse);
+        final Response response = matchingServiceResource.receiveSoapRequest(inDocument);
 
-        assertThat(requestContextArgumentCaptor.getValue().getAttributeQueryDocument()).isSameAs(attributeQueryDocument);
+        verify(attributeQueryHandler, times(1)).handle(inboundMatchingServiceRequest);
+        verify(soapMessageManager, times(1)).wrapWithSoapEnvelope(any());
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
     }
+
+
+    @Test
+    public void testHealthcheck() throws ParserConfigurationException {
+        final Document inDocument = XmlUtils.newDocumentBuilder().newDocument();
+        final InboundMatchingServiceRequest inboundMatchingServiceRequest = InboundMatchingServiceRequestBuilder
+                .anInboundMatchingServiceRequest()
+                .withAuthnStatementAssertion(null)
+                .withMatchingDatasetAssertion(null)
+                .build();
+        when(documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(inDocument)).thenReturn(inboundMatchingServiceRequest);
+        when(manifestReader.getManifest()).thenReturn(new Attributes());
+
+        final Response response = matchingServiceResource.receiveSoapRequest(inDocument);
+
+        verify(soapMessageManager, times(1)).wrapWithSoapEnvelope(any());
+        verify(healthCheckResponseTransformer, times(1)).apply(any());
+        assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
+    }
+
 }
