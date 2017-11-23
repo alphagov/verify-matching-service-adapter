@@ -6,7 +6,6 @@ import org.beanplanet.validation.Validator;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
-import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
 
 import static org.beanplanet.messages.domain.MessagesImpl.messages;
 
@@ -28,7 +27,7 @@ public class EidasMatchingService implements MatchingService {
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
         Messages validationMessages = validator.validate(request.getAttributeQuery(), messages());
         if (validationMessages.hasErrors()) {
-            throw new AttributeQueryValidationException("Eidas Attribute Query was invalid: " + validationMessages);
+            throw new RuntimeException("Eidas Attribute Query was invalid: " + validationMessages);
         }
 
         // TODO - EID-202 handle attributes and fill out the nulls below
