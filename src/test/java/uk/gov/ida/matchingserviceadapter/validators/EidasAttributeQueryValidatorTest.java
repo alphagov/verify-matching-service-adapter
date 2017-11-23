@@ -51,7 +51,6 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
-import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
@@ -113,6 +112,7 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldValidateAttributeQuerySuccessfully() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -128,7 +128,7 @@ public class EidasAttributeQueryValidatorTest {
             .withId(requestId)
             .withSubject(aSubjectWithEncryptedAssertion(encryptedAssertion, requestId, HUB_ENTITY_ID))
             .build();
-        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(anEidasAssertion().withConditions(aConditions()).buildUnencrypted()));
+        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(assertion));
 
         Messages messages = validator.validate(attributeQuery, messages());
 
@@ -139,6 +139,7 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldReturnErrorWhenAttributeQueryIssuerValidationFails() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().withConditions(aConditions()).build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId("").build())
@@ -154,7 +155,7 @@ public class EidasAttributeQueryValidatorTest {
             .withId(requestId)
             .withSubject(aSubjectWithEncryptedAssertion(encryptedAssertion, requestId, HUB_ENTITY_ID))
             .build();
-        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(anEidasAssertion().withConditions(aConditions()).buildUnencrypted()));
+        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(assertion));
 
         Messages messages = validator.validate(attributeQuery, messages());
 
@@ -165,9 +166,9 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldReturnErrorWhenAttributeQuerySignatureValidationFails() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().withConditions(aConditions()).build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
-
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
             .withSignature(
                 aSignature()
@@ -181,7 +182,7 @@ public class EidasAttributeQueryValidatorTest {
             .withId(requestId)
             .withSubject(aSubjectWithEncryptedAssertion(encryptedAssertion, requestId, HUB_ENTITY_ID))
             .build();
-        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(anEidasAssertion().withConditions(aConditions()).buildUnencrypted()));
+        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(assertion));
 
         Messages messages = validator.validate(attributeQuery, messages());
 
@@ -284,6 +285,7 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
+        assertThat(messages.size()).isEqualTo(2);
         assertThat(messages.hasErrorLike(DEFAULT_ISSUER_EMPTY_MESSAGE)).isTrue();
         assertThat(messages.hasErrorLike(generateEmptyIssuerMessage(IDENTITY_ASSERTION))).isTrue();
     }

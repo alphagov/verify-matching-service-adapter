@@ -16,6 +16,7 @@ import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
+import uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
@@ -31,7 +32,6 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
-import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPAddress;
@@ -105,7 +105,8 @@ public class AssertionHelper {
     }
 
     public static EncryptedAssertion anEidasEncryptedAssertion(String issuerId) {
-        return anEidasAssertion()
+        return anAssertion()
+                .addAuthnStatement(AuthnStatementBuilder.anAuthnStatement().build())
                 .withIssuer(
                         anIssuer()
                                 .withIssuerId(issuerId)

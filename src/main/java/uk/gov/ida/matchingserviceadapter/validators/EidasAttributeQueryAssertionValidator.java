@@ -63,12 +63,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
                 new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
             ),
-            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId),
-            new CompositeValidator<>(
-                true,
-                new FixedErrorValidator<>(a -> a.getAttributeStatements().size() != 1 , generateWrongNumberOfAttributeStatementsMessage(typeOfAssertion)),
-                new AttributeStatementValidator<>(a -> a.getAttributeStatements().get(0))
-            )
+            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId)
         );
     }
 
@@ -85,10 +80,6 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
     }
 
     public static MessageImpl generateWrongNumberOfAuthnStatementsMessage(final String typeOfAssertion) {
-        return fieldMessage("authnStatements", "authnStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of authn statements.");
-    }
-
-    public static MessageImpl generateWrongNumberOfAttributeStatementsMessage(final String typeOfAssertion) {
-        return fieldMessage("attributeStatements", "attributeStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of attribute statements.");
+        return fieldMessage("issuer.authnStatements", "issuer.authnStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of authn statements.");
     }
 }
