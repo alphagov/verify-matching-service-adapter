@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.validators;
 import org.beanplanet.messages.domain.Messages;
 import org.beanplanet.validation.Validator;
 import org.junit.Test;
+import org.junit.experimental.theories.suppliers.TestedOn;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;

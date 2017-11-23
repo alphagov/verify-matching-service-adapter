@@ -5,6 +5,7 @@ import org.beanplanet.messages.domain.Message;
 import org.beanplanet.validation.PredicatedValidator;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.function.Function;
 
 import static org.beanplanet.messages.domain.MessageImpl.globalMessage;

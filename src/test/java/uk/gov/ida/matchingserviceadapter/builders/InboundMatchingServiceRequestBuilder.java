@@ -4,12 +4,12 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
-import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
-import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
+import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
+import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;

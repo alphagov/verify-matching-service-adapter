@@ -9,7 +9,6 @@ import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
-import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.matchingserviceadapter.saml.factories.UserAccountCreationAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
@@ -17,6 +16,7 @@ import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.impl.VerifiedImpl;
 import uk.gov.ida.saml.core.test.OpenSAMLRunner;
 import uk.gov.ida.saml.core.transformers.outbound.OutboundAssertionToSubjectTransformer;
+import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 
 import java.util.ArrayList;

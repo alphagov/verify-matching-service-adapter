@@ -38,7 +38,6 @@ public class SamlAttributeQueryAssertionsValidator {
                     matchingServiceAdapterConfiguration.getEntityId());
         }
     }
-
     public void validateIdpAssertions(ValidatedAttributeQuery attributeQuery, List<Assertion> assertions) {
         for (Assertion assertion : assertions) {
             identityProviderAssertionValidator.validate(
@@ -46,6 +45,5 @@ public class SamlAttributeQueryAssertionsValidator {
                     attributeQuery.getID(),
                     hubEntityId);
         }
-        identityProviderAssertionValidator.validateConsistency(assertions);
     }
 }
