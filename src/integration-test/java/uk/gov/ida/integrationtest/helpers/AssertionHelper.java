@@ -10,7 +10,6 @@ import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
-import uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
@@ -99,7 +98,6 @@ public class AssertionHelper {
 
     public static EncryptedAssertion anEidasEncryptedAssertion(String issuerId) {
         return anAssertion()
-                .addAuthnStatement(AuthnStatementBuilder.anAuthnStatement().build())
                 .withIssuer(
                         anIssuer()
                                 .withIssuerId(issuerId)

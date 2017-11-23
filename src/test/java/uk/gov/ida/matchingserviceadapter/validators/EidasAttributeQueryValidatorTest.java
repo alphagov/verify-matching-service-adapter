@@ -45,7 +45,6 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
-import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
@@ -102,8 +101,8 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldValidateAttributeQuerySuccessfully() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+        final EncryptedAssertion encryptedAssertion = anAssertion().build();
+        final Assertion assertion = anAssertion().buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -130,7 +129,7 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldReturnErrorWhenAttributeQueryIssuerValidationFails() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+        final Assertion assertion = anAssertion().buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId("").build())
@@ -157,7 +156,7 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldReturnErrorWhenAttributeQuerySignatureValidationFails() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
+        final Assertion assertion = anAssertion().buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -184,7 +183,7 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldReturnErrorWhenAnEncryptedAssertionValidationFails() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
+        final Assertion assertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -256,7 +255,7 @@ public class EidasAttributeQueryValidatorTest {
     @Test
     public void shouldReturnErrorWhenAttributeQueryIssuerValidationAndEncryptedAssertionValidationBothFail() throws ResolverException {
         final EncryptedAssertion encryptedAssertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
+        final Assertion assertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId("").build())
