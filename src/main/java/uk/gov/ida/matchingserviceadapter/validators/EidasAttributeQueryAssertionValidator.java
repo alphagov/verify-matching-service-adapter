@@ -29,8 +29,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                                                  final DateTimeComparator dateTimeComparator,
                                                  final String typeOfAssertion,
                                                  final Duration ttl,
-                                                 final Duration clockDelta,
-                                                 final String hubConnectorEntityId) {
+                                                 final Duration clockDelta) {
         super(
             new CompositeValidator<>(
                 true,
@@ -62,8 +61,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 true,
                 new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
                 new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
-            ),
-            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId)
+            )
         );
     }
 

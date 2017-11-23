@@ -118,4 +118,5 @@ public class SubjectValidatorTest {
 
         assertThat(messages.hasErrorLike(SUBJECT_CONFIRMATION_DATA_NOT_PRESENT)).isTrue();
     }
+
 }

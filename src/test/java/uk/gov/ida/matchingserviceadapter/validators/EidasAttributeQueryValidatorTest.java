@@ -3,7 +3,6 @@ package uk.gov.ida.matchingserviceadapter.validators;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.beanplanet.messages.domain.Messages;
-import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,17 +11,11 @@ import org.mockito.Mock;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
-import org.opensaml.saml.saml2.core.Audience;
-import org.opensaml.saml.saml2.core.AudienceRestriction;
-import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
-import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
-import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
-import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
@@ -62,7 +55,6 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryValidatorTest {
-    public static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
     @Mock
     private MetadataResolver verifyMetadataResolver;
 
@@ -98,8 +90,7 @@ public class EidasAttributeQueryValidatorTest {
             certificateExtractor,
             x509CertificateFactory,
             new DateTimeComparator(Duration.ZERO),
-            assertionDecrypter,
-            HUB_CONNECTOR_ENTITY_ID);
+            assertionDecrypter);
 
         when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
         when(countryMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn((entityDescriptor));
@@ -111,8 +102,8 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldValidateAttributeQuerySuccessfully() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
+        final EncryptedAssertion encryptedAssertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -138,8 +129,8 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldReturnErrorWhenAttributeQueryIssuerValidationFails() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().withConditions(aConditions()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
+        final EncryptedAssertion encryptedAssertion = anAssertion().build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId("").build())
@@ -165,8 +156,8 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldReturnErrorWhenAttributeQuerySignatureValidationFails() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().withConditions(aConditions()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withConditions(aConditions()).buildUnencrypted();
+        final EncryptedAssertion encryptedAssertion = anAssertion().build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -214,6 +205,7 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
+        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(generateEmptyIssuerMessage(IDENTITY_ASSERTION))).isTrue();
     }
 
@@ -263,8 +255,8 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldReturnErrorWhenAttributeQueryIssuerValidationAndEncryptedAssertionValidationBothFail() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).withConditions(aConditions()).build();
-        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withIssuer(anIssuer().withIssuerId("").build()).withConditions(aConditions()).buildUnencrypted();
+        final EncryptedAssertion encryptedAssertion = anAssertion().withIssuer(anIssuer().withIssuerId("").build()).build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).withIssuer(anIssuer().withIssuerId("").build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId("").build())
@@ -298,17 +290,5 @@ public class EidasAttributeQueryValidatorTest {
         final SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(subjectConfirmationData).build();
 
         return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
-    }
-
-    private Conditions aConditions() {
-        Conditions conditions = new ConditionsBuilder().buildObject();
-        conditions.setNotBefore(DateTime.now());
-        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
-        Audience audience = new AudienceBuilder().buildObject();
-        audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
-        audienceRestriction.getAudiences().add(audience);
-        conditions.getAudienceRestrictions().add(audienceRestriction);
-        return conditions;
     }
 }

@@ -342,14 +342,13 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     private Function<AttributeQuery, InboundMatchingServiceRequest> getAttributeQueryToInboundMatchingServiceRequestTransformer(
-        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
-        @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
-        @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-        @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
-        X509CertificateFactory x509CertificateFactory,
-        IdaKeyStore eidasKeystore,
-        VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer,
-        MatchingServiceAdapterConfiguration configuration) throws ComponentInitializationException {
+            @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
+            @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
+            @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
+            @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
+            X509CertificateFactory x509CertificateFactory,
+            IdaKeyStore eidasKeystore,
+            VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer) throws ComponentInitializationException {
 
         if (countryMetadataResolver.isPresent()) {
             EidasAttributesBasedAttributeQueryDiscriminator discriminator = new EidasAttributesBasedAttributeQueryDiscriminator(
@@ -367,8 +366,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                             new CertificateExtractor(),
                             x509CertificateFactory,
                             new DateTimeComparator(Duration.ZERO),
-                            new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(eidasKeystore), new EncryptionAlgorithmValidator(), new DecrypterFactory()),
-                            configuration.getCountry().getHubConnectorEntityId()
+                            new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(eidasKeystore), new EncryptionAlgorithmValidator(), new DecrypterFactory())
                         )
                     );
 
