@@ -27,6 +27,7 @@ import uk.gov.ida.jerseyclient.JsonResponseProcessor;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.CertificateStore;
 import uk.gov.ida.matchingserviceadapter.configuration.KeyPairConfiguration;
+import uk.gov.ida.matchingserviceadapter.configuration.KeyStoreProvider;
 import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.controllogic.UnknownUserAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
@@ -49,15 +50,14 @@ import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.api.MsaTransformersFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.DiscriminatingAttributeQueryToInboundMSRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributesBasedAttributeQueryDiscriminator;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.DiscriminatingAttributeQueryToInboundMSRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.VerifyAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.utils.manifest.ManifestReader;
-import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
@@ -76,6 +76,7 @@ import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.SigningKeyStore;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
+import uk.gov.ida.truststore.ClientTrustStoreConfiguration;
 import uk.gov.ida.truststore.KeyStoreLoader;
 
 import javax.inject.Named;
@@ -123,6 +124,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
         bind(AdapterToMatchingServiceProxy.class).to(AdapterToMatchingServiceHttpProxy.class).in(Singleton.class);
+        bind(KeyStore.class).toProvider(KeyStoreProvider.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
         bind(UserIdHashFactory.class).toInstance(new UserIdHashFactory());
@@ -155,38 +157,14 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyCertificateValidator")
-    public CertificateValidator getCertificateValidator(
-        X509CertificateFactory x509CertificateFactory,
-        @Named("VerifyFixedCertificateChainValidator") FixedCertificateChainValidator fixedCertificateChainValidator) {
+    public CertificateValidator getCertificateValidator(X509CertificateFactory x509CertificateFactory, FixedCertificateChainValidator fixedCertificateChainValidator) {
         return new CertificateValidator(x509CertificateFactory, fixedCertificateChainValidator);
     }
 
     @Provides
     @Singleton
-    @Named("CountryCertificateValidator")
-    public Optional<CertificateValidator> getCountryCertificateValidator(
-        X509CertificateFactory x509CertificateFactory,
-        @Named("CountryFixedCertificateChainValidator") Optional<FixedCertificateChainValidator> fixedCertificateChainValidator) {
-        return fixedCertificateChainValidator.map(certificateChainValidator -> new CertificateValidator(x509CertificateFactory, certificateChainValidator));
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyFixedCertificateChainValidator")
-    public FixedCertificateChainValidator getFixedChainCertificateValidator(
-        @Named("VerifyTrustStore") KeyStore keyStore,
-        CertificateChainValidator certificateChainValidator) {
+    public FixedCertificateChainValidator getFixedChainCertificateValidator(KeyStore keyStore, CertificateChainValidator certificateChainValidator) {
         return new FixedCertificateChainValidator(keyStore, certificateChainValidator);
-    }
-
-    @Provides
-    @Singleton
-    @Named("CountryFixedCertificateChainValidator")
-    public Optional<FixedCertificateChainValidator> getCountryFixedChainCertificateValidator(
-        @Named("CountryTrustStore") Optional<KeyStore> CountryTrustStore,
-        CertificateChainValidator certificateChainValidator) {
-        return CountryTrustStore.map(keyStore -> new FixedCertificateChainValidator(keyStore, certificateChainValidator));
     }
 
     @Provides
@@ -197,10 +175,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyCertificateChainEvaluableCriterion")
-    public CertificateChainEvaluableCriterion getCertificateChainEvaluableCriterion(
-        CertificateChainValidator certificateChainValidator,
-        @Named("VerifyTrustStore") KeyStore keyStore) {
+    public CertificateChainEvaluableCriterion getCertificateChainEvaluableCriterion(CertificateChainValidator certificateChainValidator, KeyStore keyStore) {
         return new CertificateChainEvaluableCriterion(certificateChainValidator, keyStore);
     }
 
@@ -212,7 +187,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MetadataCertificatesRepository getMetadataCertificateRepository(@Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver, @Named("VerifyCertificateValidator") CertificateValidator certificateValidator) {
+    public MetadataCertificatesRepository getMetadataCertificateRepository(@Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver, CertificateValidator certificateValidator) {
         return new MetadataCertificatesRepository(metadataResolver, certificateValidator, new CertificateExtractor());
     }
 
@@ -226,23 +201,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyTrustStoreConfiguration")
-    public TrustStoreConfiguration getHubTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
+    public TrustStoreConfiguration getTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
         return configuration.getHubTrustStoreConfiguration();
-    }
-
-    @Provides
-    @Singleton
-    @Named("CountryTrustStore")
-    public Optional<KeyStore> getCountryTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
-        return Optional.of(configuration.getHubTrustStoreConfiguration().getTrustStore());
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyTrustStore")
-    public KeyStore getVerifyKeyStore(@Named("VerifyTrustStoreConfiguration") TrustStoreConfiguration trustStoreConfiguration) {
-        return trustStoreConfiguration.getTrustStore();
     }
 
     @Provides
@@ -327,7 +287,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         @Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver,
         IdaKeyStore keyStore,
         MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-        @Named("VerifyCertificateChainEvaluableCriterion") CertificateChainEvaluableCriterion certificateChainEvaluableCriterion,
+        CertificateChainEvaluableCriterion certificateChainEvaluableCriterion,
         @Named("HubEntityId") String hubEntityId) throws ComponentInitializationException {
         return new MsaTransformersFactory().getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
                 metadataResolver,
@@ -342,11 +302,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
     private Function<AttributeQuery, InboundMatchingServiceRequest> getAttributeQueryToInboundMatchingServiceRequestTransformer(
             @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
             @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
-            @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-            @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
-            X509CertificateFactory x509CertificateFactory,
             IdaKeyStore eidasKeystore,
-            VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer) throws ComponentInitializationException {
+            VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer,
+            CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
 
         if (countryMetadataResolver.isPresent()) {
             EidasAttributesBasedAttributeQueryDiscriminator discriminator = new EidasAttributesBasedAttributeQueryDiscriminator(
@@ -356,16 +314,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
             EidasAttributeQueryToInboundMatchingServiceRequestTransformer eidasTransformer =
                     new MsaTransformersFactory().getEidasAttributeQueryToInboundMatchingServiceRequestTransformer(
-                        new EidasAttributeQueryValidator(
-                            verifyMetadataResolver,
-                            countryMetadataResolver.get(),
-                            verifyCertificateValidator,
-                            countryCertificateValidator.get(),
-                            new CertificateExtractor(),
-                            x509CertificateFactory,
-                            new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(eidasKeystore), new EncryptionAlgorithmValidator(), new DecrypterFactory())
-                        )
-                    );
+                        verifyMetadataResolver,
+                certificateChainEvaluableCriterion
+            );
 
             return new DiscriminatingAttributeQueryToInboundMSRequestTransformer(discriminator, verifyTransformer, eidasTransformer);
         }

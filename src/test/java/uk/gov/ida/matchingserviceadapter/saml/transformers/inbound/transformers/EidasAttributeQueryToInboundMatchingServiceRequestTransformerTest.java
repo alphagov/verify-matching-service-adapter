@@ -1,40 +1,45 @@
 package uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers;
 
-import org.beanplanet.messages.domain.MessagesImpl;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.AttributeQuery;
-import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
+import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributeQueryToInboundMatchingServiceRequestTransformer.TODO_MESSAGE;
-import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EidasAttributeQueryToInboundMatchingServiceRequestTransformerTest {
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     @Mock
-    private EidasAttributeQueryValidator eidasAttributeQueryValidator;
+    private SamlAttributeQueryValidator samlAttributeQueryValidator;
+
+    @Mock
+    private AttributeQuerySignatureValidator attributeQuerySignatureValidator;
+
+    @Mock
+    private AttributeQuery attributeQuery;
 
     @InjectMocks
     private EidasAttributeQueryToInboundMatchingServiceRequestTransformer transformer;
 
     @Test
     public void theAttributeQuerySignatureIsValidated() {
-        AttributeQuery attributeQuery = anAttributeQuery().build();
-        MessagesImpl messages = messages();
-        when(eidasAttributeQueryValidator.validate(attributeQuery, messages)).thenReturn(messages);
+        exception.expect(RuntimeException.class);
 
-        try {
-            transformer.apply(attributeQuery);
-        } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo(TODO_MESSAGE);
-        }
-        verify(eidasAttributeQueryValidator).validate(attributeQuery, messages);
+        transformer.apply(attributeQuery);
+
+        exception.expectMessage("TODO: Signature valid. Next stage of eIDAS MSA development");
+        verify(samlAttributeQueryValidator).validate(attributeQuery);
+        verify(attributeQuerySignatureValidator).validate(attributeQuery);
+        verifyNoMoreInteractions(samlAttributeQueryValidator, attributeQuerySignatureValidator);
     }
 }

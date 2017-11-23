@@ -1,11 +1,9 @@
 package uk.gov.ida.matchingserviceadapter.saml.api;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import org.beanplanet.validation.Validator;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.BasicRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
@@ -19,8 +17,8 @@ import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureVa
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributeQueryToInboundMatchingServiceRequestTransformer;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.InboundMatchingServiceRequestUnmarshaller;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.VerifyAttributeQueryToInboundMatchingServiceRequestTransformer;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.InboundMatchingServiceRequestUnmarshaller;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
@@ -201,9 +199,15 @@ public class MsaTransformersFactory {
     }
 
     public EidasAttributeQueryToInboundMatchingServiceRequestTransformer getEidasAttributeQueryToInboundMatchingServiceRequestTransformer(
-        final Validator<AttributeQuery> validator) throws ComponentInitializationException {
+        final MetadataResolver metaDataResolver,
+        final CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
 
-        return new EidasAttributeQueryToInboundMatchingServiceRequestTransformer(validator);
+        SignatureValidator signatureValidator = getMetadataBackedSignatureValidator(metaDataResolver, certificateChainEvaluableCriterion);
+
+        return new EidasAttributeQueryToInboundMatchingServiceRequestTransformer(
+            new SamlAttributeQueryValidator(),
+            new AttributeQuerySignatureValidator(new SamlMessageSignatureValidator(signatureValidator))
+        );
     }
 
 

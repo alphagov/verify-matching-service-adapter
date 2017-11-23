@@ -23,7 +23,6 @@ hub:
 
 metadata:
   url: ${METADATA_URL:-http://localhost:55000/metadata.xml}
-  jerseyClientName: metadata-client
   trustStore:
     type: encoded
     store: ${METADATA_TRUST_STORE}

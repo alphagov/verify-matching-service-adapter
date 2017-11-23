@@ -42,7 +42,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     private static final HttpStubRule countryMetadataServer = new HttpStubRule();
 
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
-    private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource clientTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("interCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).withCertificate("idpCA", CACertificates.TEST_IDP_CA).build();
 
     public MatchingServiceAdapterAppRule(ConfigOverride... otherConfigOverrides) {
@@ -59,7 +58,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     @Override
     protected void before() {
         metadataTrustStore.create();
-        countryMetadataTrustStore.create();
         clientTrustStore.create();
 
         JerseyGuiceUtils.reset();
@@ -81,7 +79,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     @Override
     protected void after() {
         metadataTrustStore.delete();
-        countryMetadataTrustStore.delete();
         clientTrustStore.delete();
 
         super.after();
@@ -112,14 +109,14 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         if (isCountryEnabled) {
             List<ConfigOverride> countryOverrides = Stream.of(
                     ConfigOverride.config("returnStackTraceInResponse", "true"),  // Until eiDAS happy-path through MSA is complete (EID-270)
-                    ConfigOverride.config("country.hubConnectorEntityId", HUB_ENTITY_ID),
+                    ConfigOverride.config("country.hubConnectorEntityId", HUB_CONNECTOR_ENTITY_ID),
 
                     ConfigOverride.config("country.metadata.uri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
-                    ConfigOverride.config("country.metadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
-                    ConfigOverride.config("country.metadata.trustStore.password", countryMetadataTrustStore.getPassword()),
+                    ConfigOverride.config("country.metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+                    ConfigOverride.config("country.metadata.trustStore.password", metadataTrustStore.getPassword()),
                     ConfigOverride.config("country.metadata.minRefreshDelay", "60000"),
                     ConfigOverride.config("country.metadata.maxRefreshDelay", "600000"),
-                    ConfigOverride.config("country.metadata.expectedEntityId", "http://stub_idp.acme.org/stub-idp-one/SSO/POST"),
+                    ConfigOverride.config("country.metadata.expectedEntityId", "http://localhost:56002/ServiceMetadata"),
                     ConfigOverride.config("country.metadata.jerseyClientName", "country-metadata-client"),
 
                     ConfigOverride.config("country.metadata.client.timeout", "2s"),
