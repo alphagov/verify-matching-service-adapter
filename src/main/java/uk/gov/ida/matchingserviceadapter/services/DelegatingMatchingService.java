@@ -31,18 +31,13 @@ public class DelegatingMatchingService implements MatchingService {
         this.assertionDecrypter = assertionDecrypter;
     }
 
+
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext requestContext) {
         AttributeQuery attributeQuery = unwrapAttributeQuery(requestContext.getAttributeQueryDocument());
         requestContext.setAttributeQuery(attributeQuery);
         requestContext.setAssertions(decryptAssertions(attributeQuery));
-
-        MatchingService delegateService = matchingServiceLocator.findServiceFor(requestContext);
-        if (delegateService == null) {
-            throw new IllegalStateException("No delegate found to handle Matching Service Request");
-        }
-
-        return delegateService.handle(requestContext);
+        return matchingServiceLocator.findServiceFor(requestContext).handle(requestContext);
     }
 
     private AttributeQuery unwrapAttributeQuery(Document attributeQueryDocument) {
