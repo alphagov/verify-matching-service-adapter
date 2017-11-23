@@ -29,7 +29,7 @@ public class HealthCheckResponseRenderer implements MatchingServiceResponseRende
     @Override
     public Response render(HealthCheckMatchingServiceResponse healthCheckMatchingServiceResponse) {
         return ok()
-            .header("ida-msa-version", manifestReader.getValue("Version-Number"))
+            .header("ida-msa-version", manifestReader.getManifest().getValue("Version-Number"))
             .entity(
                 soapMessageManager.wrapWithSoapEnvelope(
                     healthCheckResponseTransformer.apply(

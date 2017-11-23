@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
+import org.opensaml.saml.saml2.core.Response;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 
 public class HealthCheckMatchingServiceResponse implements MatchingServiceResponse {

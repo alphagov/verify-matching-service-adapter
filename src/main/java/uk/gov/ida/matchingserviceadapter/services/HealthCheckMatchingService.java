@@ -20,13 +20,12 @@ public class HealthCheckMatchingService implements MatchingService {
     public HealthCheckMatchingService(ManifestReader manifestReader, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration) {
         this.manifestReader = manifestReader;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
-        System.out.println("#######################Version: " + manifestReader.getValue("Version-Number"));
     }
 
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
         String requestId = request.getAttributeQuery().getID();
         LOG.info("Responding to health check with id '{}'.", requestId);
-        return new HealthCheckMatchingServiceResponse(new HealthCheckResponseFromMatchingService(matchingServiceAdapterConfiguration.getEntityId(), requestId, manifestReader.getValue("Version-Number")));
+        return new HealthCheckMatchingServiceResponse(new HealthCheckResponseFromMatchingService(matchingServiceAdapterConfiguration.getEntityId(), requestId, manifestReader.getManifest().getValue("Version-Number")));
     }
 }
