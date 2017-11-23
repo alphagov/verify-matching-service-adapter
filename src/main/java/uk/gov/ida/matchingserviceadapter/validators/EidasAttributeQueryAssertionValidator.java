@@ -23,7 +23,6 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                                                  final CertificateValidator certificateValidator,
                                                  final CertificateExtractor certificateExtractor,
                                                  final X509CertificateFactory x509CertificateFactory,
-                                                 final DateTimeComparator dateTimeComparator,
                                                  final String typeOfAssertion) {
         super(
             true,
@@ -41,8 +40,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                     .collect(Collectors.toList()),
                 Assertion::getIssuer,
                 IDPSSODescriptor.DEFAULT_ELEMENT_NAME
-            ),
-            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator)
+            )
         );
     }
 
