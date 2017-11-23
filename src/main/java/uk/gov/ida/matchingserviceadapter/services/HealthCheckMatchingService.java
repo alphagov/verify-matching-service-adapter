@@ -20,6 +20,7 @@ public class HealthCheckMatchingService implements MatchingService {
     public HealthCheckMatchingService(ManifestReader manifestReader, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration) {
         this.manifestReader = manifestReader;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
+        System.out.println("#######################Version: " + manifestReader.getValue("Version-Number"));
     }
 
     @Override
