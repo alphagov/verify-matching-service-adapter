@@ -5,7 +5,8 @@ The Matching Service Adapter (MSA) is a software tool provided by GOV.UK
 Verify. It simplifies communication between your local matching service and the
 GOV.UK Verify hub.
 
-For more details, see [the full documentation on how to use the MSA.](http://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msa.html)
+For more details, see
+[http://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msa.html](the documentation).
 
 Running the MSA
 ---------------
