@@ -9,16 +9,20 @@ import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.AttributeValue;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
+import uk.gov.ida.saml.core.extensions.eidas.BirthName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentFamilyName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
 import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
 import uk.gov.ida.saml.core.extensions.eidas.Gender;
 import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
+import uk.gov.ida.saml.core.extensions.eidas.PlaceOfBirth;
+import uk.gov.ida.saml.core.extensions.eidas.impl.BirthNameBuilder;
 import uk.gov.ida.saml.core.extensions.eidas.impl.CurrentFamilyNameBuilder;
 import uk.gov.ida.saml.core.extensions.eidas.impl.CurrentGivenNameBuilder;
 import uk.gov.ida.saml.core.extensions.eidas.impl.DateOfBirthBuilder;
 import uk.gov.ida.saml.core.extensions.eidas.impl.GenderBuilder;
 import uk.gov.ida.saml.core.extensions.eidas.impl.PersonIdentifierBuilder;
+import uk.gov.ida.saml.core.extensions.eidas.impl.PlaceOfBirthBuilder;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -98,25 +102,19 @@ public class AttributeStatementBuilder {
     }
 
     public static Attribute aBirthNameAttribute(String birthName) {
-        // TODO: Once type is created in ida-saml-extensions
-        throw new UnsupportedOperationException();
-
-//        Attribute birthNameAttribute =  anAttribute(BIRTH_NAME);
-//        XSStringBuilder stringBuilder = new XSStringBuilder();
-//        XSString birthNameAttributeValue = stringBuilder.buildObject(
-////            new QName(SAMLConstants.SAML20_NS, AttributeValue.DEFAULT_ELEMENT_LOCAL_NAME, SAMLConstants.SAML20_PREFIX),
-//            new QName(SAMLConstants.SAML20_NS, "AttributeValue", SAMLConstants.SAML20_PREFIX),
-////            new QName("", "BirthNameType", IdaConstants.EIDAS_NATURUAL_PREFIX),
-//            new QName(EIDAS_NATURAL_PERSON_NS, "BirthNameType", IdaConstants.EIDAS_NATURUAL_PREFIX)
-//        );
-//        birthNameAttributeValue.setValue(birthName);
-//        birthNameAttribute.getAttributeValues().add(birthNameAttributeValue);
-//        return birthNameAttribute;
+        Attribute birthNameAttribute =  anAttribute(IdaConstants.Eidas_Attributes.BirthName.NAME);
+        BirthName birthNameValue = new BirthNameBuilder().buildObject();
+        birthNameValue.setPlaceOfBirth(birthName);
+        birthNameAttribute.getAttributeValues().add(birthNameValue);
+        return birthNameAttribute;
     }
 
-    public static Attribute aPlaceOfBirthAttribute(String birthName) {
-        // TODO: Once type is created in ida-saml-extensions
-        throw new UnsupportedOperationException();
+    public static Attribute aPlaceOfBirthAttribute(String placeOfBirth) {
+        Attribute placeOfBirthAttribute =  anAttribute(IdaConstants.Eidas_Attributes.PlaceOfBirth.NAME);
+        PlaceOfBirth placeOfBirthValue = new PlaceOfBirthBuilder().buildObject();
+        placeOfBirthValue.setPlaceOfBirth(placeOfBirth);
+        placeOfBirthAttribute.getAttributeValues().add(placeOfBirthValue);
+        return placeOfBirthAttribute;
     }
 
     private static Attribute anAttribute(String name) {
