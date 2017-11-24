@@ -6,17 +6,27 @@ import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import io.dropwizard.util.Duration;
 import org.apache.http.HttpStatus;
+import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.core.Audience;
+import org.opensaml.saml.saml2.core.AudienceRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
+import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
+import org.opensaml.xmlsec.signature.Signature;
 import org.w3c.dom.Document;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
+import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
+import uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder;
 import uk.gov.ida.saml.serializers.XmlObjectToElementTransformer;
 import uk.gov.ida.shared.utils.xml.XmlUtils;
 
@@ -40,8 +50,18 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PRIVA
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
+import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 
@@ -77,7 +97,36 @@ public class CountryEnabledIntegrationTest {
                 .withIssuer(anIssuer().withIssuerId(issuerId).build())
             .withSubject(
                     aSubjectWithEncryptedAssertions(
-                        singletonList(anEidasEncryptedAssertion(STUB_IDP_ONE)), REQUEST_ID, HUB_ENTITY_ID)
+                        singletonList(
+                            anAssertion()
+                                .withIssuer(
+                                    anIssuer()
+                                        .withIssuerId(STUB_IDP_ONE)
+                                        .build())
+                                .addAttributeStatement(anEidasAttributeStatement().build())
+                                .addAuthnStatement(
+                                    anAuthnStatement()
+                                    .withAuthnContext(
+                                        anAuthnContext()
+                                            .withAuthnContextClassRef(
+                                                anAuthnContextClassRef()
+                                                .withAuthnContextClasRefValue(EidasLoa.HIGH.getValueUri())
+                                                .build()
+                                            )
+                                        .build()
+
+                                    )
+                                        .build())
+                                .withSignature(aValidSignature())
+                                .withConditions(aConditions())
+                                .buildWithEncrypterCredential(
+                                    new TestCredentialFactory(
+                                        TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+                                        TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
+                                    ).getEncryptingCredential()
+                                )
+                        ),
+                        REQUEST_ID, HUB_ENTITY_ID)
                 )
                 .withSignature(
                     aSignature()
@@ -160,4 +209,27 @@ public class CountryEnabledIntegrationTest {
                 .request()
                 .post(Entity.entity(xmlString, MediaType.TEXT_XML));
     }
+
+    private static Signature aValidSignature() {
+        return aSignature()
+            .withSigningCredential(
+                new TestCredentialFactory(
+                    STUB_IDP_PUBLIC_PRIMARY_CERT,
+                    STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
+                ).getSigningCredential()
+            ).build();
+    }
+
+    private static Conditions aConditions() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(DateTime.now());
+        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
+        AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
+        Audience audience = new AudienceBuilder().buildObject();
+        audience.setAudienceURI(HUB_SECONDARY_ENTITY_ID);
+        audienceRestriction.getAudiences().add(audience);
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+        return conditions;
+    }
+
 }
