@@ -15,11 +15,13 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aBirthNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentGivenNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aDateOfBirthAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aGenderAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aPersonIdentifierAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aPlaceOfBirthAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
@@ -53,12 +55,10 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
                     aCurrentFamilyNameAttribute("Flintstone"),
                     aPersonIdentifierAttribute("the-pid"),
                     aGenderAttribute("MALE"),
-                    aDateOfBirthAttribute(DOB)
-                    // TODO: Add tests for the following attributes once ida-saml-extensions has types for them.
-//                    aBirthNameAttribute("birth-name")
-//                    aPlaceOfBirthAttribute("birth-name")
-                )
-                    .build()
+                    aDateOfBirthAttribute(DOB),
+                    aBirthNameAttribute("birth-name"),
+                    aPlaceOfBirthAttribute("place-of-birth")
+                ).build()
             ).buildUnencrypted();
         transform = new EidasMatchingRequestToLMSRequestTransform();
     }
@@ -94,7 +94,8 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
         assertThat(lmsDto.getEidasDataset().getDateOfBirth(), equalTo(DOB));
         assertThat(lmsDto.getEidasDataset().getFamilyName(), equalTo("Flintstone"));
         assertThat(lmsDto.getEidasDataset().getGender(), equalTo("MALE"));
-//        assertThat(lmsDto.getEidasDataset().getBirthName(), equalTo("the-birth-name"));
+        assertThat(lmsDto.getEidasDataset().getBirthName(), equalTo("birth-name"));
+        assertThat(lmsDto.getEidasDataset().getPlaceOfBirth(), equalTo("place-of-birth"));
 
     }
 }
