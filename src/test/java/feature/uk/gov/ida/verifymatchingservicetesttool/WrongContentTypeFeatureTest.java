@@ -35,7 +35,7 @@ public class WrongContentTypeFeatureTest extends FeatureTestBase {
         assertThat(
             firstFailure.getException().getMessage(),
             allOf(
-                containsString("Expected: is \"application/json\""),
+                containsString("Expected: a string containing \"application/json\""),
                 containsString("but: was \"application/xhtml+xml\"")
             )
         );
