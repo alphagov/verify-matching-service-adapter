@@ -61,10 +61,7 @@ import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.api.MsaTransformersFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.DiscriminatingAttributeQueryToInboundMSRequestTransformer;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributesBasedAttributeQueryDiscriminator;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.VerifyAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
@@ -147,7 +144,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(AdapterToMatchingServiceProxy.class).to(AdapterToMatchingServiceHttpProxy.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
-        bind(UserIdHashFactory.class).toInstance(new UserIdHashFactory());
+    }
+
+    @Provides
+    @Singleton
+    private UserIdHashFactory getUserIdHashFactory(MatchingServiceAdapterConfiguration configuration) {
+        return new UserIdHashFactory(configuration.getEntityId());
     }
 
     @Provides
@@ -214,7 +216,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
         @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
         X509CertificateFactory x509CertificateFactory,
         MatchingServiceAdapterConfiguration configuration,
-        AssertionDecrypter assertionDecrypter
+        AssertionDecrypter assertionDecrypter,
+        UserIdHashFactory userIdHashFactory
     ) {
         return countryMetadataResolver.map(cmr ->
             new EidasMatchingService(
@@ -229,7 +232,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     assertionDecrypter,
                     configuration.getCountry().getHubConnectorEntityId()
                 ),
-                new EidasMatchingRequestToLMSRequestTransform()
+                new EidasMatchingRequestToLMSRequestTransform(userIdHashFactory)
             ));
     }
 
@@ -441,45 +444,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
             hubEntityId,
             certificateChainEvaluableCriterion);
     }
-
-//    @Provides
-//    @Singleton
-//    private Function<AttributeQuery, InboundMatchingServiceRequest> getAttributeQueryToInboundMatchingServiceRequestTransformer(
-//        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
-//        @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
-//        @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-//        @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
-//        X509CertificateFactory x509CertificateFactory,
-//        VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer,
-//        MatchingServiceAdapterConfiguration configuration,
-//        AssertionDecrypter assertionDecrypter) throws ComponentInitializationException {
-//
-//        if (countryMetadataResolver.isPresent()) {
-//            EidasAttributesBasedAttributeQueryDiscriminator discriminator = new EidasAttributesBasedAttributeQueryDiscriminator(
-//                assertionDecrypter,
-//                new ResolverBackedMetadataRepository(countryMetadataResolver.get())
-//            );
-//
-//            EidasAttributeQueryToInboundMatchingServiceRequestTransformer eidasTransformer =
-//                new MsaTransformersFactory().getEidasAttributeQueryToInboundMatchingServiceRequestTransformer(
-//                    new EidasAttributeQueryValidator(
-//                        verifyMetadataResolver,
-//                        countryMetadataResolver.get(),
-//                        verifyCertificateValidator,
-//                        countryCertificateValidator.get(),
-//                        new CertificateExtractor(),
-//                        x509CertificateFactory,
-//                        new DateTimeComparator(Duration.ZERO),
-//                        assertionDecrypter,
-//                        configuration.getCountry().getHubConnectorEntityId()
-//                    )
-//                );
-//
-//            return new DiscriminatingAttributeQueryToInboundMSRequestTransformer(discriminator, verifyTransformer, eidasTransformer);
-//        }
-//
-//        return verifyTransformer;
-//    }
 
     @Provides
     public AssertionDecrypter getAssertionDecrypter(IdaKeyStore eidasKeystore) {

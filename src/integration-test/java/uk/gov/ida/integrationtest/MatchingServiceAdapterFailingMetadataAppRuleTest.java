@@ -22,7 +22,6 @@ import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.Constants;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
-import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder;
