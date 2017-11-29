@@ -57,7 +57,7 @@ applicationDistribution.from("examples") {
 }
 
 distZip {
-    into(project.name + "-" + project.version) {
+    into(project.name) {
         from '.'
         include 'verify-matching-service-test-tool.yml'
     }
