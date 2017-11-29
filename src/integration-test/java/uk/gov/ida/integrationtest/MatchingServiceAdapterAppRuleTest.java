@@ -48,6 +48,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVAT
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
+import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_TWO;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.aCycle3DatasetAssertion;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
@@ -58,6 +59,8 @@ import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
+import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
+import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
 
 public class MatchingServiceAdapterAppRuleTest {
@@ -231,6 +234,82 @@ public class MatchingServiceAdapterAppRuleTest {
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
         assertThat(response.getStatus().getStatusMessage().getMessage()).contains("assertions do not contain matching persistent identifiers");
+    }
+
+    @Test
+    public void shouldReturnErrorResponseWhenAnAttributeQueryContainsIdpAssertionsWithDifferentIssuers() {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAssertion()
+                                .addAuthnStatement(anAuthnStatement().build())
+                                .withIssuer(anIssuer().withIssuerId(STUB_IDP_ONE).build())
+                                .addAttributeStatement(anAttributeStatement().build())
+                                .withSubject(aSubject().build())
+                        .buildUnencrypted(),
+                        anAssertion()
+                                .withId("mds-assertion")
+                                .withIssuer(anIssuer().withIssuerId(STUB_IDP_TWO).build())
+                                .withSubject(aSubject().build())
+                                .addAttributeStatement(
+                                        anAttributeStatement()
+                                        .addAllAttributes(Collections.emptyList())
+                                        .build()
+                                )
+                        .buildUnencrypted()
+                ), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("IDP matching dataset and authn statement assertions do not contain matching issuers");
+    }
+
+
+    @Test
+    public void shouldReturnErrorResponseWhenAnAttributeQueryRequestContainsIdpMatchingDatasetAssertionWithInResponseToNotMatchingRequestId() {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion(),
+                        aMatchingDatasetAssertion(Collections.emptyList(), false, "wrong-request-id")), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo'");
+    }
+
+    @Test
+    public void shouldReturnErrorResponseWhenAnAttributeQueryRequestContainsIdpAuthnAssertionWithInResponseToNotMatchingRequestId() {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(aSubjectWithAssertions(asList(
+                anAssertion()
+                    .withSubject(
+                        aSubject()
+                            .withSubjectConfirmation(
+                                aSubjectConfirmation()
+                                    .withSubjectConfirmationData(
+                                        aSubjectConfirmationData().withInResponseTo("wrong-request-id").build()
+                                    )
+                                .build()
+                            )
+                        .build()
+                    )
+                    .buildUnencrypted(),
+                aMatchingDatasetAssertion(Collections.emptyList(), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID))
+            .build();
+
+        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo'");
     }
 
     @Test
