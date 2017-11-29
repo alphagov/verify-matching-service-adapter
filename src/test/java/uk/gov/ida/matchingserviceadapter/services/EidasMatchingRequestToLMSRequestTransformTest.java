@@ -4,10 +4,13 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
+import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
 
@@ -15,6 +18,9 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aBirthNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentGivenNameAttribute;
@@ -35,8 +41,15 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
 
     private EidasMatchingRequestToLMSRequestTransform transform;
 
+    @Mock
+    private AttributeQuery attributeQuery;
+
+    @Mock
+    private UserIdHashFactory pidHashFactory;
+
     @Before
     public void setUp() {
+        when(attributeQuery.getID()).thenReturn("the-aqr-id");
         assertion = anAssertion()
             .addAuthnStatement(
                 anAuthnStatement()
@@ -60,12 +73,13 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
                     aPlaceOfBirthAttribute("place-of-birth")
                 ).build()
             ).buildUnencrypted();
-        transform = new EidasMatchingRequestToLMSRequestTransform();
+        transform = new EidasMatchingRequestToLMSRequestTransform(pidHashFactory);
+        when(pidHashFactory.hashId(anyString(), anyString(), any())).thenReturn("the-hashed-pid");
     }
 
     @Test
     public void shouldMapLoaCorrectly() {
-        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, null, asList(assertion));
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);
 
@@ -76,16 +90,16 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
 
     @Test
     public void shouldExtractPidCorrectly() throws Throwable {
-        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, null, asList(assertion));
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);
 
-        assertThat(lmsDto.getHashedPid(), equalTo("the-pid"));
+        assertThat(lmsDto.getHashedPid(), equalTo("the-hashed-pid"));
     }
 
     @Test
     public void shouldMapEidasMatchingDatasetCorrectly() {
-        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, null, asList(assertion));
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);
 

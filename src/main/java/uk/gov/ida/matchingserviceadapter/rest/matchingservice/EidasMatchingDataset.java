@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
-import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 
 public class EidasMatchingDataset {
