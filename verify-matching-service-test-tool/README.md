@@ -14,8 +14,7 @@ You can use the test tool while [building your local matching service](http://al
 
 ## Installation
 
-1. Download the zip file from the [release list](https://github.com/alphagov/verify-matching-service-test-tool/releases)
-2. Unzip the file
+Unzip Test Tool zip file
 
 ## Configuration
 
