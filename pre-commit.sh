@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -eu
-./gradlew clean
-./gradlew --daemon --parallel build test intTest copyToLib 2>&1
+./gradlew --daemon --parallel clean build test intTest copyToLib 2>&1
 
 printf "Testing application starts up\n"
 ./startup.sh skip-build
