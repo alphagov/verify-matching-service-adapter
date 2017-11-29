@@ -104,7 +104,7 @@ public class AttributeStatementBuilder {
     public static Attribute aBirthNameAttribute(String birthName) {
         Attribute birthNameAttribute =  anAttribute(IdaConstants.Eidas_Attributes.BirthName.NAME);
         BirthName birthNameValue = new BirthNameBuilder().buildObject();
-        birthNameValue.setPlaceOfBirth(birthName);
+        birthNameValue.setBirthName(birthName);
         birthNameAttribute.getAttributeValues().add(birthNameValue);
         return birthNameAttribute;
     }

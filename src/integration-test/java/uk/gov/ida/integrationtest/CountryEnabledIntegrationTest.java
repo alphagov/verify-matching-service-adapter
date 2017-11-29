@@ -28,7 +28,6 @@ import org.opensaml.xmlsec.signature.Signature;
 import org.w3c.dom.Document;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
-import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
@@ -71,9 +70,7 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
-import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
-import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
-import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
@@ -216,19 +213,7 @@ public class CountryEnabledIntegrationTest {
                                     .withIssuerId(STUB_IDP_ONE)
                                     .build())
                             .addAttributeStatement(anEidasAttributeStatement().build())
-                            .addAuthnStatement(
-                                anAuthnStatement()
-                                    .withAuthnContext(
-                                        anAuthnContext()
-                                            .withAuthnContextClassRef(
-                                                anAuthnContextClassRef()
-                                                    .withAuthnContextClasRefValue(EidasLoa.HIGH.getValueUri())
-                                                    .build()
-                                            )
-                                            .build()
-
-                                    )
-                                    .build())
+                            .addAuthnStatement(anEidasAuthnStatement().build())
                             .withSignature(aValidSignature())
                             .withConditions(aConditions())
                             .buildWithEncrypterCredential(
