@@ -73,7 +73,7 @@ public class EidasMatchingRequestToLMSRequestTransform implements Function<Match
         Optional<LocalDate> dob = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.DateOfBirth.NAME), DateOfBirth.class, DateOfBirth::getDateOfBirth);
         Optional<String> givenName = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.FirstName.NAME), CurrentGivenName.class, CurrentGivenName::getFirstName);
         Optional<String> familyName = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.FamilyName.NAME), CurrentFamilyName.class, CurrentFamilyName::getFamilyName);
-        Optional<String> birthName = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.BirthName.NAME), BirthName.class, BirthName::getPlaceOfBirth);
+        Optional<String> birthName = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.BirthName.NAME), BirthName.class, BirthName::getBirthName);
         Optional<String> placeOfBirth = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.PlaceOfBirth.NAME), PlaceOfBirth.class, PlaceOfBirth::getPlaceOfBirth);
         Optional<String> gender = getAttributeValue(attributes, a -> a.getName().equals(Eidas_Attributes.Gender.NAME), Gender.class, Gender::getValue);
 

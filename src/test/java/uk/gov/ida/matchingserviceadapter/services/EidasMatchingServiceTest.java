@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.w3c.dom.Document;
-import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
@@ -37,10 +36,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
-import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
-import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
-import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasMatchingServiceTest {
@@ -67,19 +62,8 @@ public class EidasMatchingServiceTest {
 
     private static final String PID = "pid";
     private static final AttributeQuery ATTRIBUTE_QUERY = AttributeQueryBuilder.anAttributeQuery().build();
-    private static final Assertion ASSERTION = AssertionBuilder.anAssertion().addAttributeStatement(anEidasAttributeStatement().build())
-        .addAuthnStatement(
-            anAuthnStatement()
-                .withAuthnContext(
-                    anAuthnContext()
-                        .withAuthnContextClassRef(
-                            anAuthnContextClassRef()
-                                .withAuthnContextClasRefValue(EidasLoa.HIGH.getValueUri())
-                                .build()
-                        )
-                        .build()
+    private static final Assertion ASSERTION = AssertionBuilder.anEidasAssertion().buildUnencrypted();
 
-                ).build()).buildUnencrypted();
     private EidasMatchingService service;
     private MatchingServiceRequestContext request;
 
@@ -107,7 +91,7 @@ public class EidasMatchingServiceTest {
         when(matchingServiceClient.makeMatchingServiceRequest(matchingServiceRequestDto)).thenReturn(matchingServiceResponseDto);
         when(matchingServiceRequestDto.getHashedPid()).thenReturn(PID);
         when(responseMapper.map(matchingServiceResponseDto, PID, request.getAttributeQuery().getID(), request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
-            AuthnContext.LEVEL_3, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier()))
+            AuthnContext.LEVEL_2, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier()))
             .thenReturn(outboundResponseFromMatchingService);
 
         VerifyMatchingServiceResponse response = (VerifyMatchingServiceResponse) service.handle(request);
@@ -116,7 +100,7 @@ public class EidasMatchingServiceTest {
         verify(transformer).apply(request);
         verify(matchingServiceClient).makeMatchingServiceRequest(matchingServiceRequestDto);
         verify(responseMapper).map(matchingServiceResponseDto, PID, request.getAttributeQuery().getID(), request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
-            AuthnContext.LEVEL_3, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier());
+            AuthnContext.LEVEL_2, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier());
         assertThat(response.getOutboundResponseFromMatchingService()).isEqualTo(outboundResponseFromMatchingService);
         verifyNoMoreInteractions(validator, transformer, matchingServiceClient);
     }
