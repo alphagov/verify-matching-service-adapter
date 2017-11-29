@@ -44,8 +44,8 @@ import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServic
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatasetDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
-import uk.gov.ida.matchingserviceadapter.proxies.AdapterToMatchingServiceHttpProxy;
-import uk.gov.ida.matchingserviceadapter.proxies.AdapterToMatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxyImpl;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
@@ -141,7 +141,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(EncryptionKeyStore.class).to(MetadataPublicKeyStore.class).in(Singleton.class);
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
-        bind(AdapterToMatchingServiceProxy.class).to(AdapterToMatchingServiceHttpProxy.class).in(Singleton.class);
+        bind(MatchingServiceProxy.class).to(MatchingServiceProxyImpl.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
     }
@@ -164,7 +164,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                                                                                         Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
                                                                                         ManifestReader manifestReader,
                                                                                         Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
-                                                                                        ) {
+    ) {
         return new DelegatingMatchingServiceResponseRenderer(
             ImmutableMap.of(
                 HealthCheckMatchingServiceResponse.class,
@@ -180,7 +180,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         HealthCheckMatchingService healthCheckMatchingService,
         VerifyMatchingService verifyMatchingService,
         Optional<EidasMatchingService> eidasMatchingService,
-            @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver
+        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver
     ) {
         Map<Predicate<MatchingServiceRequestContext>, MatchingService> servicesMap = new LinkedHashMap<>();
         servicesMap.put((MatchingServiceRequestContext ctx) -> ctx.getAssertions().isEmpty(), healthCheckMatchingService);
@@ -216,8 +216,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
         @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
         X509CertificateFactory x509CertificateFactory,
         MatchingServiceAdapterConfiguration configuration,
-        AssertionDecrypter assertionDecrypter
-    ) {
+        AssertionDecrypter assertionDecrypter,
+        UserIdHashFactory userIdHashFactory,
+        MatchingServiceProxy matchingServiceClient,
+        MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
         return countryMetadataResolver.map(cmr ->
             new EidasMatchingService(
                 new EidasAttributeQueryValidator(
@@ -231,8 +233,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     assertionDecrypter,
                     configuration.getCountry().getHubConnectorEntityId()
                 ),
-                new EidasMatchingRequestToLMSRequestTransform()
-            ));
+                new EidasMatchingRequestToLMSRequestTransform(userIdHashFactory),
+                matchingServiceClient,
+                responseMapper));
     }
 
     @Provides
@@ -491,7 +494,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public MatchingServiceAttributeQueryHandler matchingServiceAttributeQueryHandler(
-        AdapterToMatchingServiceProxy proxy,
+        MatchingServiceProxy proxy,
         InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper inboundMapper,
         MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper outboundMapper) {
         return new MatchingServiceAttributeQueryHandler(proxy, inboundMapper, outboundMapper);
