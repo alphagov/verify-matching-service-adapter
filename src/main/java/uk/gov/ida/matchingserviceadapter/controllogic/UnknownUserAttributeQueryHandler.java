@@ -12,7 +12,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.mappers.AuthnContextToLevelOfAssuranceDtoMapper;
-import uk.gov.ida.matchingserviceadapter.proxies.AdapterToMatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
@@ -35,21 +35,22 @@ public class UnknownUserAttributeQueryHandler {
     private final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
     private final MatchingServiceAssertionFactory matchingServiceAssertionFactory;
     private final AssertionLifetimeConfiguration assertionLifetimeConfiguration;
-    private final AdapterToMatchingServiceProxy adapterToMatchingServiceProxy;
+    private final MatchingServiceProxy matchingServiceProxy;
     private final UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor;
 
     @Inject
     public UnknownUserAttributeQueryHandler(
-        UserIdHashFactory userIdHashFactory, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+        UserIdHashFactory userIdHashFactory,
+        MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
         MatchingServiceAssertionFactory matchingServiceAssertionFactory,
         AssertionLifetimeConfiguration assertionLifetimeConfiguration,
-        AdapterToMatchingServiceProxy adapterToMatchingServiceProxy,
+        MatchingServiceProxy matchingServiceProxy,
         UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor) {
         this.userIdHashFactory = userIdHashFactory;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
         this.matchingServiceAssertionFactory = matchingServiceAssertionFactory;
         this.assertionLifetimeConfiguration = assertionLifetimeConfiguration;
-        this.adapterToMatchingServiceProxy = adapterToMatchingServiceProxy;
+        this.matchingServiceProxy = matchingServiceProxy;
         this.userAccountCreationAttributeExtractor = userAccountCreationAttributeExtractor;
     }
 
@@ -61,7 +62,7 @@ public class UnknownUserAttributeQueryHandler {
             authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
 
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext());
-        UnknownUserCreationResponseDto unknownUserCreationResponseDto = adapterToMatchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssurance));
+        UnknownUserCreationResponseDto unknownUserCreationResponseDto = matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssurance));
         if (unknownUserCreationResponseDto.getResult().equalsIgnoreCase(UnknownUserCreationResponseDto.FAILURE)) {
             return OutboundResponseFromUnknownUserCreationService.createFailure(attributeQuery.getId(), matchingServiceAdapterConfiguration.getEntityId());
         }
@@ -77,7 +78,7 @@ public class UnknownUserAttributeQueryHandler {
 
     private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(final InboundMatchingServiceRequest attributeQuery, final String hashedPid, final List<Attribute> extractedUserAccountCreationAttributes) {
         final OutboundResponseFromUnknownUserCreationService matchingServiceResponse;
-        if(!extractedUserAccountCreationAttributes.isEmpty()) {
+        if (!extractedUserAccountCreationAttributes.isEmpty()) {
             matchingServiceResponse = getMatchingServiceResponse(hashedPid, attributeQuery, extractedUserAccountCreationAttributes);
         } else {
             matchingServiceResponse = OutboundResponseFromUnknownUserCreationService.createNoAttributeFailure(attributeQuery.getId(), matchingServiceAdapterConfiguration.getEntityId());
@@ -86,25 +87,25 @@ public class UnknownUserAttributeQueryHandler {
     }
 
     private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(
-            final String hashPid,
-            final InboundMatchingServiceRequest attributeQuery,
-            final List<Attribute> userAttributesForAccountCreation) {
+        final String hashPid,
+        final InboundMatchingServiceRequest attributeQuery,
+        final List<Attribute> userAttributesForAccountCreation) {
         AssertionRestrictions assertionRestrictions = new AssertionRestrictions(
-                DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()),
-                attributeQuery.getId(),
-                attributeQuery.getAssertionConsumerServiceUrl());
+            DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()),
+            attributeQuery.getId(),
+            attributeQuery.getAssertionConsumerServiceUrl());
 
         MatchingServiceAssertion assertion = matchingServiceAssertionFactory.createAssertionFromMatchingService(
-                new PersistentId(hashPid),
-                matchingServiceAdapterConfiguration.getEntityId(),
-                assertionRestrictions,
-                attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
-                attributeQuery.getAuthnRequestIssuerId(),
-                userAttributesForAccountCreation);
+            new PersistentId(hashPid),
+            matchingServiceAdapterConfiguration.getEntityId(),
+            assertionRestrictions,
+            attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
+            attributeQuery.getAuthnRequestIssuerId(),
+            userAttributesForAccountCreation);
         return OutboundResponseFromUnknownUserCreationService.createSuccess(
-                assertion,
-                attributeQuery.getId(),
-                matchingServiceAdapterConfiguration.getEntityId()
+            assertion,
+            attributeQuery.getId(),
+            matchingServiceAdapterConfiguration.getEntityId()
         );
     }
 

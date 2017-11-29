@@ -94,7 +94,8 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
         when(assertionFactory.createAssertionFromMatchingService(any(PersistentId.class), eq(issuerId), assertionRestrictionsCaptor.capture(), eq(levelOfAssurance), eq(authnRequestIssuerEntityId), eq(new ArrayList<Attribute>())))
                 .thenReturn(matchingServiceAssertion);
 
-        OutboundResponseFromMatchingService responseFromMatchingService = mapper.map(response, hashPid, attributeQuery);
+        OutboundResponseFromMatchingService responseFromMatchingService = mapper.map(response, hashPid,  attributeQuery.getId(), attributeQuery.getAssertionConsumerServiceUrl(), attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(), attributeQuery.getAuthnRequestIssuerId());
+
 
         assertThat(responseFromMatchingService.getMatchingServiceAssertion().get()).isEqualTo(matchingServiceAssertion);
         AssertionRestrictions actualAssertionRestriction = assertionRestrictionsCaptor.getValue();
@@ -112,7 +113,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
         String issuerId = "issue";
         when(configuration.getEntityId()).thenReturn(issuerId);
 
-        OutboundResponseFromMatchingService idaResponse = mapper.map(response, "hashedpid", attributeQuery);
+        OutboundResponseFromMatchingService idaResponse = mapper.map(response, "hashedpid", attributeQuery.getId(), attributeQuery.getAssertionConsumerServiceUrl(), attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(), attributeQuery.getAuthnRequestIssuerId());
 
         assertThat(idaResponse.getStatus()).isEqualTo(MatchingServiceIdaStatus.NoMatchingServiceMatchFromMatchingService);
     }
@@ -124,6 +125,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
         String issuerId = "issue";
         when(configuration.getEntityId()).thenReturn(issuerId);
 
-        mapper.map(response, "hashedpid", attributeQuery);
+        mapper.map(response, "hashedpid",  attributeQuery.getId(), attributeQuery.getAssertionConsumerServiceUrl(), attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(), attributeQuery.getAuthnRequestIssuerId());
+
     }
 }
