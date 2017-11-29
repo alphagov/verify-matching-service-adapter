@@ -22,7 +22,7 @@ import static uk.gov.ida.matchingserviceadapter.builders.UnknownUserCreationRequ
 import static uk.gov.ida.matchingserviceadapter.builders.UnknownUserCreationResponseDtoBuilder.anUnknownUserCreationResponseDto;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AdapterToMatchingServiceHttpProxyTest {
+public class MatchingServiceProxyImplTest {
 
     @Mock
     private JsonClient client;
@@ -30,11 +30,11 @@ public class AdapterToMatchingServiceHttpProxyTest {
     @Mock
     private MatchingServiceAdapterConfiguration configuration;
 
-    private AdapterToMatchingServiceHttpProxy proxy;
+    private MatchingServiceProxyImpl proxy;
 
     @Before
     public void setUp() {
-        proxy = new AdapterToMatchingServiceHttpProxy(client, configuration);
+        proxy = new MatchingServiceProxyImpl(client, configuration);
     }
 
     @Test

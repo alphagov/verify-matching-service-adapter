@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.healthcheck;
 
-import com.codahale.metrics.health.HealthCheck;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
