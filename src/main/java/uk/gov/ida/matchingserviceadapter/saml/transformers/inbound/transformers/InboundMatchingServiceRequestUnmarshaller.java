@@ -50,9 +50,8 @@ public class InboundMatchingServiceRequestUnmarshaller {
             }
         }
 
-
-        String spNameQualifier = subject.getNameID().getSPNameQualifier(); // this is the authn request issuer id
-        String nameQualifier = subject.getNameID().getNameQualifier(); // this is the assertion consumer url
+        String authnRequestIssuerId = subject.getNameID().getSPNameQualifier();
+        String assertionConsumerUrl = subject.getNameID().getNameQualifier();
 
         return new InboundMatchingServiceRequest(
                 id,
@@ -61,8 +60,8 @@ public class InboundMatchingServiceRequestUnmarshaller {
                 authnStatementAssertion,
                 cycle3AttributeAssertion,
                 originalQuery.getIssueInstant(),
-                spNameQualifier,
-                nameQualifier,
+                authnRequestIssuerId,
+                assertionConsumerUrl,
                 originalQuery.getAttributes()
         );
     }
