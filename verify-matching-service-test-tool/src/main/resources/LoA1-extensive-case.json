@@ -1,0 +1,123 @@
+{
+  "hashedPid": "8a5db0ad424efe4e09622cc4a876cc4c338558384752b483ff69dda4dca1ef04",
+  "levelOfAssurance": "LEVEL_1",
+  "matchId": "default-match-id",
+  "matchingDataset": {
+    "addresses": [
+      {
+        "fromDate": "2005-05-14T00:00:00.000Z",
+        "internationalPostCode": "GB1 2PF",
+        "lines": [
+          "10 George Street"
+        ],
+        "postCode": "GB1 2PF",
+        "toDate": "2007-05-14T00:00:00.000Z",
+        "uprn": "833F1187-9F33-A7E27B3F211E",
+        "verified": true
+      },
+      {
+        "fromDate": "2009-05-24T00:00:00.000Z",
+        "internationalPostCode": "GB1 2PP",
+        "lines": [
+          "344 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "toDate": "%within405days-100days%",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": true
+      },
+      {
+        "fromDate": "%yesterdayDate%",
+        "internationalPostCode": "GB1 5PP",
+        "lines": [
+          "2323 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": false
+      },
+      {
+        "fromDate": "%within405days-101days%",
+        "internationalPostCode": "GB1 3PP",
+        "lines": [
+          "67676 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "toDate": "%within405days-200days%",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": false
+      },
+      {
+        "fromDate": "1980-05-24T00:00:00.000Z",
+        "internationalPostCode": "GB1 3PP",
+        "lines": [
+          "46244 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "toDate": "1987-05-24T00:00:00.000Z",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": false
+      },
+      {
+        "fromDate": "1987-05-24T00:00:00.000Z",
+        "lines": [
+          "Flat , Alberta Court",
+          "36 Harrods Road",
+          "New Berkshire",
+          "Berkshire",
+          "Cambria",
+          "Europe"
+        ],
+        "toDate": "1989-05-24T00:00:00.000Z",
+        "verified": false
+      }
+    ],
+    "dateOfBirth": {
+      "value": "1980-05-24",
+      "verified": true
+    },
+    "firstName": {
+      "value": "Joe",
+      "verified": false
+    },
+    "gender": {
+      "value": "MALE",
+      "verified": false
+    },
+    "middleNames": {
+      "value": "Bob Rob",
+      "verified": false
+    },
+    "surnames": [
+      {
+        "from": "1980-05-24T00:00:00.000Z",
+        "to": "1987-01-20T00:00:00.000Z",
+        "value": "Fred",
+        "verified": false
+      },
+      {
+        "from": "%yesterdayDate%",
+        "value": "Dou",
+        "verified": false
+      },
+      {
+        "from": "2003-05-24T00:00:00.000Z",
+        "to": "2004-01-20T00:00:00.000Z",
+        "value": "John",
+        "verified": true
+      },
+      {
+        "from": "2005-05-24T00:00:00.000Z",
+        "to": "%within405days-100days%",
+        "value": "Joe",
+        "verified": true
+      },
+      {
+        "from": "%within405days-101days%",
+        "to": "%within405days-200days%",
+        "value": "Simon",
+        "verified": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,3 @@
+localMatchingService:
+  matchUrl: http://localhost:50130/local-matching/match
+  accountCreationUrl: http://localhost:50130/local-matching/create-user
