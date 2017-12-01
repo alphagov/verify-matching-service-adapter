@@ -8,8 +8,8 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
-
 buildscript {
     repositories {
         mavenCentral()
@@ -20,7 +20,7 @@ buildscript {
 }
 
 ext {
-    everitJsonSchemaVersion = '1.5.1'
+    everitJsonSchemaVersion = '1.6.1'
     jerseyVersion = '2.26'
     jacksonVersion = '2.9.2'
     javaValidationVersion = '2.0.0.Final'
@@ -40,7 +40,7 @@ dependencies {
             "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion",
             "javax.validation:validation-api:$javaValidationVersion",
             "org.hamcrest:hamcrest-library:$hamcrestVersion",
-            "org.everit.json:org.everit.json.schema:$everitJsonSchemaVersion",
+            "com.github.everit-org.json-schema:org.everit.json.schema:$everitJsonSchemaVersion",
             //junit 5
             "org.junit.jupiter:junit-jupiter-api:$jUnitJupiterVersion",
             "org.junit.platform:junit-platform-launcher:$jUnitPlatformLauncherVersion",
