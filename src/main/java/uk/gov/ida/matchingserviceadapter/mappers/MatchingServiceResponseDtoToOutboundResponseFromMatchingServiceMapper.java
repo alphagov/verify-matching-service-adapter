@@ -14,20 +14,30 @@ import uk.gov.ida.saml.core.domain.PersistentId;
 
 import java.util.ArrayList;
 
-
 public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper {
     private final MatchingServiceAdapterConfiguration configuration;
     private final MatchingServiceAssertionFactory outboundAssertionFactory;
     private final AssertionLifetimeConfiguration assertionLifetimeConfiguration;
 
     @Inject
-    public MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper(MatchingServiceAdapterConfiguration configuration, MatchingServiceAssertionFactory outboundAssertionFactory, AssertionLifetimeConfiguration assertionLifetimeConfiguration) {
+    public MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper(
+        MatchingServiceAdapterConfiguration configuration,
+        MatchingServiceAssertionFactory outboundAssertionFactory,
+        AssertionLifetimeConfiguration assertionLifetimeConfiguration) {
+
         this.configuration = configuration;
         this.outboundAssertionFactory = outboundAssertionFactory;
         this.assertionLifetimeConfiguration = assertionLifetimeConfiguration;
     }
 
-    public OutboundResponseFromMatchingService map(MatchingServiceResponseDto response, String hashPid, String requestId, String assertionConsumerServiceUrl, AuthnContext authnContext, String authnRequestIssuerId) {
+    public OutboundResponseFromMatchingService map(
+        MatchingServiceResponseDto response,
+        String hashPid,
+        String requestId,
+        String assertionConsumerServiceUrl,
+        AuthnContext authnContext,
+        String authnRequestIssuerId) {
+
         String result = response.getResult();
 
         switch (result) {
@@ -42,10 +52,11 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
 
     private OutboundResponseFromMatchingService getMatchResponse(
         final String hashPid,
-        String requestId,
-        String assertionConsumerServiceUrl,
-        AuthnContext authnContext,
-        String authnRequestIssuerId) {
+        final String requestId,
+        final String assertionConsumerServiceUrl,
+        final AuthnContext authnContext,
+        final String authnRequestIssuerId) {
+
         AssertionRestrictions assertionRestrictions = new AssertionRestrictions(
                 DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()),
                 requestId,

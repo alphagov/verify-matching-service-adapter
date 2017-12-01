@@ -33,6 +33,12 @@ public class MatchingServiceAttributeQueryHandler {
         MatchingServiceRequestDto matchingServiceAttributeQuery = queryDtoMapper.map(attributeQuery);
         MatchingServiceResponseDto matchingServiceResponseDto = matchingServiceProxy.makeMatchingServiceRequest(matchingServiceAttributeQuery);
         LOG.info("Result from matching service for id " + attributeQuery.getId() + " is " + matchingServiceResponseDto.getResult());
-        return dtoResponseMapper.map(matchingServiceResponseDto, matchingServiceAttributeQuery.getHashedPid(), attributeQuery.getId(), attributeQuery.getAssertionConsumerServiceUrl(), attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(), attributeQuery.getAuthnRequestIssuerId());
+        return dtoResponseMapper.map(
+            matchingServiceResponseDto,
+            matchingServiceAttributeQuery.getHashedPid(),
+            attributeQuery.getId(),
+            attributeQuery.getAssertionConsumerServiceUrl(),
+            attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
+            attributeQuery.getAuthnRequestIssuerId());
     }
 }
