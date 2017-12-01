@@ -63,11 +63,6 @@ distZip {
     }
 }
 
-task extractZip(type: Copy) {
-    from zipTree("$projectDir/build/distributions/$project.name" + ".zip")
-    destinationDir = file("$projectDir/build/distributions")
-}
-
 task copyExamples(type: Copy) {
     ['build/examples', 'out/examples'].each { dest ->
         copy {
