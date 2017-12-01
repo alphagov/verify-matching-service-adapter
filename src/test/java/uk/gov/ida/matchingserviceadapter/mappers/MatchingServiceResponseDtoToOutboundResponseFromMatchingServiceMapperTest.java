@@ -10,7 +10,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
@@ -53,7 +52,8 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
     @Captor
     private ArgumentCaptor<AssertionRestrictions> assertionRestrictionsCaptor = null;
 
-
+    private static final String ENTITY_ID = "entityId";
+    private static final String HASH_PID = "hashPid";
     private MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper mapper;
 
     @Before
@@ -61,6 +61,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
         DateTimeFreezer.freezeTime();
         mapper = new MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper(configuration, assertionFactory, assertionLifetimeConfiguration);
         when(assertionLifetimeConfiguration.getAssertionLifetime()).thenReturn(Duration.parse("30m"));
+        when(configuration.getEntityId()).thenReturn(ENTITY_ID);
     }
 
     @After
@@ -71,35 +72,43 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
     @Test
     public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithMatch() throws Exception {
         MatchingServiceAssertion matchingServiceAssertion = aMatchingServiceAssertion().build();
-        AuthnContext levelOfAssurance = AuthnContext.LEVEL_2;
         IdentityProviderAuthnStatement authnStatement = anIdentityProviderAuthnStatement()
-                .withAuthnContext(levelOfAssurance)
-                .build();
-        String authnRequestIssuerEntityId = "issuer-id";
+            .withAuthnContext(AuthnContext.LEVEL_2)
+            .build();
+        final String authnRequestIssuerEntityId = "authnRequestIssuerEntityId";
         InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest()
                 .withAssertionConsumerServiceUrl("/foo")
                 .withRequestIssuerEntityId(authnRequestIssuerEntityId)
                 .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(authnStatement).build())
                 .build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withMatch().build();
-        String issuerId = "issue";
-        String hashPid = "apid";
-        when(configuration.getEntityId()).thenReturn(issuerId);
+
         AssertionRestrictions expectedAssertionRestrictions =
                 anAssertionRestrictions()
                         .withInResponseTo(attributeQuery.getId())
                         .withRecipient(attributeQuery.getAssertionConsumerServiceUrl())
                         .withNotOnOrAfter(DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()))
                         .build();
-        when(assertionFactory.createAssertionFromMatchingService(any(PersistentId.class), eq(issuerId), assertionRestrictionsCaptor.capture(), eq(levelOfAssurance), eq(authnRequestIssuerEntityId), eq(new ArrayList<Attribute>())))
-                .thenReturn(matchingServiceAssertion);
+        when(assertionFactory.createAssertionFromMatchingService(
+            any(PersistentId.class),
+            eq(ENTITY_ID),
+            assertionRestrictionsCaptor.capture(),
+            eq(AuthnContext.LEVEL_2),
+            eq(authnRequestIssuerEntityId),
+            eq(new ArrayList<>()))).thenReturn(matchingServiceAssertion);
 
-        OutboundResponseFromMatchingService responseFromMatchingService = mapper.map(response, hashPid, attributeQuery);
+        OutboundResponseFromMatchingService responseFromMatchingService = mapper.map(
+            response,
+            HASH_PID,
+            attributeQuery.getId(),
+            attributeQuery.getAssertionConsumerServiceUrl(),
+            attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
+            attributeQuery.getAuthnRequestIssuerId());
+
 
         assertThat(responseFromMatchingService.getMatchingServiceAssertion().get()).isEqualTo(matchingServiceAssertion);
         AssertionRestrictions actualAssertionRestriction = assertionRestrictionsCaptor.getValue();
         assertThat(actualAssertionRestriction).isNotNull();
-
         assertThat(actualAssertionRestriction.getInResponseTo()).isEqualTo(expectedAssertionRestrictions.getInResponseTo());
         assertThat(actualAssertionRestriction.getNotOnOrAfter()).isEqualTo(expectedAssertionRestrictions.getNotOnOrAfter());
         assertThat(actualAssertionRestriction.getRecipient()).isEqualTo(expectedAssertionRestrictions.getRecipient());
@@ -109,10 +118,14 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
     public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithNoMatch() throws Exception {
         InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withNoMatch().build();
-        String issuerId = "issue";
-        when(configuration.getEntityId()).thenReturn(issuerId);
 
-        OutboundResponseFromMatchingService idaResponse = mapper.map(response, "hashedpid", attributeQuery);
+        OutboundResponseFromMatchingService idaResponse = mapper.map(
+            response,
+            HASH_PID,
+            attributeQuery.getId(),
+            attributeQuery.getAssertionConsumerServiceUrl(),
+            attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
+            attributeQuery.getAuthnRequestIssuerId());
 
         assertThat(idaResponse.getStatus()).isEqualTo(MatchingServiceIdaStatus.NoMatchingServiceMatchFromMatchingService);
     }
@@ -121,9 +134,13 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
     public void map_shouldThrowExceptionIfNotNoMatchOrMatch() throws Exception {
         InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withCrappyResponse().build();
-        String issuerId = "issue";
-        when(configuration.getEntityId()).thenReturn(issuerId);
 
-        mapper.map(response, "hashedpid", attributeQuery);
+        mapper.map(
+            response,
+            HASH_PID,
+            attributeQuery.getId(),
+            attributeQuery.getAssertionConsumerServiceUrl(),
+            attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
+            attributeQuery.getAuthnRequestIssuerId());
     }
 }
