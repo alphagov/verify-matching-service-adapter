@@ -43,14 +43,6 @@ Use classpath of module: verify-matching-service-adapter_main
 
 The environment variables from `local.env` can be added to this configuration by running `env-for-intellij.sh` to copy them to the clipboard before pasting them into the environment variable window in the run configuration
 
-Verify Matching Service Test Tool
----------------------------------
-
-The MSA is distributed as a zip file which also contain the Verify Matching Service Test tool.
-
-The Verify Matching Service Test Tool is designed to help you develop your Local Matching Service.
-
-Detailed information on how to use Verify Matching Service Test Tool is provided [here](https://github.com/alphagov/verify-matching-service-adapter/verify-matching-service-test-tool).
 
 Support and raising issues
 --------------------------

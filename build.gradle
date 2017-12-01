@@ -158,15 +158,9 @@ task copyToLib(dependsOn: jar, type: Copy) {
 }
 
 task zip(dependsOn: copyToLib, type: Zip) {
-    from("$buildDir/output").into('./' + project.name)
-    from('RELEASE_NOTES.md', 'USAGE_README.md', 'prod-config.yml', 'test-config.yml').into('./' + project.name)
+    from("$buildDir/output").into('./')
+    from('RELEASE_NOTES.md', 'USAGE_README.md', 'prod-config.yml', 'test-config.yml').into('./')
     rename('USAGE_README\\.md', 'README\\.md')
-
-    dependsOn 'verify-matching-service-test-tool:distZip'
-
-    from("$projectDir/verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool.zip"){
-        into('/')
-    }
 }
 
 task intTest(type: Test) {
