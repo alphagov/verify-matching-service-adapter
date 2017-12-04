@@ -1,4 +1,5 @@
 group 'uk.gov.ida'
+version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -64,7 +65,7 @@ distZip {
 }
 
 task extractZip(type: Copy) {
-    from zipTree("$projectDir/build/distributions/$project.name" + ".zip")
+    from zipTree("$projectDir/build/distributions/$project.name" + "-" + project.version+ ".zip")
     destinationDir = file("$projectDir/build/distributions")
 }
 
