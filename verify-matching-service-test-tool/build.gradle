@@ -1,5 +1,5 @@
 group 'uk.gov.ida'
-version '1.0-SNAPSHOT'
+version = "$version"
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -58,14 +58,14 @@ applicationDistribution.from("examples") {
 }
 
 distZip {
-    into(project.name) {
+    into(project.name + "-" + project.version) {
         from '.'
         include 'verify-matching-service-test-tool.yml'
     }
 }
 
 task extractZip(type: Copy) {
-    from zipTree("$projectDir/build/distributions/$project.name" + "-" + project.version+ ".zip")
+    from zipTree("$projectDir/build/distributions/$project.name-$project.version" + ".zip")
     destinationDir = file("$projectDir/build/distributions")
 }
 
