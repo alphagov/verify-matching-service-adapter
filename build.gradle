@@ -164,7 +164,7 @@ task zip(dependsOn: copyToLib, type: Zip) {
     dependsOn 'verify-matching-service-test-tool:extractZip'
 
     into('./verify-matching-service-test-tool'){
-        from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool")
+        from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + project.version)
     }
 
     from("$buildDir/output").into('./')
