@@ -61,6 +61,7 @@ distZip {
     into(project.name + "-" + project.version) {
         from '.'
         include 'verify-matching-service-test-tool.yml'
+        include 'README.md'
     }
 }
 

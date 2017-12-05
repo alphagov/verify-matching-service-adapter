@@ -15,7 +15,8 @@ pkill -9 -f msa
 
 mkdir -p logs
 if test ! "$1" == "skip-build"; then
-    ./gradlew clean build copyToLib
+    ./gradlew clean
+    ./gradlew build copyToLib
 fi
 
 printf "Starting... "
