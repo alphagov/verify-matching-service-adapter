@@ -95,7 +95,8 @@ dependencies {
         "uk.gov.ida:saml-serializers:$dependencyVersions.saml_serializers",
         "uk.gov.verify:saml-domain-objects:$dependencyVersions.saml_domain_objects",
         "uk.gov.verify:saml-utils:$dependencyVersions.saml_utils",
-        "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml"
+        "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml",
+        "uk.gov.ida:validation:1.0.9-40"
 
     compile configurations.dropwizard,
         configurations.saml,
