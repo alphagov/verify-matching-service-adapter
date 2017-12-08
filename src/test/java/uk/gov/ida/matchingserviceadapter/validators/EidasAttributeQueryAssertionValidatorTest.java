@@ -1,12 +1,11 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
@@ -46,9 +45,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
     @Mock
     private EntityDescriptor entityDescriptor;
 
-    @Mock
-    private TimeRestrictionValidator timeRestrictionValidator;
-
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryAssertionValidator validator;
 
@@ -59,7 +55,7 @@ public class EidasAttributeQueryAssertionValidatorTest {
             certificateValidator,
             certificateExtractor,
             x509CertificateFactory,
-            timeRestrictionValidator,
+            new DateTimeComparator(Duration.ZERO),
             TYPE_OF_ASSERTION);
     }
 

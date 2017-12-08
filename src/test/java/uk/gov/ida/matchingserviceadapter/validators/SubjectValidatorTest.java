@@ -1,9 +1,9 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
@@ -32,13 +32,10 @@ public class SubjectValidatorTest {
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator<Subject> subjectValidator;
 
-    @Mock
-    private TimeRestrictionValidator timeRestrictionValidator;
-
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(identity(), timeRestrictionValidator);
+        subjectValidator = new SubjectValidator(identity(), new DateTimeComparator(Duration.ZERO));
     }
 
     @Test

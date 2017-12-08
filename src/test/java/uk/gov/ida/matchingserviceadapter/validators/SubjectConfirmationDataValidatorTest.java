@@ -12,7 +12,6 @@ import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.CONFIRMATION_DATA_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.IN_RESPONSE_TO_NOT_PRESENT;
-import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_BEFORE_INVALID;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_INVALID;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.RECIPIENT_NOT_PRESENT;
@@ -21,15 +20,11 @@ import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class SubjectConfirmationDataValidatorTest {
 
-    private static final String DEFAULT_REQUEST_ID = "some request id";
-
     private SubjectConfirmationDataValidator<SubjectConfirmationData> validator;
-
-    public TimeRestrictionValidator timeRestrictionValidator = new TimeRestrictionValidator(new DateTimeComparator(Duration.ZERO));
 
     @Before
     public void setup() {
-        validator = new SubjectConfirmationDataValidator<>(identity(), timeRestrictionValidator);
+        validator = new SubjectConfirmationDataValidator<>(identity(), new DateTimeComparator(Duration.ZERO));
         IdaSamlBootstrap.bootstrap();
     }
 
@@ -51,7 +46,7 @@ public class SubjectConfirmationDataValidatorTest {
 
     @Test
     public void shouldGenerateErrorWhenSubjectConfirmationDataNotOnOrAfterIsInThePast() throws Exception {
-        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withNotOnOrAfter(DateTime.now().minusMinutes(5)).build();
+        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withNotOnOrAfter(DateTime.now().minusMinutes(5)).withNotBefore(DateTime.now()).build();
 
         Messages messages = validator.validate(subjectConfirmationData, messages());
 
@@ -59,17 +54,8 @@ public class SubjectConfirmationDataValidatorTest {
     }
 
     @Test
-    public void shouldGenerateErrorWhenSubjectConfirmationDataNotBeforeIsInTheFuture() throws Exception {
-        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withNotBefore(DateTime.now().plusMinutes(10)).build();
-
-        Messages messages = validator.validate(subjectConfirmationData, messages());
-
-        assertThat(messages.hasErrorLike(NOT_BEFORE_INVALID)).isTrue();
-    }
-
-    @Test
     public void shouldGenerateErrorWhenSubjectConfirmationDataHasNoInResponseTo() throws Exception {
-        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withInResponseTo(null).build();
+        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withNotBefore(DateTime.now()).withInResponseTo(null).build();
 
         Messages messages = validator.validate(subjectConfirmationData, messages());
 
@@ -78,7 +64,7 @@ public class SubjectConfirmationDataValidatorTest {
 
     @Test
     public void shouldGenerateErrorWhenSubjectConfirmationDataHasNoRecipient() throws Exception {
-        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withInResponseTo(DEFAULT_REQUEST_ID).withRecipient(null).build();
+        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withNotBefore(DateTime.now()).withRecipient(null).build();
 
         Messages messages = validator.validate(subjectConfirmationData, messages());
 

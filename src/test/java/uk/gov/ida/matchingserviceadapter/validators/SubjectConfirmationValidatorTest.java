@@ -21,11 +21,11 @@ public class SubjectConfirmationValidatorTest {
     private SubjectConfirmationValidator<SubjectConfirmation> validator;
 
     @Mock
-    public TimeRestrictionValidator timeRestrictionValidator;
+    public DateTimeComparator dateTimeComparator;
 
     @Before
     public void setup() {
-        validator = new SubjectConfirmationValidator<>(identity(), timeRestrictionValidator);
+        validator = new SubjectConfirmationValidator<>(identity(), dateTimeComparator);
         IdaSamlBootstrap.bootstrap();
     }
 

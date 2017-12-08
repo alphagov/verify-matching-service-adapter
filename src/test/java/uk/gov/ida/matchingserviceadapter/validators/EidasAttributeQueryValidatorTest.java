@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,9 +74,6 @@ public class EidasAttributeQueryValidatorTest {
     @Mock
     private EntityDescriptor entityDescriptor;
 
-    @Mock
-    private TimeRestrictionValidator timeRestrictionValidator;
-
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryValidator validator;
 
@@ -88,7 +86,7 @@ public class EidasAttributeQueryValidatorTest {
             countryCertificateValidator,
             certificateExtractor,
             x509CertificateFactory,
-            timeRestrictionValidator,
+            new DateTimeComparator(Duration.ZERO),
             assertionDecrypter);
 
         when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
