@@ -15,10 +15,9 @@ public class SubjectConfirmationDataValidator<T> extends CompositeValidator<T> {
     public static final MessageImpl NOT_ON_OR_AFTER_INVALID = MessageImpl.fieldMessage("confirmationData.notOnOrAfter", "confirmationData.notOnOrAfter.invalid", "Not on or after must not be in the past");
     public static final MessageImpl NOT_BEFORE_INVALID = MessageImpl.fieldMessage("confirmationData.notBefore", "confirmationData.notBefore.invalid", "Not before must not be in the future");
     public static final MessageImpl IN_RESPONSE_TO_NOT_PRESENT = MessageImpl.fieldMessage("confirmationData.inResponseTo", "confirmationData.inResponseTo.absent", "In response to must not be null");
-    public static final MessageImpl IN_RESPONSE_TO_NOT_WHAT_WAS_EXPECTED = MessageImpl.fieldMessage("confirmationData.inResponseTo", "confirmationData.inResponseTo.incorrect", "In response to was not what was expected");
     public static final MessageImpl RECIPIENT_NOT_PRESENT = MessageImpl.fieldMessage("confirmationData.recipient", "confirmationData.recipient.absent", "Recipient must not be null");
 
-    public SubjectConfirmationDataValidator(Function<T, SubjectConfirmationData> valueProvider, TimeRestrictionValidator timeRestrictionValidator, String requestId) {
+    public SubjectConfirmationDataValidator(Function<T, SubjectConfirmationData> valueProvider, TimeRestrictionValidator timeRestrictionValidator) {
         super(
             true,
             valueProvider,
@@ -43,7 +42,6 @@ public class SubjectConfirmationDataValidator<T> extends CompositeValidator<T> {
                 }
             }, NOT_BEFORE_INVALID),
             new RequiredValidator<>(IN_RESPONSE_TO_NOT_PRESENT, SubjectConfirmationData::getInResponseTo),
-            new FixedErrorValidator<>(scd -> !scd.getInResponseTo().equals(requestId), IN_RESPONSE_TO_NOT_WHAT_WAS_EXPECTED),
             new RequiredValidator<>(RECIPIENT_NOT_PRESENT, SubjectConfirmationData::getRecipient)
         );
     }

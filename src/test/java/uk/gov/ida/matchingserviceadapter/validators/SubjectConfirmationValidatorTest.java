@@ -25,7 +25,7 @@ public class SubjectConfirmationValidatorTest {
 
     @Before
     public void setup() {
-        validator = new SubjectConfirmationValidator<>(identity(), timeRestrictionValidator, "some request id");
+        validator = new SubjectConfirmationValidator<>(identity(), timeRestrictionValidator);
         IdaSamlBootstrap.bootstrap();
     }
 

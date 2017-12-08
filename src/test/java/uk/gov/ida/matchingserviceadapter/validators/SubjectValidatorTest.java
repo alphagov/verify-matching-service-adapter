@@ -15,7 +15,6 @@ import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.CONFIRMATION_DATA_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.IN_RESPONSE_TO_NOT_PRESENT;
-import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.IN_RESPONSE_TO_NOT_WHAT_WAS_EXPECTED;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.RECIPIENT_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationValidator.WRONG_SUBJECT_CONFIRMATION_METHOD;
@@ -39,7 +38,7 @@ public class SubjectValidatorTest {
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
-        subjectValidator = new SubjectValidator(identity(), timeRestrictionValidator, IN_RESPONSE_TO);
+        subjectValidator = new SubjectValidator(identity(), timeRestrictionValidator);
     }
 
     @Test
@@ -158,21 +157,6 @@ public class SubjectValidatorTest {
         Messages messages = subjectValidator.validate(subject, messages());
 
         assertThat(messages.hasErrorLike(IN_RESPONSE_TO_NOT_PRESENT)).isTrue();
-    }
-
-    @Test
-    public void shouldGenerateErrorWhenInResponseToRequestIdDoesNotMatchTheRequestId() throws Exception {
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo("foo")
-                        .build()).build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        Messages messages = subjectValidator.validate(subject, messages());
-
-        assertThat(messages.hasErrorLike(IN_RESPONSE_TO_NOT_WHAT_WAS_EXPECTED)).isTrue();
     }
 
     @Test

@@ -73,6 +73,9 @@ public class EidasAttributeQueryValidatorTest {
     @Mock
     private EntityDescriptor entityDescriptor;
 
+    @Mock
+    private TimeRestrictionValidator timeRestrictionValidator;
+
     private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryValidator validator;
 
@@ -85,6 +88,7 @@ public class EidasAttributeQueryValidatorTest {
             countryCertificateValidator,
             certificateExtractor,
             x509CertificateFactory,
+            timeRestrictionValidator,
             assertionDecrypter);
 
         when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
