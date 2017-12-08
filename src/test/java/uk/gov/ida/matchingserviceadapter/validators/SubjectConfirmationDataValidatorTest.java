@@ -4,8 +4,9 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
-import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.validation.messages.Messages;
 
 import static java.util.function.Function.identity;
@@ -18,6 +19,7 @@ import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDa
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
+@RunWith(OpenSAMLMockitoRunner.class)
 public class SubjectConfirmationDataValidatorTest {
 
     private SubjectConfirmationDataValidator<SubjectConfirmationData> validator;
@@ -25,7 +27,6 @@ public class SubjectConfirmationDataValidatorTest {
     @Before
     public void setup() {
         validator = new SubjectConfirmationDataValidator<>(identity(), new DateTimeComparator(Duration.ZERO));
-        IdaSamlBootstrap.bootstrap();
     }
 
     @Test

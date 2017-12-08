@@ -4,10 +4,9 @@ import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.builders.NameIdBuilder;
 import uk.gov.ida.validation.messages.Messages;
 
@@ -24,14 +23,13 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSub
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(OpenSAMLMockitoRunner.class)
 public class SubjectValidatorTest {
     private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator<Subject> subjectValidator;
 
     @Before
     public void setUp() {
-        IdaSamlBootstrap.bootstrap();
         subjectValidator = new SubjectValidator(identity(), new DateTimeComparator(Duration.ZERO));
     }
 
