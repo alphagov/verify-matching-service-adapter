@@ -12,7 +12,7 @@ import uk.gov.ida.validation.messages.Messages;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.CONFIRMATION_DATA_NOT_PRESENT;
+import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.SUBJECT_CONFIRMATION_DATA_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationValidator.WRONG_SUBJECT_CONFIRMATION_METHOD;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.NAME_ID_IN_WRONG_FORMAT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.NAME_ID_NOT_PRESENT;
@@ -25,7 +25,6 @@ import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class SubjectValidatorTest {
-    private static final String IN_RESPONSE_TO = "_some-request-id";
     private SubjectValidator<Subject> subjectValidator;
 
     @Before
@@ -37,7 +36,6 @@ public class SubjectValidatorTest {
     public void shouldGenerateNoErrorsWhenSubjectIsValid() {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withInResponseTo(IN_RESPONSE_TO)
                 .build()).build();
         Subject subject = aSubject()
             .withSubjectConfirmation(subjectConfirmation)
@@ -59,7 +57,6 @@ public class SubjectValidatorTest {
     public void shouldGenerateErrorWhenNameIdIsMissing() throws Exception {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withInResponseTo(IN_RESPONSE_TO)
                 .build()).build();
         Subject subject = aSubject()
             .withSubjectConfirmation(subjectConfirmation)
@@ -77,7 +74,6 @@ public class SubjectValidatorTest {
 
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
             aSubjectConfirmationData()
-                .withInResponseTo(IN_RESPONSE_TO)
                 .build()).build();
         Subject subject = aSubject()
             .withSubjectConfirmation(subjectConfirmation)
@@ -120,7 +116,7 @@ public class SubjectValidatorTest {
 
         Messages messages = subjectValidator.validate(subject, messages());
 
-        assertThat(messages.hasErrorLike(CONFIRMATION_DATA_NOT_PRESENT)).isTrue();
+        assertThat(messages.hasErrorLike(SUBJECT_CONFIRMATION_DATA_NOT_PRESENT)).isTrue();
     }
 
 }
