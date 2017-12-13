@@ -20,7 +20,7 @@ public class OptionalAddressFieldsExcludedScenario extends ScenarioBase {
 
     @Test
     @DisplayName("Simple request with address missing optional fields")
-    public void runCase() {
+    public void runCase() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("simple-case-excluding-optional-address-fields.json")));
