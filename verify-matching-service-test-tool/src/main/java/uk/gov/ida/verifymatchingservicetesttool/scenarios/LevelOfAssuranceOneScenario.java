@@ -22,7 +22,7 @@ public class LevelOfAssuranceOneScenario extends ScenarioBase {
 
     @Test
     @DisplayName("Simple request with level of assurance 1")
-    public void runForSimpleCase() {
+    public void runForSimpleCase() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("LoA1-simple-case.json")));
@@ -32,7 +32,7 @@ public class LevelOfAssuranceOneScenario extends ScenarioBase {
 
     @Test
     @DisplayName("Complex request with level of assurance 1")
-    public void runForComplexCase() {
+    public void runForComplexCase() throws Exception {
         String jsonString = fileUtils.readFromResources("LoA1-extensive-case.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
             .replace("%within405days-100days%", Instant.now().minus(405-100, DAYS).toString())

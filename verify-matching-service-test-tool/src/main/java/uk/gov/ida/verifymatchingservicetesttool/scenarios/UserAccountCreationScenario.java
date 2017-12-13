@@ -25,7 +25,7 @@ public class UserAccountCreationScenario extends ScenarioBase {
         "(remove accountCreationUrl from verify-matching-service-test-tool.yml " +
         "to skip this if you don't need to test account creation)"
     )
-    public void runForUserAccountCreation() {
+    public void runForUserAccountCreation() throws Exception {
         assumeTrue(
             configuration.getLocalMatchingServiceAccountCreationUrl() != null,
             "Test aborted as no user account creation is not configured."
