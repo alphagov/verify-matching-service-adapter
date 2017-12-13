@@ -31,14 +31,14 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
     public static final MessageImpl DEFAULT_INVALID_SIGNATURE_MESSAGE = globalMessage("invalid.signature", "Eidas Attribute Query's signature was invalid.");
     public static final String IDENTITY_ASSERTION = "Identity";
 
-    public EidasAttributeQueryValidator(MetadataResolver verifyMetadataResolver,
-                                        MetadataResolver countryMetadataResolver,
-                                        CertificateValidator verifyHubCertificateValidator,
-                                        CertificateValidator countryMetadataCertificateValidator,
-                                        CertificateExtractor certificateExtractor,
-                                        X509CertificateFactory x509CertificateFactory,
-                                        DateTimeComparator dateTimeComparator,
-                                        AssertionDecrypter assertionDecrypter) {
+
+    public EidasAttributeQueryValidator(final MetadataResolver verifyMetadataResolver,
+                                        final MetadataResolver countryMetadataResolver,
+                                        final CertificateValidator verifyCertificateValidator,
+                                        final CertificateExtractor certificateExtractor,
+                                        final X509CertificateFactory x509CertificateFactory,
+                                        final DateTimeComparator dateTimeComparator,
+                                        final AssertionDecrypter assertionDecrypter) {
         super(
             false,
             new CompositeValidator<>(
@@ -46,7 +46,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                 new IssuerValidator<>(DEFAULT_ISSUER_REQUIRED_MESSAGE, DEFAULT_ISSUER_EMPTY_MESSAGE, AttributeQuery::getIssuer),
                 new SamlDigitalSignatureValidator<>(
                     DEFAULT_INVALID_SIGNATURE_MESSAGE,
-                    attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, verifyHubCertificateValidator, certificateExtractor)
+                    attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, verifyCertificateValidator, certificateExtractor)
                         .getHubSigningCertificates(attributeQuery.getIssuer().getValue()).stream()
                         .map(Certificate::getCertificate)
                         .map(x509CertificateFactory::createCertificate)
@@ -63,7 +63,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                     aqr -> assertionDecrypter.decryptAssertions(() -> getEncryptedAssertions(aqr)).get(0),
                     new EidasAttributeQueryAssertionValidator(
                         countryMetadataResolver,
-                        countryMetadataCertificateValidator,
+                        verifyCertificateValidator,
                         certificateExtractor,
                         x509CertificateFactory,
                         dateTimeComparator,

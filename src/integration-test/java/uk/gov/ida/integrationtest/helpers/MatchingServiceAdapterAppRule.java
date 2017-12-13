@@ -82,7 +82,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         metadataTrustStore.delete();
         countryMetadataTrustStore.delete();
         clientTrustStore.delete();
-
         super.after();
     }
 
@@ -110,30 +109,29 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
 
         if (isCountryEnabled) {
             List<ConfigOverride> countryOverrides = Stream.of(
-                    ConfigOverride.config("returnStackTraceInResponse", "true"),  // Until eiDAS happy-path through MSA is complete (EID-270)
-                    ConfigOverride.config("country.hubConnectorEntityId", HUB_ENTITY_ID),
+                ConfigOverride.config("returnStackTraceInResponse", "true"),  // Until eiDAS happy-path through MSA is complete (EID-270)
+                ConfigOverride.config("country.hubConnectorEntityId", HUB_ENTITY_ID),
 
-                    ConfigOverride.config("country.metadata.uri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
-                    ConfigOverride.config("country.metadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
-                    ConfigOverride.config("country.metadata.trustStore.password", countryMetadataTrustStore.getPassword()),
-                    ConfigOverride.config("country.metadata.minRefreshDelay", "60000"),
-                    ConfigOverride.config("country.metadata.maxRefreshDelay", "600000"),
-                    ConfigOverride.config("country.metadata.expectedEntityId", "http://stub_idp.acme.org/stub-idp-one/SSO/POST"),
-                    ConfigOverride.config("country.metadata.jerseyClientName", "country-metadata-client"),
+                ConfigOverride.config("country.metadata.uri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
+                ConfigOverride.config("country.metadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("country.metadata.trustStore.password", countryMetadataTrustStore.getPassword()),
+                ConfigOverride.config("country.metadata.minRefreshDelay", "60000"),
+                ConfigOverride.config("country.metadata.maxRefreshDelay", "600000"),
+                ConfigOverride.config("country.metadata.expectedEntityId", "http://stub_idp.acme.org/stub-idp-one/SSO/POST"),
+                ConfigOverride.config("country.metadata.jerseyClientName", "country-metadata-client"),
 
-                    ConfigOverride.config("country.metadata.client.timeout", "2s"),
-                    ConfigOverride.config("country.metadata.client.timeToLive", "10m"),
-                    ConfigOverride.config("country.metadata.client.cookiesEnabled", "false"),
-                    ConfigOverride.config("country.metadata.client.connectionTimeout", "1s"),
-                    ConfigOverride.config("country.metadata.client.retries", "3"),
-                    ConfigOverride.config("country.metadata.client.keepAlive", "60s"),
-                    ConfigOverride.config("country.metadata.client.chunkedEncodingEnabled", "false"),
-                    ConfigOverride.config("country.metadata.client.validateAfterInactivityPeriod", "5s"),
+                ConfigOverride.config("country.metadata.client.timeout", "2s"),
+                ConfigOverride.config("country.metadata.client.timeToLive", "10m"),
+                ConfigOverride.config("country.metadata.client.cookiesEnabled", "false"),
+                ConfigOverride.config("country.metadata.client.connectionTimeout", "1s"),
+                ConfigOverride.config("country.metadata.client.retries", "3"),
+                ConfigOverride.config("country.metadata.client.keepAlive", "60s"),
+                ConfigOverride.config("country.metadata.client.chunkedEncodingEnabled", "false"),
+                ConfigOverride.config("country.metadata.client.validateAfterInactivityPeriod", "5s"),
 
-                    ConfigOverride.config("country.metadata.client.tls.protocol", "TLSv1.2"),
-                    ConfigOverride.config("country.metadata.client.tls.verifyHostname", "false"),
-                    ConfigOverride.config("country.metadata.client.tls.trustSelfSignedCertificates", "true")
-
+                ConfigOverride.config("country.metadata.client.tls.protocol", "TLSv1.2"),
+                ConfigOverride.config("country.metadata.client.tls.verifyHostname", "false"),
+                ConfigOverride.config("country.metadata.client.tls.trustSelfSignedCertificates", "true")
             ).collect(Collectors.toList());
             overrides.addAll(countryOverrides);
         }
