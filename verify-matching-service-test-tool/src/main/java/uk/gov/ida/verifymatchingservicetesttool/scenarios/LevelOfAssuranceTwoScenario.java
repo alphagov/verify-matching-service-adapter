@@ -35,12 +35,12 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
     public void runForComplexCase() {
         String jsonString = fileUtils.readFromResources("LoA2-extensive-case.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
-            .replace("%within405days-100days%", Instant.now().minus(405-100, DAYS).toString())
-            .replace("%within405days-101days%", Instant.now().minus(405-101, DAYS).toString())
-            .replace("%within405days-200days%", Instant.now().minus(405-200, DAYS).toString())
-            .replace("%within180days-100days%", Instant.now().minus(105-100, DAYS).toString())
-            .replace("%within180days-101days%", Instant.now().minus(105-101, DAYS).toString())
-            .replace("%within180days-150days%", Instant.now().minus(105-150, DAYS).toString());
+            .replace("%within405days-100days%", Instant.now().minus(100, DAYS).toString())
+            .replace("%within405days-101days%", Instant.now().minus(150, DAYS).toString())
+            .replace("%within405days-200days%", Instant.now().minus(400, DAYS).toString())
+            .replace("%within180days-100days%", Instant.now().minus(100, DAYS).toString())
+            .replace("%within180days-101days%", Instant.now().minus(140, DAYS).toString())
+            .replace("%within180days-150days%", Instant.now().minus(160, DAYS).toString());
 
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
