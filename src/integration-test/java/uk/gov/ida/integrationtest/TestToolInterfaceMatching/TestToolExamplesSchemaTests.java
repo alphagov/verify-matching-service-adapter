@@ -57,13 +57,13 @@ public class TestToolExamplesSchemaTests {
     private static final String REQUEST_ID = "default-match-id";
     private static final String PID = "default-pid";
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper().setDateFormat(ISO8601DateFormat.getDateInstance());
-    private static final Integer replaceYesterday = 1;
-    private static final Integer replace405to100 = 100;
-    private static final Integer replace405to101 = 150;
-    private static final Integer replace405to200 = 400;
-    private static final Integer replace180to100 = 100;
-    private static final Integer replace180to101 = 140;
-    private static final Integer replace180to150 = 160;
+    private static final Integer yesterday = 1;
+    private static final Integer inRange405to100 = 100;
+    private static final Integer inRange405to101 = 150;
+    private static final Integer inRange405to200 = 400;
+    private static final Integer inRange180to100 = 100;
+    private static final Integer inRange180to101 = 140;
+    private static final Integer inRange180to150 = 160;
 
     @ClassRule
     public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(1234));
@@ -300,7 +300,7 @@ public class TestToolExamplesSchemaTests {
                             aPersonNameValue()
                                 .withValue("Dou")
                                 .withVerified(false)
-                                .withFrom(getDateReplacement(replaceYesterday))
+                                .withFrom(getDateReplacement(yesterday))
                                 .withTo(null)
                                 .build()
                         ).addValue(
@@ -315,14 +315,14 @@ public class TestToolExamplesSchemaTests {
                                 .withValue("Joe")
                                 .withVerified(true)
                                 .withFrom(new DateTime(2005, 5, 24, 0, 0, DateTimeZone.UTC))
-                                .withTo(getDateReplacement(replace405to100))
+                                .withTo(getDateReplacement(inRange405to100))
                                 .build()
                         ).addValue(
                             aPersonNameValue()
                                 .withValue("Simon")
                                 .withVerified(false)
-                                .withFrom(getDateReplacement(replace405to101))
-                                .withTo(getDateReplacement(replace405to200))
+                                .withFrom(getDateReplacement(inRange405to101))
+                                .withTo(getDateReplacement(inRange405to200))
                                 .build()
                         )
                         .buildAsSurname(),
@@ -337,7 +337,7 @@ public class TestToolExamplesSchemaTests {
                     anAddressAttribute().addAddress(
                         anAddressAttributeValue()
                             .addLines(asList("2323 George Street"))
-                            .withFrom(getDateReplacement(replaceYesterday))
+                            .withFrom(getDateReplacement(yesterday))
                             .withInternationalPostcode("GB1 5PP")
                             .withPostcode("GB1 2PP")
                             .withUprn("7D68E096-5510-B3844C0BA3FD")
@@ -360,7 +360,7 @@ public class TestToolExamplesSchemaTests {
                             anAddressAttributeValue()
                                 .addLines(asList("344 George Street"))
                                 .withFrom(new DateTime(2009, 5, 24, 0, 0, DateTimeZone.UTC))
-                                .withTo(getDateReplacement(replace405to100))
+                                .withTo(getDateReplacement(inRange405to100))
                                 .withPostcode("GB1 2PP")
                                 .withInternationalPostcode("GB1 2PP")
                                 .withUprn("7D68E096-5510-B3844C0BA3FD")
@@ -369,8 +369,8 @@ public class TestToolExamplesSchemaTests {
                         ).addAddress(
                             anAddressAttributeValue()
                                 .addLines(asList("67676 George Street"))
-                                .withFrom(getDateReplacement(replace405to101))
-                                .withTo(getDateReplacement(replace405to200))
+                                .withFrom(getDateReplacement(inRange405to101))
+                                .withTo(getDateReplacement(inRange405to200))
                                 .withPostcode("GB1 2PP")
                                 .withInternationalPostcode("GB1 3PP")
                                 .withUprn("7D68E096-5510-B3844C0BA3FD")
@@ -441,7 +441,7 @@ public class TestToolExamplesSchemaTests {
                         aPersonNameValue()
                             .withValue("Dou")
                             .withVerified(false)
-                            .withFrom(getDateReplacement(replaceYesterday))
+                            .withFrom(getDateReplacement(yesterday))
                             .withTo(null)
                             .build()
                     ).addValue(
@@ -456,14 +456,14 @@ public class TestToolExamplesSchemaTests {
                             .withValue("Joe")
                             .withVerified(true)
                             .withFrom(new DateTime(2005, 5, 24, 0, 0, DateTimeZone.UTC))
-                            .withTo(getDateReplacement(replace180to100))
+                            .withTo(getDateReplacement(inRange180to100))
                             .build()
                     ).addValue(
                         aPersonNameValue()
                             .withValue("Simon")
                             .withVerified(false)
-                            .withFrom(getDateReplacement(replace180to101))
-                            .withTo(getDateReplacement(replace180to150))
+                            .withFrom(getDateReplacement(inRange180to101))
+                            .withTo(getDateReplacement(inRange180to150))
                             .build()
                     )
                         .buildAsSurname(),
@@ -478,7 +478,7 @@ public class TestToolExamplesSchemaTests {
                     anAddressAttribute().addAddress(
                         anAddressAttributeValue()
                             .addLines(asList("2323 George Street"))
-                            .withFrom(getDateReplacement(replaceYesterday))
+                            .withFrom(getDateReplacement(yesterday))
                             .withInternationalPostcode("GB1 5PP")
                             .withPostcode("GB1 2PP")
                             .withUprn("7D68E096-5510-B3844C0BA3FD")
@@ -501,7 +501,7 @@ public class TestToolExamplesSchemaTests {
                         anAddressAttributeValue()
                             .addLines(asList("344 George Street"))
                             .withFrom(new DateTime(2009, 5, 24, 0, 0, DateTimeZone.UTC))
-                            .withTo(getDateReplacement(replace405to100))
+                            .withTo(getDateReplacement(inRange405to100))
                             .withPostcode("GB1 2PP")
                             .withInternationalPostcode("GB1 2PP")
                             .withUprn("7D68E096-5510-B3844C0BA3FD")
@@ -510,8 +510,8 @@ public class TestToolExamplesSchemaTests {
                     ).addAddress(
                         anAddressAttributeValue()
                             .addLines(asList("67676 George Street"))
-                            .withFrom(getDateReplacement(replace405to101))
-                            .withTo(getDateReplacement(replace405to200))
+                            .withFrom(getDateReplacement(inRange405to101))
+                            .withTo(getDateReplacement(inRange405to200))
                             .withPostcode("GB1 2PP")
                             .withInternationalPostcode("GB1 3PP")
                             .withUprn("7D68E096-5510-B3844C0BA3FD")
@@ -547,7 +547,7 @@ public class TestToolExamplesSchemaTests {
     }
 
     @Test
-    public void shouldProducesUserAccountCreationJson() throws Exception {
+    public void shouldProduceUserAccountCreationJson() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withAttributes(asList())
@@ -594,13 +594,13 @@ public class TestToolExamplesSchemaTests {
     }
 
     private String makeDateReplacements(String input) {
-        return input.replace("%yesterdayDate%", getDateReplacement(replaceYesterday).toString())
-            .replace("%within405days-100days%", getDateReplacement(replace405to100).toString())
-            .replace("%within405days-101days%", getDateReplacement(replace405to101).toString())
-            .replace("%within405days-200days%", getDateReplacement(replace405to200).toString())
-            .replace("%within180days-100days%", getDateReplacement(replace180to100).toString())
-            .replace("%within180days-101days%", getDateReplacement(replace180to101).toString())
-            .replace("%within180days-150days%", getDateReplacement(replace180to150).toString());
+        return input.replace("%yesterdayDate%", getDateReplacement(yesterday).toString())
+            .replace("%within405days-100days%", getDateReplacement(inRange405to100).toString())
+            .replace("%within405days-101days%", getDateReplacement(inRange405to101).toString())
+            .replace("%within405days-200days%", getDateReplacement(inRange405to200).toString())
+            .replace("%within180days-100days%", getDateReplacement(inRange180to100).toString())
+            .replace("%within180days-101days%", getDateReplacement(inRange180to101).toString())
+            .replace("%within180days-150days%", getDateReplacement(inRange180to150).toString());
     }
 
     private DateTime getDateReplacement(Integer daysToSubtract) {
