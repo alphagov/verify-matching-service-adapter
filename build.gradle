@@ -43,7 +43,7 @@ def dependencyVersions = [
         saml_test_utils:"$opensaml-33",
         saml_domain_objects: "$opensaml-40",
         hub_saml: "$opensaml-98",
-        dev_pki: '1.1.0-19',
+        dev_pki: '1.1.0-19'
 ]
 
 apply plugin: "idaJar"
@@ -60,10 +60,6 @@ configurations {
 }
 
 configurations.all {
-    resolutionStrategy {
-        // dropwizard-testing uses 2.2.0 but our libraries currently only work with 1.6.0.
-        force "org.assertj:assertj-core:1.6.0"
-    }
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
@@ -128,11 +124,12 @@ dependencies {
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.mockito:mockito-core:1.10.19',
-        'org.assertj:assertj-core:1.6.0',
+        'org.assertj:assertj-core:3.8.0',
         'org.assertj:assertj-joda-time:1.1.0',
         'com.google.code.findbugs:jsr305:3.0.1',
         "uk.gov.ida:hub-saml-test-utils:$dependencyVersions.hub_saml",
-        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
+        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils",
+        "com.github.tomakehurst:wiremock:2.10.1"
 }
 
 sourceSets {
