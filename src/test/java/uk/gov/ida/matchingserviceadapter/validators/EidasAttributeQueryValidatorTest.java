@@ -63,9 +63,6 @@ public class EidasAttributeQueryValidatorTest {
     private CertificateValidator verifyCertificateValidator;
 
     @Mock
-    private CertificateValidator countryCertificateValidator;
-
-    @Mock
     private CertificateExtractor certificateExtractor;
 
     @Mock
@@ -83,7 +80,6 @@ public class EidasAttributeQueryValidatorTest {
             verifyMetadataResolver,
             countryMetadataResolver,
             verifyCertificateValidator,
-            countryCertificateValidator,
             certificateExtractor,
             x509CertificateFactory,
             new DateTimeComparator(Duration.ZERO),

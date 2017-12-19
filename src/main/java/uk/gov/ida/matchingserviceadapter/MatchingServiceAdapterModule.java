@@ -157,38 +157,18 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyCertificateValidator")
     public CertificateValidator getCertificateValidator(
         X509CertificateFactory x509CertificateFactory,
-        @Named("VerifyFixedCertificateChainValidator") FixedCertificateChainValidator fixedCertificateChainValidator) {
+        FixedCertificateChainValidator fixedCertificateChainValidator) {
         return new CertificateValidator(x509CertificateFactory, fixedCertificateChainValidator);
     }
 
     @Provides
     @Singleton
-    @Named("CountryCertificateValidator")
-    public Optional<CertificateValidator> getCountryCertificateValidator(
-        X509CertificateFactory x509CertificateFactory,
-        @Named("CountryFixedCertificateChainValidator") Optional<FixedCertificateChainValidator> fixedCertificateChainValidator) {
-        return fixedCertificateChainValidator.map(certificateChainValidator -> new CertificateValidator(x509CertificateFactory, certificateChainValidator));
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyFixedCertificateChainValidator")
     public FixedCertificateChainValidator getFixedChainCertificateValidator(
-        @Named("VerifyTrustStore") KeyStore keyStore,
+        KeyStore keyStore,
         CertificateChainValidator certificateChainValidator) {
         return new FixedCertificateChainValidator(keyStore, certificateChainValidator);
-    }
-
-    @Provides
-    @Singleton
-    @Named("CountryFixedCertificateChainValidator")
-    public Optional<FixedCertificateChainValidator> getCountryFixedChainCertificateValidator(
-        @Named("CountryTrustStore") Optional<KeyStore> CountryTrustStore,
-        CertificateChainValidator certificateChainValidator) {
-        return CountryTrustStore.map(keyStore -> new FixedCertificateChainValidator(keyStore, certificateChainValidator));
     }
 
     @Provides
@@ -199,10 +179,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyCertificateChainEvaluableCriterion")
     public CertificateChainEvaluableCriterion getCertificateChainEvaluableCriterion(
         CertificateChainValidator certificateChainValidator,
-        @Named("VerifyTrustStore") KeyStore keyStore) {
+        KeyStore keyStore) {
         return new CertificateChainEvaluableCriterion(certificateChainValidator, keyStore);
     }
 
@@ -214,7 +193,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MetadataCertificatesRepository getMetadataCertificateRepository(@Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver, @Named("VerifyCertificateValidator") CertificateValidator certificateValidator) {
+    public MetadataCertificatesRepository getMetadataCertificateRepository(@Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver, CertificateValidator certificateValidator) {
         return new MetadataCertificatesRepository(metadataResolver, certificateValidator, new CertificateExtractor());
     }
 
@@ -228,22 +207,13 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyTrustStoreConfiguration")
     public TrustStoreConfiguration getHubTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
         return configuration.getHubTrustStoreConfiguration();
     }
 
     @Provides
     @Singleton
-    @Named("CountryTrustStore")
-    public Optional<KeyStore> getCountryTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
-        return Optional.of(configuration.getHubTrustStoreConfiguration().getTrustStore());
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyTrustStore")
-    public KeyStore getVerifyKeyStore(@Named("VerifyTrustStoreConfiguration") TrustStoreConfiguration trustStoreConfiguration) {
+    public KeyStore getVerifyKeyStore(TrustStoreConfiguration trustStoreConfiguration) {
         return trustStoreConfiguration.getTrustStore();
     }
 
@@ -267,15 +237,15 @@ class MatchingServiceAdapterModule extends AbstractModule {
             .collect(Collectors.toList());
 
         return new CertificateStore(
-                publicEncryptionCertificates,
-                publicSigningCertificates);
+            publicEncryptionCertificates,
+            publicSigningCertificates);
     }
 
     private Certificate cert(String keyName, String cert, Certificate.KeyUse keyUse) {
         return new Certificate(
-                keyName,
-                cert.replace("-----BEGIN CERTIFICATE-----", "").replace("-----END CERTIFICATE-----", "").replace(" ", ""),
-                keyUse);
+            keyName,
+            cert.replace("-----BEGIN CERTIFICATE-----", "").replace("-----END CERTIFICATE-----", "").replace(" ", ""),
+            keyUse);
     }
 
     @Provides
@@ -284,10 +254,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
         Injector injector
     ) {
         return new MsaTransformersFactory().getHealthcheckResponseFromMatchingServiceToElementTransformer(
-                injector.getInstance(EncryptionKeyStore.class),
-                injector.getInstance(IdaKeyStore.class),
-                injector.getInstance(EntityToEncryptForLocator.class),
-                injector.getInstance(MatchingServiceAdapterConfiguration.class)
+            injector.getInstance(EncryptionKeyStore.class),
+            injector.getInstance(IdaKeyStore.class),
+            injector.getInstance(EntityToEncryptForLocator.class),
+            injector.getInstance(MatchingServiceAdapterConfiguration.class)
         );
     }
 
@@ -297,10 +267,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
         Injector injector
     ) {
         return new MsaTransformersFactory().getOutboundResponseFromMatchingServiceToElementTransformer(
-                injector.getInstance(EncryptionKeyStore.class),
-                injector.getInstance(IdaKeyStore.class),
-                injector.getInstance(EntityToEncryptForLocator.class),
-                injector.getInstance(MatchingServiceAdapterConfiguration.class)
+            injector.getInstance(EncryptionKeyStore.class),
+            injector.getInstance(IdaKeyStore.class),
+            injector.getInstance(EntityToEncryptForLocator.class),
+            injector.getInstance(MatchingServiceAdapterConfiguration.class)
         );
     }
 
@@ -310,10 +280,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
         Injector injector
     ) {
         return new MsaTransformersFactory().getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
-                injector.getInstance(EncryptionKeyStore.class),
-                injector.getInstance(IdaKeyStore.class),
-                injector.getInstance(EntityToEncryptForLocator.class),
-                injector.getInstance(MatchingServiceAdapterConfiguration.class)
+            injector.getInstance(EncryptionKeyStore.class),
+            injector.getInstance(IdaKeyStore.class),
+            injector.getInstance(EntityToEncryptForLocator.class),
+            injector.getInstance(MatchingServiceAdapterConfiguration.class)
         );
     }
 
@@ -329,26 +299,25 @@ class MatchingServiceAdapterModule extends AbstractModule {
         @Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver,
         IdaKeyStore keyStore,
         MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-        @Named("VerifyCertificateChainEvaluableCriterion") CertificateChainEvaluableCriterion certificateChainEvaluableCriterion,
+        CertificateChainEvaluableCriterion certificateChainEvaluableCriterion,
         @Named("HubEntityId") String hubEntityId) throws ComponentInitializationException {
         return new MsaTransformersFactory().getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-                metadataResolver,
-                keyStore,
-                matchingServiceAdapterConfiguration,
-                hubEntityId,
-                certificateChainEvaluableCriterion);
+            metadataResolver,
+            keyStore,
+            matchingServiceAdapterConfiguration,
+            hubEntityId,
+            certificateChainEvaluableCriterion);
     }
 
     @Provides
     @Singleton
     private Function<AttributeQuery, InboundMatchingServiceRequest> getAttributeQueryToInboundMatchingServiceRequestTransformer(
-            @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
-            @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
-            @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-            @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
-            X509CertificateFactory x509CertificateFactory,
-            IdaKeyStore eidasKeystore,
-            VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer) throws ComponentInitializationException {
+        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
+        @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
+        CertificateValidator verifyCertificateValidator,
+        X509CertificateFactory x509CertificateFactory,
+        IdaKeyStore eidasKeystore,
+        VerifyAttributeQueryToInboundMatchingServiceRequestTransformer verifyTransformer) throws ComponentInitializationException {
 
         if (countryMetadataResolver.isPresent()) {
             EidasAttributesBasedAttributeQueryDiscriminator discriminator = new EidasAttributesBasedAttributeQueryDiscriminator(
@@ -362,7 +331,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
                             verifyMetadataResolver,
                             countryMetadataResolver.get(),
                             verifyCertificateValidator,
-                            countryCertificateValidator.get(),
                             new CertificateExtractor(),
                             x509CertificateFactory,
                             new DateTimeComparator(Duration.ZERO),
@@ -444,5 +412,4 @@ class MatchingServiceAdapterModule extends AbstractModule {
         }
         return Optional.empty();
     }
-
 }

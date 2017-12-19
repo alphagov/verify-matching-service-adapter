@@ -12,12 +12,21 @@ public class CountryConfiguration {
     @NotNull
     @Valid
     @JsonProperty
-    public String hubConnectorEntityId;
+    private String hubConnectorEntityId;
 
     @NotNull
     @Valid
     @JsonProperty
     private TrustStoreBackedMetadataConfiguration metadata;
+
+    private CountryConfiguration() { }
+
+    public CountryConfiguration(
+        final String hubConnectorEntityId,
+        final TrustStoreBackedMetadataConfiguration metadata) {
+        this.hubConnectorEntityId = hubConnectorEntityId;
+        this.metadata = metadata;
+    }
 
     public String getHubConnectorEntityId() {
         return hubConnectorEntityId;
