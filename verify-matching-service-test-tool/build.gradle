@@ -22,6 +22,7 @@ buildscript {
 
 ext {
     everitJsonSchemaVersion = '1.5.1'
+    commonsCliVersion = '1.4'
     jerseyVersion = '2.26'
     jacksonVersion = '2.9.2'
     javaValidationVersion = '2.0.0.Final'
@@ -42,6 +43,7 @@ dependencies {
             "javax.validation:validation-api:$javaValidationVersion",
             "org.hamcrest:hamcrest-library:$hamcrestVersion",
             "org.everit.json:org.everit.json.schema:$everitJsonSchemaVersion",
+            "commons-cli:commons-cli:$commonsCliVersion",
             //junit 5
             "org.junit.jupiter:junit-jupiter-api:$jUnitJupiterVersion",
             "org.junit.platform:junit-platform-launcher:$jUnitPlatformLauncherVersion",
