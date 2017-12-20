@@ -9,10 +9,10 @@ import java.io.IOException;
 
 public class ConfigurationReader {
 
-    public static ApplicationConfiguration getConfiguration() {
+    public static ApplicationConfiguration getConfiguration(String configFile) {
         try {
             return new ObjectMapper(new YAMLFactory()).readValue(
-                new File(getConfigurationFolderLocation()),
+                new File(getConfigurationFolderLocation(configFile)),
                 ApplicationConfiguration.class
             );
         } catch (IOException e) {
@@ -20,11 +20,11 @@ public class ConfigurationReader {
         }
     }
 
-    private static String getConfigurationFolderLocation() {
+    private static String getConfigurationFolderLocation(String configFile) {
         String path = Application.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         return new File(path)
             .getParentFile()
             .getParentFile()
-            .getAbsolutePath() + File.separator + "verify-matching-service-test-tool.yml";
+            .getAbsolutePath() + File.separator + configFile;
     }
 }

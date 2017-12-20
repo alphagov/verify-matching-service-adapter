@@ -22,7 +22,7 @@ public class FilesLocatorResolver implements ParameterResolver {
         ExtensionContext extensionContext
     ) throws ParameterResolutionException {
         if (applicationFilesLocator == null) {
-            applicationFilesLocator = new DefaultFilesLocator();
+            applicationFilesLocator = new DefaultFilesLocator("examples");
         }
 
         return applicationFilesLocator;

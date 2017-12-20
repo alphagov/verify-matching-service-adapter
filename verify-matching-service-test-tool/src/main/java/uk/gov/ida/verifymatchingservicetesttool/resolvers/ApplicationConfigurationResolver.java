@@ -26,7 +26,7 @@ public class ApplicationConfigurationResolver implements ParameterResolver {
 
     private ApplicationConfiguration getConfiguration() {
         if (configuration == null) {
-            configuration = ConfigurationReader.getConfiguration();
+            configuration = ConfigurationReader.getConfiguration("verify-matching-service-test-tool.yml");
         }
 
         return configuration;
