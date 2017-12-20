@@ -14,7 +14,7 @@ public abstract class FeatureTestBase {
 
     protected LocalMatchingServiceStub localMatchingService = new LocalMatchingServiceStub();
     protected SummaryGeneratingListener listener = new SummaryGeneratingListener();
-    protected FilesLocator fileLocator = new DefaultFilesLocator();
+    protected FilesLocator fileLocator = new DefaultFilesLocator("examples");
 
 
     @BeforeEach

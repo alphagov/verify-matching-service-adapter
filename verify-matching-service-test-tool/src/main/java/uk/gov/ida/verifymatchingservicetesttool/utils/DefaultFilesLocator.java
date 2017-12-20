@@ -10,7 +10,11 @@ import java.util.stream.Stream;
 
 public class DefaultFilesLocator implements FilesLocator {
 
-    private final static String EXAMPLES_FOLDER_NAME = "examples";
+    private String examplesFolderName;
+
+    public DefaultFilesLocator(String examplesFolderName) {
+        this.examplesFolderName = examplesFolderName;
+    }
 
     public Stream<File> getFiles(FolderName folderName) {
         try {
@@ -30,6 +34,6 @@ public class DefaultFilesLocator implements FilesLocator {
         return new File(path)
             .getParentFile()
             .getParentFile()
-            .getAbsolutePath() + File.separator + EXAMPLES_FOLDER_NAME;
+            .getAbsolutePath() + File.separator + examplesFolderName;
     }
 }
