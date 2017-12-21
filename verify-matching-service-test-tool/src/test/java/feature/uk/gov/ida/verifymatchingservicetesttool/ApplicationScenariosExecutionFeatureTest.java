@@ -2,12 +2,10 @@ package feature.uk.gov.ida.verifymatchingservicetesttool;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
-import uk.gov.ida.verifymatchingservicetesttool.utils.DefaultFilesLocator;
 import uk.gov.ida.verifymatchingservicetesttool.utils.ExitStatus;
 import uk.gov.ida.verifymatchingservicetesttool.utils.TestStatusPrintingListener;
 
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
-import static common.uk.gov.ida.verifymatchingservicetesttool.services.LocalMatchingServiceStub.MatchingResult.MATCH;
 import static common.uk.gov.ida.verifymatchingservicetesttool.services.LocalMatchingServiceStub.MatchingResult.NO_MATCH;
 import static common.uk.gov.ida.verifymatchingservicetesttool.services.LocalMatchingServiceStub.RELATIVE_MATCH_URL;
 import static javax.ws.rs.core.Response.Status.OK;
