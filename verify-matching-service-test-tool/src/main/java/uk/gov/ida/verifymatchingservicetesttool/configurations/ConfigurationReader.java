@@ -9,22 +9,26 @@ import java.io.IOException;
 
 public class ConfigurationReader {
 
-    public static ApplicationConfiguration getConfiguration(String configFile) {
+    private static final String VERIFY_MATCHING_SERVICE_TEST_TOOL_YML = "verify-matching-service-test-tool.yml";
+
+    public static ApplicationConfiguration getConfiguration(String configFileLocation) {
         try {
-            return new ObjectMapper(new YAMLFactory()).readValue(
-                new File(getConfigurationFolderLocation(configFile)),
-                ApplicationConfiguration.class
-            );
+            return new ObjectMapper(new YAMLFactory()).readValue(new File(getConfigurationFolderLocation(configFileLocation)),
+                    ApplicationConfiguration.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static String getConfigurationFolderLocation(String configFile) {
+    private static String getConfigurationFolderLocation(String configFileLocation) {
+        return configFileLocation != null ? configFileLocation : getDefaultConfigLocation();
+    }
+
+    private static String getDefaultConfigLocation() {
         String path = Application.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         return new File(path)
-            .getParentFile()
-            .getParentFile()
-            .getAbsolutePath() + File.separator + configFile;
+                .getParentFile()
+                .getParentFile()
+                .getAbsolutePath() + File.separator + VERIFY_MATCHING_SERVICE_TEST_TOOL_YML;
     }
 }
