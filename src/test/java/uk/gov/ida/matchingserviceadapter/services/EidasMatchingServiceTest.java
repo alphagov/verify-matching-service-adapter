@@ -26,7 +26,7 @@ public class EidasMatchingServiceTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void constructor() {
+    public void shouldUseValidatorSupplied() {
         Validator<AttributeQuery> attributeQueryValidator = mock(Validator.class);
         EidasMatchingService service = new EidasMatchingService(attributeQueryValidator);
 

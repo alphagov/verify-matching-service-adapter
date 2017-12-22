@@ -25,12 +25,12 @@ public class MatchingServiceResource {
     private static final Logger LOG = LoggerFactory.getLogger(MatchingServiceResource.class);
 
     private final MatchingService matchingService;
-    private final MatchingServiceResponseRenderer<MatchingServiceResponse> responseRenderer;
+    private final MatchingServiceRestResponseRenderer<MatchingServiceResponse> responseRenderer;
 
     @Inject
     public MatchingServiceResource(
         MatchingService matchingService,
-        MatchingServiceResponseRenderer<MatchingServiceResponse> responseRenderer) {
+        MatchingServiceRestResponseRenderer<MatchingServiceResponse> responseRenderer) {
         this.matchingService = matchingService;
         this.responseRenderer = responseRenderer;
     }

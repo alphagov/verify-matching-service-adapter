@@ -14,13 +14,13 @@ import static javax.ws.rs.core.Response.ok;
 /**
  * Created by gary on 17/11/17.
  */
-public class HealthCheckResponseRenderer implements MatchingServiceResponseRenderer<HealthCheckMatchingServiceResponse> {
+public class HealthCheckRestResponseRenderer implements MatchingServiceRestResponseRenderer<HealthCheckMatchingServiceResponse> {
 
     private final SoapMessageManager soapMessageManager;
     private final Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
     private final ManifestReader manifestReader;
 
-    public HealthCheckResponseRenderer(SoapMessageManager soapMessageManager, Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader) {
+    public HealthCheckRestResponseRenderer(SoapMessageManager soapMessageManager, Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader) {
         this.soapMessageManager = soapMessageManager;
         this.healthCheckResponseTransformer = healthCheckResponseTransformer;
         this.manifestReader = manifestReader;
