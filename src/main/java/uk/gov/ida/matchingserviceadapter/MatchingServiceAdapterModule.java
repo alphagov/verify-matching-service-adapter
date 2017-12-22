@@ -51,20 +51,17 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.ResolverBackedMetadataRepository;
-import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseRenderer;
-import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseRenderer;
-import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseRenderer;
-import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseRenderer;
+import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceRestResponseRenderer;
+import uk.gov.ida.matchingserviceadapter.resources.HealthCheckRestResponseRenderer;
+import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceRestResponseRenderer;
+import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceRestResponseRenderer;
 import uk.gov.ida.matchingserviceadapter.rest.MetadataPublicKeyStore;
 import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCertificateChainValidator;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.api.MsaTransformersFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.DiscriminatingAttributeQueryToInboundMSRequestTransformer;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributesBasedAttributeQueryDiscriminator;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.VerifyAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
@@ -157,17 +154,17 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MatchingServiceResponseRenderer<MatchingServiceResponse> getResponseRenderer(SoapMessageManager soapMessageManager,
-                                                                                        Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
-                                                                                        ManifestReader manifestReader,
-                                                                                        Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
+    public MatchingServiceRestResponseRenderer<MatchingServiceResponse> getResponseRenderer(SoapMessageManager soapMessageManager,
+                                                                                            Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
+                                                                                            ManifestReader manifestReader,
+                                                                                            Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
                                                                                         ) {
-        return new DelegatingMatchingServiceResponseRenderer(
+        return new DelegatingMatchingServiceRestResponseRenderer(
             ImmutableMap.of(
                 HealthCheckMatchingServiceResponse.class,
-                new HealthCheckResponseRenderer(soapMessageManager, healthCheckResponseTransformer, manifestReader),
+                new HealthCheckRestResponseRenderer(soapMessageManager, healthCheckResponseTransformer, manifestReader),
                 VerifyMatchingServiceResponse.class,
-                new VerifyMatchingServiceResponseRenderer(soapMessageManager, responseElementTransformer)
+                new VerifyMatchingServiceRestResponseRenderer(soapMessageManager, responseElementTransformer)
             ));
     }
 
