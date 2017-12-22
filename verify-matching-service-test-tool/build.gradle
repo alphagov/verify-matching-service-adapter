@@ -65,27 +65,29 @@ distZip {
     }
 }
 
-task copyExamples(type: Copy) {
-    ['build/examples', 'out/examples'].each { dest ->
-        copy {
-            from projectDir.getPath() + "/examples"
-            into dest
+task copyExamples(dependsOn: assemble) {
+    doLast {
+        ['build', 'out'].each { dest ->
+            copy {
+                from 'examples'
+                into "${dest}/examples"
+            }
         }
     }
 }
 
-task copyConfiguration(type: Copy) {
-    ['build', 'out'].each { dest ->
-        copy {
-            from project.rootDir.getPath() + "/verify-matching-service-test-tool.yml"
-            into dest
+task copyConfiguration(dependsOn: assemble) {
+    doLast {
+        ['build', 'out'].each { dest ->
+            copy {
+                from 'verify-matching-service-test-tool.yml'
+                into dest
+            }
         }
     }
 }
 
-compileJava {
-    dependsOn copyExamples
-    dependsOn copyConfiguration
-}
+test { dependsOn copyExamples, copyConfiguration }
+run { dependsOn copyExamples, copyConfiguration }
 
 mainClassName = 'uk.gov.ida.verifymatchingservicetesttool.Application'
