@@ -29,7 +29,7 @@ public class IssueInstantValidatorTest {
     private static final Duration CLOCK_DELTA = Duration.parse("PT1M");
 
     @Test
-    public void ctorTtlFutureMessageDateTimeProviderAndDurations() {
+    public void validationWithTtlFutureMessageDateTimeProviderAndDurations() {
         Instant providedDateTime = Instant.now().minus(1000, DAYS);
         Function<Object, Instant> instantProvider = context -> providedDateTime;
         IssueInstantValidator<Object> validator = new IssueInstantValidator<>(
