@@ -13,12 +13,10 @@ public class CommandLineOptionValue {
     }
 
     public String getExamplesFolderLocation() {
-        return examplesFolderLocation != null ?
-                System.getProperty("user.dir") + File.separator + examplesFolderLocation : null;
+        return examplesFolderLocation;
     }
 
     public String getConfigFileLocation() {
-        return configFileLocation != null ?
-                System.getProperty("user.dir") + File.separator + configFileLocation : null;
+        return configFileLocation;
     }
 }

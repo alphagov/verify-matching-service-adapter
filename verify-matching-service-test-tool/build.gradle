@@ -90,4 +90,10 @@ compileJava {
     dependsOn copyConfiguration
 }
 
+run {
+    if ( project.hasProperty("commandLineArgs") ) {
+        args Eval.me(commandLineArgs)
+    }
+}
+
 mainClassName = 'uk.gov.ida.verifymatchingservicetesttool.Application'
