@@ -92,4 +92,10 @@ task copyConfiguration(dependsOn: assemble) {
 test { dependsOn copyExamples, copyConfiguration }
 run { dependsOn copyExamples, copyConfiguration }
 
+run {
+    if ( project.hasProperty("commandLineArgs") ) {
+        args Eval.me(commandLineArgs)
+    }
+}
+
 mainClassName = 'uk.gov.ida.verifymatchingservicetesttool.Application'
