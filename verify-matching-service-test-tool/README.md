@@ -26,7 +26,17 @@ Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you crea
 
 Run `bin/verify-matching-service-test-tool` to start the test tool.
 
-This command will run a series of test scenarios. 
+This command will run a series of test scenarios.
+
+## Optional Command Line Arguments
+
+You can also use command line arguments to specify the relative location of the configuration file and/or the relative location of the directory containing the additional scenario files described below.
+
+e.g. `bin/verify-matching-service-test-tool -c <../config-file.yml> -e <../examplesFolder>`
+
+NB: the 'examplesFolder' should be the relative path of the folder containing the 'match' and 'no-match' sub-folders.
+
+`bin/verify-matching-service-test-tool --help` will display the available command line arguments.
 
 ## Test scenarios
 
