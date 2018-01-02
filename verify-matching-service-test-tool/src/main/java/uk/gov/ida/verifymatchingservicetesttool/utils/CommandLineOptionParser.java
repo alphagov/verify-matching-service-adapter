@@ -28,14 +28,16 @@ public class CommandLineOptionParser {
         if (exampleScenariosFolderLocation != null &&
             checkIfFileDoesNotExist(exampleScenariosFolderLocation, FolderName.MATCH_FOLDER_NAME) &&
             checkIfFileDoesNotExist(exampleScenariosFolderLocation, FolderName.NO_MATCH_FOLDER_NAME)) {
-            System.out.println(String.format("Ensure the specified example scenarios folder '%s' " +
-                "has 'match' and 'no-match' sub-folders", exampleScenariosFolderLocation));
+            System.out.println(String.format("%sTest Run Failed%s", Color.RED, Color.NONE));
+            System.out.println(String.format("%sEnsure the specified example scenarios folder '%s' " +
+                "has 'match' and 'no-match' sub-folders%s", Color.YELLOW, exampleScenariosFolderLocation, Color.NONE));
             System.exit(2);
         }
 
         String configFileLocation = getAbsoluteFilePath(cmd.getOptionValue(CONFIG_FILE.getValue()));
         if (configFileLocation != null && checkIfFileDoesNotExist(configFileLocation)) {
-            System.out.println("Config file does not exist : " + configFileLocation);
+            System.out.println(String.format("%sTest Run Failed%s", Color.RED, Color.NONE));
+            System.out.println(String.format("%sConfig file does not exist: '%s'%s", Color.YELLOW, configFileLocation, Color.NONE));
             System.exit(2);
         }
 
