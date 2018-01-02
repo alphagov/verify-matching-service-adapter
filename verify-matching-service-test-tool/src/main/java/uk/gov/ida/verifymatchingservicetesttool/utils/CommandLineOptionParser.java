@@ -25,13 +25,16 @@ public class CommandLineOptionParser {
         }
 
         String exampleScenariosFolderLocation = getAbsoluteFilePath(cmd.getOptionValue(EXAMPLES_FOLDER.getValue()));
-        if (exampleScenariosFolderLocation != null && checkIfFileDoesNotExists(exampleScenariosFolderLocation, FolderName.MATCH_FOLDER_NAME) && checkIfFileDoesNotExists(exampleScenariosFolderLocation, FolderName.NO_MATCH_FOLDER_NAME)) {
-            System.out.println("Ensure the specified example scenarios folder '" + exampleScenariosFolderLocation + "' has 'match' and 'no-match' sub-folders ");
+        if (exampleScenariosFolderLocation != null &&
+            checkIfFileDoesNotExist(exampleScenariosFolderLocation, FolderName.MATCH_FOLDER_NAME) &&
+            checkIfFileDoesNotExist(exampleScenariosFolderLocation, FolderName.NO_MATCH_FOLDER_NAME)) {
+            System.out.println(String.format("Ensure the specified example scenarios folder '%s' " +
+                "has 'match' and 'no-match' sub-folders", exampleScenariosFolderLocation));
             System.exit(2);
         }
 
         String configFileLocation = getAbsoluteFilePath(cmd.getOptionValue(CONFIG_FILE.getValue()));
-        if (configFileLocation != null && checkIfFileDoesNotExists(configFileLocation)) {
+        if (configFileLocation != null && checkIfFileDoesNotExist(configFileLocation)) {
             System.out.println("Config file does not exist : " + configFileLocation);
             System.exit(2);
         }
@@ -40,15 +43,18 @@ public class CommandLineOptionParser {
     }
 
     private static String getAbsoluteFilePath(String fileName) {
-        return fileName != null ? System.getProperty("user.dir") + File.separator + fileName : fileName;
+        if (fileName != null) {
+            fileName = System.getProperty("user.dir") + File.separator + fileName;
+        }
+        return fileName;
     }
 
-    private static boolean checkIfFileDoesNotExists(String fileName) {
+    private static boolean checkIfFileDoesNotExist(String fileName) {
         return !Files.exists(Paths.get(fileName));
     }
 
-    private static boolean checkIfFileDoesNotExists(String fileName, FolderName folderName) {
-        return !Files.exists(Paths.get(fileName + File.separator + folderName.getValue()));
+    private static boolean checkIfFileDoesNotExist(String fileName, FolderName folderName) {
+        return !Files.exists(Paths.get(fileName, folderName.getValue()));
     }
 
     private static Options getOptions() {

@@ -6,6 +6,7 @@ import uk.gov.ida.verifymatchingservicetesttool.Application;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class ConfigurationReader {
 
@@ -21,7 +22,7 @@ public class ConfigurationReader {
     }
 
     private static String getConfigurationFolderLocation(String configFileLocation) {
-        return configFileLocation != null ? configFileLocation : getDefaultConfigLocation();
+        return Optional.ofNullable(configFileLocation).orElseGet(ConfigurationReader::getDefaultConfigLocation);
     }
 
     private static String getDefaultConfigLocation() {
