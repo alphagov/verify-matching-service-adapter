@@ -14,14 +14,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class DelegatingMatchingServiceRestResponseRendererTest {
+public class DelegatingMatchingServiceRestResponseGeneratorTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void shouldSaveDelegatesList() {
-        ImmutableMap<Class<?>, MatchingServiceRestResponseRenderer> delegates = ImmutableMap.of();
-        DelegatingMatchingServiceRestResponseRenderer renderer = new DelegatingMatchingServiceRestResponseRenderer(delegates);
+        ImmutableMap<Class<?>, MatchingServiceRestResponseGenerator> delegates = ImmutableMap.of();
+        DelegatingMatchingServiceRestResponseGenerator renderer = new DelegatingMatchingServiceRestResponseGenerator(delegates);
 
         assertThat(renderer.getDelegates(), sameInstance(delegates));
     }
@@ -30,25 +30,25 @@ public class DelegatingMatchingServiceRestResponseRendererTest {
     public void renderErrorsWhenNoDelegateIsFound() {
         exception.expectMessage("No delegate found for matching service response");
 
-        ImmutableMap<Class<?>, MatchingServiceRestResponseRenderer> delegates = ImmutableMap.of(DelegatingMatchingServiceRestResponseRendererTest.class, mock(MatchingServiceRestResponseRenderer.class));
-        DelegatingMatchingServiceRestResponseRenderer renderer = new DelegatingMatchingServiceRestResponseRenderer(delegates);
+        ImmutableMap<Class<?>, MatchingServiceRestResponseGenerator> delegates = ImmutableMap.of(DelegatingMatchingServiceRestResponseGeneratorTest.class, mock(MatchingServiceRestResponseGenerator.class));
+        DelegatingMatchingServiceRestResponseGenerator renderer = new DelegatingMatchingServiceRestResponseGenerator(delegates);
 
-        renderer.render(mock(MatchingServiceResponse.class));
+        renderer.generateResponse(mock(MatchingServiceResponse.class));
     }
 
     @Test
     public void renderDelegatesToConfiguredResponseRenderer() {
-        MatchingServiceRestResponseRenderer notSelectedRenderer = mock(MatchingServiceRestResponseRenderer.class);
-        MatchingServiceRestResponseRenderer selectedRenderer = mock(MatchingServiceRestResponseRenderer.class);
-        ImmutableMap<Class<?>, MatchingServiceRestResponseRenderer> delegates = ImmutableMap.of(
+        MatchingServiceRestResponseGenerator notSelectedRenderer = mock(MatchingServiceRestResponseGenerator.class);
+        MatchingServiceRestResponseGenerator selectedRenderer = mock(MatchingServiceRestResponseGenerator.class);
+        ImmutableMap<Class<?>, MatchingServiceRestResponseGenerator> delegates = ImmutableMap.of(
             MatchingServiceResponse.class, notSelectedRenderer,
             VerifyMatchingServiceResponse.class, selectedRenderer);
         VerifyMatchingServiceResponse response = new VerifyMatchingServiceResponse(mock(OutboundResponseFromMatchingService.class));
-        DelegatingMatchingServiceRestResponseRenderer renderer = new DelegatingMatchingServiceRestResponseRenderer(delegates);
+        DelegatingMatchingServiceRestResponseGenerator renderer = new DelegatingMatchingServiceRestResponseGenerator(delegates);
 
-        renderer.render(response);
+        renderer.generateResponse(response);
 
-        verify(selectedRenderer).render(response);
+        verify(selectedRenderer).generateResponse(response);
         verifyNoMoreInteractions(notSelectedRenderer, selectedRenderer);
     }
 }

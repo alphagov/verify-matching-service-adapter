@@ -25,7 +25,7 @@ public class MatchingServiceResourceTest {
     @Mock
     private MatchingService matchingService;
     @Mock
-    private MatchingServiceRestResponseRenderer<MatchingServiceResponse> responseRenderer;
+    private MatchingServiceRestResponseGenerator<MatchingServiceResponse> responseRenderer;
     @Mock
     private Document attributeQueryDocument;
     @Mock
@@ -47,7 +47,7 @@ public class MatchingServiceResourceTest {
 
         ArgumentCaptor<MatchingServiceRequestContext> requestContextArgumentCaptor = ArgumentCaptor.forClass(MatchingServiceRequestContext.class);
         verify(matchingService).handle(requestContextArgumentCaptor.capture());
-        verify(responseRenderer).render(matchingServiceResponse);
+        verify(responseRenderer).generateResponse(matchingServiceResponse);
 
         assertThat(requestContextArgumentCaptor.getValue().getAttributeQueryDocument()).isSameAs(attributeQueryDocument);
     }

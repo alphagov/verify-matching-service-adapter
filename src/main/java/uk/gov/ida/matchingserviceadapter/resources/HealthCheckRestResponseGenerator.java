@@ -11,23 +11,20 @@ import java.util.function.Function;
 
 import static javax.ws.rs.core.Response.ok;
 
-/**
- * Created by gary on 17/11/17.
- */
-public class HealthCheckRestResponseRenderer implements MatchingServiceRestResponseRenderer<HealthCheckMatchingServiceResponse> {
+public class HealthCheckRestResponseGenerator implements MatchingServiceRestResponseGenerator<HealthCheckMatchingServiceResponse> {
 
     private final SoapMessageManager soapMessageManager;
     private final Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
     private final ManifestReader manifestReader;
 
-    public HealthCheckRestResponseRenderer(SoapMessageManager soapMessageManager, Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader) {
+    public HealthCheckRestResponseGenerator(SoapMessageManager soapMessageManager, Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader) {
         this.soapMessageManager = soapMessageManager;
         this.healthCheckResponseTransformer = healthCheckResponseTransformer;
         this.manifestReader = manifestReader;
     }
 
     @Override
-    public Response render(HealthCheckMatchingServiceResponse healthCheckMatchingServiceResponse) {
+    public Response generateResponse(HealthCheckMatchingServiceResponse healthCheckMatchingServiceResponse) {
         return ok()
             .header("ida-msa-version", manifestReader.getValue("Version-Number"))
             .entity(

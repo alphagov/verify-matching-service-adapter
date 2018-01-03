@@ -25,12 +25,12 @@ public class MatchingServiceResource {
     private static final Logger LOG = LoggerFactory.getLogger(MatchingServiceResource.class);
 
     private final MatchingService matchingService;
-    private final MatchingServiceRestResponseRenderer<MatchingServiceResponse> responseRenderer;
+    private final MatchingServiceRestResponseGenerator<MatchingServiceResponse> responseRenderer;
 
     @Inject
     public MatchingServiceResource(
         MatchingService matchingService,
-        MatchingServiceRestResponseRenderer<MatchingServiceResponse> responseRenderer) {
+        MatchingServiceRestResponseGenerator<MatchingServiceResponse> responseRenderer) {
         this.matchingService = matchingService;
         this.responseRenderer = responseRenderer;
     }
@@ -42,6 +42,6 @@ public class MatchingServiceResource {
         LOG.debug("AttributeQuery POSTED: {}", attributeQueryDocument);
 
         MatchingServiceResponse matchingServiceResponse = matchingService.handle(new MatchingServiceRequestContext(attributeQueryDocument));
-        return responseRenderer.render(matchingServiceResponse);
+        return responseRenderer.generateResponse(matchingServiceResponse);
     }
 }

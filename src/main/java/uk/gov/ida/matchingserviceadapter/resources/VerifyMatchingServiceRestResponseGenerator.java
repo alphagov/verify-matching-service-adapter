@@ -8,11 +8,11 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResp
 import javax.ws.rs.core.Response;
 import java.util.function.Function;
 
-public class VerifyMatchingServiceRestResponseRenderer implements MatchingServiceRestResponseRenderer<VerifyMatchingServiceResponse> {
+public class VerifyMatchingServiceRestResponseGenerator implements MatchingServiceRestResponseGenerator<VerifyMatchingServiceResponse> {
     private SoapMessageManager soapMessageManager;
     private Function<OutboundResponseFromMatchingService, Element> responseElementTransformer;
 
-    public VerifyMatchingServiceRestResponseRenderer(
+    public VerifyMatchingServiceRestResponseGenerator(
         SoapMessageManager soapMessageManager,
         Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
 
@@ -22,7 +22,7 @@ public class VerifyMatchingServiceRestResponseRenderer implements MatchingServic
     }
 
     @Override
-    public Response render(VerifyMatchingServiceResponse verifyMatchingServiceResponse) {
+    public Response generateResponse(VerifyMatchingServiceResponse verifyMatchingServiceResponse) {
         return Response.ok()
                 .entity(soapMessageManager.wrapWithSoapEnvelope(responseElementTransformer.apply(verifyMatchingServiceResponse.getOutboundResponseFromMatchingService())))
                 .build();
