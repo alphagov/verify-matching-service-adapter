@@ -51,10 +51,10 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.ResolverBackedMetadataRepository;
-import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceRestResponseGenerator;
-import uk.gov.ida.matchingserviceadapter.resources.HealthCheckRestResponseGenerator;
-import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceRestResponseGenerator;
-import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceRestResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.rest.MetadataPublicKeyStore;
 import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCertificateChainValidator;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
@@ -154,17 +154,17 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MatchingServiceRestResponseGenerator<MatchingServiceResponse> getResponseRenderer(SoapMessageManager soapMessageManager,
-                                                                                             Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
-                                                                                             ManifestReader manifestReader,
-                                                                                             Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
+    public MatchingServiceResponseGenerator<MatchingServiceResponse> getResponseGenerator(SoapMessageManager soapMessageManager,
+                                                                                          Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
+                                                                                          ManifestReader manifestReader,
+                                                                                          Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
                                                                                         ) {
-        return new DelegatingMatchingServiceRestResponseGenerator(
+        return new DelegatingMatchingServiceResponseGenerator(
             ImmutableMap.of(
                 HealthCheckMatchingServiceResponse.class,
-                new HealthCheckRestResponseGenerator(soapMessageManager, healthCheckResponseTransformer, manifestReader),
+                new HealthCheckResponseGenerator(soapMessageManager, healthCheckResponseTransformer, manifestReader),
                 VerifyMatchingServiceResponse.class,
-                new VerifyMatchingServiceRestResponseGenerator(soapMessageManager, responseElementTransformer)
+                new VerifyMatchingServiceResponseGenerator(soapMessageManager, responseElementTransformer)
             ));
     }
 

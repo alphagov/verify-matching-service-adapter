@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 import static javax.ws.rs.core.Response.ok;
 
-public class HealthCheckRestResponseGenerator implements MatchingServiceRestResponseGenerator<HealthCheckMatchingServiceResponse> {
+public class HealthCheckResponseGenerator implements MatchingServiceResponseGenerator<HealthCheckMatchingServiceResponse> {
 
     private final SoapMessageManager soapMessageManager;
     private final Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
     private final ManifestReader manifestReader;
 
-    public HealthCheckRestResponseGenerator(SoapMessageManager soapMessageManager, Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader) {
+    public HealthCheckResponseGenerator(SoapMessageManager soapMessageManager, Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader) {
         this.soapMessageManager = soapMessageManager;
         this.healthCheckResponseTransformer = healthCheckResponseTransformer;
         this.manifestReader = manifestReader;
