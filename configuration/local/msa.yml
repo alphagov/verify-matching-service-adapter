@@ -1,0 +1,59 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 80
+  adminConnectors:
+    - type: http
+      port: 81
+  requestLog:
+    appenders:
+      - type: console
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+      logFormat: '%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'
+
+matchingServiceAdapter:
+  entityId: http://dev-rp-ms.local/SAML2/MD
+  externalUrl: ${ASSERTION_CONSUMER_SERVICE_URL}
+
+localMatchingService:
+  matchUrl: ${LMS_MATCH_URL}
+  accountCreationUrl: ${LMS_UAC_URL}
+
+hub:
+  ssoUrl: ${HUB_SSO_URL}
+  republishHubCertificatesInLocalMetadata: true
+  hubEntityId: https://dev-hub.local
+  trustStore:
+    path: data/pki/hub.ts
+    password: marshmallow
+
+metadata:
+  url: ${METADATA_URL}
+  trustStore:
+    path: data/pki/metadata.ts
+    password: marshmallow
+  minRefreshDelay: 60000
+  maxRefreshDelay: 600000
+  hubEntityId: https://dev-hub.local
+  hubFederationId: VERIFY-FEDERATION
+
+signingKeys:
+  primary:
+    publicKey:
+      certFile: data/pki/sample_rp_msa_signing_primary.crt
+      name: http://www.test-rp-ms.gov.uk/SAML2/MD
+    privateKey:
+      keyFile: data/pki/sample_rp_msa_signing_primary.pk8
+
+encryptionKeys:
+  - publicKey:
+      certFile: data/pki/sample_rp_msa_encryption_primary.crt
+      name: http://www.test-rp-ms.gov.uk/SAML2/MD
+    privateKey:
+      keyFile: data/pki/sample_rp_msa_encryption_primary.pk8
+
+returnStackTraceInResponse: true
