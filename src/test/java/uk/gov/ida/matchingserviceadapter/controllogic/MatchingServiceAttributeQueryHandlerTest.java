@@ -6,7 +6,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
-import uk.gov.ida.matchingserviceadapter.proxies.AdapterToMatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
@@ -23,7 +23,7 @@ import static uk.gov.ida.matchingserviceadapter.builders.OutboundResponseFromMat
 public class MatchingServiceAttributeQueryHandlerTest {
 
     @Mock
-    AdapterToMatchingServiceProxy adapterToMatchingServiceProxy;
+    MatchingServiceProxy matchingServiceProxy;
 
     @Mock
     InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper queryDtoMapper;
@@ -40,10 +40,10 @@ public class MatchingServiceAttributeQueryHandlerTest {
         MatchingServiceResponseDto responseDto = aMatchingServiceResponseDto().build();
         OutboundResponseFromMatchingService idaResponse = aResponse().build();
 
-        MatchingServiceAttributeQueryHandler handler = new MatchingServiceAttributeQueryHandler(adapterToMatchingServiceProxy, queryDtoMapper, dtoResponseMapper);
+        MatchingServiceAttributeQueryHandler handler = new MatchingServiceAttributeQueryHandler(matchingServiceProxy, queryDtoMapper, dtoResponseMapper);
         when(queryDtoMapper.map(attributeQuery)).thenReturn(matchingServiceAttributeQuery);
-        when(adapterToMatchingServiceProxy.makeMatchingServiceRequest(matchingServiceAttributeQuery)).thenReturn(responseDto);
-        when(dtoResponseMapper.map(responseDto, hashedPid, attributeQuery)).thenReturn(idaResponse);
+        when(matchingServiceProxy.makeMatchingServiceRequest(matchingServiceAttributeQuery)).thenReturn(responseDto);
+        when(dtoResponseMapper.map(responseDto, hashedPid, attributeQuery.getId(), attributeQuery.getAssertionConsumerServiceUrl(), attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(), attributeQuery.getAuthnRequestIssuerId())).thenReturn(idaResponse);
         OutboundResponseFromMatchingService result = handler.handle(attributeQuery);
 
         assertThat(result).isEqualTo(idaResponse);

@@ -4,33 +4,59 @@ package uk.gov.ida.matchingserviceadapter.services;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
+import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
+import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
+
+import javax.inject.Inject;
+import java.util.function.Function;
 
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class EidasMatchingService implements MatchingService {
-    public static final String TODO_MESSAGE = "TODO: Eidas Attribute Query and its identity assertion signatures are valid." +
-        " Next stage of eIDAS MSA development is to validate the AQR";
 
-    private Validator<AttributeQuery> validator;
+    private final Validator<AttributeQuery> validator;
+    private final Function<MatchingServiceRequestContext, MatchingServiceRequestDto> transformer;
+    private final MatchingServiceProxy matchingServiceClient;
+    private final MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper;
+    private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
-    public EidasMatchingService(Validator<AttributeQuery> validator) {
+    @Inject
+    public EidasMatchingService(Validator<AttributeQuery> validator,
+                                Function<MatchingServiceRequestContext, MatchingServiceRequestDto> transformer,
+                                MatchingServiceProxy matchingServiceClient,
+                                MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
         this.validator = validator;
-    }
-
-    public Validator<AttributeQuery> getValidator() {
-        return validator;
+        this.transformer = transformer;
+        this.matchingServiceClient = matchingServiceClient;
+        this.responseMapper = responseMapper;
     }
 
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
         Messages validationMessages = validator.validate(request.getAttributeQuery(), messages());
         if (validationMessages.hasErrors()) {
-            throw new RuntimeException("Eidas Attribute Query was invalid: " + validationMessages);
+            throw new AttributeQueryValidationException("Eidas Attribute Query was invalid: " + validationMessages);
         }
 
-        // TODO - EID-202 handle attributes and fill out the nulls below
-        throw new RuntimeException(TODO_MESSAGE);
+        MatchingServiceRequestDto matchingServiceRequestDto = transformer.apply(request);
+        MatchingServiceResponseDto responseFromMatchingService = matchingServiceClient.makeMatchingServiceRequest(matchingServiceRequestDto);
+
+        return new VerifyMatchingServiceResponse(
+            responseMapper.map(
+                responseFromMatchingService,
+                matchingServiceRequestDto.getHashedPid(),
+                request.getAttributeQuery().getID(),
+                request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
+                authnContextFactory.mapFromEidasToLoA(request.getAssertions().get(0).getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef()),
+                request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier()
+            )
+        );
     }
 }
