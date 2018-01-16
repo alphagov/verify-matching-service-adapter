@@ -70,7 +70,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
     }
 
     @Test
-    public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithMatch() throws Exception {
+    public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithMatch() {
         MatchingServiceAssertion matchingServiceAssertion = aMatchingServiceAssertion().build();
         IdentityProviderAuthnStatement authnStatement = anIdentityProviderAuthnStatement()
             .withAuthnContext(AuthnContext.LEVEL_2)
@@ -82,13 +82,6 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
                 .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(authnStatement).build())
                 .build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withMatch().build();
-
-        AssertionRestrictions expectedAssertionRestrictions =
-                anAssertionRestrictions()
-                        .withInResponseTo(attributeQuery.getId())
-                        .withRecipient(attributeQuery.getAssertionConsumerServiceUrl())
-                        .withNotOnOrAfter(DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()))
-                        .build();
         when(assertionFactory.createAssertionFromMatchingService(
             any(PersistentId.class),
             eq(ENTITY_ID),
@@ -109,13 +102,13 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
         assertThat(responseFromMatchingService.getMatchingServiceAssertion().get()).isEqualTo(matchingServiceAssertion);
         AssertionRestrictions actualAssertionRestriction = assertionRestrictionsCaptor.getValue();
         assertThat(actualAssertionRestriction).isNotNull();
-        assertThat(actualAssertionRestriction.getInResponseTo()).isEqualTo(expectedAssertionRestrictions.getInResponseTo());
-        assertThat(actualAssertionRestriction.getNotOnOrAfter()).isEqualTo(expectedAssertionRestrictions.getNotOnOrAfter());
-        assertThat(actualAssertionRestriction.getRecipient()).isEqualTo(expectedAssertionRestrictions.getRecipient());
+        assertThat(actualAssertionRestriction.getInResponseTo()).isEqualTo(attributeQuery.getId());
+        assertThat(actualAssertionRestriction.getNotOnOrAfter()).isEqualTo(DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()));
+        assertThat(actualAssertionRestriction.getRecipient()).isEqualTo(attributeQuery.getAssertionConsumerServiceUrl());
     }
 
     @Test
-    public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithNoMatch() throws Exception {
+    public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithNoMatch() {
         InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withNoMatch().build();
 
@@ -131,7 +124,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
     }
 
     @Test(expected = UnsupportedOperationException.class)
-    public void map_shouldThrowExceptionIfNotNoMatchOrMatch() throws Exception {
+    public void map_shouldThrowExceptionIfNotNoMatchOrMatch() {
         InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withCrappyResponse().build();
 

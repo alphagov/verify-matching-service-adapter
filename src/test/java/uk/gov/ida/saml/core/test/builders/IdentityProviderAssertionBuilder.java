@@ -57,4 +57,9 @@ public class IdentityProviderAssertionBuilder {
         this.matchingDataset = fromNullable(matchingDataset);
         return this;
     }
+
+    public IdentityProviderAssertionBuilder withIssuerId(String issuerId) {
+        this.issuerId = issuerId;
+        return this;
+    }
 }

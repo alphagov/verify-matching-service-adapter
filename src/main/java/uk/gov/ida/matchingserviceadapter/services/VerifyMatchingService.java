@@ -25,6 +25,8 @@ public class VerifyMatchingService implements MatchingService {
 
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
+
+        //TODO - eid-333 Make class match structure of EidasMatchingService
         InboundMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(request.getAttributeQueryDocument());
 
         OutboundResponseFromMatchingService samlResponse = getOutboundResponseFromMatchingService(hubMatchingServiceRequest);

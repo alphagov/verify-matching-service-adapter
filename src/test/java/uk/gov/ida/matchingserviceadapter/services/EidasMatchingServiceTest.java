@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.w3c.dom.Document;
+import uk.gov.ida.matchingserviceadapter.builders.MatchingServiceRequestDtoBuilder;
+import uk.gov.ida.matchingserviceadapter.builders.MatchingServiceResponseDtoBuilder;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
@@ -31,13 +33,7 @@ import java.util.function.Function;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
-import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
-import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
-import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
@@ -51,10 +47,7 @@ public class EidasMatchingServiceTest {
     private Document document;
     @Mock
     private Validator<AttributeQuery> validator;
-    @Mock
-    private MatchingServiceRequestDto matchingServiceRequestDto;
-    @Mock
-    private MatchingServiceResponseDto matchingServiceResponseDto;
+
     @Mock
     OutboundResponseFromMatchingService outboundResponseFromMatchingService;
     @Mock
@@ -90,23 +83,18 @@ public class EidasMatchingServiceTest {
 
     @Test
     public void shouldHandleValidAQR() {
+        MatchingServiceRequestDto matchingServiceRequestDto = MatchingServiceRequestDtoBuilder.aMatchingServiceRequestDto().withHashedPid(PID).build();
+        MatchingServiceResponseDto matchingServiceResponseDto = MatchingServiceResponseDtoBuilder.aMatchingServiceResponseDto().build();
         when(validator.validate(eq(ATTRIBUTE_QUERY), any(Messages.class))).thenReturn(messages());
         when(transformer.apply(request)).thenReturn(matchingServiceRequestDto);
         when(matchingServiceClient.makeMatchingServiceRequest(matchingServiceRequestDto)).thenReturn(matchingServiceResponseDto);
-        when(matchingServiceRequestDto.getHashedPid()).thenReturn(PID);
         when(responseMapper.map(matchingServiceResponseDto, PID, request.getAttributeQuery().getID(), request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
             AuthnContext.LEVEL_2, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier()))
             .thenReturn(outboundResponseFromMatchingService);
 
         VerifyMatchingServiceResponse response = (VerifyMatchingServiceResponse) service.handle(request);
 
-        verify(validator).validate(eq(ATTRIBUTE_QUERY), any(Messages.class));
-        verify(transformer).apply(request);
-        verify(matchingServiceClient).makeMatchingServiceRequest(matchingServiceRequestDto);
-        verify(responseMapper).map(matchingServiceResponseDto, PID, request.getAttributeQuery().getID(), request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
-            AuthnContext.LEVEL_2, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier());
         assertThat(response.getOutboundResponseFromMatchingService()).isEqualTo(outboundResponseFromMatchingService);
-        verifyNoMoreInteractions(validator, transformer, matchingServiceClient);
     }
 
 }

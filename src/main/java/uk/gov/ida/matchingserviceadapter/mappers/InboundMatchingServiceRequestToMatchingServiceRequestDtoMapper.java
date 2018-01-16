@@ -2,7 +2,6 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
@@ -25,7 +24,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
     @Inject
     public InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
-        UserIdHashFactory userIdHashFactory, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+        UserIdHashFactory userIdHashFactory,
         MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper) {
         this.userIdHashFactory = userIdHashFactory;
         this.matchingDatasetToMatchingDatasetDtoMapper = matchingDatasetToMatchingDatasetDtoMapper;

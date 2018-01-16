@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.controllogic;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.util.Duration;
 import org.junit.Before;
@@ -20,11 +21,10 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResp
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.UnknownUserCreationIdaStatus;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
+import uk.gov.ida.saml.core.test.builders.PersistentIdBuilder;
 import uk.gov.ida.saml.core.test.builders.SimpleMdsValueBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.builders.InboundMatchingServiceRequestBuilder.anInboundMatchingServiceRequest;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.FIRST_NAME;
@@ -55,61 +55,69 @@ public class UnknownUserAttributeQueryHandlerTest {
     private UnknownUserAttributeQueryHandler unknownUserAttributeQueryHandler;
 
     private String hashedPid = "hashedPid";
+    private String issuerId = "some-idp";
+    private String nameId = "nameId";
+    private AuthnContext authnContext = AuthnContext.LEVEL_2;
+    private LevelOfAssuranceDto levelOfAssuranceDto = LevelOfAssuranceDto.LEVEL_2;
 
     @Before
     public void setup() {
         when(assertionLifetimeConfiguration.getAssertionLifetime()).thenReturn(Duration.days(2));
+        when(userIdHashFactory.hashId(issuerId, nameId, Optional.of(authnContext))).thenReturn(hashedPid);
+
         unknownUserAttributeQueryHandler = new UnknownUserAttributeQueryHandler(
             userIdHashFactory, configuration,
             assertionFactory,
             assertionLifetimeConfiguration,
             matchingServiceProxy,
             new UserAccountCreationAttributeExtractor());
-        when(userIdHashFactory.hashId(anyString(), anyString(), anyObject())).thenReturn(hashedPid);
     }
 
     @Test
     public void shouldReturnSuccessResponseWhenMatchingServiceReturnsSuccess() {
-        InboundMatchingServiceRequest inboundMatchingServiceRequest = anInboundMatchingServiceRequest()
-            .withAuthnStatementAssertion(
-                anIdentityProviderAssertion()
-                    .withAuthnStatement(anIdentityProviderAuthnStatement().withAuthnContext(AuthnContext.LEVEL_1).build())
-                    .build()
-            )
-            .withUserCreationAttributes(ImmutableList.of(FIRST_NAME))
-            .withMatchingDatasetAssertion(
-                anIdentityProviderAssertion()
-                    .withMatchingDataset(
-                        aMatchingDataset().addFirstname(
-                            SimpleMdsValueBuilder.<String>aSimpleMdsValue()
-                                .withValue("name")
-                                .withFrom(null)
-                                .withTo(null)
-                                .build())
-                            .build())
-                    .build()
-            )
-            .build();
-        when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, LevelOfAssuranceDto.LEVEL_1)))
+        when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(SUCCESS));
 
-        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.handle(inboundMatchingServiceRequest);
+        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.handle(buildInboundMatchingServiceRequest());
+
         assertThat(response.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.Success);
     }
 
     @Test
     public void shouldReturnFailureResponseWhenMatchingServiceReturnsFailure() {
-        InboundMatchingServiceRequest inboundMatchingServiceRequest = anInboundMatchingServiceRequest()
-            .withAuthnStatementAssertion(
-                anIdentityProviderAssertion()
-                    .withAuthnStatement(anIdentityProviderAuthnStatement().withAuthnContext(AuthnContext.LEVEL_2).build())
-                    .build()
-            )
-            .build();
-        when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, LevelOfAssuranceDto.LEVEL_2)))
+        when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(FAILURE));
 
-        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.handle(inboundMatchingServiceRequest);
+        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.handle(buildInboundMatchingServiceRequest());
+
         assertThat(handle.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.CreateFailure);
+    }
+
+    private InboundMatchingServiceRequest buildInboundMatchingServiceRequest(){
+        return anInboundMatchingServiceRequest()
+                .withAuthnStatementAssertion(
+                        anIdentityProviderAssertion()
+                                .withAuthnStatement(anIdentityProviderAuthnStatement().withAuthnContext(authnContext).build())
+                                .build()
+                )
+                .withUserCreationAttributes(ImmutableList.of(FIRST_NAME))
+                .withMatchingDatasetAssertion(
+                        anIdentityProviderAssertion()
+                                .withMatchingDataset(
+                                        aMatchingDataset().addFirstname(
+                                                SimpleMdsValueBuilder.<String>aSimpleMdsValue()
+                                                        .withValue("name")
+                                                        .withFrom(null)
+                                                        .withTo(null)
+                                                        .build())
+                                                .build())
+                                .withIssuerId(issuerId)
+                                .withPersistentId(
+                                        PersistentIdBuilder.aPersistentId()
+                                                .withNameId(nameId)
+                                                .build())
+                                .build()
+                )
+                .build();
     }
 }

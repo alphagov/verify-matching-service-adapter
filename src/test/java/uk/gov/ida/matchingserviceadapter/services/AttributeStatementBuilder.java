@@ -26,10 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class AttributeStatementBuilder {
-
-    public static final String BIRTH_NAME="http://eidas.europa.eu/attributes/naturalperson/BirthName";
-    public static final String PLACE_OF_BIRTH="http://eidas.europa.eu/attributes/naturalperson/PlaceOfBirth";
-
     private static OpenSamlXmlObjectFactory openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
     private List<Attribute> attributes = new ArrayList<>();
 
@@ -37,21 +33,12 @@ public class AttributeStatementBuilder {
         return new AttributeStatementBuilder();
     }
 
-    /**
-     * Retain original defaults to maintain backward compatibility with existing tests.
-     * @deprecated Use @link AttributeStatementBuilder#anEidasAttributeStatement(Attribute ... attributes) instead for future tests.
-     * @return
-     */
-    public static AttributeStatementBuilder anEidasAttributeStatement() {
-        return anEidasAttributeStatement(
-            aCurrentGivenNameAttribute("Joe"),
-            aCurrentFamilyNameAttribute("Bloggs"),
-            aPersonIdentifierAttribute("JB12345"),
-            aDateOfBirthAttribute(LocalDate.now()));
-    }
-
     public static AttributeStatementBuilder anEidasAttributeStatement(Attribute ... attributes) {
         return anAttributeStatement().addAllAttributes(attributes != null ? Arrays.asList(attributes) : Collections.emptyList());
+    }
+
+    public static Attribute aCurrentGivenNameAttribute(){
+        return aCurrentGivenNameAttribute("Joe");
     }
 
     public static Attribute aCurrentGivenNameAttribute(String givenName) {
@@ -62,6 +49,10 @@ public class AttributeStatementBuilder {
         return firstNameAttr;
     }
 
+    public static Attribute aCurrentFamilyNameAttribute(){
+        return aCurrentFamilyNameAttribute("Bloggs");
+    }
+
     public static Attribute aCurrentFamilyNameAttribute(String familyName) {
         Attribute familyNameAttr =  anAttribute(IdaConstants.Eidas_Attributes.FamilyName.NAME);
         CurrentFamilyName familyNameValue = new CurrentFamilyNameBuilder().buildObject();
@@ -70,12 +61,20 @@ public class AttributeStatementBuilder {
         return familyNameAttr;
     }
 
+    public static Attribute aPersonIdentifierAttribute(){
+        return aPersonIdentifierAttribute("JB12345");
+    }
+
     public static Attribute aPersonIdentifierAttribute(String personIdentifier) {
         Attribute personIdentifierAttr =  anAttribute(IdaConstants.Eidas_Attributes.PersonIdentifier.NAME);
         PersonIdentifier personIdentifierValue = new PersonIdentifierBuilder().buildObject();
         personIdentifierValue.setPersonIdentifier(personIdentifier);
         personIdentifierAttr.getAttributeValues().add(personIdentifierValue);
         return personIdentifierAttr;
+    }
+
+    public static Attribute aDateOfBirthAttribute(){
+        return aDateOfBirthAttribute(LocalDate.now());
     }
 
     public static Attribute aDateOfBirthAttribute(LocalDate dateOfBirth) {

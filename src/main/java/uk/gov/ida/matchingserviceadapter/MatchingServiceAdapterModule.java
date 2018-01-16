@@ -66,7 +66,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckR
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.services.DelegatingMatchingService;
-import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToLMSRequestTransform;
+import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToMSRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
@@ -220,11 +220,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
         UserIdHashFactory userIdHashFactory,
         MatchingServiceProxy matchingServiceClient,
         MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
-        return countryMetadataResolver.map(countryMetadataResolver1 ->
+
+        return countryMetadataResolver.map(countryMetadataResolverValue ->
             new EidasMatchingService(
                 new EidasAttributeQueryValidator(
                     verifyMetadataResolver,
-                    countryMetadataResolver1,
+                    countryMetadataResolverValue,
                     verifyCertificateValidator,
                     countryCertificateValidator.get(),
                     new CertificateExtractor(),
@@ -233,7 +234,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     assertionDecrypter,
                     configuration.getCountry().getHubConnectorEntityId()
                 ),
-                new EidasMatchingRequestToLMSRequestTransform(userIdHashFactory),
+                new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory),
                 matchingServiceClient,
                 responseMapper));
     }

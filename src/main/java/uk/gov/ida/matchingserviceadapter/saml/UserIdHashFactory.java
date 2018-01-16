@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.saml;
 import com.google.common.base.Optional;
 import org.apache.commons.codec.binary.Hex;
 import org.opensaml.security.crypto.JCAConstants;
+import uk.gov.ida.matchingserviceadapter.exceptions.AuthnContextMissingException;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 
 import java.io.UnsupportedEncodingException;
@@ -19,9 +20,9 @@ public class UserIdHashFactory {
     }
 
     public String hashId(String issuerEntityId, String persistentId, Optional<AuthnContext> authnContext) {
-        MessageDigest md;
+        MessageDigest messageDigest;
         try {
-            md = MessageDigest.getInstance(JCAConstants.DIGEST_SHA256);
+            messageDigest = MessageDigest.getInstance(JCAConstants.DIGEST_SHA256);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -29,19 +30,19 @@ public class UserIdHashFactory {
         final String toHash = idToHash(issuerEntityId, persistentId, authnContext);
 
         try {
-            md.update(toHash.getBytes("UTF-8"));
+            messageDigest.update(toHash.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
 
-        byte[] digest = md.digest();
+        byte[] digest = messageDigest.digest();
         return Hex.encodeHexString(digest);
     }
 
     private String idToHash(String issuerEntityId, String persistentId, Optional<AuthnContext> context) {
         String persistentIdHash;
 
-        final AuthnContext authnContext = context.toJavaUtil().orElseThrow(() -> new IllegalStateException(String.format("Authn context absent for persistent id %s", persistentId)));
+        final AuthnContext authnContext = context.toJavaUtil().orElseThrow(() -> new AuthnContextMissingException(String.format("Authn context absent for persistent id %s", persistentId)));
         if(authnContext.equals(AuthnContext.LEVEL_2)) {
             // default behaviour - for LEVEL_2
             persistentIdHash = MessageFormat.format("{0}{1}{2}", issuerEntityId, msaEntityId, persistentId);

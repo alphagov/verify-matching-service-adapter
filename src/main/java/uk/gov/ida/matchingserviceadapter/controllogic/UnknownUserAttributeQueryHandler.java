@@ -68,7 +68,10 @@ public class UnknownUserAttributeQueryHandler {
         }
 
         Optional<MatchingDataset> matchingDataset = attributeQuery.getMatchingDatasetAssertion().getMatchingDataset();
-        List<Attribute> extractedUserAccountCreationAttributes = userAccountCreationAttributeExtractor.getUserAttributesForAccountCreation(attributeQuery.getUserCreationAttributes(), matchingDataset, attributeQuery.getCycle3AttributeAssertion());
+        List<Attribute> extractedUserAccountCreationAttributes = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(
+                attributeQuery.getUserCreationAttributes(),
+                matchingDataset,
+                attributeQuery.getCycle3AttributeAssertion());
 
         final OutboundResponseFromUnknownUserCreationService matchingServiceResponse = getMatchingServiceResponse(attributeQuery, hashedPid, extractedUserAccountCreationAttributes);
         LOG.info(MessageFormat.format("Result from unknown attribute query request for id {0} is {1}", attributeQuery.getId(), matchingServiceResponse.getStatus()));

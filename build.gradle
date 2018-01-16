@@ -181,7 +181,7 @@ run {
     args = ["server", "configuration/verify-matching-service-adapter.yml"]
 }
 
-task(outputDependencies) << {
+task(outputDependencies) doLast {
     println "ida_utils=$dependencyVersions.ida_utils"
 }
 

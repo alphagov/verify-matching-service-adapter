@@ -1,5 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
+import com.google.common.base.Optional;
+import org.joda.time.LocalDate;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +20,6 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aBirthNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
@@ -33,13 +33,14 @@ import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.*;
 
 @RunWith(OpenSAMLMockitoRunner.class)
-public class EidasMatchingRequestToLMSRequestTransformTest {
-    public static final org.joda.time.LocalDate DOB = org.joda.time.LocalDate.parse("2001-02-01", ISODateTimeFormat.dateTimeParser());
+public class EidasMatchingRequestToMSRequestTransformerTest {
+    public static final LocalDate DOB = LocalDate.parse("2001-02-01", ISODateTimeFormat.dateTimeParser());
     private Assertion assertion;
 
-    private EidasMatchingRequestToLMSRequestTransform transform;
+    private EidasMatchingRequestToMSRequestTransformer transform;
 
     @Mock
     private AttributeQuery attributeQuery;
@@ -50,13 +51,21 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
     @Before
     public void setUp() {
         when(attributeQuery.getID()).thenReturn("the-aqr-id");
+        LevelOfAssurance levelOfAssurance = LevelOfAssurance.SUBSTANTIAL;
+        String personIdentifier = "the-pid";
+        String issuerId = "issuer-id";
         assertion = anAssertion()
+            .withIssuer(
+                anIssuer()
+                    .withIssuerId(issuerId)
+                .build()
+            )
             .addAuthnStatement(
                 anAuthnStatement()
                     .withAuthnContext(anAuthnContext()
                         .withAuthnContextClassRef(
                             anAuthnContextClassRef()
-                            .withAuthnContextClasRefValue(LevelOfAssurance.SUBSTANTIAL.toString())
+                            .withAuthnContextClasRefValue(levelOfAssurance.toString())
                             .build()
                         ).build()
                     )
@@ -66,15 +75,15 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
                 anEidasAttributeStatement(
                     aCurrentGivenNameAttribute("Fred"),
                     aCurrentFamilyNameAttribute("Flintstone"),
-                    aPersonIdentifierAttribute("the-pid"),
+                    aPersonIdentifierAttribute(personIdentifier),
                     aGenderAttribute("MALE"),
                     aDateOfBirthAttribute(DOB),
                     aBirthNameAttribute("birth-name"),
                     aPlaceOfBirthAttribute("place-of-birth")
                 ).build()
             ).buildUnencrypted();
-        transform = new EidasMatchingRequestToLMSRequestTransform(pidHashFactory);
-        when(pidHashFactory.hashId(anyString(), anyString(), any())).thenReturn("the-hashed-pid");
+        transform = new EidasMatchingRequestToMSRequestTransformer(pidHashFactory);
+        when(pidHashFactory.hashId(issuerId, personIdentifier, Optional.of(levelOfAssurance.toVerifyLevelOfAssurance()))).thenReturn("the-hashed-pid");
     }
 
     @Test
@@ -89,7 +98,7 @@ public class EidasMatchingRequestToLMSRequestTransformTest {
     }
 
     @Test
-    public void shouldExtractPidCorrectly() throws Throwable {
+    public void shouldExtractPidCorrectly() {
         MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);

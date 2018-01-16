@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;

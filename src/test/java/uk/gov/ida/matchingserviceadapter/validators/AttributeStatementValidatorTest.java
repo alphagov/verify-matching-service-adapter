@@ -4,7 +4,6 @@ import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.validation.messages.Messages;
@@ -59,9 +58,9 @@ public class AttributeStatementValidatorTest {
     @Test
     public void shouldGenerateErrorIfFirstNameAttributeIsMissing() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(familyNameAttribute())
-            .addAttribute(personIdentifierAttribute())
-            .addAttribute(dateOfBirthAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute())
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
@@ -72,9 +71,9 @@ public class AttributeStatementValidatorTest {
     @Test
     public void shouldGenerateErrorIfFamilyNameAttributeIsMissing() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(firstNameAttribute())
-            .addAttribute(personIdentifierAttribute())
-            .addAttribute(dateOfBirthAttribute())
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute())
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
@@ -85,9 +84,9 @@ public class AttributeStatementValidatorTest {
     @Test
     public void shouldGenerateErrorIfPersonIdentifierAttributeIsMissing() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(firstNameAttribute())
-            .addAttribute(familyNameAttribute())
-            .addAttribute(dateOfBirthAttribute())
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aDateOfBirthAttribute())
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
@@ -98,9 +97,9 @@ public class AttributeStatementValidatorTest {
     @Test
     public void shouldGenerateErrorIfDateOfBirthAttributeIsMissing() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(firstNameAttribute())
-            .addAttribute(familyNameAttribute())
-            .addAttribute(personIdentifierAttribute())
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
@@ -111,10 +110,10 @@ public class AttributeStatementValidatorTest {
     @Test
     public void shouldGenerateErrorIfDateOfBirthAttributeIsInTheFuture() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(firstNameAttribute())
-            .addAttribute(familyNameAttribute())
-            .addAttribute(personIdentifierAttribute())
-            .addAttribute(dateOfBirthAttribute(LocalDate.now().plusDays(1)))
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute(LocalDate.now().plusDays(1)))
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
@@ -125,35 +124,15 @@ public class AttributeStatementValidatorTest {
     @Test
     public void shouldGenerateErrorIfGenderIsPresentAndInvalid() {
         AttributeStatement attributeStatement = anAttributeStatement()
-            .addAttribute(firstNameAttribute())
-            .addAttribute(familyNameAttribute())
-            .addAttribute(personIdentifierAttribute())
-            .addAttribute(dateOfBirthAttribute())
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute())
             .addAttribute(aGenderAttribute("foo"))
             .build();
 
         Messages messages = validator.validate(attributeStatement, messages());
 
         assertThat(messages.hasErrorLike(STRING_VALUE_NOT_ENUMERATED)).isTrue();
-    }
-
-    private Attribute firstNameAttribute() {
-        return aCurrentGivenNameAttribute("Joe");
-    }
-
-    private Attribute familyNameAttribute() {
-        return aCurrentFamilyNameAttribute("Bloggs");
-    }
-
-    private Attribute personIdentifierAttribute() {
-        return aPersonIdentifierAttribute("JB12345");
-    }
-
-    private Attribute dateOfBirthAttribute(LocalDate dob) {
-        return aDateOfBirthAttribute(dob);
-    }
-
-    private Attribute dateOfBirthAttribute() {
-        return dateOfBirthAttribute(LocalDate.now());
     }
 }
