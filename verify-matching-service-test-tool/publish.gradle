@@ -1,6 +1,6 @@
 apply plugin: 'maven-publish'
 
-def build_number = System.getProperty('BUILD_NUMBER')
+def build_number = System.getenv('BUILD_NUMBER')
 
 publishing {
     publications {
