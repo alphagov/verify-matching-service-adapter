@@ -4,7 +4,6 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.BasicRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
@@ -17,7 +16,6 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.InboundMatchingServiceRequestUnmarshaller;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.VerifyAttributeQueryToInboundMatchingServiceRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
@@ -199,13 +197,6 @@ public class MsaTransformersFactory {
                 new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(keyStore), new EncryptionAlgorithmValidator(), new DecrypterFactory()),
                 hubEntityId);
     }
-
-    public EidasAttributeQueryToInboundMatchingServiceRequestTransformer getEidasAttributeQueryToInboundMatchingServiceRequestTransformer(
-        final Validator<AttributeQuery> validator) throws ComponentInitializationException {
-
-        return new EidasAttributeQueryToInboundMatchingServiceRequestTransformer(validator);
-    }
-
 
     private SignatureValidator getMetadataBackedSignatureValidator(MetadataResolver metadataResolver, CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
         BasicRoleDescriptorResolver basicRoleDescriptorResolver = new BasicRoleDescriptorResolver(metadataResolver);
