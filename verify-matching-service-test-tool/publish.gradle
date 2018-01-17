@@ -1,6 +1,6 @@
 apply plugin: 'maven-publish'
 
-def build_number = System.getProperty('IDA_MSA_VERSION')
+def build_number = System.getProperty('BUILD_NUMBER')
 
 publishing {
     publications {
@@ -9,7 +9,7 @@ publishing {
             version "$build_number"
             groupId = "uk.gov.verify"
 
-            artifact file('verify-matching-service-test-tool' + "$build_number" + 'zip')
+            artifact file('verify-matching-service-test-tool-' + "$build_number" + '.zip')
         }
     }
     repositories {
