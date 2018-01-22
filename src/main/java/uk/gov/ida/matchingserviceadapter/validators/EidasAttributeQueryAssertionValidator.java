@@ -65,7 +65,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
                 new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
             ),
-            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId),
+            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId, dateTimeComparator),
             new CompositeValidator<>(
                 true,
                 new FixedErrorValidator<>(a -> a.getAttributeStatements().size() != 1 , generateWrongNumberOfAttributeStatementsMessage(typeOfAssertion)),

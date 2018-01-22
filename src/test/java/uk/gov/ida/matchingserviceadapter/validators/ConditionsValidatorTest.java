@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.validators;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class ConditionsValidatorTest {
     @Before
     public void setUp() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(NOW.getMillis());
-        validator = new ConditionsValidator<>(conditions -> conditions, AUDIENCE_URI);
+        validator = new ConditionsValidator<>(conditions -> conditions, AUDIENCE_URI, new DateTimeComparator(Duration.standardSeconds(5)));
 
         audienceRestriction= new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
@@ -65,9 +66,21 @@ public class ConditionsValidatorTest {
     }
 
     @Test
-    public void shouldReturnErrorIfNotBeforeIsNotMet() {
+    public void shouldNotReturnErrorIfNotBeforeIsCloseToNow() {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(NOW.plusMillis(1));
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+
+        Messages messages = validator.validate(conditions, messages());
+
+        assertThat(messages.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldReturnErrorIfNotBeforeIsDefinitelyNotMet() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(NOW.plusSeconds(20));
+        conditions.getAudienceRestrictions().add(audienceRestriction);
 
         Messages messages = validator.validate(conditions, messages());
 
