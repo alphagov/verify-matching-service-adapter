@@ -7,7 +7,7 @@ import io.dropwizard.client.ssl.TlsConfiguration;
 import io.dropwizard.util.Duration;
 import uk.gov.ida.configuration.ServiceNameConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
-import uk.gov.ida.matchingserviceadapter.configuration.CountryConfiguration;
+import uk.gov.ida.matchingserviceadapter.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.HubConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.KeyPairConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.LocalMatchingServiceConfiguration;
@@ -67,7 +67,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     @Valid
     @JsonProperty
-    private CountryConfiguration country;
+    private EuropeanIdentityConfiguration europeanIdentity;
 
     protected MatchingServiceAdapterConfiguration() {
     }
@@ -142,8 +142,8 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         return hub.getHubEntityId();
     }
 
-    public CountryConfiguration getCountry() {
-        return country;
+    public EuropeanIdentityConfiguration getEuropeanIdentity() {
+        return europeanIdentity;
     }
 
     public static JerseyClientConfiguration getDefaultJerseyClientConfiguration(boolean verifyHostname, boolean trustSelfSignedCertificates) {
@@ -163,5 +163,9 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         jerseyClientConfiguration.setTlsConfiguration(tlsConfiguration);
         jerseyClientConfiguration.setGzipEnabledForRequests(false);
         return jerseyClientConfiguration;
+    }
+
+    public boolean isEidasEnabled() {
+        return getEuropeanIdentity() != null && getEuropeanIdentity().isEnabled();
     }
 }

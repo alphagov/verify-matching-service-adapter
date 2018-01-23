@@ -7,12 +7,17 @@ import uk.gov.ida.saml.metadata.TrustStoreBackedMetadataConfiguration;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-public class CountryConfiguration {
+public class EuropeanIdentityConfiguration {
 
     @NotNull
     @Valid
     @JsonProperty
-    public String hubConnectorEntityId;
+    private String hubConnectorEntityId;
+
+    @NotNull
+    @Valid
+    @JsonProperty
+    private boolean enabled;
 
     @NotNull
     @Valid
@@ -25,5 +30,9 @@ public class CountryConfiguration {
 
     public MetadataResolverConfiguration getMetadata() {
         return metadata;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 }

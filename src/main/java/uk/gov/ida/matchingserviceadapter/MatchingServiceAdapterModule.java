@@ -232,7 +232,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     x509CertificateFactory,
                     new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),
                     assertionDecrypter,
-                    configuration.getCountry().getHubConnectorEntityId()
+                    configuration.getEuropeanIdentity().getHubConnectorEntityId()
                 ),
                 new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory),
                 matchingServiceClient,
@@ -514,9 +514,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named(COUNTRY_METADATA_RESOLVER)
     private Optional<MetadataResolver> getCountryMetadataResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
-        if (configuration.getCountry() != null) {
-            MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(environment, configuration.getCountry().getMetadata());
-            environment.healthChecks().register("CountryMetadataHealthCheck", new MetadataHealthCheck(metadataResolver, configuration.getCountry().getMetadata().getExpectedEntityId()));
+        if (configuration.isEidasEnabled()) {
+            MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(environment, configuration.getEuropeanIdentity().getMetadata());
+            environment.healthChecks().register("CountryMetadataHealthCheck", new MetadataHealthCheck(metadataResolver, configuration.getEuropeanIdentity().getMetadata().getExpectedEntityId()));
             return Optional.of(metadataResolver);
         }
         return Optional.empty();

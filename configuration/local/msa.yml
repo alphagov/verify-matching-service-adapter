@@ -57,3 +57,29 @@ encryptionKeys:
       keyFile: data/pki/sample_rp_msa_encryption_primary.pk8
 
 returnStackTraceInResponse: true
+
+europeanIdentity:
+  enabled: ${EUROPEAN_IDENTITY_ENABLED}
+  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
+  metadata:
+    uri: ${COUNTRY_METADATA_URI}
+    trustStore:
+      path: truststores/country_metadata_truststore.ts
+      password: Password
+    minRefreshDelay: 60000
+    maxRefreshDelay: 600000
+    expectedEntityId: ${COUNTRY_EXPECTED_ENTITY_ID}
+    jerseyClientName: country-metadata-client
+    client:
+      timeout: 2s
+      timeToLive: 10m
+      cookiesEnabled: false
+      connectionTimeout: 1s
+      retries: 3
+      keepAlive: 60s
+      chunkedEncodingEnabled: false
+      validateAfterInactivityPeriod: 5s
+      tls:
+        protocol: TLSv1.2
+        verifyHostname: false
+        trustSelfSignedCertificates: true
