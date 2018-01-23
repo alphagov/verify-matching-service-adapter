@@ -5,7 +5,21 @@ The Matching Service Adapter (MSA) is a software tool provided by GOV.UK
 Verify. It simplifies communication between your local matching service and the
 GOV.UK Verify hub.
 
+If you are a government service connecting to GOV.UK Verify, refer to the USAGE_README 
+for more information on [how to install and use the MSA](USAGE_README.md).
+
+It is published as a zip file that contains the jar file and all of its dependencies.
+See the [release notes](RELEASE_NOTES.md) for specific release information.
+
 For more details, see [the full documentation on how to use the MSA.](http://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msa.html)
+
+Pre-requisites
+--------------
+
+To install and run MSA, you need:
+
+* Java Runtime Environment (JRE) version 8
+* 512 MB to 1 GB of RAM (on top of what you need to run your operating system)
 
 Running the MSA
 ---------------
