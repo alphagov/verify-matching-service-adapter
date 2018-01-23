@@ -21,7 +21,7 @@ public class ConditionsValidator<T> extends CompositeValidator<T> {
     public static final MessageImpl DEFAULT_NOT_BEFORE_MUST_BE_LESS_THAN_NOT_ON_OR_AFTER_TIME_MESSAGE = fieldMessage("conditions.invalid", "conditions.invalid", "The value for NotBefore MUST be less than (earlier than) the value for NotOnOrAfter.");
     public static final MessageImpl DEFAULT_CONDITIONS_MUST_CONTAIN_ONE_AUDIENCE_RESTRICTION_MESSAGE = globalMessage("conditions.audienceRestrictions.audienceRestriction", "There must be 1 audience restriction.");
 
-    public ConditionsValidator(final Function<T, Conditions> valueProvider, final String audienceUri) {
+    public ConditionsValidator(final Function<T, Conditions> valueProvider, final String audienceUri, final DateTimeComparator dateTimeComparator) {
         super(
             true,
             valueProvider,
@@ -30,12 +30,12 @@ public class ConditionsValidator<T> extends CompositeValidator<T> {
             new CompositeValidator<>(
                 conditions -> conditions.getNotBefore() != null && conditions.getNotOnOrAfter() != null,
                 false,
-                new FixedErrorValidator<>(conditions -> conditions.getNotOnOrAfter().isBefore(conditions.getNotOnOrAfter()) || conditions.getNotOnOrAfter().isEqual(conditions.getNotBefore()), DEFAULT_NOT_BEFORE_MUST_BE_LESS_THAN_NOT_ON_OR_AFTER_TIME_MESSAGE)
+                new FixedErrorValidator<>(conditions -> !conditions.getNotBefore().isBefore(conditions.getNotOnOrAfter()), DEFAULT_NOT_BEFORE_MUST_BE_LESS_THAN_NOT_ON_OR_AFTER_TIME_MESSAGE)
             ),
             new CompositeValidator<>(
                 conditions -> conditions.getNotBefore() != null,
                 false,
-                new FixedErrorValidator<>(conditions -> DateTime.now(DateTimeZone.UTC).isBefore(conditions.getNotBefore()), DEFAULT_CURRENT_TIME_BEFORE_VALID_TIME_MESSAGE)
+                new FixedErrorValidator<>(conditions -> !dateTimeComparator.isBeforeNow(conditions.getNotBefore()), DEFAULT_CURRENT_TIME_BEFORE_VALID_TIME_MESSAGE)
             ),
             new CompositeValidator<>(
                 conditions -> conditions.getNotOnOrAfter() != null,

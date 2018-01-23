@@ -7,76 +7,46 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DateTimeComparatorTest {
-
-    private static final DateTime baseTime = new DateTime(2017, 1, 1, 12, 0);
     private static final DateTimeComparator comparator = new DateTimeComparator(Duration.standardSeconds(5));
 
     @Test
-    public void isAfterReturnsTrueWhenAIsAfterB() throws Exception {
-        DateTime newTime = baseTime.plusMinutes(1);
-
-        assertThat(comparator.isAfterFuzzy(newTime, baseTime)).isTrue();
-    }
-
-    @Test
-    public void isAfterReturnsFalseWhenAIsBeforeB() throws Exception {
-        DateTime newTime = baseTime.minusMinutes(1);
-
-        assertThat(comparator.isAfterFuzzy(newTime, baseTime)).isFalse();
-    }
-
-    @Test
-    public void isAfterReturnsTrueWhenAIsWithinSkewOfB() throws Exception {
-        DateTime newTime = baseTime.minusSeconds(4);
-
-        assertThat(comparator.isAfterFuzzy(newTime, baseTime)).isTrue();
-    }
-
-    @Test
-    public void isBeforeReturnsTrueWhenAIsBeforeB() throws Exception {
-        DateTime newTime = baseTime.minusMinutes(1);
-
-        assertThat(comparator.isBeforeFuzzy(newTime, baseTime)).isTrue();
-    }
-
-    @Test
-    public void isBeforeReturnsFalseWhenAIsAfterB() throws Exception {
-        DateTime newTime = baseTime.plusMinutes(1);
-
-        assertThat(comparator.isBeforeFuzzy(newTime, baseTime)).isFalse();
-    }
-
-    @Test
-    public void isBeforeReturnsTrueWhenAIsWithinSkewOfB() throws Exception {
-        DateTime newTime = baseTime.plusSeconds(4);
-
-        assertThat(comparator.isBeforeFuzzy(newTime, baseTime)).isTrue();
-    }
-
-    @Test
     public void isBeforeNowReturnsTrueWhenInThePast() {
-        DateTime pastDateTime = new DateTime().minusMinutes(1);
+        DateTime pastDateTime = DateTime.now().minusMinutes(1);
 
         assertThat(comparator.isBeforeNow(pastDateTime)).isTrue();
     }
 
     @Test
-    public void isBeforeNowReturnsFalseWhenInThePast() {
-        DateTime dateTime = new DateTime().plusMillis(1);
+    public void isBeforeNowReturnsTrueWhenInTheFutureButLessThanTheSkew() {
+        DateTime dateTime = new DateTime().plusSeconds(1);
+
+        assertThat(comparator.isBeforeNow(dateTime)).isTrue();
+    }
+
+    @Test
+    public void isBeforeNowReturnsFalseWhenFarInTheFuture() {
+        DateTime dateTime = new DateTime().plusSeconds(10);
 
         assertThat(comparator.isBeforeNow(dateTime)).isFalse();
     }
 
     @Test
     public void isAfterNowReturnsTrueWhenInTheFuture() {
-        DateTime futureDateTime = new DateTime().plusMinutes(1);
+        DateTime futureDateTime = DateTime.now().plusMinutes(1);
 
         assertThat(comparator.isAfterNow(futureDateTime)).isTrue();
     }
 
     @Test
-    public void isAfterNowReturnsFalseWhenInThePast() {
-        DateTime pastDateTime = new DateTime().minusMillis(1);
+    public void isAfterNowReturnsTrueWhenInThePastButLessThanTheSkew() {
+        DateTime pastDateTime = DateTime.now().minusSeconds(1);
+
+        assertThat(comparator.isAfterNow(pastDateTime)).isTrue();
+    }
+
+    @Test
+    public void isAfterNowReturnsFalseWhenFarInThePast() {
+        DateTime pastDateTime = DateTime.now().minusSeconds(10);
 
         assertThat(comparator.isAfterNow(pastDateTime)).isFalse();
     }

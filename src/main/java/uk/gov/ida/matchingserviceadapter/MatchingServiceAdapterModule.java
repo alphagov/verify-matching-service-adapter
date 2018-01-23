@@ -230,7 +230,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     countryCertificateValidator.get(),
                     new CertificateExtractor(),
                     x509CertificateFactory,
-                    new DateTimeComparator(Duration.ZERO),
+                    new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),
                     assertionDecrypter,
                     configuration.getCountry().getHubConnectorEntityId()
                 ),
