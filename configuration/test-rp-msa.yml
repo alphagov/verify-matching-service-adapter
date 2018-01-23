@@ -110,8 +110,8 @@ europeanIdentity:
   metadata:
     uri: ${COUNTRY_METADATA_URI}
     trustStore:
-      path: truststores/country_metadata_truststore.ts
-      password: Password
+      path: ${TRUSTSTORE_PATH}/country_metadata_truststore.ts
+      password: ${TRUSTSTORE_PASSWORD}
     minRefreshDelay: 60000
     maxRefreshDelay: 600000
     expectedEntityId: ${COUNTRY_EXPECTED_ENTITY_ID}
