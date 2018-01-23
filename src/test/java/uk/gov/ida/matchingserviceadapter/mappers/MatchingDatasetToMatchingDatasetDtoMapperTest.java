@@ -109,7 +109,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void map_shouldCombineCurrentAndPreviousAddressesFromAMatchingDatasetToSingleAddressField(){
+    public void map_shouldCombineCurrentAndPreviousAddressesFromAMatchingDatasetToSingleAddressField() {
         String currentAddressLine = "line-1";
         String previousAddressLine = "previousAddressLine";
         List<Address> currentAddress = asList(new AddressFactory().create(asList(currentAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
@@ -130,6 +130,30 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         }
         assertThat(addressLines).contains(currentAddressLine);
         assertThat(addressLines).contains(previousAddressLine);
+    }
+
+    @Test
+    public void map_shouldPutCurrentAddressBeforePreviousAddressesWhenMappingToASingleAddressField() {
+        String currentAddressLine = "line-1";
+        String previousAddressLine = "previousAddressLine";
+        List<Address> currentAddress = asList(new AddressFactory().create(asList(currentAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
+        List<Address> previousAddress = asList(new AddressFactory().create(asList(previousAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
+        MatchingDataset matchingDataset = aMatchingDataset()
+            .withPreviousAddresses(previousAddress)
+            .withCurrentAddresses(currentAddress)
+            .build();
+
+        MatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.map(matchingDataset);
+
+        List<AddressDto> addresses = matchingDatasetDto.getAddresses();
+        assertThat(addresses).hasSize(2);
+
+        List<String> addressLines = new ArrayList<>();
+        for(AddressDto addressDto : addresses){
+            addressLines.add(addressDto.getLines().get(0));
+        }
+        assertThat(addressLines.get(0)).isEqualTo(currentAddressLine);
+        assertThat(addressLines.get(1)).isEqualTo(previousAddressLine);
     }
 
     @Test

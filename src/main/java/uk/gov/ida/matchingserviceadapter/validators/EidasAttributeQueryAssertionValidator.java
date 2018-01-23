@@ -1,8 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.FixedErrorValidator;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
@@ -12,13 +9,16 @@ import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.FixedErrorValidator;
 
 import java.time.Duration;
 import java.util.stream.Collectors;
 
-import static org.beanplanet.messages.domain.MessageImpl.fieldMessage;
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.IssueInstantValidator.IssueInstantJodaDateTimeValidator;
+import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class EidasAttributeQueryAssertionValidator extends CompositeValidator<Assertion> {
 
@@ -28,16 +28,18 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                                                  final X509CertificateFactory x509CertificateFactory,
                                                  final DateTimeComparator dateTimeComparator,
                                                  final String typeOfAssertion,
+                                                 final String hubConnectorEntityId,
                                                  final Duration ttl,
-                                                 final Duration clockDelta,
-                                                 final String hubConnectorEntityId) {
+                                                 final Duration clockDelta) {
         super(
+            false,
             new CompositeValidator<>(
                 true,
                 new IssuerValidator<>(
                     generateMissingIssuerMessage(typeOfAssertion),
                     generateEmptyIssuerMessage(typeOfAssertion),
-                    Assertion::getIssuer),
+                    Assertion::getIssuer
+                ),
                 new SamlDigitalSignatureValidator<>(
                     generateInvalidSignatureMessage(typeOfAssertion),
                     assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)
@@ -50,6 +52,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                     IDPSSODescriptor.DEFAULT_ELEMENT_NAME
                 )
             ),
+            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
             IssueInstantJodaDateTimeValidator(
                 globalMessage("expired.message", "Issue Instant time-to-live has been exceeded"),
                 globalMessage("issue.instance.in.future", "Issue Instant is in the future"),
@@ -57,13 +60,12 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 ttl,
                 clockDelta
             ),
-            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
             new CompositeValidator<>(
                 true,
                 new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
                 new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
             ),
-            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId),
+            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId, dateTimeComparator),
             new CompositeValidator<>(
                 true,
                 new FixedErrorValidator<>(a -> a.getAttributeStatements().size() != 1 , generateWrongNumberOfAttributeStatementsMessage(typeOfAssertion)),

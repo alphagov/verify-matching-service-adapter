@@ -1,13 +1,12 @@
 package uk.gov.ida.matchingserviceadapter.validators.datetime;
 
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.validation.PredicatedValidator;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
-
 
 public class DurationNotExceededValidator<T> extends PredicatedValidator<T> {
     public static final Function<?, Instant> NOW_INSTANT_PROVIDER = ignored -> Instant.now();
@@ -15,7 +14,6 @@ public class DurationNotExceededValidator<T> extends PredicatedValidator<T> {
     private final Function<T, Instant> fromInstantInclusiveProvider;
     private final Function<T, Instant> toInstantInclusiveProvider;
     private final Duration maximumDuration;
-
 
     public DurationNotExceededValidator(@NotNull final Message message,
                                         @NotNull final Function<T, Instant> fromInstantInclusiveProvider,

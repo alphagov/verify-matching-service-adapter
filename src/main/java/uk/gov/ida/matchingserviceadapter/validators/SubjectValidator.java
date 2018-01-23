@@ -1,18 +1,18 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
 import com.google.common.collect.ImmutableSet;
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.FixedErrorValidator;
-import org.beanplanet.validation.RequiredValidator;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.FixedErrorValidator;
+import uk.gov.ida.validation.validators.RequiredValidator;
 
 import java.util.Set;
 import java.util.function.Function;
 
-import static org.beanplanet.messages.domain.MessageImpl.fieldMessage;
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class SubjectValidator<T> extends CompositeValidator<T> {
 

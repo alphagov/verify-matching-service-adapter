@@ -2,10 +2,6 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.logic.ConstraintViolationException;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.PredicatedValidator;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.saml.criterion.EntityRoleCriterion;
@@ -22,6 +18,10 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureValidationParametersCriterion;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class SamlDigitalSignatureValidator<T extends SignableSAMLObject> extends CompositeValidator<T> {
 

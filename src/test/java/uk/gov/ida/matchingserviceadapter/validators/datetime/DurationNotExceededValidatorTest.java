@@ -1,30 +1,29 @@
 package uk.gov.ida.matchingserviceadapter.validators.datetime;
 
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.messages.domain.Messages;
 import org.junit.Test;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.messages.Messages;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.ida.matchingserviceadapter.validators.datetime.DurationNotExceededValidator.NOW_INSTANT_PROVIDER;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class DurationNotExceededValidatorTest {
-
     public static final MessageImpl DEFAULT_MESSAGE = globalMessage("theCode", "theMessage");
 
     @Test
-    public void ctorMessageFromToAndMaximum() {
+    public void shouldUseMessageAndRangeWithMaximum() {
         Message message = globalMessage("theCode", "theMessage");
         Function<Object, Instant> from = c -> Instant.now();
         Function<Object, Instant> to = c -> Instant.now();
@@ -42,7 +41,7 @@ public class DurationNotExceededValidatorTest {
     }
 
     @Test
-    public void ctorMessageFromAndMaximum() {
+    public void shouldUseMessageAndFromAndMaximum() {
         Message message = globalMessage("theCode", "theMessage");
         Function<Object, Instant> from = c -> Instant.now();
         Duration max = Duration.parse("PT10S");

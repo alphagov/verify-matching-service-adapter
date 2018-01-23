@@ -1,14 +1,14 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
 import org.apache.commons.lang3.StringUtils;
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.validation.PredicatedValidator;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.function.Function;
 
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class StringValidators {
 

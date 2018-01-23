@@ -1,17 +1,17 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Messages;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.Audience;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
+import uk.gov.ida.validation.messages.Messages;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator.DEFAULT_AUDIENCES_MUST_CONTAIN_ONE_AUDIENCE_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator.DEFAULT_REQUIRED_MESSAGE;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class AudienceRestrictionValidatorTest {
     public static final String AUDIENCE_URI = "audienceUri";

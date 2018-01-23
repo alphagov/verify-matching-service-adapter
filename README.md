@@ -37,6 +37,17 @@ Run the following to create the zip.
 
 `./gradlew zip`
 
+
+Verify Matching Service Test Tool
+---------------------------------
+The MSA is distributed as a zip file which also contains the [Verify Matching Service Test tool](https://github.com/alphagov/verify-matching-service-adapter/tree/master/verify-matching-service-test-tool).
+
+The test tool helps you check your matching service can:
+
+* handle matching datasets
+* find and match records correctly
+* handle matching failures
+
 ## Support and responsible disclosure
 
 If you think you have discovered a security issue in this code please email [disclosure@digital.cabinet-office.gov.uk](mailto:disclosure@digital.cabinet-office.gov.uk) with details.

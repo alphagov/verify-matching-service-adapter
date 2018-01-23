@@ -15,14 +15,15 @@ pkill -9 -f msa
 
 mkdir -p logs
 if test ! "$1" == "skip-build"; then
-    ./gradlew clean build copyToLib
+    ./gradlew clean
+    ./gradlew build copyToLib
 fi
 
 printf "Starting... "
 ./gradlew run > logs/verify-matching-service-adapter_console.log 2>&1 &
 if test -d ../verify-local-startup; then
     source ../verify-local-startup/lib/services.sh
-    ( start_service_checker $port "Unknown" "logs/verify-matching-service-adapter_console.log"
+    ( start_service_checker "matching-service-adapter" $port "Unknown" "logs/verify-matching-service-adapter_console.log" "localhost:$port/service-status"
         wait )
 else
     sleep 10

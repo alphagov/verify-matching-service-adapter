@@ -1,20 +1,20 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
 import com.google.common.collect.ImmutableList;
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.messages.domain.Messages;
-import org.beanplanet.validation.PredicatedValidator;
-import org.beanplanet.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.messages.Messages;
+import uk.gov.ida.validation.validators.PredicatedValidator;
+import uk.gov.ida.validation.validators.Validator;
 
 import java.util.Collection;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class MatchingElementValidatorTest {
 

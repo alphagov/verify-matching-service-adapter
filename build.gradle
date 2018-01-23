@@ -35,15 +35,15 @@ def dependencyVersions = [
         dropwizard: '1.1.4',
         ida_utils: '317',
         ida_test_utils: '35',
-        saml_extensions:"$opensaml-1.2a-33",
-        saml_serializers:"$opensaml-24",
-        saml_security:"$opensaml-46",
-        saml_metadata_bindings:"$opensaml-58",
-        saml_utils: "$opensaml-46",
-        saml_test_utils:"$opensaml-30",
-        saml_domain_objects: "$opensaml-37",
-        hub_saml: "$opensaml-87",
-        dev_pki: '1.1.0-19',
+        saml_extensions:"$opensaml-1.2a-38",
+        saml_serializers:"$opensaml-28",
+        saml_security:"$opensaml-51",
+        saml_metadata_bindings:"$opensaml-61",
+        saml_utils: "$opensaml-53",
+        saml_test_utils:"$opensaml-34",
+        saml_domain_objects: "$opensaml-40",
+        hub_saml: "$opensaml-100",
+        dev_pki: '1.1.0-19'
 ]
 
 apply plugin: "idaJar"
@@ -60,10 +60,6 @@ configurations {
 }
 
 configurations.all {
-    resolutionStrategy {
-        // dropwizard-testing uses 2.2.0 but our libraries currently only work with 1.6.0.
-        force "org.assertj:assertj-core:1.6.0"
-    }
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
@@ -95,7 +91,8 @@ dependencies {
         "uk.gov.ida:saml-serializers:$dependencyVersions.saml_serializers",
         "uk.gov.verify:saml-domain-objects:$dependencyVersions.saml_domain_objects",
         "uk.gov.verify:saml-utils:$dependencyVersions.saml_utils",
-        "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml"
+        "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml",
+        "uk.gov.ida:validation:1.0.9-40"
 
     compile configurations.dropwizard,
         configurations.saml,
@@ -113,8 +110,7 @@ dependencies {
         'commons-lang:commons-lang:2.6',
         'org.apache.ws.commons:ws-commons-util:1.0.1',
         'com.google.code.findbugs:annotations:3.0.0',
-        'xml-apis:xml-apis:1.0.b2',
-        'org.beanplanet:beanplanet-validation:2.0.0'
+        'xml-apis:xml-apis:1.0.b2'
 
     runtime "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
 
@@ -128,11 +124,12 @@ dependencies {
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.mockito:mockito-core:1.10.19',
-        'org.assertj:assertj-core:1.6.0',
+        'org.assertj:assertj-core:3.8.0',
         'org.assertj:assertj-joda-time:1.1.0',
         'com.google.code.findbugs:jsr305:3.0.1',
         "uk.gov.ida:hub-saml-test-utils:$dependencyVersions.hub_saml",
-        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
+        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils",
+        "com.github.tomakehurst:wiremock:2.10.1"
 }
 
 sourceSets {
@@ -158,7 +155,12 @@ task copyToLib(dependsOn: jar, type: Copy) {
     from configurations.runtime
 }
 
-task zip(dependsOn: copyToLib, type: Zip) {
+task copyTestToolZip(dependsOn: 'verify-matching-service-test-tool:distZip', type: Copy) {
+    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + project.version + ".zip")
+    into(distsDir)
+}
+
+task zip(dependsOn: [copyToLib, copyTestToolZip], type: Zip) {
     from("$buildDir/output").into('./')
     from('RELEASE_NOTES.md', 'USAGE_README.md', 'prod-config.yml', 'test-config.yml').into('./')
     rename('USAGE_README\\.md', 'README\\.md')
@@ -179,7 +181,7 @@ run {
     args = ["server", "configuration/verify-matching-service-adapter.yml"]
 }
 
-task(outputDependencies) << {
+task(outputDependencies) doLast {
     println "ida_utils=$dependencyVersions.ida_utils"
 }
 

@@ -1,9 +1,9 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Messages;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,15 +13,16 @@ import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
+import uk.gov.ida.validation.messages.Messages;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_CONDITIONS_MUST_CONTAIN_ONE_AUDIENCE_RESTRICTION_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_CURRENT_TIME_BEFORE_VALID_TIME_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_CURRENT_TIME_IS_ON_AND_AFTER_VALID_TIME_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_NOT_BEFORE_AND_NOT_ON_OR_AFTER_ARE_MISSING_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_NOT_BEFORE_MUST_BE_LESS_THAN_NOT_ON_OR_AFTER_TIME_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator.DEFAULT_REQUIRED_MESSAGE;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class ConditionsValidatorTest {
     private static final DateTime NOW = DateTime.now(DateTimeZone.UTC);
@@ -32,7 +33,7 @@ public class ConditionsValidatorTest {
     @Before
     public void setUp() throws Exception {
         DateTimeUtils.setCurrentMillisFixed(NOW.getMillis());
-        validator = new ConditionsValidator<>(conditions -> conditions, AUDIENCE_URI);
+        validator = new ConditionsValidator<>(conditions -> conditions, AUDIENCE_URI, new DateTimeComparator(Duration.standardSeconds(5)));
 
         audienceRestriction= new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
@@ -65,9 +66,21 @@ public class ConditionsValidatorTest {
     }
 
     @Test
-    public void shouldReturnErrorIfNotBeforeIsNotMet() {
+    public void shouldNotReturnErrorIfNotBeforeIsCloseToNow() {
         Conditions conditions = new ConditionsBuilder().buildObject();
         conditions.setNotBefore(NOW.plusMillis(1));
+        conditions.getAudienceRestrictions().add(audienceRestriction);
+
+        Messages messages = validator.validate(conditions, messages());
+
+        assertThat(messages.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void shouldReturnErrorIfNotBeforeIsDefinitelyNotMet() {
+        Conditions conditions = new ConditionsBuilder().buildObject();
+        conditions.setNotBefore(NOW.plusSeconds(20));
+        conditions.getAudienceRestrictions().add(audienceRestriction);
 
         Messages messages = validator.validate(conditions, messages());
 

@@ -44,17 +44,17 @@ import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServic
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatasetDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
-import uk.gov.ida.matchingserviceadapter.proxies.AdapterToMatchingServiceHttpProxy;
-import uk.gov.ida.matchingserviceadapter.proxies.AdapterToMatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxyImpl;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.ResolverBackedMetadataRepository;
-import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseRenderer;
-import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseRenderer;
-import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseRenderer;
-import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseRenderer;
+import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseGenerator;
+import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.rest.MetadataPublicKeyStore;
 import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCertificateChainValidator;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
@@ -66,6 +66,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckR
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.services.DelegatingMatchingService;
+import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToMSRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
@@ -140,10 +141,15 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(EncryptionKeyStore.class).to(MetadataPublicKeyStore.class).in(Singleton.class);
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
-        bind(AdapterToMatchingServiceProxy.class).to(AdapterToMatchingServiceHttpProxy.class).in(Singleton.class);
+        bind(MatchingServiceProxy.class).to(MatchingServiceProxyImpl.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
-        bind(UserIdHashFactory.class).toInstance(new UserIdHashFactory());
+    }
+
+    @Provides
+    @Singleton
+    private UserIdHashFactory getUserIdHashFactory(MatchingServiceAdapterConfiguration configuration) {
+        return new UserIdHashFactory(configuration.getEntityId());
     }
 
     @Provides
@@ -154,17 +160,17 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MatchingServiceResponseRenderer<MatchingServiceResponse> getResponseRenderer(SoapMessageManager soapMessageManager,
-                                                                                        Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
-                                                                                        ManifestReader manifestReader,
-                                                                                        Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
+    public MatchingServiceResponseGenerator<MatchingServiceResponse> getResponseGenerator(SoapMessageManager soapMessageManager,
+                                                                                          Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
+                                                                                          ManifestReader manifestReader,
+                                                                                          Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
                                                                                         ) {
-        return new DelegatingMatchingServiceResponseRenderer(
+        return new DelegatingMatchingServiceResponseGenerator(
             ImmutableMap.of(
                 HealthCheckMatchingServiceResponse.class,
-                new HealthCheckResponseRenderer(soapMessageManager, healthCheckResponseTransformer, manifestReader),
+                new HealthCheckResponseGenerator(soapMessageManager, healthCheckResponseTransformer, manifestReader),
                 VerifyMatchingServiceResponse.class,
-                new VerifyMatchingServiceResponseRenderer(soapMessageManager, responseElementTransformer)
+                new VerifyMatchingServiceResponseGenerator(soapMessageManager, responseElementTransformer)
             ));
     }
 
@@ -174,7 +180,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         HealthCheckMatchingService healthCheckMatchingService,
         VerifyMatchingService verifyMatchingService,
         Optional<EidasMatchingService> eidasMatchingService,
-            @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver
+        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver
     ) {
         Map<Predicate<MatchingServiceRequestContext>, MatchingService> servicesMap = new LinkedHashMap<>();
         servicesMap.put((MatchingServiceRequestContext ctx) -> ctx.getAssertions().isEmpty(), healthCheckMatchingService);
@@ -210,22 +216,27 @@ class MatchingServiceAdapterModule extends AbstractModule {
         @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
         X509CertificateFactory x509CertificateFactory,
         MatchingServiceAdapterConfiguration configuration,
-        AssertionDecrypter assertionDecrypter
-    ) {
-        return countryMetadataResolver.map(cmr ->
+        AssertionDecrypter assertionDecrypter,
+        UserIdHashFactory userIdHashFactory,
+        MatchingServiceProxy matchingServiceClient,
+        MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
+
+        return countryMetadataResolver.map(countryMetadataResolverValue ->
             new EidasMatchingService(
                 new EidasAttributeQueryValidator(
                     verifyMetadataResolver,
-                    cmr,
+                    countryMetadataResolverValue,
                     verifyCertificateValidator,
                     countryCertificateValidator.get(),
                     new CertificateExtractor(),
                     x509CertificateFactory,
-                    new DateTimeComparator(Duration.ZERO),
+                    new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),
                     assertionDecrypter,
                     configuration.getCountry().getHubConnectorEntityId()
-                )
-            ));
+                ),
+                new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory),
+                matchingServiceClient,
+                responseMapper));
     }
 
     @Provides
@@ -484,7 +495,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public MatchingServiceAttributeQueryHandler matchingServiceAttributeQueryHandler(
-        AdapterToMatchingServiceProxy proxy,
+        MatchingServiceProxy proxy,
         InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper inboundMapper,
         MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper outboundMapper) {
         return new MatchingServiceAttributeQueryHandler(proxy, inboundMapper, outboundMapper);

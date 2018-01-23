@@ -1,14 +1,14 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.messages.domain.Messages;
-import org.beanplanet.validation.AbstractValueProvidedValidator;
-import org.beanplanet.validation.Validator;
 import org.junit.Test;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.messages.Messages;
+import uk.gov.ida.validation.validators.AbstractValueProvidedValidator;
+import uk.gov.ida.validation.validators.Validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.TypeValidators.typeMismatchError;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class TypeValidatorsTest {
 

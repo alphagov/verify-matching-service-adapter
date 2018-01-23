@@ -1,16 +1,16 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.FixedErrorValidator;
-import org.beanplanet.validation.RequiredValidator;
-import org.beanplanet.validation.Validator;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Attribute;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.FixedErrorValidator;
+import uk.gov.ida.validation.validators.RequiredValidator;
+import uk.gov.ida.validation.validators.Validator;
 
 import java.util.function.Function;
 
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class AttributeValidator<T, R extends XMLObject> extends CompositeValidator<T> {
 

@@ -1,8 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.FixedErrorValidator;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
@@ -14,14 +11,17 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.FixedErrorValidator;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.beanplanet.messages.domain.MessageImpl.fieldMessage;
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQuery> {
 
@@ -31,16 +31,15 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
     public static final MessageImpl DEFAULT_INVALID_SIGNATURE_MESSAGE = globalMessage("invalid.signature", "Eidas Attribute Query's signature was invalid.");
     public static final String IDENTITY_ASSERTION = "Identity";
 
-    public EidasAttributeQueryValidator(
-        final MetadataResolver verifyMetadataResolver,
-        final MetadataResolver countryMetadataResolver,
-        final CertificateValidator verifyHubCertificateValidator,
-        final CertificateValidator countryMetadataCertificateValidator,
-        final CertificateExtractor certificateExtractor,
-        final X509CertificateFactory x509CertificateFactory,
-        final DateTimeComparator dateTimeComparator,
-        final AssertionDecrypter assertionDecrypter,
-        final String hubConnectorEntityId) {
+    public EidasAttributeQueryValidator(MetadataResolver verifyMetadataResolver,
+                                        MetadataResolver countryMetadataResolver,
+                                        CertificateValidator verifyHubCertificateValidator,
+                                        CertificateValidator countryMetadataCertificateValidator,
+                                        CertificateExtractor certificateExtractor,
+                                        X509CertificateFactory x509CertificateFactory,
+                                        DateTimeComparator dateTimeComparator,
+                                        AssertionDecrypter assertionDecrypter,
+                                        final String hubConnectorEntityId) {
         super(
             false,
             new CompositeValidator<>(
@@ -70,15 +69,15 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                         x509CertificateFactory,
                         dateTimeComparator,
                         IDENTITY_ASSERTION,
+                        hubConnectorEntityId,
                         Duration.parse("PT20M"),
-                        Duration.parse("PT1M"),
-                        hubConnectorEntityId)
+                        Duration.parse("PT1M"))
                 )
             )
         );
     }
 
-    //TODO this hsould be removed and the validator should take the assertions from the context object
+    //TODO this should be removed and the validator should take the assertions from the context object
     private static List<EncryptedAssertion> getEncryptedAssertions(AttributeQuery attributeQuery) {
         if (attributeQuery.getSubject() == null
             || attributeQuery.getSubject().getSubjectConfirmations().isEmpty()) {

@@ -1,15 +1,15 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.NotEmptyValidator;
-import org.beanplanet.validation.RequiredValidator;
 import org.opensaml.saml.saml2.core.Issuer;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.NotEmptyValidator;
+import uk.gov.ida.validation.validators.RequiredValidator;
 
 import java.util.function.Function;
 
-import static org.beanplanet.messages.domain.MessageImpl.fieldMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 
 public class IssuerValidator<T> extends CompositeValidator<T> {
 

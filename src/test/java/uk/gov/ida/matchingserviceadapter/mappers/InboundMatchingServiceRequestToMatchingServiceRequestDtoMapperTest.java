@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
+import com.google.common.base.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,13 +31,8 @@ import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchin
 @RunWith(MockitoJUnitRunner.class)
 public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest {
 
-    public static final String ISSUER_ID = "issuerId";
-
     @Mock
-    MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
-
-    @Mock
-    UserIdHashFactory hashFactory;
+    private UserIdHashFactory userIdHashFactory;
 
     @Mock
     private MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
@@ -44,12 +40,12 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
     private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper mapper;
 
     @Before
-    public void setUp() throws Exception {
-        mapper = new InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(hashFactory, matchingServiceAdapterConfiguration, matchingDatasetToMatchingDatasetDtoMapper);
+    public void setUp() {
+        mapper = new InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(userIdHashFactory, matchingDatasetToMatchingDatasetDtoMapper);
     }
 
     @Test
-    public void map_shouldMapTheFieldsCorrectly() throws Exception {
+    public void map_shouldMapTheFieldsCorrectly() {
         MatchingDataset matchingDataset = aMatchingDataset().build();
         AuthnContext levelOfAssurance = AuthnContext.LEVEL_2;
         LevelOfAssuranceDto levelOfAssuranceDto = LevelOfAssuranceDto.LEVEL_2;
@@ -69,18 +65,14 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
     }
 
     @Test
-    public void map_shouldUseTheHashedPid() throws Exception {
+    public void map_shouldUseTheHashedPid() {
         MatchingDataset matchingDataset = aMatchingDataset().build();
         InboundMatchingServiceRequest request = anInboundMatchingServiceRequest()
                 .withMatchingDatasetAssertion(anIdentityProviderAssertion().withMatchingDataset(matchingDataset).build())
                 .build();
-
         String hashedPid = "a-hashed-pid";
-        when(matchingServiceAdapterConfiguration.getEntityId()).thenReturn(ISSUER_ID);
-        when(hashFactory.createHashedId(request.getMatchingDatasetAssertion().getIssuerId(),
-                ISSUER_ID,
-                request.getMatchingDatasetAssertion().getPersistentId().getNameId(), request.getAuthnStatementAssertion().getAuthnStatement()))
-                .thenReturn(hashedPid);
+        Optional<AuthnContext> levelOfAssurance = request.getAuthnStatementAssertion().getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext);
+        when(userIdHashFactory.hashId(request.getMatchingDatasetAssertion().getIssuerId(), request.getMatchingDatasetAssertion().getPersistentId().getNameId(), levelOfAssurance)).thenReturn(hashedPid);
 
         MatchingServiceRequestDto requestDto = mapper.map(request);
 
@@ -88,7 +80,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
     }
 
     @Test
-    public void map_shouldAddCycle3DatasetWhenPresent() throws Exception {
+    public void map_shouldAddCycle3DatasetWhenPresent() {
         Cycle3Dataset cycle3Data = aCycle3Dataset().build();
         Cycle3DatasetDto cycle3DatasetDto = aCycle3DatasetDto().build();
         InboundMatchingServiceRequest request = anInboundMatchingServiceRequest()

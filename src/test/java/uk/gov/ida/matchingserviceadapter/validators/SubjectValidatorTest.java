@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Messages;
 import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,10 +8,10 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.builders.NameIdBuilder;
+import uk.gov.ida.validation.messages.Messages;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.SUBJECT_CONFIRMATION_DATA_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationValidator.WRONG_SUBJECT_CONFIRMATION_METHOD;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.NAME_ID_IN_WRONG_FORMAT;
@@ -22,6 +21,7 @@ import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.WRON
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class SubjectValidatorTest {
@@ -118,4 +118,5 @@ public class SubjectValidatorTest {
 
         assertThat(messages.hasErrorLike(SUBJECT_CONFIRMATION_DATA_NOT_PRESENT)).isTrue();
     }
+
 }

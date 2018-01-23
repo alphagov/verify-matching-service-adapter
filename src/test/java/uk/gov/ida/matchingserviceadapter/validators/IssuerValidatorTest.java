@@ -1,15 +1,15 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Messages;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.Issuer;
+import uk.gov.ida.validation.messages.Messages;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.IssuerValidator.DEFAULT_EMPTY_VALUE_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.IssuerValidator.DEFAULT_REQUIRED_MESSAGE;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class IssuerValidatorTest {
     private IssuerValidator<Issuer> validator;

@@ -63,6 +63,10 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     @Valid
     @JsonProperty
+    private long clockSkewInSeconds = 30;
+
+    @Valid
+    @JsonProperty
     private CountryConfiguration country;
 
     protected MatchingServiceAdapterConfiguration() {
@@ -83,6 +87,10 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     public String getEntityId() {
         return matchingServiceAdapter.getEntityId();
+    }
+
+    public long getClockSkew() {
+        return clockSkewInSeconds;
     }
 
     public URI getLocalMatchingServiceMatchUrl() {

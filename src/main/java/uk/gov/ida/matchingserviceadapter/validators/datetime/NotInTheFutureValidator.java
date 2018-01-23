@@ -1,8 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.validators.datetime;
 
-
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.validation.PredicatedValidator;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import javax.validation.constraints.NotNull;
 import java.time.Duration;

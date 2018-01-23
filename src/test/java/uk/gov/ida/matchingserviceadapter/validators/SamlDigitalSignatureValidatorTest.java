@@ -1,7 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.messages.domain.Messages;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
@@ -11,14 +9,14 @@ import org.opensaml.security.x509.BasicX509Credential;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.messages.Messages;
 
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
@@ -26,6 +24,8 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class SamlDigitalSignatureValidatorTest {
     private static final MessageImpl EXPECTED_MESSAGE = globalMessage("theCode", "theMessage");

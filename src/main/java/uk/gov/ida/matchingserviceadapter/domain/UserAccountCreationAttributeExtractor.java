@@ -28,7 +28,7 @@ public class UserAccountCreationAttributeExtractor {
 
     private final UserAccountCreationAttributeFactory userAccountCreationAttributeFactory = new UserAccountCreationAttributeFactory(new OpenSamlXmlObjectFactory());
 
-    public List<Attribute> getUserAttributesForAccountCreation(List<Attribute> userCreationAttributes, Optional<MatchingDataset> optionalMatchingDataset, Optional<HubAssertion> cycle3Data) {
+    public List<Attribute> getUserAccountCreationAttributes(List<Attribute> userCreationAttributes, Optional<MatchingDataset> optionalMatchingDataset, Optional<HubAssertion> cycle3Data) {
         List<Attribute> userCreationAttributesWithValues = new ArrayList<>();
 
         for (Attribute userCreationAttribute : userCreationAttributes) {

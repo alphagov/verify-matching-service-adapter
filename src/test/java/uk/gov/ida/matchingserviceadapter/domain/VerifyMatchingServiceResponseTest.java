@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mock;
 
 public class VerifyMatchingServiceResponseTest {
     @Test
-    public void ctor() {
+    public void shouldStoreOutboundResponseFromMSA() {
         OutboundResponseFromMatchingService outboundResponseFromMatchingService = mock(OutboundResponseFromMatchingService.class);
 
         VerifyMatchingServiceResponse response = new VerifyMatchingServiceResponse(outboundResponseFromMatchingService);

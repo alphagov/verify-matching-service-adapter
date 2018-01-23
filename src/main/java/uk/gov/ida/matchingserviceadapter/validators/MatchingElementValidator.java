@@ -1,16 +1,16 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.messages.domain.Messages;
-import org.beanplanet.validation.AbstractValueProvidedValidator;
-import org.beanplanet.validation.Validator;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.messages.Messages;
+import uk.gov.ida.validation.validators.AbstractValueProvidedValidator;
+import uk.gov.ida.validation.validators.Validator;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 /**
  * Filter a collection according to some predicate and apply the supplied validator to the first

@@ -1,9 +1,9 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.MessageImpl;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.RequiredValidator;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
+import uk.gov.ida.validation.messages.MessageImpl;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.RequiredValidator;
 
 import java.util.function.Function;
 

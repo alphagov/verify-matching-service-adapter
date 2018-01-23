@@ -2,7 +2,6 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
-import org.beanplanet.messages.domain.Messages;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.junit.Before;
@@ -28,16 +27,15 @@ import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
-import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.validation.messages.Messages;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateEmptyIssuerMessage;
@@ -60,10 +58,12 @@ import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryValidatorTest {
     public static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
+
     @Mock
     private MetadataResolver verifyMetadataResolver;
 
@@ -90,7 +90,6 @@ public class EidasAttributeQueryValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        IdaSamlBootstrap.bootstrap();
         validator = new EidasAttributeQueryValidator(
             verifyMetadataResolver,
             countryMetadataResolver,
@@ -138,7 +137,8 @@ public class EidasAttributeQueryValidatorTest {
 
     @Test
     public void shouldReturnErrorWhenAttributeQueryIssuerValidationFails() throws ResolverException {
-        final EncryptedAssertion encryptedAssertion = anAssertion().withConditions(aConditions()).build();
+        final EncryptedAssertion encryptedAssertion = anAssertion().build();
+        final Assertion assertion = anAssertion().addAuthnStatement(anAuthnStatement().build()).buildUnencrypted();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
             .withIssuer(anIssuer().withIssuerId("").build())
@@ -154,11 +154,10 @@ public class EidasAttributeQueryValidatorTest {
             .withId(requestId)
             .withSubject(aSubjectWithEncryptedAssertion(encryptedAssertion, requestId, HUB_ENTITY_ID))
             .build();
-        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(anEidasAssertion().withConditions(aConditions()).buildUnencrypted()));
+        when(assertionDecrypter.decryptAssertions(any())).thenReturn(Arrays.asList(assertion));
 
         Messages messages = validator.validate(attributeQuery, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(DEFAULT_ISSUER_EMPTY_MESSAGE)).isTrue();
     }
 
@@ -167,7 +166,6 @@ public class EidasAttributeQueryValidatorTest {
         final EncryptedAssertion encryptedAssertion = anAssertion().withConditions(aConditions()).build();
         final String requestId = "request-id";
         final AttributeQuery attributeQuery = anAttributeQuery()
-
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
             .withSignature(
                 aSignature()
@@ -185,7 +183,6 @@ public class EidasAttributeQueryValidatorTest {
 
         Messages messages = validator.validate(attributeQuery, messages());
 
-        assertThat(messages.size()).isEqualTo(1);
         assertThat(messages.hasErrorLike(DEFAULT_INVALID_SIGNATURE_MESSAGE)).isTrue();
     }
 
@@ -297,6 +294,7 @@ public class EidasAttributeQueryValidatorTest {
 
         return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
     }
+
 
     private Conditions aConditions() {
         Conditions conditions = new ConditionsBuilder().buildObject();

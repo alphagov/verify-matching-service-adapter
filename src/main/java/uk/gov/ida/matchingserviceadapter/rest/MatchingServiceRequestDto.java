@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 
@@ -15,6 +16,7 @@ public class MatchingServiceRequestDto {
 
     private MatchingDatasetDto matchingDataset;
     private Optional<Cycle3DatasetDto> cycle3Dataset = Optional.absent();
+    private EidasMatchingDatasetDto eidasDataset;
     private String hashedPid;
     private String matchId;
     private LevelOfAssuranceDto levelOfAssurance;
@@ -29,7 +31,25 @@ public class MatchingServiceRequestDto {
             String matchId,
             LevelOfAssuranceDto levelOfAssurance) {
 
+        this(cycle3Dataset, hashedPid, matchId, levelOfAssurance);
         this.matchingDataset = matchingDataset;
+    }
+
+    public MatchingServiceRequestDto(
+        EidasMatchingDatasetDto eidasDataset,
+        Optional<Cycle3DatasetDto> cycle3Dataset,
+        String hashedPid,
+        String matchId,
+        LevelOfAssuranceDto levelOfAssurance) {
+
+        this(cycle3Dataset, hashedPid, matchId, levelOfAssurance);
+        this.eidasDataset = eidasDataset;
+    }
+
+    private MatchingServiceRequestDto(Optional<Cycle3DatasetDto> cycle3Dataset,
+            String hashedPid,
+            String matchId,
+            LevelOfAssuranceDto levelOfAssurance) {
         this.cycle3Dataset = cycle3Dataset;
         this.hashedPid = hashedPid;
         this.matchId = matchId;
@@ -55,6 +75,10 @@ public class MatchingServiceRequestDto {
 
     public LevelOfAssuranceDto getLevelOfAssurance() {
         return levelOfAssurance;
+    }
+
+    public EidasMatchingDatasetDto getEidasDataset() {
+        return eidasDataset;
     }
 
     @Override

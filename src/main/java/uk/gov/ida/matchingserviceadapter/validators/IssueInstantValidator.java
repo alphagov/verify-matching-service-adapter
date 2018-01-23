@@ -1,11 +1,11 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.validation.CompositeValidator;
 import org.joda.time.DateTime;
 import uk.gov.ida.matchingserviceadapter.validators.datetime.DurationNotExceededValidator;
 import uk.gov.ida.matchingserviceadapter.validators.datetime.JodaAndJavaDateTimeConverters;
 import uk.gov.ida.matchingserviceadapter.validators.datetime.NotInTheFutureValidator;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.validators.CompositeValidator;
 
 import java.time.Duration;
 import java.time.Instant;

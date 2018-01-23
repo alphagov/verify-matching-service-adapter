@@ -1,13 +1,14 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.messages.domain.Messages;
-import org.beanplanet.validation.AbstractValueProvidedValidator;
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.PredicatedValidator;
-import org.beanplanet.validation.Validator;
 
-import static org.beanplanet.messages.domain.MessageImpl.globalMessage;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.messages.Messages;
+import uk.gov.ida.validation.validators.AbstractValueProvidedValidator;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.PredicatedValidator;
+import uk.gov.ida.validation.validators.Validator;
+
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class TypeValidators {
 

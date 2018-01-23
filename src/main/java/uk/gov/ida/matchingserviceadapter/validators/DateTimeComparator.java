@@ -11,19 +11,15 @@ public class DateTimeComparator {
 
     private final Duration clockSkew;
 
-    public boolean isAfterFuzzy(DateTime source, DateTime target) {
-        return source.isAfter(target.minus(clockSkew));
-    }
-
-    public boolean isBeforeFuzzy(DateTime source, DateTime target) {
-        return source.isBefore(target.plus(clockSkew));
-    }
-
     public boolean isBeforeNow(DateTime dateTime) {
-        return !isBeforeFuzzy(DateTime.now(), dateTime);
+        return isBefore(dateTime, DateTime.now());
     }
 
     public boolean isAfterNow(DateTime dateTime) {
-        return !isAfterFuzzy(DateTime.now(), dateTime);
+        return isBefore(DateTime.now(), dateTime);
+    }
+
+    private boolean isBefore(DateTime dateTime, DateTime target) {
+        return dateTime.isBefore(target.plus(clockSkew));
     }
 }

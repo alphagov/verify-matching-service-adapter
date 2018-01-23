@@ -15,8 +15,9 @@ import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.xmlsec.signature.Signature;
+import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
-import uk.gov.ida.saml.core.test.builders.SubjectBuilder;
+import uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder;
 import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
 
@@ -31,13 +32,15 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
-import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
+import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPAddress;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
+import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 
@@ -54,22 +57,49 @@ public class AssertionHelper {
     }
 
     public static Assertion anAuthnStatementAssertion() {
+        return anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "default-request-id");
+    }
+
+    public static Assertion anAuthnStatementAssertion(String authnContext, String inResponseTo) {
         return anAssertion()
-                .addAuthnStatement(anAuthnStatement().build())
+                .addAuthnStatement(
+                    anAuthnStatement()
+                        .withAuthnContext(
+                            anAuthnContext()
+                                .withAuthnContextClassRef(
+                                    anAuthnContextClassRef()
+                                        .withAuthnContextClasRefValue(authnContext)
+                                        .build())
+                                .build())
+                        .build())
+                .withSubject(
+                    aSubject()
+                        .withSubjectConfirmation(
+                            aSubjectConfirmation()
+                                .withSubjectConfirmationData(
+                                    aSubjectConfirmationData()
+                                        .withInResponseTo(inResponseTo)
+                                        .build()
+                                ).build()
+                        ).build())
                 .withIssuer(anIssuer().withIssuerId(STUB_IDP_ONE).build())
                 .addAttributeStatement(anAttributeStatement().addAttribute(anIPAddress().build()).build())
                 .buildUnencrypted();
     }
 
     public static Subject aSubjectWithAssertions(List<Assertion> assertions, String requestId, String hubEntityId) {
-        final NameID nameId = aNameId().withNameQualifier("").withSpNameQualifier(hubEntityId).build();
+        return aSubjectWithAssertions(assertions, requestId, hubEntityId, "default-pid");
+    }
+
+    public static Subject aSubjectWithAssertions(List<Assertion> assertions, String requestId, String hubEntityId, String pid) {
+        final NameID nameId = aNameId().withValue(pid).withNameQualifier("").withSpNameQualifier(hubEntityId).build();
         SubjectConfirmationDataBuilder subjectConfirmationDataBuilder = aSubjectConfirmationData().withInResponseTo(requestId);
         assertions.stream().forEach(subjectConfirmationDataBuilder::addAssertion);
         final SubjectConfirmationData subjectConfirmationData = subjectConfirmationDataBuilder.build();
         final SubjectConfirmation subjectConfirmation = SubjectConfirmationBuilder.aSubjectConfirmation()
-                .withSubjectConfirmationData(subjectConfirmationData).build();
+            .withSubjectConfirmationData(subjectConfirmationData).build();
 
-        return SubjectBuilder.aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
+        return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
     }
 
     public static Subject aSubjectWithEncryptedAssertions(List<EncryptedAssertion> assertions, String requestId, String hubEntityId) {
@@ -82,7 +112,7 @@ public class AssertionHelper {
         final SubjectConfirmation subjectConfirmation = SubjectConfirmationBuilder.aSubjectConfirmation()
                 .withSubjectConfirmationData(subjectConfirmationData).build();
 
-        return SubjectBuilder.aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
+        return aSubject().withNameId(nameId).withSubjectConfirmation(subjectConfirmation).build();
     }
 
     public static Assertion aMatchingDatasetAssertion(List<Attribute> attributes, boolean shouldBeExpired, String requestId) {
@@ -105,7 +135,8 @@ public class AssertionHelper {
     }
 
     public static EncryptedAssertion anEidasEncryptedAssertion(String issuerId) {
-        return anEidasAssertion()
+        return anAssertion()
+                .addAuthnStatement(AuthnStatementBuilder.anAuthnStatement().build())
                 .withIssuer(
                         anIssuer()
                                 .withIssuerId(issuerId)
@@ -148,7 +179,7 @@ public class AssertionHelper {
         } else {
             notOnOrAfter = DateTime.now().plus(1000000);
         }
-        return SubjectBuilder.aSubject()
+        return aSubject()
                 .withSubjectConfirmation(
                         aSubjectConfirmation()
                                 .withSubjectConfirmationData(

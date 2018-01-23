@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Throwables.propagate;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
@@ -73,7 +72,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             countryMetadataServer.reset();
             countryMetadataServer.register(COUNTRY_METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, new MetadataFactory().defaultMetadata());
         } catch (Exception e) {
-            throw propagate(e);
+            throw new RuntimeException(e);
         }
 
         super.before();

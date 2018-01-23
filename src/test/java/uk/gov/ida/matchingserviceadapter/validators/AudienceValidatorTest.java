@@ -1,16 +1,16 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Messages;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.Audience;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
+import uk.gov.ida.validation.messages.Messages;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.AudienceValidator.DEFAULT_REQUIRED_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.AudienceValidator.DEFAULT_REQUIRED_URI_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.AudienceValidator.generateMismatchedAudienceUriMessage;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class AudienceValidatorTest {
     public static final String AUDIENCE_URI = "audienceUri";

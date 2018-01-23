@@ -1,15 +1,14 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Messages;
-import org.beanplanet.validation.Validator;
 import org.junit.Test;
-import org.junit.experimental.theories.suppliers.TestedOn;
+import uk.gov.ida.validation.messages.Messages;
+import uk.gov.ida.validation.validators.Validator;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.beanplanet.messages.domain.MessagesImpl.messages;
 import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_IS_EMPTY;
 import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_NOT_ENUMERATED;
+import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class StringValidatorsTest {
 

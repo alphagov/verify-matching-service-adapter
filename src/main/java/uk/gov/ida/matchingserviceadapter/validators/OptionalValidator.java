@@ -1,7 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.validation.CompositeValidator;
-import org.beanplanet.validation.Validator;
+import uk.gov.ida.validation.validators.CompositeValidator;
+import uk.gov.ida.validation.validators.Validator;
 
 import java.util.Objects;
 import java.util.function.Function;

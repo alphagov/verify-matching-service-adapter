@@ -1,12 +1,18 @@
 package uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers;
 
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Issuer;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataRepository;
+import uk.gov.ida.saml.security.AssertionDecrypter;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class EidasAttributesBasedAttributeQueryDiscriminator implements Predicate<MatchingServiceRequestContext> {
     private final MetadataRepository countryMetadataRepository;

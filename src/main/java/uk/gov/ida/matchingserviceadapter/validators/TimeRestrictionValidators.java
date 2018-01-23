@@ -1,8 +1,8 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.beanplanet.messages.domain.Message;
-import org.beanplanet.validation.PredicatedValidator;
 import org.joda.time.DateTime;
+import uk.gov.ida.validation.messages.Message;
+import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import java.util.function.Function;
 
