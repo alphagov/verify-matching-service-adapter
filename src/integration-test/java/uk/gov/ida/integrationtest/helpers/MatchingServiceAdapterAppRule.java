@@ -42,7 +42,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     private static final HttpStubRule countryMetadataServer = new HttpStubRule();
 
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
-    private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource clientTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("interCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).withCertificate("idpCA", CACertificates.TEST_IDP_CA).build();
 
     public MatchingServiceAdapterAppRule(ConfigOverride... otherConfigOverrides) {
@@ -106,7 +106,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("hub.trustStore.type", "file"),
             ConfigOverride.config("hub.trustStore.path", clientTrustStore.getAbsolutePath()),
             ConfigOverride.config("hub.trustStore.password", clientTrustStore.getPassword())
-
         ).collect(Collectors.toList());
 
         if (isCountryEnabled) {
