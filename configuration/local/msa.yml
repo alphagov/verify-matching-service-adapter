@@ -38,7 +38,7 @@ metadata:
     password: marshmallow
   minRefreshDelay: 60000
   maxRefreshDelay: 600000
-  hubEntityId: https://dev-hub.local
+  expectedEntityId: https://dev-hub.local
   hubFederationId: VERIFY-FEDERATION
 
 signingKeys:

@@ -73,7 +73,7 @@ metadata:
     password: ${TRUSTSTORE_PASSWORD}
   minRefreshDelay: 30000
   maxRefreshDelay: 1800000
-  hubEntityId: ${METADATA_ENTITY_ID}
+  expectedEntityId: ${METADATA_ENTITY_ID}
   client:
     timeout: 60s
     timeToLive: 10m
