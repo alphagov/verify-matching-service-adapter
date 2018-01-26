@@ -16,6 +16,13 @@ publishing {
             groupId "uk.gov.ida"
             artifact file('test-rp-msa_' + "$build_number" + '_amd64.deb')
         }
+        zip(MavenPublication) {
+            artifactId = "matching-service-adapter-zip"
+            version "$build_number"
+            groupId = "uk.gov.ida"
+
+            artifact file('verify-matching-service-adapter-' + "$build_number" + '.zip')
+        }
     }
     repositories {
         maven {
