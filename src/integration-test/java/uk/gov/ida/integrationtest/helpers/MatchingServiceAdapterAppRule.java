@@ -87,8 +87,9 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         super.after();
     }
 
-    public static ConfigOverride[] withDefaultOverrides(boolean isCountryEnabled, ConfigOverride... otherConfigOverrides) {
+    public static ConfigOverride[] withDefaultOverrides(boolean isCountryPresent, ConfigOverride... otherConfigOverrides) {
         List<ConfigOverride> overrides = Stream.of(
+            ConfigOverride.config("returnStackTraceInResponse", "true"),
             ConfigOverride.config("server.applicationConnectors[0].port", "0"),
             ConfigOverride.config("server.adminConnectors[0].port", "0"),
             ConfigOverride.config("encryptionKeys[0].privateKey.key", TEST_RP_MS_PRIVATE_ENCRYPTION_KEY),
@@ -108,34 +109,32 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("hub.trustStore.password", clientTrustStore.getPassword())
         ).collect(Collectors.toList());
 
-        if (isCountryEnabled) {
+        if (isCountryPresent) {
             List<ConfigOverride> countryOverrides = Stream.of(
-                    ConfigOverride.config("returnStackTraceInResponse", "true"),  // Until eiDAS happy-path through MSA is complete (EID-270)
-                    ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_SECONDARY_ENTITY_ID),
+                ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_SECONDARY_ENTITY_ID),
 
-                    ConfigOverride.config("europeanIdentity.enabled", "true"),
+                ConfigOverride.config("europeanIdentity.enabled", "true"),
 
-                    ConfigOverride.config("europeanIdentity.metadata.uri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
-                    ConfigOverride.config("europeanIdentity.metadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
-                    ConfigOverride.config("europeanIdentity.metadata.trustStore.password", countryMetadataTrustStore.getPassword()),
-                    ConfigOverride.config("europeanIdentity.metadata.minRefreshDelay", "60000"),
-                    ConfigOverride.config("europeanIdentity.metadata.maxRefreshDelay", "600000"),
-                    ConfigOverride.config("europeanIdentity.metadata.expectedEntityId", "http://stub_idp.acme.org/stub-idp-one/SSO/POST"),
-                    ConfigOverride.config("europeanIdentity.metadata.jerseyClientName", "country-metadata-client"),
+                ConfigOverride.config("europeanIdentity.metadata.uri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
+                ConfigOverride.config("europeanIdentity.metadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("europeanIdentity.metadata.trustStore.password", countryMetadataTrustStore.getPassword()),
+                ConfigOverride.config("europeanIdentity.metadata.minRefreshDelay", "60000"),
+                ConfigOverride.config("europeanIdentity.metadata.maxRefreshDelay", "600000"),
+                ConfigOverride.config("europeanIdentity.metadata.expectedEntityId", "http://stub_idp.acme.org/stub-idp-one/SSO/POST"),
+                ConfigOverride.config("europeanIdentity.metadata.jerseyClientName", "country-metadata-client"),
 
-                    ConfigOverride.config("europeanIdentity.metadata.client.timeout", "2s"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.timeToLive", "10m"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.cookiesEnabled", "false"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.connectionTimeout", "1s"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.retries", "3"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.keepAlive", "60s"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.chunkedEncodingEnabled", "false"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.validateAfterInactivityPeriod", "5s"),
+                ConfigOverride.config("europeanIdentity.metadata.client.timeout", "2s"),
+                ConfigOverride.config("europeanIdentity.metadata.client.timeToLive", "10m"),
+                ConfigOverride.config("europeanIdentity.metadata.client.cookiesEnabled", "false"),
+                ConfigOverride.config("europeanIdentity.metadata.client.connectionTimeout", "1s"),
+                ConfigOverride.config("europeanIdentity.metadata.client.retries", "3"),
+                ConfigOverride.config("europeanIdentity.metadata.client.keepAlive", "60s"),
+                ConfigOverride.config("europeanIdentity.metadata.client.chunkedEncodingEnabled", "false"),
+                ConfigOverride.config("europeanIdentity.metadata.client.validateAfterInactivityPeriod", "5s"),
 
-                    ConfigOverride.config("europeanIdentity.metadata.client.tls.protocol", "TLSv1.2"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.tls.verifyHostname", "false"),
-                    ConfigOverride.config("europeanIdentity.metadata.client.tls.trustSelfSignedCertificates", "true")
-
+                ConfigOverride.config("europeanIdentity.metadata.client.tls.protocol", "TLSv1.2"),
+                ConfigOverride.config("europeanIdentity.metadata.client.tls.verifyHostname", "false"),
+                ConfigOverride.config("europeanIdentity.metadata.client.tls.trustSelfSignedCertificates", "true")
             ).collect(Collectors.toList());
             overrides.addAll(countryOverrides);
         }

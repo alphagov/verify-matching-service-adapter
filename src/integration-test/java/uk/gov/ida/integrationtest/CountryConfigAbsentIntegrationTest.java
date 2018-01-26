@@ -1,6 +1,5 @@
 package uk.gov.ida.integrationtest;
 
-import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -9,15 +8,13 @@ import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CountryDisabledIntegrationTest {
+public class CountryConfigAbsentIntegrationTest {
 
     @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule(true,
-            ConfigOverride.config("europeanIdentity.enabled", "false"),
-            ConfigOverride.config("europeanIdentity.metadata.trustStore.path", "/file/doesNotExist"));
+    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule();
 
     @Test
-    public void shouldNotFetchCountryMetadataWhenCountryConfigIsPresentButDisabled() {
+    public void shouldNotFetchCountryMetadataWhenCountryConfigIsMissing() {
         assertThat(applicationRule.getEnvironment().healthChecks().getNames()).doesNotContain("CountryMetadataHealthCheck");
     }
 }
