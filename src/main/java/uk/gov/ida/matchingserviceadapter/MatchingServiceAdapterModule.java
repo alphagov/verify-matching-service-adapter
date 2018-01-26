@@ -346,7 +346,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named("CountryTrustStore")
     public Optional<KeyStore> getCountryTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
-        return Optional.ofNullable(configuration.getEuropeanIdentity()).map(euid -> euid.getMetadata().getTrustStore());
+        if (configuration.isEidasEnabled()) {
+            return Optional.of(configuration.getEuropeanIdentity().getMetadata().getTrustStore());
+        }
+        return Optional.empty();
     }
 
     @Provides
