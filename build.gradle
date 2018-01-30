@@ -156,7 +156,7 @@ task copyToLib(dependsOn: jar, type: Copy) {
 }
 
 task copyTestToolZip(dependsOn: 'verify-matching-service-test-tool:distZip', type: Copy) {
-    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool.zip")
+    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + "$version" + ".zip")
     into(distsDir)
 }
 
