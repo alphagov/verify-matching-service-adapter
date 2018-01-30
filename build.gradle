@@ -23,12 +23,13 @@ idaSonar {
     name = 'verify-matching-service-adapter-sonar'
 }
 
-group = "uk.gov.ida"
-project.version = "$gradle.ext.version_number-$version"
-
 ext {
-  opensaml = '3.3.0'
+    opensaml = '3.3.0'
+    build_number="$version"
 }
+
+group = "uk.gov.ida"
+project.version = "$gradle.ext.version_number-$build_number"
 
 def dependencyVersions = [
         opensaml:"$opensaml",
@@ -156,7 +157,7 @@ task copyToLib(dependsOn: jar, type: Copy) {
 }
 
 task copyTestToolZip(dependsOn: 'verify-matching-service-test-tool:distZip', type: Copy) {
-    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + "$version" + ".zip")
+    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + "$build_number" + ".zip")
     into(distsDir)
 }
 
