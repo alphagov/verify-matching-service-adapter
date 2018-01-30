@@ -24,7 +24,7 @@ idaSonar {
 }
 
 group = "uk.gov.ida"
-project.version = "$gradle.ext.version"
+project.version = "$gradle.ext.version_number-$version"
 
 ext {
   opensaml = '3.3.0'

@@ -18,10 +18,10 @@ publishing {
         }
         zipFile(MavenPublication) {
             artifactId = "verify-matching-service-adapter"
-            version "$gradle.ext.version"
+            version "$gradle.ext.version_number-$build_number"
             groupId = "uk.gov.ida"
 
-            artifact file('verify-matching-service-adapter-' + "$gradle.ext.version" + '.zip')
+            artifact file('verify-matching-service-adapter-' + "$gradle.ext.version_number-$build_number" + '.zip')
         }
     }
     repositories {
