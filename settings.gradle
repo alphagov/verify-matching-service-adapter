@@ -1,2 +1,8 @@
 include 'verify-matching-service-test-tool'
 
+def build_number = System.getProperty('IDA_MSA_VERSION')
+
+gradle.ext {
+    version_number =  '2.1.0'
+    version = "$version_number-$build_number"
+}

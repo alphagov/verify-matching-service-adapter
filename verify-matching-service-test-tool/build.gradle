@@ -1,6 +1,4 @@
 group 'uk.gov.ida'
-version = "$version"
-
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'org.junit.platform.gradle.plugin'
@@ -60,7 +58,7 @@ applicationDistribution.from("examples") {
 }
 
 distZip {
-    into(project.name + "-" + project.version) {
+    into(project.name) {
         from '.'
         include 'verify-matching-service-test-tool.yml'
         include 'README.md'

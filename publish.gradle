@@ -17,8 +17,8 @@ publishing {
             artifact file('test-rp-msa_' + "$build_number" + '_amd64.deb')
         }
         zipFile(MavenPublication) {
-            artifactId = "matching-service-adapter-zip"
-            version "$build_number"
+            artifactId = "verify-matching-service-adapter"
+            version "$gradle.ext.version"
             groupId = "uk.gov.ida"
 
             artifact file('verify-matching-service-adapter-' + "$build_number" + '.zip')

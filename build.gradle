@@ -24,7 +24,7 @@ idaSonar {
 }
 
 group = "uk.gov.ida"
-ext.version = "$version"
+ext.version = "$gradle.ext.version"
 
 ext {
   opensaml = '3.3.0'
@@ -156,7 +156,7 @@ task copyToLib(dependsOn: jar, type: Copy) {
 }
 
 task copyTestToolZip(dependsOn: 'verify-matching-service-test-tool:distZip', type: Copy) {
-    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + project.version + ".zip")
+    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool.zip")
     into(distsDir)
 }
 
