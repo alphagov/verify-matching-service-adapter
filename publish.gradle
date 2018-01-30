@@ -21,7 +21,7 @@ publishing {
             version "$gradle.ext.version"
             groupId = "uk.gov.ida"
 
-            artifact file('verify-matching-service-adapter-' + "$build_number" + '.zip')
+            artifact file('verify-matching-service-adapter-' + "$gradle.ext.version" + '.zip')
         }
     }
     repositories {
