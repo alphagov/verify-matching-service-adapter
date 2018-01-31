@@ -1,5 +1,6 @@
 MSA Release Notes
 =================
+### 2.1.0
 
 11th September 2017 - v2.1.0-592
 * No longer allow MD5 digest and signature algorithms
