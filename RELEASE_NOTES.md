@@ -3,6 +3,15 @@ MSA Release Notes
 
 ### Next
 
+* Open sourced the verify-matching-service-adapter :tada:
+* Made the checks we perform on assertions from identity providers more strict
+* Improved support for configuration via environment variables
+* Added experimental support for running inside Docker
+* Improved support for semantic version numbers
+* Added verify-matching-service-test-tool to the open source repository (see https://github.com/alphagov/verify-matching-service-adapter/tree/master/verify-matching-service-test-tool)
+* Partially implemented support for use with european identity schemes through eIDAS (disabled by default).
+
+
 ### 2.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.1.0...2.1.0)
 
