@@ -13,6 +13,8 @@ MSA Release Notes
  - If a transaction is configured with ADDRESS_HISTORY in its list of user account creation attributes, then the MSA will extract the user's full address history and return it to the hub as an "addresshistory" SAML attribute.
  - Address history will be added to the onboarding form at a later date for Relying Parties to request it. 
 
+### 2.0.0
+
 16th May 2017 - v2.0.0-580
 
 * new semantic version number for the MSA - starting at v2.0.0. The number after the - represent the build number. This is the version number we used to use for the MSA
