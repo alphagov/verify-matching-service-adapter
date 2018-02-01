@@ -3,6 +3,9 @@ MSA Release Notes
 
 ### Next
 
+### 2.2.0
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.1.0...2.2.0)
+
 * Open sourced the verify-matching-service-adapter :tada:
 * Made the checks we perform on assertions from identity providers more strict
 * Improved support for configuration via environment variables
