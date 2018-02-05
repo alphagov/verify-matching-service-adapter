@@ -71,7 +71,6 @@ import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
 import uk.gov.ida.matchingserviceadapter.services.VerifyMatchingService;
-import uk.gov.ida.matchingserviceadapter.utils.manifest.ManifestReader;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
@@ -92,6 +91,7 @@ import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.SigningKeyStore;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
+import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.truststore.KeyStoreLoader;
 
 import javax.inject.Named;
@@ -164,7 +164,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                                                                                           Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
                                                                                           ManifestReader manifestReader,
                                                                                           Function<OutboundResponseFromMatchingService, Element> responseElementTransformer
-                                                                                        ) {
+    ) {
         return new DelegatingMatchingServiceResponseGenerator(
             ImmutableMap.of(
                 HealthCheckMatchingServiceResponse.class,
