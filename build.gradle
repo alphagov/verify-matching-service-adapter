@@ -34,7 +34,7 @@ project.version = "$gradle.ext.version_number-$build_number"
 def dependencyVersions = [
         opensaml:"$opensaml",
         dropwizard: '1.1.4',
-        ida_utils: '317',
+        ida_utils: '326',
         ida_test_utils: '35',
         saml_extensions:"$opensaml-1.2a-38",
         saml_serializers:"$opensaml-28",
