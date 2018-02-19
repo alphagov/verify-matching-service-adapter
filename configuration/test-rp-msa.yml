@@ -112,7 +112,7 @@ europeanIdentity:
     trustStore:
       path: ${TRUSTSTORE_PATH}/country_metadata_truststore.ts
       password: ${TRUSTSTORE_PASSWORD}
-    minRefreshDelay: 60000
+    minRefreshDelay: 5000
     maxRefreshDelay: 600000
     expectedEntityId: ${COUNTRY_EXPECTED_ENTITY_ID}
     jerseyClientName: country-metadata-client

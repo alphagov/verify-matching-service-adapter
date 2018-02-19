@@ -39,7 +39,7 @@ def dependencyVersions = [
         saml_extensions:"$opensaml-1.2a-38",
         saml_serializers:"$opensaml-28",
         saml_security:"$opensaml-51",
-        saml_metadata_bindings:"$opensaml-61",
+        saml_metadata_bindings:"$opensaml-66",
         saml_utils: "$opensaml-53",
         saml_test_utils:"$opensaml-34",
         saml_domain_objects: "$opensaml-40",
