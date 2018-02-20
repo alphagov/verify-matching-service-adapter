@@ -7,7 +7,11 @@ import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 
 import java.util.Optional;
-
+/**
+ * @deprecated
+ * openSAML's implementation for fetching certificates when validating signatures should be used
+ */
+@Deprecated
 public class ResolverBackedMetadataRepository implements MetadataRepository {
     private final MetadataResolver metadataResolver;
     public ResolverBackedMetadataRepository(final MetadataResolver metadataResolver) {

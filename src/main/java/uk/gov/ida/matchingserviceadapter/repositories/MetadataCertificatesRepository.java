@@ -12,6 +12,11 @@ import uk.gov.ida.matchingserviceadapter.exceptions.InvalidSamlMetadataException
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @deprecated
+ * openSAML's implementation for fetching certificates when validating signatures should be used
+ */
+@Deprecated()
 public class MetadataCertificatesRepository {
     private final MetadataResolver metadataResolver;
     private final CertificateValidator certificateValidator;

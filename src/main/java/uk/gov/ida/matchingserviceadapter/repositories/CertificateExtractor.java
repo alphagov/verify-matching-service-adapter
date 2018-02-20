@@ -15,6 +15,11 @@ import uk.gov.ida.saml.core.validation.SamlValidationSpecificationFailure;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated
+ * openSAML's implementation for fetching certificates when validating signatures should be used
+ */
+@Deprecated
 public class CertificateExtractor {
 
     public List<Certificate> extractHubSigningCertificates(EntityDescriptor hubDescriptor) {

@@ -7,6 +7,11 @@ import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCe
 import javax.inject.Inject;
 import java.util.List;
 
+/**
+ * @deprecated
+ * openSAML's implementation for fetching certificates when validating signatures should be used
+ */
+@Deprecated
 public class CertificateValidator {
 
     private final X509CertificateFactory certificateFactory;
