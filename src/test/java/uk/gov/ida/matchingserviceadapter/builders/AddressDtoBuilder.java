@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.builders;
 import com.google.common.base.Optional;
 import org.joda.time.DateTime;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ public class AddressDtoBuilder {
     private Optional<DateTime> toDate = absent();
     private boolean verified = false;
 
-    public AddressDto build() {
-        return new AddressDto(
+    public VerifyAddressDto buildVerifyAddressDto() {
+        return new VerifyAddressDto(
                 lines,
                 postCode,
                 internationalPostCode,

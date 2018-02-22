@@ -4,22 +4,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.joda.time.DateTime;
 
 import java.util.List;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class AddressDto {
+public abstract class AddressDto {
     private boolean verified;
-    private DateTime fromDate;
-    private Optional<DateTime> toDate = Optional.absent();
     private Optional<String> postCode = Optional.absent();
     private List<String> lines;
     private Optional<String> internationalPostCode = Optional.absent();
     private Optional<String> uprn = Optional.absent();
 
     @SuppressWarnings("unused") // needed for JAXB
-    private AddressDto() {
+    protected AddressDto() {
     }
 
     public AddressDto(
@@ -27,16 +24,12 @@ public class AddressDto {
             Optional<String> postCode,
             Optional<String> internationalPostCode,
             Optional<String> uprn,
-            DateTime fromDate,
-            Optional<DateTime> toDate,
             boolean verified) {
 
         this.lines = lines;
         this.postCode = postCode;
         this.internationalPostCode = internationalPostCode;
         this.uprn = uprn;
-        this.fromDate = fromDate;
-        this.toDate = toDate;
         this.verified = verified;
     }
 
@@ -54,14 +47,6 @@ public class AddressDto {
 
     public Optional<String> getUPRN() {
         return uprn;
-    }
-
-    public DateTime getFromDate() {
-        return fromDate;
-    }
-
-    public Optional<DateTime> getToDate() {
-        return toDate;
     }
 
     public boolean isVerified() {

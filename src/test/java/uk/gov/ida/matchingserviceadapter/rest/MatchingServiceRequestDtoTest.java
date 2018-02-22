@@ -20,6 +20,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 
 import java.io.IOException;
 
@@ -92,7 +93,7 @@ public class MatchingServiceRequestDtoTest {
         return objectMapper.writeValueAsString(objectMapper.readValue(fixture(filename), JsonNode.class));
     }
 
-    private AddressDto getAddressDto(String postcode, DateTime dateTime) {
+    private VerifyAddressDto getAddressDto(String postcode, DateTime dateTime) {
         return new AddressDtoBuilder()
                 .withFromDate(dateTime)
                 .withInternationalPostCode("123")
@@ -100,7 +101,7 @@ public class MatchingServiceRequestDtoTest {
                 .withToDate(dateTime)
                 .withUPRN("urpn")
                 .withVerified(true)
-                .build();
+                .buildVerifyAddressDto();
     }
 
     private <T> SimpleMdsValueDto<T> getSimpleMdsValue(T value, DateTime dateTime) {

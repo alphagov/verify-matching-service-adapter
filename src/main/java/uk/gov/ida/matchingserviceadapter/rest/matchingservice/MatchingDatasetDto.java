@@ -18,7 +18,7 @@ public class MatchingDatasetDto {
     private List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
     private Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.absent();
     private Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.absent();
-    private List<AddressDto> addresses = new ArrayList<>();
+    private List<VerifyAddressDto> addresses = new ArrayList<>();
 
     @SuppressWarnings("unused") // needed for JAXB
     private MatchingDatasetDto() {
@@ -30,7 +30,7 @@ public class MatchingDatasetDto {
             List<SimpleMdsValueDto<String>> surnames,
             Optional<SimpleMdsValueDto<GenderDto>> gender,
             Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth,
-            List<AddressDto> addresses) {
+            List<VerifyAddressDto> addresses) {
 
         this.firstName = firstName;
         this.middleNames = middleNames;
@@ -60,7 +60,7 @@ public class MatchingDatasetDto {
         return dateOfBirth;
     }
 
-    public List<AddressDto> getAddresses() {
+    public List<VerifyAddressDto> getAddresses() {
         return addresses;
     }
 

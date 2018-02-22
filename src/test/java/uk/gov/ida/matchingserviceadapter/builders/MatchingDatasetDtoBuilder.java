@@ -2,10 +2,10 @@ package uk.gov.ida.matchingserviceadapter.builders;
 
 import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class MatchingDatasetDtoBuilder {
     private List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
     private Optional<SimpleMdsValueDto<GenderDto>> gender = absent();
     private Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = absent();
-    private List<AddressDto> addressesHistory = new ArrayList<>();
+    private List<VerifyAddressDto> addressesHistory = new ArrayList<>();
 
     public static MatchingDatasetDtoBuilder aMatchingDatasetDto() {
         return new MatchingDatasetDtoBuilder();
@@ -55,7 +55,7 @@ public class MatchingDatasetDtoBuilder {
         return this;
     }
 
-    public MatchingDatasetDtoBuilder withAddressHistory(List<AddressDto> addressesHistory) {
+    public MatchingDatasetDtoBuilder withAddressHistory(List<VerifyAddressDto> addressesHistory) {
         this.addressesHistory = addressesHistory;
         return this;
     }

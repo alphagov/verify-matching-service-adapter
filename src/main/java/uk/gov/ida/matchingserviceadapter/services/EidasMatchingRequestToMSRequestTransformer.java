@@ -90,7 +90,7 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         String placeOfBirth = getAttributeValue(attributes, Eidas_Attributes.PlaceOfBirth.NAME, PlaceOfBirth::getPlaceOfBirth);
         String gender = getAttributeValue(attributes, Eidas_Attributes.Gender.NAME, Gender::getValue);
 
-        return new EidasMatchingDatasetDto(null,
+        return new EidasMatchingDatasetDto(
             dob,
             givenName,
             familyName,

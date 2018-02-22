@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -9,35 +10,36 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class EidasAddressDto extends AddressDto {
-    private DateTime from;
-    private Optional<DateTime> to = Optional.absent();
+@JsonPropertyOrder({ "verified", "fromDate", "toDate" })
+public class VerifyAddressDto extends AddressDto {
+    private DateTime fromDate;
+    private Optional<DateTime> toDate = Optional.absent();
 
     @SuppressWarnings("unused") // needed for JAXB
-    private EidasAddressDto() {
+    private VerifyAddressDto() {
         super();
     }
 
-    public EidasAddressDto(
+    public VerifyAddressDto(
             List<String> lines,
             Optional<String> postCode,
             Optional<String> internationalPostCode,
             Optional<String> uprn,
-            DateTime from,
-            Optional<DateTime> to,
+            DateTime fromDate,
+            Optional<DateTime> toDate,
             boolean verified) {
 
         super(lines, postCode, internationalPostCode, uprn, verified);
-        this.from = from;
-        this.to = to;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
     }
 
-    public DateTime getFrom() {
-        return from;
+    public DateTime getFromDate() {
+        return fromDate;
     }
 
-    public Optional<DateTime> getTo() {
-        return to;
+    public Optional<DateTime> getToDate() {
+        return toDate;
     }
 
     @Override
