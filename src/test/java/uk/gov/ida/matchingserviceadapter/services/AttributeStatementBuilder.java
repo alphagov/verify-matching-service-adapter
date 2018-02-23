@@ -29,8 +29,8 @@ public class AttributeStatementBuilder {
     private static OpenSamlXmlObjectFactory openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
     private List<Attribute> attributes = new ArrayList<>();
 
-    public static AttributeStatementBuilder anAttributeStatement() {
-        return new AttributeStatementBuilder();
+    public static AttributeStatementBuilder anAttributeStatement(Attribute ... attributes) {
+        return new AttributeStatementBuilder().addAllAttributes(attributes != null ? Arrays.asList(attributes) : Collections.emptyList());
     }
 
     public static AttributeStatementBuilder anEidasAttributeStatement(Attribute ... attributes) {

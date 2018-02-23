@@ -219,6 +219,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         AssertionDecrypter assertionDecrypter,
         UserIdHashFactory userIdHashFactory,
         MatchingServiceProxy matchingServiceClient,
+        @Named("HubEntityId") String hubEntityId,
         MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
 
         return countryMetadataResolver.map(countryMetadataResolverValue ->
@@ -234,7 +235,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     assertionDecrypter,
                     configuration.getEuropeanIdentity().getHubConnectorEntityId()
                 ),
-                new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory),
+                new MsaTransformersFactory().getEidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId),
                 matchingServiceClient,
                 responseMapper));
     }

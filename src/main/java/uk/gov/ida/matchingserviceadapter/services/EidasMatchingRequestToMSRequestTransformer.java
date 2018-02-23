@@ -7,12 +7,15 @@ import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaConstants.Eidas_Attributes;
 import uk.gov.ida.saml.core.domain.AuthnContext;
+import uk.gov.ida.saml.core.domain.Cycle3Dataset;
+import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.extensions.eidas.BirthName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentFamilyName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
@@ -20,29 +23,43 @@ import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
 import uk.gov.ida.saml.core.extensions.eidas.Gender;
 import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
 import uk.gov.ida.saml.core.extensions.eidas.PlaceOfBirth;
+import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public class EidasMatchingRequestToMSRequestTransformer implements Function<MatchingServiceRequestContext, MatchingServiceRequestDto> {
 
-    private UserIdHashFactory userIdHashFactory;
+    private final UserIdHashFactory userIdHashFactory;
+    private final String hubEntityId;
+    private final HubAssertionUnmarshaller hubAssertionUnmarshaller;
 
-    public EidasMatchingRequestToMSRequestTransformer(UserIdHashFactory userIdHashFactory) {
+    public EidasMatchingRequestToMSRequestTransformer(final UserIdHashFactory userIdHashFactory,
+        final String hubEntityId,
+        final HubAssertionUnmarshaller hubAssertionUnmarshaller) {
         this.userIdHashFactory = userIdHashFactory;
+        this.hubEntityId = hubEntityId;
+        this.hubAssertionUnmarshaller = hubAssertionUnmarshaller;
     }
 
     @Override
     public MatchingServiceRequestDto apply(MatchingServiceRequestContext matchingServiceRequestContext) {
-        Assertion assertion = matchingServiceRequestContext.getAssertions().get(0);
-        List<Attribute> attributes = assertion.getAttributeStatements().get(0).getAttributes();
+        Map<Boolean, Assertion> assertions = matchingServiceRequestContext.getAssertions().stream()
+            .collect(Collectors.toMap(this::isHubAssertion, Function.identity()));
+        Assertion eidasAssertion = assertions.get(false);
+        Optional<Assertion> hubAssertion = Optional.fromNullable(assertions.get(true));
+
+        Optional<Cycle3DatasetDto> cycle3Data = hubAssertion.transform(this::extractCycle3Data).transform(Optional::get);
+        List<Attribute> attributes = eidasAssertion.getAttributeStatements().get(0).getAttributes();
 
         return new MatchingServiceRequestDto(extractEidasMatchingDataset(attributes),
-            Optional.absent(),
-            extractAndHashPid(assertion),
+            cycle3Data,
+            extractAndHashPid(eidasAssertion),
             matchingServiceRequestContext.getAttributeQuery().getID(),
-            extractVerifyLoa(assertion));
+            extractVerifyLoa(eidasAssertion));
     }
 
     private LevelOfAssuranceDto extractVerifyLoa(Assertion assertion) {
@@ -83,6 +100,12 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         );
     }
 
+    private Optional<Cycle3DatasetDto> extractCycle3Data(final Assertion hubAssertion) {
+        return hubAssertionUnmarshaller.toHubAssertion(hubAssertion).getCycle3Data()
+            .transform(Cycle3Dataset::getAttributes)
+            .transform(Cycle3DatasetDto::createFromData);
+    }
+
     private <T, V> V getAttributeValue(List<Attribute> attributes, String attributeName, Function<T, V> getContent) {
         return attributes.stream()
             .filter(a -> a.getName().equals(attributeName))
@@ -90,5 +113,9 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
             .map(a -> a.getAttributeValues().get(0))
             .map(value -> getContent.apply((T) value))
             .orElse(null);
+    }
+
+    private boolean isHubAssertion(final Assertion assertion) {
+        return assertion.getIssuer().getValue().equals(hubEntityId);
     }
 }
