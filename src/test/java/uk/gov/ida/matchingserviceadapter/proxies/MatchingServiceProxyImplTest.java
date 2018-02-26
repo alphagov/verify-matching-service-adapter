@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ida.jerseyclient.JsonClient;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
@@ -39,17 +39,17 @@ public class MatchingServiceProxyImplTest {
 
     @Test
     public void sendRequestToMatchingService_shouldReturnAMatchingServiceResponseDto() throws Exception {
-        MatchingServiceRequestDto matchingServiceRequestDto = aMatchingServiceRequestDto().build();
+        VerifyMatchingServiceRequestDto verifyMatchingServiceRequestDto = aMatchingServiceRequestDto().buildVerifyMatchingServiceRequestDto();
         URI localMatchingServiceUri = URI.create("http://a-uri");
         when(configuration.getLocalMatchingServiceMatchUrl()).thenReturn(localMatchingServiceUri);
 
         MatchingServiceResponseDto expectedResponse = aMatchingServiceResponseDto().build();
         when(client.post(
-                matchingServiceRequestDto,
+                verifyMatchingServiceRequestDto,
                 localMatchingServiceUri,
                 MatchingServiceResponseDto.class)).thenReturn(expectedResponse);
 
-        MatchingServiceResponseDto actualResponse = proxy.makeMatchingServiceRequest(matchingServiceRequestDto);
+        MatchingServiceResponseDto actualResponse = proxy.makeMatchingServiceRequest(verifyMatchingServiceRequestDto);
 
         assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
     }

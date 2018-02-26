@@ -8,7 +8,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
@@ -39,7 +39,7 @@ public class MatchingServiceAttributeQueryHandlerTest {
         InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         AuthnContext authnContext = attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext();
         String hashedPid = "pid";
-        MatchingServiceRequestDto matchingServiceAttributeQuery = aMatchingServiceRequestDto().withHashedPid(hashedPid).build();
+        VerifyMatchingServiceRequestDto matchingServiceAttributeQuery = aMatchingServiceRequestDto().withHashedPid(hashedPid).buildVerifyMatchingServiceRequestDto();
         MatchingServiceResponseDto responseDto = aMatchingServiceResponseDto().build();
         OutboundResponseFromMatchingService idaResponse = aResponse().build();
 

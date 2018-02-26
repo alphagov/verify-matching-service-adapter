@@ -3,9 +3,9 @@ package uk.gov.ida.matchingserviceadapter.builders;
 import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,8 @@ public class MatchingDatasetDtoBuilder {
         return new MatchingDatasetDtoBuilder();
     }
 
-    public MatchingDatasetDto build() {
-        return new MatchingDatasetDto(firstname, middleNames, surnames, gender, dateOfBirth, addressesHistory);
+    public VerifyMatchingDatasetDto buildVerifyMatchingDatasetDto() {
+        return new VerifyMatchingDatasetDto(firstname, middleNames, surnames, gender, dateOfBirth, addressesHistory);
     }
 
     public MatchingDatasetDtoBuilder withFirstname(SimpleMdsValueDto<String> firstname) {

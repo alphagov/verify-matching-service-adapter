@@ -14,13 +14,12 @@ import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.AddressDtoBuilder;
 import uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetDtoBuilder;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueDtoBuilder;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
 import java.io.IOException;
 
@@ -43,29 +42,29 @@ public class MatchingServiceRequestDtoTest {
 
     @Test
     public void shouldSerializeToJson() throws IOException {
-        MatchingServiceRequestDto matchingServiceRequestDto = getMatchingServiceRequestDto();
+        VerifyMatchingServiceRequestDto verifyMatchingServiceRequestDto = getMatchingServiceRequestDto();
 
-        String jsonString = objectMapper.writeValueAsString(matchingServiceRequestDto);
+        String jsonString = objectMapper.writeValueAsString(verifyMatchingServiceRequestDto);
 
         assertThat(jsonString).isEqualTo(jsonFixture("matching-service-request.json"));
     }
 
     @Test
     public void shouldDeserializeFromJson() throws Exception {
-        MatchingServiceRequestDto deserializedValue =
-                objectMapper.readValue(jsonFixture("matching-service-request.json"), MatchingServiceRequestDto.class);
+        VerifyMatchingServiceRequestDto deserializedValue =
+                objectMapper.readValue(jsonFixture("matching-service-request.json"), VerifyMatchingServiceRequestDto.class);
 
-        MatchingServiceRequestDto expectedValue = getMatchingServiceRequestDto();
+        VerifyMatchingServiceRequestDto expectedValue = getMatchingServiceRequestDto();
         assertThat(deserializedValue).isEqualTo(expectedValue);
     }
 
-    private MatchingServiceRequestDto getMatchingServiceRequestDto() {
+    private VerifyMatchingServiceRequestDto getMatchingServiceRequestDto() {
         LevelOfAssuranceDto levelOfAssurance = LevelOfAssuranceDto.LEVEL_1;
-        MatchingDatasetDto matchingDataset = getMatchingDataset(DateTime.parse("2014-02-01T01:02:03.567Z"));
+        VerifyMatchingDatasetDto matchingDataset = getVerifyMatchingDataset(DateTime.parse("2014-02-01T01:02:03.567Z"));
         Cycle3DatasetDto cycle3DatasetDto = Cycle3DatasetDto.createFromData(ImmutableMap.of("NI", "1234"));
         String hashedPid = "8f2f8c23-f767-4590-aee9-0842f7f1e36d";
         String matchId = "cda6126c-9695-4051-ba6f-27a8938a0b03";
-        return new MatchingServiceRequestDto(
+        return new VerifyMatchingServiceRequestDto(
                 matchingDataset,
                 Optional.of(cycle3DatasetDto),
                 hashedPid,
@@ -73,7 +72,7 @@ public class MatchingServiceRequestDtoTest {
                 levelOfAssurance);
     }
 
-    private MatchingDatasetDto getMatchingDataset(DateTime dateTime) {
+    private VerifyMatchingDatasetDto getVerifyMatchingDataset(DateTime dateTime) {
         return new MatchingDatasetDtoBuilder()
                 .addSurname(getSimpleMdsValue("walker", dateTime))
                 .withAddressHistory(ImmutableList.of(getAddressDto("EC2", dateTime), getAddressDto("WC1", dateTime)))
@@ -86,7 +85,7 @@ public class MatchingServiceRequestDtoTest {
                                 getSimpleMdsValue("smith", dateTime),
                                 getSimpleMdsValue("walker", dateTime)
                         ))
-                .build();
+                .buildVerifyMatchingDatasetDto();
     }
 
     private String jsonFixture(String filename) throws IOException {

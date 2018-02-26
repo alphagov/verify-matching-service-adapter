@@ -5,12 +5,11 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import org.joda.time.LocalDate;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
@@ -24,16 +23,16 @@ import static com.google.common.base.Optional.fromNullable;
 
 public class MatchingDatasetToMatchingDatasetDtoMapper {
 
-    public MatchingDatasetDto map(MatchingDataset matchingDataset) {
+    public VerifyMatchingDatasetDto mapToVerifyMatchingDatasetDto(MatchingDataset matchingDataset) {
         Optional<SimpleMdsValue<String>> firstNameValue = !matchingDataset.getFirstNames().isEmpty() ? fromNullable(matchingDataset.getFirstNames().get(0)) : Optional.absent();
         Optional<SimpleMdsValue<String>> middleNameValue = !matchingDataset.getMiddleNames().isEmpty() ? fromNullable(matchingDataset.getMiddleNames().get(0)) : Optional.absent();
         Optional<SimpleMdsValue<LocalDate>> birthDateValue = !matchingDataset.getDateOfBirths().isEmpty() ? fromNullable(matchingDataset.getDateOfBirths().get(0)) : Optional.absent();
-        return new MatchingDatasetDto(
-                map(firstNameValue),
-                map(middleNameValue),
-                map(matchingDataset.getSurnames()),
+        return new VerifyMatchingDatasetDto(
+                mapToVerifyMatchingDatasetDto(firstNameValue),
+                mapToVerifyMatchingDatasetDto(middleNameValue),
+                mapToVerifyMatchingDatasetDto(matchingDataset.getSurnames()),
                 mapGender(matchingDataset.getGender()),
-                map(birthDateValue),
+                mapToVerifyMatchingDatasetDto(birthDateValue),
                 mapVerifyAddresses(matchingDataset.getAddresses()));
     }
 
@@ -60,7 +59,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
         return Optional.fromNullable(new SimpleMdsValueDto<>(genderDto, simpleMdsValue.getFrom(), simpleMdsValue.getTo(), simpleMdsValue.isVerified()));
     }
 
-    protected <T> Optional<SimpleMdsValueDto<T>> map(Optional<SimpleMdsValue<T>> simpleMdsValueOptional) {
+    protected <T> Optional<SimpleMdsValueDto<T>> mapToVerifyMatchingDatasetDto(Optional<SimpleMdsValue<T>> simpleMdsValueOptional) {
         if (!simpleMdsValueOptional.isPresent()) {
             return absent();
         }
@@ -69,7 +68,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
         return Optional.fromNullable(new SimpleMdsValueDto<>(simpleMdsValue.getValue(), simpleMdsValue.getFrom(), simpleMdsValue.getTo(), simpleMdsValue.isVerified()));
     }
 
-    protected <T> List<SimpleMdsValueDto<T>> map(List<SimpleMdsValue<T>> simpleMdsValues) {
+    protected <T> List<SimpleMdsValueDto<T>> mapToVerifyMatchingDatasetDto(List<SimpleMdsValue<T>> simpleMdsValues) {
         return Lists.newArrayList(Collections2.transform(simpleMdsValues, new Function<SimpleMdsValue<T>, SimpleMdsValueDto<T>>() {
             @Nullable
             @Override

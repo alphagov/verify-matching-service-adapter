@@ -5,7 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import uk.gov.ida.jerseyclient.JsonClient;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
@@ -25,7 +25,7 @@ public class MatchingServiceProxyImpl implements MatchingServiceProxy {
 
     @Override
     @Timed
-    public MatchingServiceResponseDto makeMatchingServiceRequest(MatchingServiceRequestDto attributeQuery) {
+    public MatchingServiceResponseDto makeMatchingServiceRequest(VerifyMatchingServiceRequestDto attributeQuery) {
         return client.post(attributeQuery, configuration.getLocalMatchingServiceMatchUrl(), MatchingServiceResponseDto.class);
     }
 

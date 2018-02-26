@@ -10,6 +10,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.domain.Gender;
@@ -80,7 +81,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     public void map_shouldMapGenericSimpleMdsValue() throws Exception {
         SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
         Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.fromNullable(simpleMdsValue);
-        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.map(simpleMdsValueOptional);
+        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.isPresent()).isEqualTo(true);
         assertThat(result.get().getValue()).isEqualTo("hello");
@@ -93,7 +94,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     public void map_shouldMapListOfGenericSimpleMdsValues() throws Exception {
         SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
         List<SimpleMdsValue<String>> simpleMdsValueOptional = singletonList(simpleMdsValue);
-        List<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.map(simpleMdsValueOptional);
+        List<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getValue()).isEqualTo("hello");
@@ -105,7 +106,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     @Test
     public void map_shouldMapGenericSimpleMdsValueAbsent() throws Exception {
         Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.absent();
-        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.map(simpleMdsValueOptional);
+        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.isPresent()).isEqualTo(false);
     }
@@ -121,7 +122,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
                 .withPreviousAddresses(previousAddress)
                 .build();
 
-        MatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.map(matchingDataset);
+        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
 
         List<VerifyAddressDto> addresses = matchingDatasetDto.getAddresses();
         assertThat(addresses).hasSize(2);
@@ -145,7 +146,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
             .withCurrentAddresses(currentAddress)
             .build();
 
-        MatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.map(matchingDataset);
+        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
 
         List<VerifyAddressDto> addresses = matchingDatasetDto.getAddresses();
         assertThat(addresses).hasSize(2);

@@ -2,10 +2,11 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.saml.core.domain.AuthnContext;
@@ -30,7 +31,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
         this.matchingDatasetToMatchingDatasetDtoMapper = matchingDatasetToMatchingDatasetDtoMapper;
     }
 
-    public MatchingServiceRequestDto map(InboundMatchingServiceRequest attributeQuery) {
+    public VerifyMatchingServiceRequestDto map(InboundMatchingServiceRequest attributeQuery) {
         IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         MatchingDataset matchingDataset = matchingDatasetAssertion.getMatchingDataset().get();
@@ -46,11 +47,11 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
         }
         AuthnContext authnContext = authnStatementAssertion.getAuthnStatement().get().getAuthnContext();
 
-        MatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.map(matchingDataset);
+        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
 
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
 
-        return new MatchingServiceRequestDto(
+        return new VerifyMatchingServiceRequestDto(
                 matchingDatasetDto,
                 mapCycle3(cycle3Dataset),
                 hashedPid,

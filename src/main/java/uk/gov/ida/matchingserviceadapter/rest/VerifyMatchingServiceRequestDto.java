@@ -7,14 +7,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
 
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
-public class MatchingServiceRequestDto {
+public class VerifyMatchingServiceRequestDto {
 
-    private MatchingDatasetDto matchingDataset;
+    private VerifyMatchingDatasetDto matchingDataset;
     private Optional<Cycle3DatasetDto> cycle3Dataset = Optional.absent();
     private EidasMatchingDatasetDto eidasDataset;
     private String hashedPid;
@@ -22,10 +22,10 @@ public class MatchingServiceRequestDto {
     private LevelOfAssuranceDto levelOfAssurance;
 
     @SuppressWarnings("unused")//Needed by JAXB
-    private MatchingServiceRequestDto() {}
+    private VerifyMatchingServiceRequestDto() {}
 
-    public MatchingServiceRequestDto(
-            MatchingDatasetDto matchingDataset,
+    public VerifyMatchingServiceRequestDto(
+            VerifyMatchingDatasetDto matchingDataset,
             Optional<Cycle3DatasetDto> cycle3Dataset,
             String hashedPid,
             String matchId,
@@ -35,7 +35,7 @@ public class MatchingServiceRequestDto {
         this.matchingDataset = matchingDataset;
     }
 
-    public MatchingServiceRequestDto(
+    public VerifyMatchingServiceRequestDto(
         EidasMatchingDatasetDto eidasDataset,
         Optional<Cycle3DatasetDto> cycle3Dataset,
         String hashedPid,
@@ -46,17 +46,17 @@ public class MatchingServiceRequestDto {
         this.eidasDataset = eidasDataset;
     }
 
-    private MatchingServiceRequestDto(Optional<Cycle3DatasetDto> cycle3Dataset,
-            String hashedPid,
-            String matchId,
-            LevelOfAssuranceDto levelOfAssurance) {
+    private VerifyMatchingServiceRequestDto(Optional<Cycle3DatasetDto> cycle3Dataset,
+                                            String hashedPid,
+                                            String matchId,
+                                            LevelOfAssuranceDto levelOfAssurance) {
         this.cycle3Dataset = cycle3Dataset;
         this.hashedPid = hashedPid;
         this.matchId = matchId;
         this.levelOfAssurance = levelOfAssurance;
     }
 
-    public MatchingDatasetDto getMatchingDataset() {
+    public VerifyMatchingDatasetDto getMatchingDataset() {
         return matchingDataset;
     }
 

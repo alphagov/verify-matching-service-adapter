@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
@@ -114,7 +114,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     public void shouldMapLoaCorrectly() {
         MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
 
-        MatchingServiceRequestDto lmsDto = transform.apply(request);
+        VerifyMatchingServiceRequestDto lmsDto = transform.apply(request);
 
         assertThat(lmsDto.getLevelOfAssurance(), notNullValue());
         assertThat(lmsDto.getLevelOfAssurance().name(), equalTo(LevelOfAssuranceDto.LEVEL_2.name()));
@@ -125,7 +125,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     public void shouldExtractPidCorrectly() {
         MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
 
-        MatchingServiceRequestDto lmsDto = transform.apply(request);
+        VerifyMatchingServiceRequestDto lmsDto = transform.apply(request);
 
         assertThat(lmsDto.getHashedPid(), equalTo("the-hashed-pid"));
     }
@@ -134,7 +134,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     public void shouldMapEidasMatchingDatasetCorrectly() {
         MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
 
-        MatchingServiceRequestDto lmsDto = transform.apply(request);
+        VerifyMatchingServiceRequestDto lmsDto = transform.apply(request);
 
         assertThat(lmsDto.getEidasDataset(), notNullValue());
         assertThat(lmsDto.getEidasDataset().getFirstName(), equalTo("Fred"));
@@ -150,7 +150,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     public void shouldExtractCycle3DataCorrectly() {
         MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion(), makeCycle3Assertion()));
 
-        MatchingServiceRequestDto lmsDto = transform.apply(request);
+        VerifyMatchingServiceRequestDto lmsDto = transform.apply(request);
 
         assertThat(lmsDto.getCycle3Dataset().orNull(), notNullValue());
         assertThat(lmsDto.getCycle3Dataset().get().getAttributes().size(), equalTo(1));
