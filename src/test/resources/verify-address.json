@@ -1,0 +1,12 @@
+{
+  "verified": true,
+  "fromDate": "2010-06-29T23:20:00.000Z",
+  "toDate":   "2014-02-01T01:02:03.567Z",
+  "postCode": "EC2",
+  "lines": [
+    "a",
+    "b"
+  ],
+  "internationalPostCode": "EC-2",
+  "uprn":"uprn1234"
+}

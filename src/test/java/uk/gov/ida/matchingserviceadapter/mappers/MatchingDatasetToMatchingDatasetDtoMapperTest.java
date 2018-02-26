@@ -5,9 +5,8 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
@@ -195,10 +194,10 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
                 .withInternationalPostCode("int-post-code")
                 .withPostCode("postcode")
                 .build();
-        List<EidasAddressDto> result = matchingDatasetToMatchingDatasetDtoMapper.mapEidasAddresses(singletonList(address));
+        List<UniversalAddressDto> result = matchingDatasetToMatchingDatasetDtoMapper.mapEidasAddresses(singletonList(address));
 
         assertThat(result.size()).isEqualTo(1);
-        EidasAddressDto addressDto = result.get(0);
+        UniversalAddressDto addressDto = result.get(0);
         assertThat(addressDto.getLines().size()).isEqualTo(1);
         assertThat(addressDto.getLines().get(0)).isEqualTo(address.getLines().get(0));
         assertThat(addressDto.isVerified()).isEqualTo(address.isVerified());

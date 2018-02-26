@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import org.joda.time.LocalDate;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
@@ -88,12 +88,12 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
         }));
     }
 
-    protected List<EidasAddressDto> mapEidasAddresses(List<Address> addresses) {
-        return Lists.newArrayList(Collections2.transform(addresses, new Function<Address, EidasAddressDto>() {
+    protected List<UniversalAddressDto> mapEidasAddresses(List<Address> addresses) {
+        return Lists.newArrayList(Collections2.transform(addresses, new Function<Address, UniversalAddressDto>() {
             @Nullable
             @Override
-            public EidasAddressDto apply(Address input) {
-                return new EidasAddressDto(input.getLines(), input.getPostCode(), input.getInternationalPostCode(), input.getUPRN(), input.getFrom(), input.getTo(), input.isVerified());
+            public UniversalAddressDto apply(Address input) {
+                return new UniversalAddressDto(input.getLines(), input.getPostCode(), input.getInternationalPostCode(), input.getUPRN(), input.getFrom(), input.getTo(), input.isVerified());
             }
         }));
     }
