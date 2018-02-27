@@ -23,16 +23,21 @@ import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
 
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder.aSimpleStringAttribute;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
@@ -46,14 +51,18 @@ import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.
 
 public class AssertionHelper {
 
-    private static Signature aValidSignature() {
+    private static Signature aValidSignature(String cert, String privateKey) {
         return aSignature()
                 .withSigningCredential(
                         new TestCredentialFactory(
-                                STUB_IDP_PUBLIC_PRIMARY_CERT,
-                                STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
+                                cert,
+                                privateKey
                         ).getSigningCredential()
                 ).build();
+    }
+
+    private static Signature aValidSignature() {
+        return aValidSignature(STUB_IDP_PUBLIC_PRIMARY_CERT, STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY);
     }
 
     public static Assertion anAuthnStatementAssertion() {
@@ -132,6 +141,26 @@ public class AssertionHelper {
                                 .addAllAttributes(attributes)
                                 .build()
                 ).buildUnencrypted();
+    }
+
+    public static Assertion aCycle3Assertion(String attributeName, String attributeValue, String requestId) {
+        return anAssertion()
+            .withId("cycle3-assertion")
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(
+                anAssertionSubject(requestId, false)
+            )
+            .withSignature(aValidSignature(HUB_TEST_PUBLIC_SIGNING_CERT, HUB_TEST_PRIVATE_SIGNING_KEY))
+            .addAttributeStatement(
+                anAttributeStatement()
+                    .addAllAttributes(asList(
+                        aSimpleStringAttribute()
+                            .withName(attributeName)
+                            .withSimpleStringValue(attributeValue)
+                            .build()
+                    ))
+                    .build()
+            ).buildUnencrypted();
     }
 
     public static EncryptedAssertion anEidasEncryptedAssertion(String issuerId) {

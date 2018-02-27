@@ -38,6 +38,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aMatchingDatasetAssertion;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCycle3Assertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
@@ -86,6 +87,66 @@ public class TestToolExamplesSchemaTests {
     @Before
     public void reset() {
         wireMockRule.resetRequests();
+    }
+
+    @Test
+    public void shouldProduceLoA2SimpleWithCycle3Case() throws Exception {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(aSubjectWithAssertions(asList(
+                aCycle3Assertion("NI", "12345", REQUEST_ID),
+                anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, REQUEST_ID),
+                aMatchingDatasetAssertion(asList(
+                    aPersonName_1_1().addValue(
+                        aPersonNameValue()
+                            .withValue("Joe")
+                            .withVerified(true)
+                            .withFrom(null)
+                            .withTo(null)
+                            .build())
+                        .buildAsFirstname(),
+                    aPersonName_1_1().addValue(
+                        aPersonNameValue()
+                            .withValue("Bob Rob")
+                            .withVerified(true)
+                            .withFrom(null)
+                            .withTo(null)
+                            .build())
+                        .buildAsMiddlename(),
+                    aPersonName_1_1().addValue(
+                        aPersonNameValue()
+                            .withValue("Dou")
+                            .withVerified(true)
+                            .withFrom(new DateTime(2010, 1, 20, 0, 0, DateTimeZone.UTC))
+                            .withTo(null)
+                            .build())
+                        .buildAsSurname(),
+                    aGender_1_1().withValue("Male").withVerified(true).withFrom(null).withTo(null).build(),
+                    aDate_1_1().addValue(
+                        aDateValue()
+                            .withValue("1980-05-24")
+                            .withVerified(true)
+                            .withFrom(null)
+                            .withTo(null)
+                            .build()).buildAsDateOfBirth(),
+                    anAddressAttribute().addAddress(
+                        anAddressAttributeValue()
+                            .addLines(asList("10 George Street"))
+                            .withFrom(new DateTime(2005, 5, 14, 0, 0, DateTimeZone.UTC))
+                            .withInternationalPostcode("GB1 2PF")
+                            .withPostcode("GB1 2PF")
+                            .withUprn("833F1187-9F33-A7E27B3F211E")
+                            .withVerified(true)
+                            .withTo(null)
+                            .build())
+                        .buildCurrentAddress()
+                ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
+            .build();
+
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-cycle3-simple-case.json");
+
+        assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
 
     @Test
@@ -142,7 +203,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/LoA2-simple-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-simple-case.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -200,7 +261,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/simple-case-excluding-optional-address-fields.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/simple-case-excluding-optional-address-fields.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -259,7 +320,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/LoA1-simple-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-simple-case.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -400,7 +461,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/LoA1-extensive-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-extensive-case.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -541,7 +602,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/LoA2-extensive-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-extensive-case.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -563,7 +624,7 @@ public class TestToolExamplesSchemaTests {
         List<LoggedRequest> requests = findAll(RequestPatternBuilder.allRequests());
         assertThat(requests.size()).isEqualTo(1);
 
-        Path filePath = Paths.get("verify-matching-service-test-tool/src/main/resources/user-account-creation.json");
+        Path filePath = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/user-account-creation.json");
 
         Map requestSent = objectMapper.readValue(requests.get(0).getBodyAsString(), Map.class);
         Map requestExpected = objectMapper.readValue(readExpectedJson(filePath), Map.class);
