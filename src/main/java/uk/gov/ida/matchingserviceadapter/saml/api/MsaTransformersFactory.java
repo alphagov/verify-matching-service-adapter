@@ -13,6 +13,9 @@ import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngin
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
+import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
@@ -27,6 +30,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.MatchingServiceAuthnStatementToAuthnStatementTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.OutboundResponseFromMatchingServiceToSamlResponseTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.OutboundResponseFromUnknownUserCreationServiceToSamlResponseTransformer;
+import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToMSRequestTransformer;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
@@ -227,5 +231,10 @@ public class MsaTransformersFactory {
                     new AssertionAttributeStatementValidator(),
                     new BasicAssertionSubjectConfirmationValidator()
         );
+    }
+
+    public Function<MatchingServiceRequestContext, MatchingServiceRequestDto> getEidasMatchingRequestToMSRequestTransformer(
+        UserIdHashFactory userIdHashFactory, String hubEntityId) {
+        return new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId, coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId));
     }
 }

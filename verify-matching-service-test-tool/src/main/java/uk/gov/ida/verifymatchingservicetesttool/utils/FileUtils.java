@@ -15,7 +15,7 @@ public class FileUtils {
     public String readFromResources(String fileName) throws IOException {
         InputStream inputStream = this.getClass()
             .getClassLoader()
-            .getResourceAsStream(fileName);
+            .getResourceAsStream("legacy/"+fileName);
 
         return readFrom(inputStream);
     }

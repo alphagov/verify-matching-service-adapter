@@ -14,6 +14,8 @@ import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
+import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
 
 import static java.util.Arrays.asList;
@@ -28,17 +30,22 @@ import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuild
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aGenderAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aPersonIdentifierAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aPlaceOfBirthAttribute;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder.aSimpleStringAttribute;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.*;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasMatchingRequestToMSRequestTransformerTest {
-    public static final LocalDate DOB = LocalDate.parse("2001-02-01", ISODateTimeFormat.dateTimeParser());
-    private Assertion assertion;
+    private static final LocalDate DOB = LocalDate.parse("2001-02-01", ISODateTimeFormat.dateTimeParser());
+    private static final LevelOfAssurance levelOfAssurance = LevelOfAssurance.SUBSTANTIAL;
+    private static final String personIdentifier = "the-pid";
+    private static final String issuerId = "issuer-id";
+    private static final String hubEntityId = "hub-id";
 
     private EidasMatchingRequestToMSRequestTransformer transform;
 
@@ -51,10 +58,12 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     @Before
     public void setUp() {
         when(attributeQuery.getID()).thenReturn("the-aqr-id");
-        LevelOfAssurance levelOfAssurance = LevelOfAssurance.SUBSTANTIAL;
-        String personIdentifier = "the-pid";
-        String issuerId = "issuer-id";
-        assertion = anAssertion()
+        when(pidHashFactory.hashId(issuerId, personIdentifier, Optional.of(levelOfAssurance.toVerifyLevelOfAssurance()))).thenReturn("the-hashed-pid");
+        transform = new EidasMatchingRequestToMSRequestTransformer(pidHashFactory, hubEntityId, new HubAssertionUnmarshaller(new Cycle3DatasetFactory(), hubEntityId));
+    }
+
+    private Assertion makeAssertion() {
+        return anAssertion()
             .withIssuer(
                 anIssuer()
                     .withIssuerId(issuerId)
@@ -82,13 +91,28 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
                     aPlaceOfBirthAttribute("place-of-birth")
                 ).build()
             ).buildUnencrypted();
-        transform = new EidasMatchingRequestToMSRequestTransformer(pidHashFactory);
-        when(pidHashFactory.hashId(issuerId, personIdentifier, Optional.of(levelOfAssurance.toVerifyLevelOfAssurance()))).thenReturn("the-hashed-pid");
+    }
+
+    private Assertion makeCycle3Assertion() {
+        return anAssertion()
+            .withIssuer(
+                anIssuer()
+                    .withIssuerId(hubEntityId)
+                .build()
+            )
+            .addAttributeStatement(
+                anAttributeStatement(
+                    aSimpleStringAttribute()
+                        .withName("NI")
+                        .withSimpleStringValue("12345")
+                    .build()
+                ).build()
+            ).buildUnencrypted();
     }
 
     @Test
     public void shouldMapLoaCorrectly() {
-        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);
 
@@ -99,7 +123,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
 
     @Test
     public void shouldExtractPidCorrectly() {
-        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);
 
@@ -108,7 +132,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
 
     @Test
     public void shouldMapEidasMatchingDatasetCorrectly() {
-        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
 
         MatchingServiceRequestDto lmsDto = transform.apply(request);
 
@@ -120,5 +144,16 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
         assertThat(lmsDto.getEidasDataset().getBirthName(), equalTo("birth-name"));
         assertThat(lmsDto.getEidasDataset().getPlaceOfBirth(), equalTo("place-of-birth"));
 
+    }
+
+    @Test
+    public void shouldExtractCycle3DataCorrectly() {
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion(), makeCycle3Assertion()));
+
+        MatchingServiceRequestDto lmsDto = transform.apply(request);
+
+        assertThat(lmsDto.getCycle3Dataset().orNull(), notNullValue());
+        assertThat(lmsDto.getCycle3Dataset().get().getAttributes().size(), equalTo(1));
+        assertThat(lmsDto.getCycle3Dataset().get().getAttributes().get("NI"), equalTo("12345"));
     }
 }

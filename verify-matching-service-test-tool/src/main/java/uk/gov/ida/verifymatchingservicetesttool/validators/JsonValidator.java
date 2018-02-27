@@ -28,7 +28,7 @@ public class JsonValidator {
     }
 
     private void schemaValidation(String validationErrorMessage, String jsonString) {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("matching-schema.json")) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("legacy/matching-schema.json")) {
             JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
             SchemaLoader.load(rawSchema).validate(new JSONObject(jsonString));
         } catch (ValidationException e) {
