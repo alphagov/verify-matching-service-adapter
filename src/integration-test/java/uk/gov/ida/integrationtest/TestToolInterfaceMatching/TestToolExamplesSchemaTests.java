@@ -90,66 +90,6 @@ public class TestToolExamplesSchemaTests {
     }
 
     @Test
-    public void shouldProduceLoA2SimpleWithCycle3Case() throws Exception {
-        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
-            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(aSubjectWithAssertions(asList(
-                aCycle3Assertion("NI", "12345", REQUEST_ID),
-                anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, REQUEST_ID),
-                aMatchingDatasetAssertion(asList(
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Joe")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build())
-                        .buildAsFirstname(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Bob Rob")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build())
-                        .buildAsMiddlename(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Dou")
-                            .withVerified(true)
-                            .withFrom(new DateTime(2010, 1, 20, 0, 0, DateTimeZone.UTC))
-                            .withTo(null)
-                            .build())
-                        .buildAsSurname(),
-                    aGender_1_1().withValue("Male").withVerified(true).withFrom(null).withTo(null).build(),
-                    aDate_1_1().addValue(
-                        aDateValue()
-                            .withValue("1980-05-24")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build()).buildAsDateOfBirth(),
-                    anAddressAttribute().addAddress(
-                        anAddressAttributeValue()
-                            .addLines(asList("10 George Street"))
-                            .withFrom(new DateTime(2005, 5, 14, 0, 0, DateTimeZone.UTC))
-                            .withInternationalPostcode("GB1 2PF")
-                            .withPostcode("GB1 2PF")
-                            .withUprn("833F1187-9F33-A7E27B3F211E")
-                            .withVerified(true)
-                            .withTo(null)
-                            .build())
-                        .buildCurrentAddress()
-                ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
-            .build();
-
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-cycle3-simple-case.json");
-
-        assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
-    }
-
-    @Test
     public void shouldProduceLoA2SimpleCase() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)

@@ -1,0 +1,106 @@
+{
+  "hashedPid": "f8b5be711023fb45e7a13f323f1667767b0a7ef0584aec9550047655d8ce441b",
+  "levelOfAssurance": "LEVEL_2",
+  "matchId": "default-match-id",
+  "matchingDataset": {
+    "addresses": [
+      {
+        "internationalPostCode": "GB1 5PP",
+        "lines": [
+          "2323 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": true
+      },
+      {
+        "internationalPostCode": "GB1 2PF",
+        "lines": [
+          "10 George Street"
+        ],
+        "postCode": "GB1 2PF",
+        "uprn": "833F1187-9F33-A7E27B3F211E",
+        "verified": true
+      },
+      {
+        "internationalPostCode": "GB1 2PP",
+        "lines": [
+          "344 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": true
+      },
+      {
+        "internationalPostCode": "GB1 3PP",
+        "lines": [
+          "67676 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": true
+      },
+      {
+        "internationalPostCode": "GB1 3PP",
+        "lines": [
+          "56563 George Street"
+        ],
+        "postCode": "GB1 2PP",
+        "uprn": "7D68E096-5510-B3844C0BA3FD",
+        "verified": true
+      },
+      {
+        "lines": [
+          "Flat , Alberta Court",
+          "36 Harrods Road",
+          "New Berkshire",
+          "Berkshire",
+          "Cambria",
+          "Europe"
+        ],
+        "verified": true
+      }
+    ],
+    "dateOfBirth": {
+      "value": "1980-05-24",
+      "verified": true
+    },
+    "firstName": {
+      "value": "Joe",
+      "latinScriptValue": "Γεώργιος",
+      "verified": true
+    },
+    "gender": {
+      "value": "MALE",
+      "verified": true
+    },
+    "middleNames": {
+      "value": "Bob Rob",
+      "latinScriptValue": "Γεώργιος",
+      "verified": true
+    },
+    "surnames": [
+      {
+        "value": "Fred",
+        "latinScriptValue": "Γεώργιος",
+        "verified": true
+      },
+      {
+        "value": "Dou",
+        "verified": true
+      },
+      {
+        "value": "John",
+        "verified": true
+      },
+      {
+        "value": "Joe",
+        "verified": true
+      },
+      {
+        "value": "Simon",
+        "verified": true
+      }
+    ]
+  }
+}
