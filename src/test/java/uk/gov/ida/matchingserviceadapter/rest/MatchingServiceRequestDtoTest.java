@@ -12,7 +12,6 @@ import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.AddressDtoBuilder;
-import uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetDtoBuilder;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueDtoBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
@@ -25,6 +24,7 @@ import java.io.IOException;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.matchingserviceadapter.builders.VerifyMatchingDatasetDtoBuilder.aVerifyMatchingDatasetDto;
 
 //
 // These tests exist to prevent accidentally breaking our contract with the matching service. If they fail, ensure you
@@ -73,7 +73,7 @@ public class MatchingServiceRequestDtoTest {
     }
 
     private VerifyMatchingDatasetDto getVerifyMatchingDataset(DateTime dateTime) {
-        return new MatchingDatasetDtoBuilder()
+        return (VerifyMatchingDatasetDto) aVerifyMatchingDatasetDto()
                 .addSurname(getSimpleMdsValue("walker", dateTime))
                 .withAddressHistory(ImmutableList.of(getAddressDto("EC2", dateTime), getAddressDto("WC1", dateTime)))
                 .withDateOfBirth(getSimpleMdsValue(LocalDate.fromDateFields(dateTime.toDate()), dateTime))
@@ -85,7 +85,7 @@ public class MatchingServiceRequestDtoTest {
                                 getSimpleMdsValue("smith", dateTime),
                                 getSimpleMdsValue("walker", dateTime)
                         ))
-                .buildVerifyMatchingDatasetDto();
+                .build();
     }
 
     private String jsonFixture(String filename) throws IOException {

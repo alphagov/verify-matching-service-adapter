@@ -10,6 +10,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDtoTest;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.domain.Gender;

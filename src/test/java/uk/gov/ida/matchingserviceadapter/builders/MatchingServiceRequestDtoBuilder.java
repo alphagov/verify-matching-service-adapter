@@ -4,11 +4,10 @@ import com.google.common.base.Optional;
 import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
 import static com.google.common.base.Optional.absent;
-import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetDtoBuilder.aMatchingDatasetDto;
+import static uk.gov.ida.matchingserviceadapter.builders.VerifyMatchingDatasetDtoBuilder.aVerifyMatchingDatasetDto;
 
 public class MatchingServiceRequestDtoBuilder {
 
@@ -20,7 +19,7 @@ public class MatchingServiceRequestDtoBuilder {
     }
 
     public VerifyMatchingServiceRequestDto buildVerifyMatchingServiceRequestDto() {
-        VerifyMatchingDatasetDto matchingDataset = aMatchingDatasetDto().buildVerifyMatchingDatasetDto();
+        VerifyMatchingDatasetDto matchingDataset = aVerifyMatchingDatasetDto().build();
 
         return new VerifyMatchingServiceRequestDto(
                 matchingDataset,

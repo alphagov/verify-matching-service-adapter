@@ -1,0 +1,40 @@
+{
+  "firstName": {
+    "value": "walker",
+    "from": "2014-02-01T01:02:03.567Z",
+    "to": "2014-02-01T01:02:03.567Z",
+    "verified": true
+  },
+  "middleNames": {
+    "value": "walker",
+    "from": "2014-02-01T01:02:03.567Z",
+    "to": "2014-02-01T01:02:03.567Z",
+    "verified": true
+  },
+  "surnames": [
+    {
+      "value": "smith",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true
+    },
+    {
+      "value": "walker",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true
+    }
+  ],
+  "gender": {
+    "value": "FEMALE",
+    "from": "2014-02-01T01:02:03.567Z",
+    "to": "2014-02-01T01:02:03.567Z",
+    "verified": true
+  },
+  "dateOfBirth": {
+    "value": "2014-02-01",
+    "from": "2014-02-01T01:02:03.567Z",
+    "to": "2014-02-01T01:02:03.567Z",
+    "verified": true
+  }
+}

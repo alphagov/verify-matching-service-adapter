@@ -21,7 +21,7 @@ public class VerifyAddressDtoTest {
     private static final DateTime toDate = DateTime.parse("2014-02-01T01:02:03.567Z");
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         objectMapper = Jackson.newObjectMapper().setDateFormat(ISO8601DateFormat.getDateInstance());
     }
 
