@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.joda.time.DateTime;
@@ -13,6 +14,7 @@ import uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetDtoBuilder;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueDtoBuilder;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,9 +26,9 @@ public class UniversalMatchingDatasetDtoTest {
     private ObjectMapper objectMapper;
     private static final DateTime date = DateTime.parse("2014-02-01T01:02:03.567Z");
 
-
     @Before
     public void setUp() {
+        DateFormat.getDateInstance();
         objectMapper = Jackson.newObjectMapper().setDateFormat(ISO8601DateFormat.getDateInstance());
     }
 
@@ -92,23 +94,22 @@ public class UniversalMatchingDatasetDtoTest {
 
     private MatchingDatasetDto createUniversalMatchingDatasetDto_twoAddresses(DateTime dateTime) {
         return getMatchingDatasetDtoBuilderWithBasicDetails(dateTime)
-                .withAddressHistory(ImmutableList.of(getAddressDto("EC2", dateTime), getAddressDto("WC1", dateTime)))
+                .withAddressHistory(Optional.of(ImmutableList.of(getAddressDto("EC2", dateTime), getAddressDto("WC1", dateTime))))
                 .build();
     }
 
     private MatchingDatasetDto createUniversalMatchingDatasetDto_emptyAddressesElement(DateTime dateTime) {
         return getMatchingDatasetDtoBuilderWithBasicDetails(dateTime)
-                .withAddressHistory(Collections.emptyList())
+                .withAddressHistory(Optional.of(Collections.emptyList()))
                 .build();
     }
 
     private MatchingDatasetDto createUniversalMatchingDatasetDto_noAddresses(DateTime dateTime) {
         return getMatchingDatasetDtoBuilderWithBasicDetails(dateTime)
-                .omittingTheAddressHistory()
                 .build();
     }
 
-    private MatchingDatasetDtoBuilder<UniversalAddressDto> getMatchingDatasetDtoBuilderWithBasicDetails(DateTime dateTime) {
+    private MatchingDatasetDtoBuilder getMatchingDatasetDtoBuilderWithBasicDetails(DateTime dateTime) {
         return aUniversalMatchingDatasetDto()
                 .addSurname(getSimpleMdsValue("walker", dateTime))
                 .withDateOfBirth(getSimpleMdsValue(LocalDate.fromDateFields(dateTime.toDate()), dateTime))
