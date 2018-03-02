@@ -51,7 +51,7 @@ public class MatchingServiceAdapterMetadataRepository {
             KeyDescriptorsUnmarshaller keyDescriptorsUnmarshaller,
             Function<EntitiesDescriptor, Element> entitiesDescriptorElementTransformer,
             CertificateStore certificateStore,
-            @Named("VerifyMetadataResolver") MetadataResolver metadataResolver,
+            MetadataResolver metadataResolver,
             MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
             @Named("HubEntityId") String hubEntityId) {
 

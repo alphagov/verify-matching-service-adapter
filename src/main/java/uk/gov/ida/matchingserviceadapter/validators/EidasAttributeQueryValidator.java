@@ -64,7 +64,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                     aqr -> assertionDecrypter.decryptAssertions(() -> getEncryptedAssertions(aqr)).get(0),
                     new EidasAttributeQueryAssertionValidator(
                         countryMetadataResolver,
-                        countryMetadataCertificateValidator,
+                        countryMetadataCertificateValidator, //no need for this?
                         certificateExtractor,
                         x509CertificateFactory,
                         dateTimeComparator,

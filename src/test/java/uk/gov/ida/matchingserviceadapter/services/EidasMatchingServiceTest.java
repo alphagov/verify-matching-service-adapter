@@ -16,6 +16,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
+import uk.gov.ida.matchingserviceadapter.factories.EidasAttributeQueryValidatorFactory;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
@@ -54,6 +55,8 @@ public class EidasMatchingServiceTest {
     private MatchingServiceProxy matchingServiceClient;
     @Mock
     private MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper;
+    @Mock
+    private EidasAttributeQueryValidatorFactory attributeQueryValidatorFactory;
 
     private static final String PID = "pid";
     private static final AttributeQuery ATTRIBUTE_QUERY = AttributeQueryBuilder.anAttributeQuery().build();
@@ -64,8 +67,9 @@ public class EidasMatchingServiceTest {
 
     @Before
     public void setup() {
-        service = new EidasMatchingService(validator, transformer, matchingServiceClient, responseMapper);
+        service = new EidasMatchingService(attributeQueryValidatorFactory, transformer, matchingServiceClient, responseMapper);
         request = new MatchingServiceRequestContext(document, ATTRIBUTE_QUERY, ImmutableList.of(ASSERTION));
+        when(attributeQueryValidatorFactory.build(request.getAttributeQuery().getIssuer().getValue())).thenReturn(validator);
     }
 
     @Test

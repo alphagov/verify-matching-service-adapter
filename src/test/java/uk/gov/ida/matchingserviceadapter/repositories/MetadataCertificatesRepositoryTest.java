@@ -57,7 +57,6 @@ public class MetadataCertificatesRepositoryTest {
         Collection<Certificate> actualCertificates = repository.getIdpSigningCertificates(entityId);
 
         assertThat(actualCertificates).isEqualTo(certificates);
-        verify(certificateValidator).validate(certificates);
     }
 
     @Test
@@ -71,7 +70,6 @@ public class MetadataCertificatesRepositoryTest {
         Collection<Certificate> actualCertificates = repository.getHubSigningCertificates(HUB_ID);
 
         assertThat(actualCertificates).isEqualTo(certificates);
-        verify(certificateValidator).validate(certificates);
     }
 
 }

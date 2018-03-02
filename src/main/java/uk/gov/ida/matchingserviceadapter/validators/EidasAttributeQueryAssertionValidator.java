@@ -40,6 +40,10 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                     generateEmptyIssuerMessage(typeOfAssertion),
                     Assertion::getIssuer
                 ),
+
+                //This needs to change. First of all, as Chris points out we should use opensaml
+                //Secondly, the metadataResolver already validates the certificate for us (See DropwizardMetadataResolverFactory.java)!
+                //There's no need to do it again ourselves, and in fact we can't now that we won't have a country trust store.
                 new SamlDigitalSignatureValidator<>(
                     generateInvalidSignatureMessage(typeOfAssertion),
                     assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)

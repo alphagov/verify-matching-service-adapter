@@ -6,6 +6,7 @@ import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Issuer;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataRepository;
+import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 
 import java.util.Collections;
@@ -15,10 +16,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class EidasAttributesBasedAttributeQueryDiscriminator implements Predicate<MatchingServiceRequestContext> {
-    private final MetadataRepository countryMetadataRepository;
+    private final EidasMetadataResolverRepository eidasMetadataResolverRepository;
 
-    public EidasAttributesBasedAttributeQueryDiscriminator(final MetadataRepository countryMetadataRepository) {
-        this.countryMetadataRepository = countryMetadataRepository;
+    public EidasAttributesBasedAttributeQueryDiscriminator(EidasMetadataResolverRepository eidasMetadataResolverRepository) {
+        this.eidasMetadataResolverRepository = eidasMetadataResolverRepository;
     }
 
     @Override
@@ -28,6 +29,10 @@ public class EidasAttributesBasedAttributeQueryDiscriminator implements Predicat
             .filter(Objects::nonNull)
             .map(Issuer::getValue)
             .filter(Objects::nonNull)
-            .anyMatch(countryMetadataRepository::hasMetadataForEntity);
+            .anyMatch(this::hasMetadataResolverForEntity);
+    }
+
+    public boolean hasMetadataResolverForEntity(String entityId){
+        return eidasMetadataResolverRepository.getMetadataResolver(entityId) != null;
     }
 }

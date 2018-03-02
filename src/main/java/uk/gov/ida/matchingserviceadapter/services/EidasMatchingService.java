@@ -5,6 +5,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
+import uk.gov.ida.matchingserviceadapter.factories.EidasAttributeQueryValidatorFactory;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
@@ -19,18 +20,18 @@ import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class EidasMatchingService implements MatchingService {
 
-    private final Validator<AttributeQuery> validator;
+    private final EidasAttributeQueryValidatorFactory attributeQueryValidatorFactory;
     private final EidasMatchingRequestToMSRequestTransformer transformer;
     private final MatchingServiceProxy matchingServiceClient;
     private final MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
     @Inject
-    public EidasMatchingService(Validator<AttributeQuery> validator,
+    public EidasMatchingService(EidasAttributeQueryValidatorFactory attributeQueryValidatorFactory,
                                 EidasMatchingRequestToMSRequestTransformer transformer,
                                 MatchingServiceProxy matchingServiceClient,
                                 MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
-        this.validator = validator;
+        this.attributeQueryValidatorFactory = attributeQueryValidatorFactory;
         this.transformer = transformer;
         this.matchingServiceClient = matchingServiceClient;
         this.responseMapper = responseMapper;
@@ -38,6 +39,8 @@ public class EidasMatchingService implements MatchingService {
 
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
+        String identitySchemeEntityId = request.getAttributeQuery().getIssuer().getValue();
+        Validator<AttributeQuery> validator = attributeQueryValidatorFactory.build(identitySchemeEntityId);
         Messages validationMessages = validator.validate(request.getAttributeQuery(), messages());
         if (validationMessages.hasErrors()) {
             throw new AttributeQueryValidationException("Eidas Attribute Query was invalid: " + validationMessages);

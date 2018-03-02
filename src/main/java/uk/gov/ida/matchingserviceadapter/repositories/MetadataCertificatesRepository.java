@@ -47,7 +47,6 @@ public class MetadataCertificatesRepository {
     private List<Certificate> getAndValidateCertificates(String entityId, Function<EntityDescriptor, List<Certificate>> extractor) {
         EntityDescriptor entityDescriptor = getEntityDescriptor(entityId);
         List<Certificate> certificates = extractor.apply(entityDescriptor);
-        certificateValidator.validate(certificates);
         return certificates;
     }
 

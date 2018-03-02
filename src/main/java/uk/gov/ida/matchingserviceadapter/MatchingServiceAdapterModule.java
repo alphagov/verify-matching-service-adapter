@@ -7,7 +7,6 @@ import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.encryption.Decrypter;
@@ -44,6 +43,7 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserC
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionResponseFactory;
+import uk.gov.ida.matchingserviceadapter.factories.EidasAttributeQueryValidatorFactory;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatasetDtoMapper;
@@ -54,7 +54,6 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
-import uk.gov.ida.matchingserviceadapter.repositories.ResolverBackedMetadataRepository;
 import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseGenerator;
@@ -71,12 +70,13 @@ import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
 import uk.gov.ida.matchingserviceadapter.services.VerifyMatchingService;
-import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
-import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.dropwizard.metadata.MetadataHealthCheck;
+import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
+import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
+import uk.gov.ida.saml.metadata.EidasTrustAnchorResolver;
 import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
@@ -103,6 +103,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Timer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -110,12 +111,12 @@ import java.util.stream.Stream;
 
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Encryption;
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Signing;
-
 class MatchingServiceAdapterModule extends AbstractModule {
 
-    private static final String VERIFY_METADATA_RESOLVER = "VerifyMetadataResolver";
 
-    private static final String COUNTRY_METADATA_RESOLVER = "CountryMetadataResolver";
+    //We will also be able rip out this naming system for VerifyMetadataResolver vs  CountryMetadataResolver
+    //because CountryMetadataResolver will be no more.
+    //Also we will be able to get rid of CountryCertificateValidator and CountryFixedCertificateChainValidator because I don't think they're needed.
 
     @Override
     protected void configure() {
@@ -187,11 +188,11 @@ class MatchingServiceAdapterModule extends AbstractModule {
         HealthCheckMatchingService healthCheckMatchingService,
         VerifyMatchingService verifyMatchingService,
         Optional<EidasMatchingService> eidasMatchingService,
-        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver
+        Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository
     ) {
         Map<Predicate<MatchingServiceRequestContext>, MatchingService> servicesMap = new LinkedHashMap<>();
         servicesMap.put((MatchingServiceRequestContext ctx) -> ctx.getAssertions().isEmpty(), healthCheckMatchingService);
-        countryMetadataResolver.ifPresent(countryResolver -> servicesMap.put(new EidasAttributesBasedAttributeQueryDiscriminator(new ResolverBackedMetadataRepository(countryMetadataResolver.get())), eidasMatchingService.get()));
+        eidasMetadataResolverRepository.ifPresent(countryResolver -> servicesMap.put(new EidasAttributesBasedAttributeQueryDiscriminator(eidasMetadataResolverRepository.get()), eidasMatchingService.get()));
         servicesMap.put(ctx -> true, verifyMatchingService);
 
         return new MatchingServiceLocator(
@@ -217,31 +218,25 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public Optional<EidasMatchingService> getEidasMatchingService(
-        @Named(COUNTRY_METADATA_RESOLVER) Optional<MetadataResolver> countryMetadataResolver,
-        @Named(VERIFY_METADATA_RESOLVER) MetadataResolver verifyMetadataResolver,
+        MetadataResolver verifyMetadataResolver,
         @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-        @Named("CountryCertificateValidator") Optional<CertificateValidator> countryCertificateValidator,
         X509CertificateFactory x509CertificateFactory,
         MatchingServiceAdapterConfiguration configuration,
         AssertionDecrypter assertionDecrypter,
         UserIdHashFactory userIdHashFactory,
         MatchingServiceProxy matchingServiceClient,
         @Named("HubEntityId") String hubEntityId,
-        MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
+        MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper,
+        Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository) {
 
-        return countryMetadataResolver.map(countryMetadataResolverValue ->
+        return eidasMetadataResolverRepository.map(eidasMetadataResolverRepositoryValue ->
             new EidasMatchingService(
-                new EidasAttributeQueryValidator(
-                    verifyMetadataResolver,
-                    countryMetadataResolverValue,
+                new EidasAttributeQueryValidatorFactory(verifyMetadataResolver,
                     verifyCertificateValidator,
-                    countryCertificateValidator.get(),
-                    new CertificateExtractor(),
                     x509CertificateFactory,
-                    new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),
+                    configuration,
                     assertionDecrypter,
-                    configuration.getEuropeanIdentity().getHubConnectorEntityId()
-                ),
+                    eidasMetadataResolverRepositoryValue),
                 new MsaTransformersFactory().getEidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId),
                 matchingServiceClient,
                 responseMapper));
@@ -331,7 +326,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MetadataCertificatesRepository getMetadataCertificateRepository(@Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver, @Named("VerifyCertificateValidator") CertificateValidator certificateValidator) {
+    public MetadataCertificatesRepository getMetadataCertificateRepository(MetadataResolver metadataResolver, @Named("VerifyCertificateValidator") CertificateValidator certificateValidator) {
         return new MetadataCertificatesRepository(metadataResolver, certificateValidator, new CertificateExtractor());
     }
 
@@ -446,7 +441,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     private Function<AttributeQuery, InboundVerifyMatchingServiceRequest> getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-        @Named(VERIFY_METADATA_RESOLVER) MetadataResolver metadataResolver,
+        MetadataResolver metadataResolver,
         IdaKeyStore keyStore,
         MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
         @Named("VerifyCertificateChainEvaluableCriterion") CertificateChainEvaluableCriterion certificateChainEvaluableCriterion,
@@ -516,7 +511,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named(VERIFY_METADATA_RESOLVER)
     private MetadataResolver getVerifyMetadataResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
         MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(environment, configuration.getMetadataConfiguration());
         environment.healthChecks().register("VerifyMetadataHealthCheck", new MetadataHealthCheck(metadataResolver, configuration.getMetadataConfiguration().getExpectedEntityId()));
@@ -525,14 +519,30 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named(COUNTRY_METADATA_RESOLVER)
-    private Optional<MetadataResolver> getCountryMetadataResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
+    private Optional<EidasTrustAnchorResolver> getEidasTrustAnchorResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
         if (configuration.isEidasEnabled()) {
-            MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(environment, configuration.getEuropeanIdentity().getMetadata());
-            environment.healthChecks().register("CountryMetadataHealthCheck", new MetadataHealthCheck(metadataResolver, configuration.getEuropeanIdentity().getMetadata().getExpectedEntityId()));
-            return Optional.of(metadataResolver);
+            EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
+
+            Client client = new JerseyClientBuilder(environment)
+                    .using(metadataConfiguration.getJerseyClientConfiguration())
+                    .build(metadataConfiguration.getJerseyClientName());
+
+            return Optional.of(new EidasTrustAnchorResolver(metadataConfiguration.getTrustAnchorUri(),
+                    client,
+                    metadataConfiguration.getTrustStoreConfiguration().getTrustStore()));
         }
         return Optional.empty();
     }
 
+    @Provides
+    @Singleton
+    private Optional<EidasMetadataResolverRepository> getEidasMetadataResolverRepository(Environment environment, MatchingServiceAdapterConfiguration configuration, Optional<EidasTrustAnchorResolver> trustAnchorResolver) {
+        return trustAnchorResolver.map(trustAnchorResolverVal ->
+            new EidasMetadataResolverRepository(trustAnchorResolverVal,
+                    environment,
+                    configuration.getEuropeanIdentity().getAggregatedMetadata(),
+                    new DropwizardMetadataResolverFactory(),
+                    new Timer())
+        );
+    }
 }

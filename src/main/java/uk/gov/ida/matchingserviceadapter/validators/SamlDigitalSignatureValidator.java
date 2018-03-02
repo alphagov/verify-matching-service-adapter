@@ -67,7 +67,7 @@ public class SamlDigitalSignatureValidator<T extends SignableSAMLObject> extends
                         SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1,
                         SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256,
                         SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA512,
-                        SignatureConstants.ALGO_ID_DIGEST_SHA1,
+                        SignatureConstants.ALGO_ID_DIGEST_SHA1,//use saml security
                         SignatureConstants.ALGO_ID_DIGEST_SHA256,
                         SignatureConstants.ALGO_ID_DIGEST_SHA512
                     ));

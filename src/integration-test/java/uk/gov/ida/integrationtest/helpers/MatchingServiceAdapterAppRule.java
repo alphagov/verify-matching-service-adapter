@@ -134,7 +134,30 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
 
                 ConfigOverride.config("europeanIdentity.metadata.client.tls.protocol", "TLSv1.2"),
                 ConfigOverride.config("europeanIdentity.metadata.client.tls.verifyHostname", "false"),
-                ConfigOverride.config("europeanIdentity.metadata.client.tls.trustSelfSignedCertificates", "true")
+
+
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + countryMetadataServer.getPort() + COUNTRY_METADATA_PATH),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.path", countryMetadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.password", countryMetadataTrustStore.getPassword()),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataBaseUri", ""),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.minRefreshDelay", "60000"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.maxRefreshDelay", "600000"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.jerseyClientName", "country-metadata-client"),
+
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.timeout", "2s"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.timeToLive", "10m"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.cookiesEnabled", "false"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.connectionTimeout", "1s"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.retries", "3"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.keepAlive", "60s"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.chunkedEncodingEnabled", "false"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.validateAfterInactivityPeriod", "5s"),
+
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.tls.protocol", "TLSv1.2"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.tls.verifyHostname", "false"),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.tls.trustSelfSignedCertificates", "true")
+
+
             ).collect(Collectors.toList());
             overrides.addAll(countryOverrides);
         }
