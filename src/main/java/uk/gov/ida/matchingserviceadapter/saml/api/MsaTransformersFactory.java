@@ -14,7 +14,7 @@ import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
@@ -232,7 +232,7 @@ public class MsaTransformersFactory {
         );
     }
 
-    public Function<MatchingServiceRequestContext, VerifyMatchingServiceRequestDto> getEidasMatchingRequestToMSRequestTransformer(
+    public Function<MatchingServiceRequestContext, UniversalMatchingServiceRequestDto> getEidasMatchingRequestToMSRequestTransformer(
         UserIdHashFactory userIdHashFactory, String hubEntityId) {
         return new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId, coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId));
     }

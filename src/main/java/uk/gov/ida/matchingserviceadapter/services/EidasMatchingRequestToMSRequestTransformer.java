@@ -6,10 +6,11 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.EidasMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaConstants.Eidas_Attributes;
@@ -24,13 +25,13 @@ import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
 import uk.gov.ida.saml.core.extensions.eidas.PlaceOfBirth;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
-public class EidasMatchingRequestToMSRequestTransformer implements Function<MatchingServiceRequestContext, VerifyMatchingServiceRequestDto> {
+public class EidasMatchingRequestToMSRequestTransformer implements Function<MatchingServiceRequestContext, UniversalMatchingServiceRequestDto> {
 
     private final UserIdHashFactory userIdHashFactory;
     private final String hubEntityId;
@@ -45,8 +46,8 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
     }
 
     @Override
-    public VerifyMatchingServiceRequestDto apply(MatchingServiceRequestContext matchingServiceRequestContext) {
-       Map<Boolean, Assertion> assertions = matchingServiceRequestContext.getAssertions().stream()
+    public UniversalMatchingServiceRequestDto apply(MatchingServiceRequestContext matchingServiceRequestContext) {
+      Map<Boolean, Assertion> assertions = matchingServiceRequestContext.getAssertions().stream()
             .collect(Collectors.toMap(this::isHubAssertion, Function.identity()));
         Assertion eidasAssertion = assertions.get(false);
         Optional<Assertion> hubAssertion = Optional.fromNullable(assertions.get(true));
@@ -54,7 +55,7 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         Optional<Cycle3DatasetDto> cycle3Data = hubAssertion.transform(this::extractCycle3Data).transform(Optional::get);
         List<Attribute> attributes = eidasAssertion.getAttributeStatements().get(0).getAttributes();
 
-        return new VerifyMatchingServiceRequestDto(extractEidasMatchingDataset(attributes),
+        return new UniversalMatchingServiceRequestDto(extractUniversalMatchingDataset(attributes),
             cycle3Data,
             extractAndHashPid(eidasAssertion),
             matchingServiceRequestContext.getAttributeQuery().getID(),
@@ -81,7 +82,7 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
             Optional.of(AuthnContext.valueOf(extractVerifyLoa(assertion).name())));
     }
 
-    private EidasMatchingDatasetDto extractEidasMatchingDataset(List<Attribute> attributes) {
+    private UniversalMatchingDatasetDto extractUniversalMatchingDataset(List<Attribute> attributes) {
         LocalDate dob = getAttributeValue(attributes, Eidas_Attributes.DateOfBirth.NAME, DateOfBirth::getDateOfBirth);
         String givenName = getAttributeValue(attributes, Eidas_Attributes.FirstName.NAME, CurrentGivenName::getFirstName);
         String familyName = getAttributeValue(attributes, Eidas_Attributes.FamilyName.NAME, CurrentFamilyName::getFamilyName);
@@ -89,13 +90,23 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         String placeOfBirth = getAttributeValue(attributes, Eidas_Attributes.PlaceOfBirth.NAME, PlaceOfBirth::getPlaceOfBirth);
         String gender = getAttributeValue(attributes, Eidas_Attributes.Gender.NAME, Gender::getValue);
 
-        return new EidasMatchingDatasetDto(
-            dob,
-            givenName,
-            familyName,
-            birthName,
-            gender,
-            placeOfBirth
+        Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.of(new SimpleMdsValueDto<LocalDate>() {
+            public LocalDate getValue() { return dob; }
+        });
+        Optional<SimpleMdsValueDto<String>> firstName = Optional.of(new SimpleMdsValueDto<String>() {
+            public String getValue() { return givenName; }
+        });
+        List<SimpleMdsValueDto<String>> surnames = Collections.singletonList(new SimpleMdsValueDto<String>() {
+            public String getValue() { return familyName; }
+        });
+
+        return new UniversalMatchingDatasetDto(  //FIXME
+            firstName,
+            null,
+            surnames,
+            null,
+            dateOfBirth,
+            null
         );
     }
 

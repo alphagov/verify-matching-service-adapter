@@ -1,27 +1,25 @@
 package uk.gov.ida.matchingserviceadapter.rest;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 
 
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
-@JsonPropertyOrder({ "matchingDataset" })
-public class VerifyMatchingServiceRequestDto extends MatchingServiceRequestDto {
+public class UniversalMatchingServiceRequestDto extends MatchingServiceRequestDto {
 
-    private VerifyMatchingDatasetDto matchingDataset;
+    private UniversalMatchingDatasetDto matchingDataset;
 
     @SuppressWarnings("unused")//Needed by JAXB
-    private VerifyMatchingServiceRequestDto() { super(); }
+    private UniversalMatchingServiceRequestDto() { super(); }
 
-    public VerifyMatchingServiceRequestDto(
-            VerifyMatchingDatasetDto matchingDataset,
+    public UniversalMatchingServiceRequestDto(
+            UniversalMatchingDatasetDto matchingDataset,
             Optional<Cycle3DatasetDto> cycle3Dataset,
             String hashedPid,
             String matchId,
@@ -31,7 +29,7 @@ public class VerifyMatchingServiceRequestDto extends MatchingServiceRequestDto {
         this.matchingDataset = matchingDataset;
     }
 
-    public VerifyMatchingDatasetDto getMatchingDataset() {
+    public UniversalMatchingDatasetDto getMatchingDataset() {
         return matchingDataset;
     }
 

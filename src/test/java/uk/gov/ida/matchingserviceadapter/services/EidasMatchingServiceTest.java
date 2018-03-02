@@ -17,7 +17,7 @@ import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
-import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.saml.core.domain.AuthnContext;
@@ -51,7 +51,7 @@ public class EidasMatchingServiceTest {
     @Mock
     OutboundResponseFromMatchingService outboundResponseFromMatchingService;
     @Mock
-    private Function<MatchingServiceRequestContext, VerifyMatchingServiceRequestDto> transformer;
+    private Function<MatchingServiceRequestContext, UniversalMatchingServiceRequestDto> transformer;
     @Mock
     private MatchingServiceProxy matchingServiceClient;
     @Mock
@@ -83,11 +83,11 @@ public class EidasMatchingServiceTest {
 
     @Test
     public void shouldHandleValidAQR() {
-        VerifyMatchingServiceRequestDto verifyMatchingServiceRequestDto = MatchingServiceRequestDtoBuilder.aMatchingServiceRequestDto().withHashedPid(PID).buildVerifyMatchingServiceRequestDto();
+        UniversalMatchingServiceRequestDto universalMatchingServiceRequestDto = MatchingServiceRequestDtoBuilder.aMatchingServiceRequestDto().withHashedPid(PID).buildUniversalMatchingServiceRequestDto();
         MatchingServiceResponseDto matchingServiceResponseDto = MatchingServiceResponseDtoBuilder.aMatchingServiceResponseDto().build();
         when(validator.validate(eq(ATTRIBUTE_QUERY), any(Messages.class))).thenReturn(messages());
-        when(transformer.apply(request)).thenReturn(verifyMatchingServiceRequestDto);
-        when(matchingServiceClient.makeMatchingServiceRequest(verifyMatchingServiceRequestDto)).thenReturn(matchingServiceResponseDto);
+        when(transformer.apply(request)).thenReturn(universalMatchingServiceRequestDto);
+        when(matchingServiceClient.makeMatchingServiceRequest(universalMatchingServiceRequestDto)).thenReturn(matchingServiceResponseDto);
         when(responseMapper.map(matchingServiceResponseDto, PID, request.getAttributeQuery().getID(), request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
             AuthnContext.LEVEL_2, request.getAttributeQuery().getSubject().getNameID().getSPNameQualifier()))
             .thenReturn(outboundResponseFromMatchingService);
