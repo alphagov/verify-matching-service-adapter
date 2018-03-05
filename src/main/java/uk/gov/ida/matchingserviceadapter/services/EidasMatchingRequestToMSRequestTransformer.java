@@ -6,23 +6,24 @@ import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.helper.GenderDtoHelper;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaConstants.Eidas_Attributes;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
-import uk.gov.ida.saml.core.extensions.eidas.BirthName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentFamilyName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
 import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
 import uk.gov.ida.saml.core.extensions.eidas.Gender;
 import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
-import uk.gov.ida.saml.core.extensions.eidas.PlaceOfBirth;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 
 import java.util.Collections;
@@ -83,31 +84,38 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
     }
 
     private UniversalMatchingDatasetDto extractUniversalMatchingDataset(List<Attribute> attributes) {
-        LocalDate dob = getAttributeValue(attributes, Eidas_Attributes.DateOfBirth.NAME, DateOfBirth::getDateOfBirth);
-        String givenName = getAttributeValue(attributes, Eidas_Attributes.FirstName.NAME, CurrentGivenName::getFirstName);
-        String familyName = getAttributeValue(attributes, Eidas_Attributes.FamilyName.NAME, CurrentFamilyName::getFamilyName);
-        String birthName = getAttributeValue(attributes, Eidas_Attributes.BirthName.NAME, BirthName::getBirthName);
-        String placeOfBirth = getAttributeValue(attributes, Eidas_Attributes.PlaceOfBirth.NAME, PlaceOfBirth::getPlaceOfBirth);
-        String gender = getAttributeValue(attributes, Eidas_Attributes.Gender.NAME, Gender::getValue);
 
-        Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.of(new SimpleMdsValueDto<LocalDate>() {
-            public LocalDate getValue() { return dob; }
-        });
-        Optional<SimpleMdsValueDto<String>> firstName = Optional.of(new SimpleMdsValueDto<String>() {
-            public String getValue() { return givenName; }
-        });
-        List<SimpleMdsValueDto<String>> surnames = Collections.singletonList(new SimpleMdsValueDto<String>() {
-            public String getValue() { return familyName; }
-        });
+        SimpleMdsValueDto<LocalDate> dateOfBirth = extractSimpleMdsValue(attributes, Eidas_Attributes.DateOfBirth.NAME, DateOfBirth::getDateOfBirth);
+        SimpleMdsValueDto<String> firstName = extractSimpleMdsValue(attributes, Eidas_Attributes.FirstName.NAME, CurrentGivenName::getFirstName);
+        SimpleMdsValueDto<String> surname = extractSimpleMdsValue(attributes, Eidas_Attributes.FamilyName.NAME, CurrentFamilyName::getFamilyName);
+
+        // Current address
 
         return new UniversalMatchingDatasetDto(  //FIXME
-            firstName,
-            null,
-            surnames,
-            null,
-            dateOfBirth,
+            Optional.fromNullable(firstName),
+            Optional.absent(),
+            Collections.singletonList(surname),
+            Optional.fromNullable(extractSimpleMdsGenderValue(attributes)),
+            Optional.fromNullable(dateOfBirth),
             null
         );
+    }
+
+    private UniversalMdsValueDto<GenderDto> extractSimpleMdsGenderValue(List<Attribute> attributes) {
+        String genderStr = getAttributeValue(attributes, Eidas_Attributes.Gender.NAME, Gender::getValue);
+
+        if (genderStr == null) {
+            return null;
+        }
+
+        GenderDto genderDto = GenderDtoHelper.convertToVerifyGenderDto(genderStr);
+        return new UniversalMdsValueDto<>(genderDto);
+    }
+
+    private <T, V> UniversalMdsValueDto<V> extractSimpleMdsValue(List<Attribute> attributes, String attributeName, Function<T, V> getContent) {
+        V attributeValue = getAttributeValue(attributes, attributeName, getContent);
+
+        return attributeValue == null ? null : new UniversalMdsValueDto<V>(attributeValue);
     }
 
     private Optional<Cycle3DatasetDto> extractCycle3Data(final Assertion hubAssertion) {

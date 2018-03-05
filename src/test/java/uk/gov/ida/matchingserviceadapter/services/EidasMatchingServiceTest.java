@@ -17,8 +17,8 @@ import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
-import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
+import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
@@ -27,8 +27,6 @@ import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 import uk.gov.ida.validation.messages.Message;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
-
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -51,7 +49,7 @@ public class EidasMatchingServiceTest {
     @Mock
     OutboundResponseFromMatchingService outboundResponseFromMatchingService;
     @Mock
-    private Function<MatchingServiceRequestContext, UniversalMatchingServiceRequestDto> transformer;
+    private EidasMatchingRequestToMSRequestTransformer transformer;
     @Mock
     private MatchingServiceProxy matchingServiceClient;
     @Mock
