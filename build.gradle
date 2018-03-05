@@ -71,7 +71,6 @@ dependencies {
         "io.dropwizard:dropwizard-jersey:$dependencyVersions.dropwizard",
         'io.dropwizard.metrics:metrics-annotation:3.1.2',
         "io.dropwizard:dropwizard-client:$dependencyVersions.dropwizard",
-        'com.hubspot.dropwizard:dropwizard-guicier:1.0.0.6',
         "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
 
     saml "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
@@ -103,7 +102,6 @@ dependencies {
         'com.fasterxml.jackson.core:jackson-annotations:2.6.0',
         'com.fasterxml.jackson.core:jackson-databind:2.6.7',
         'com.google.guava:guava:18.0',
-        'com.google.inject:guice:3.0',
         'joda-time:joda-time:2.9',
         'org.slf4j:slf4j-api:1.7.21',
         'javax.ws.rs:javax.ws.rs-api:2.0.1',

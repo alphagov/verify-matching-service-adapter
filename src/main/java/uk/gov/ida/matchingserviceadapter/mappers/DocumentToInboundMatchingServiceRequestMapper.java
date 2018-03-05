@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,6 +13,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchi
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 
+import javax.inject.Inject;
 import java.util.function.Function;
 
 public class DocumentToInboundMatchingServiceRequestMapper{

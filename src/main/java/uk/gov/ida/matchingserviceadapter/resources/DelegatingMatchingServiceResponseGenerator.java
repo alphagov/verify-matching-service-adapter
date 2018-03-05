@@ -1,19 +1,21 @@
 package uk.gov.ida.matchingserviceadapter.resources;
 
-import com.google.common.collect.ImmutableMap;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
 public class DelegatingMatchingServiceResponseGenerator implements MatchingServiceResponseGenerator<MatchingServiceResponse> {
-    private final Map<Class<?>, MatchingServiceResponseGenerator> delegates;
 
-    public DelegatingMatchingServiceResponseGenerator(ImmutableMap<Class<?>, MatchingServiceResponseGenerator> delegates) {
+    private final Map<Class<? extends MatchingServiceResponse>, MatchingServiceResponseGenerator<? extends MatchingServiceResponse>> delegates;
+
+    @Inject
+    public DelegatingMatchingServiceResponseGenerator(Map<Class<? extends MatchingServiceResponse>, MatchingServiceResponseGenerator<? extends MatchingServiceResponse>> delegates) {
         this.delegates = delegates;
     }
 
-    public Map<Class<?>, MatchingServiceResponseGenerator> getDelegates() {
+    public Map<Class<? extends MatchingServiceResponse>, MatchingServiceResponseGenerator<? extends MatchingServiceResponse>> getDelegates() {
         return delegates;
     }
 

@@ -19,7 +19,6 @@ public class HealthCheckResponseGenerator implements MatchingServiceResponseGene
 
     private static final Logger LOG = LoggerFactory.getLogger(HealthCheckResponseGenerator.class);
 
-
     private final SoapMessageManager soapMessageManager;
     private final Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
     private final ManifestReader manifestReader;

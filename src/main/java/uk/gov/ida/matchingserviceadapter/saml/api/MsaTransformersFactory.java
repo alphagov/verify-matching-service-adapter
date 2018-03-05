@@ -1,6 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.saml.api;
 
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import org.apache.log4j.Logger;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.BasicRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -76,6 +77,9 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class MsaTransformersFactory {
+
+    private static final Logger LOG = Logger.getLogger(MsaTransformersFactory.class);
+
     private CoreTransformersFactory coreTransformersFactory;
 
     public MsaTransformersFactory() {
@@ -89,9 +93,9 @@ public class MsaTransformersFactory {
             MatchingServiceAdapterConfiguration configuration
     ) {
         SignatureFactory signatureFactory = new SignatureFactory(
-            new IdaKeyStoreCredentialRetriever(keyStore),
-            new SignatureRSASHA1(),
-            new DigestSHA256()
+                new IdaKeyStoreCredentialRetriever(keyStore),
+                new SignatureRSASHA1(),
+                new DigestSHA256()
         );
         SamlResponseAssertionEncrypter assertionEncrypter = new SamlResponseAssertionEncrypter(
                 new EncryptionCredentialFactory(encryptionKeyStore),
@@ -145,8 +149,8 @@ public class MsaTransformersFactory {
         Function<Response, Element> t2 = getResponseToElementTransformer(
                 encryptionKeyStore,
                 keyStore,
-            entityToEncryptForLocator,
-            configuration);
+                entityToEncryptForLocator,
+                configuration);
         return t2.compose(t1);
     }
 
@@ -180,18 +184,24 @@ public class MsaTransformersFactory {
     }
 
     public VerifyAttributeQueryToInboundMatchingServiceRequestTransformer getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-        final MetadataResolver metaDataResolver,
-        final IdaKeyStore keyStore,
-        final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-        final String hubEntityId,
-        CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
+            final MetadataResolver metaDataResolver,
+            final IdaKeyStore keyStore,
+            final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+            final String hubEntityId,
+            CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) {
         HubAssertionUnmarshaller hubAssertionTransformer = coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId);
         IdentityProviderAssertionUnmarshaller identityProviderAssertionTransformer = new IdentityProviderAssertionUnmarshaller(
                 new MatchingDatasetUnmarshaller(new AddressFactory()),
                 new IdentityProviderAuthnStatementUnmarshaller(new AuthnContextFactory()),
                 hubEntityId
         );
-        SignatureValidator signatureValidator = getMetadataBackedSignatureValidator(metaDataResolver, certificateChainEvaluableCriterion);
+        SignatureValidator signatureValidator;
+        try {
+            signatureValidator = getMetadataBackedSignatureValidator(metaDataResolver, certificateChainEvaluableCriterion);
+        } catch (ComponentInitializationException e) {
+            LOG.info("Could not initialise metadata backed signature validator");
+            throw new RuntimeException(e);
+        }
         return new VerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
                 new SamlAttributeQueryValidator(),
                 new AttributeQuerySignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
@@ -226,10 +236,10 @@ public class MsaTransformersFactory {
 
     private AssertionValidator getAssertionValidator() {
         return new AssertionValidator(
-                    new IssuerValidator(),
-                    new AssertionSubjectValidator(),
-                    new AssertionAttributeStatementValidator(),
-                    new BasicAssertionSubjectConfirmationValidator()
+                new IssuerValidator(),
+                new AssertionSubjectValidator(),
+                new AssertionAttributeStatementValidator(),
+                new BasicAssertionSubjectConfirmationValidator()
         );
     }
 

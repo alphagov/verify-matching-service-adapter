@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static uk.gov.ida.matchingserviceadapter.binders.MatchingServiceAdapterSamlBinder.HUB_ENTITY_ID;
+
 public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer implements Function<AttributeQuery, InboundMatchingServiceRequest> {
 
     private final SamlAttributeQueryValidator samlAttributeQueryValidator;
@@ -39,7 +41,7 @@ public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer impl
             final InboundMatchingServiceRequestUnmarshaller inboundMatchingServiceRequestUnmarshaller,
             final SamlAttributeQueryAssertionsValidator samlAttributeQueryAssertionsValidator,
             final AssertionDecrypter assertionDecrypter,
-            @Named("HubEntityId") final String hubEntityId) {
+            @Named(HUB_ENTITY_ID) final String hubEntityId) {
 
         this.samlAttributeQueryValidator = samlAttributeQueryValidator;
         this.attributeQuerySignatureValidator = attributeQuerySignatureValidator;

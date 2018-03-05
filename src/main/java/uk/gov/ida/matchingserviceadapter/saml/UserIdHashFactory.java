@@ -6,16 +6,21 @@ import org.opensaml.security.crypto.JCAConstants;
 import uk.gov.ida.matchingserviceadapter.exceptions.AuthnContextMissingException;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 
+import static uk.gov.ida.matchingserviceadapter.binders.MatchingServiceAdapterSamlBinder.MSA_ENTITY_ID;
+
 public class UserIdHashFactory {
 
     private final String msaEntityId;
 
-    public UserIdHashFactory(String msaEntityId) {
+    @Inject
+    public UserIdHashFactory(@Named(MSA_ENTITY_ID) String msaEntityId) {
         this.msaEntityId = msaEntityId;
     }
 

@@ -12,6 +12,7 @@ import uk.gov.ida.matchingserviceadapter.saml.errors.SamlTransformationErrorFact
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.core.validation.SamlValidationSpecificationFailure;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,10 @@ import java.util.stream.Collectors;
  */
 @Deprecated
 public class CertificateExtractor {
+
+    @Inject
+    public CertificateExtractor() {
+    }
 
     public List<Certificate> extractHubSigningCertificates(EntityDescriptor hubDescriptor) {
         SPSSODescriptor hubSsoDescriptor = hubDescriptor.getSPSSODescriptor(SAMLConstants.SAML20P_NS);

@@ -1,7 +1,6 @@
 package uk.gov.ida.integrationtest.helpers;
 
 import certificates.values.CACertificates;
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.ResourceHelpers;
@@ -62,7 +61,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         countryMetadataTrustStore.create();
         clientTrustStore.create();
 
-        JerseyGuiceUtils.reset();
         try {
             InitializationService.initialize();
 
@@ -101,7 +99,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("metadata.trustStore.type", "file"),
             ConfigOverride.config("metadata.trustStore.store", metadataTrustStore.getAbsolutePath()),
             ConfigOverride.config("metadata.trustStore.password", metadataTrustStore.getPassword()),
-            ConfigOverride.config("metadata.hubEntityId", HUB_ENTITY_ID),
+            ConfigOverride.config("metadata.expectedEntityId", HUB_ENTITY_ID),
             ConfigOverride.config("metadata.url", "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
             ConfigOverride.config("hub.hubEntityId", HUB_ENTITY_ID),
             ConfigOverride.config("hub.trustStore.type", "file"),

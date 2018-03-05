@@ -10,6 +10,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 public class HealthCheckMatchingService implements MatchingService {
@@ -19,7 +20,7 @@ public class HealthCheckMatchingService implements MatchingService {
     private final ManifestReader manifestReader;
     private final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
 
-
+    @Inject
     public HealthCheckMatchingService(ManifestReader manifestReader, MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration) {
         this.manifestReader = manifestReader;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;

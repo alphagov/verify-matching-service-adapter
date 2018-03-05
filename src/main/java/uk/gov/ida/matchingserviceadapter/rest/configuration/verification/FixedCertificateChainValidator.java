@@ -1,10 +1,10 @@
 package uk.gov.ida.matchingserviceadapter.rest.configuration.verification;
 
-import com.google.inject.Inject;
 import uk.gov.ida.common.shared.security.verification.CertificateChainValidator;
 import uk.gov.ida.common.shared.security.verification.CertificateValidity;
 import uk.gov.ida.common.shared.security.verification.exceptions.CertificateChainValidationException;
 
+import javax.inject.Inject;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 

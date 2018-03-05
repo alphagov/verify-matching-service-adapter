@@ -9,8 +9,9 @@ import javax.ws.rs.core.Response;
 import java.util.function.Function;
 
 public class VerifyMatchingServiceResponseGenerator implements MatchingServiceResponseGenerator<VerifyMatchingServiceResponse> {
-    private SoapMessageManager soapMessageManager;
-    private Function<OutboundResponseFromMatchingService, Element> responseElementTransformer;
+
+    private final SoapMessageManager soapMessageManager;
+    private final Function<OutboundResponseFromMatchingService, Element> responseElementTransformer;
 
     public VerifyMatchingServiceResponseGenerator(
         SoapMessageManager soapMessageManager,

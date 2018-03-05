@@ -9,12 +9,14 @@ import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
+import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 
 public class VerifyMatchingService implements MatchingService {
     private MatchingServiceAttributeQueryHandler attributeQueryHandler;
     private DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper;
 
+    @Inject
     public VerifyMatchingService(
         MatchingServiceAttributeQueryHandler attributeQueryHandler,
         DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper

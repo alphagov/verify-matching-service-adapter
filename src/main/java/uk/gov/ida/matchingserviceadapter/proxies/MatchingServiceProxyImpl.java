@@ -1,8 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.proxies;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import uk.gov.ida.jerseyclient.JsonClient;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
@@ -10,6 +8,8 @@ import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.net.URI;
 
 public class MatchingServiceProxyImpl implements MatchingServiceProxy {

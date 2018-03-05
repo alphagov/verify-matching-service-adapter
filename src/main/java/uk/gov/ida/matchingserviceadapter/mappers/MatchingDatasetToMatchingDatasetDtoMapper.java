@@ -15,12 +15,17 @@ import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.util.List;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
 
 public class MatchingDatasetToMatchingDatasetDtoMapper {
+
+    @Inject
+    public MatchingDatasetToMatchingDatasetDtoMapper() {
+    }
 
     public MatchingDatasetDto map(MatchingDataset matchingDataset) {
         Optional<SimpleMdsValue<String>> firstNameValue = !matchingDataset.getFirstNames().isEmpty() ? fromNullable(matchingDataset.getFirstNames().get(0)) : Optional.absent();

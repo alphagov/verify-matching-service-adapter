@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.exceptions;
 
-import com.google.inject.Inject;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.saml2.core.Issuer;
@@ -14,6 +13,8 @@ import org.w3c.dom.Element;
 import uk.gov.ida.common.shared.security.IdGenerator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
+
+import javax.inject.Inject;
 
 public class ExceptionResponseFactory {
 

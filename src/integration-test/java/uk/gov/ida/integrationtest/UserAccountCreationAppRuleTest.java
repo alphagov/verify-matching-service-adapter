@@ -2,7 +2,6 @@ package uk.gov.ida.integrationtest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
@@ -107,13 +106,6 @@ public class UserAccountCreationAppRuleTest {
     public static final HttpStubRule metadataServer = new HttpStubRule();
 
     static {
-        //doALittleHackToMakeGuicierHappy
-        // magically, this has to be the first test to run otherwise things will fail.
-        // see:
-        // - https://github.com/HubSpot/dropwizard-guice/issues/95
-        // - https://github.com/Squarespace/jersey2-guice/pull/39
-        JerseyGuiceUtils.reset();
-
         try {
             InitializationService.initialize();
 
