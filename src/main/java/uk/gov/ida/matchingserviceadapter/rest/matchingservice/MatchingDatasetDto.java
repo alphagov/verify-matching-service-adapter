@@ -11,17 +11,16 @@ import java.util.List;
 
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
-public class MatchingDatasetDto {
+public abstract class MatchingDatasetDto {
 
     private Optional<SimpleMdsValueDto<String>> firstName = Optional.absent();
     private Optional<SimpleMdsValueDto<String>> middleNames = Optional.absent();
     private List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
     private Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.absent();
     private Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.absent();
-    private List<AddressDto> addresses = new ArrayList<>();
 
     @SuppressWarnings("unused") // needed for JAXB
-    private MatchingDatasetDto() {
+    protected MatchingDatasetDto() {
     }
 
     public MatchingDatasetDto(
@@ -29,15 +28,13 @@ public class MatchingDatasetDto {
             Optional<SimpleMdsValueDto<String>> middleNames,
             List<SimpleMdsValueDto<String>> surnames,
             Optional<SimpleMdsValueDto<GenderDto>> gender,
-            Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth,
-            List<AddressDto> addresses) {
+            Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth) {
 
         this.firstName = firstName;
         this.middleNames = middleNames;
         this.surnames = surnames;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
-        this.addresses = addresses;
     }
 
     public Optional<SimpleMdsValueDto<String>> getFirstName() {
@@ -58,10 +55,6 @@ public class MatchingDatasetDto {
 
     public Optional<SimpleMdsValueDto<LocalDate>> getDateOfBirth() {
         return dateOfBirth;
-    }
-
-    public List<AddressDto> getAddresses() {
-        return addresses;
     }
 
     @Override

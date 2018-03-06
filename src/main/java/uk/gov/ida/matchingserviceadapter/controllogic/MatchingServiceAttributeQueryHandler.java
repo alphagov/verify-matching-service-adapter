@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
@@ -30,7 +30,7 @@ public class MatchingServiceAttributeQueryHandler {
     }
 
     public OutboundResponseFromMatchingService handle(InboundMatchingServiceRequest attributeQuery) {
-        MatchingServiceRequestDto matchingServiceAttributeQuery = queryDtoMapper.map(attributeQuery);
+        VerifyMatchingServiceRequestDto matchingServiceAttributeQuery = queryDtoMapper.map(attributeQuery);
         MatchingServiceResponseDto matchingServiceResponseDto = matchingServiceProxy.makeMatchingServiceRequest(matchingServiceAttributeQuery);
         LOG.info("Result from matching service for id " + attributeQuery.getId() + " is " + matchingServiceResponseDto.getResult());
         return dtoResponseMapper.map(

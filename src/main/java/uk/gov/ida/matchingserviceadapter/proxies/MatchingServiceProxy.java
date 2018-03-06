@@ -7,6 +7,9 @@ import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 
 public interface MatchingServiceProxy {
+
     MatchingServiceResponseDto makeMatchingServiceRequest(MatchingServiceRequestDto attributeQuery);
+
     UnknownUserCreationResponseDto makeUnknownUserCreationRequest(UnknownUserCreationRequestDto attributeQuery);
+
 }

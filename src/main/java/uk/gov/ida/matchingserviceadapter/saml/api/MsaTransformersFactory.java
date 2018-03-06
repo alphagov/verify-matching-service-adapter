@@ -13,8 +13,6 @@ import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngin
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
-import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
@@ -70,7 +68,6 @@ import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgori
 import uk.gov.ida.saml.security.validators.issuer.IssuerValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
 import uk.gov.ida.saml.serializers.XmlObjectToElementTransformer;
-import uk.gov.ida.validation.validators.Validator;
 
 import java.util.function.Function;
 
@@ -233,7 +230,7 @@ public class MsaTransformersFactory {
         );
     }
 
-    public Function<MatchingServiceRequestContext, MatchingServiceRequestDto> getEidasMatchingRequestToMSRequestTransformer(
+    public EidasMatchingRequestToMSRequestTransformer getEidasMatchingRequestToMSRequestTransformer(
         UserIdHashFactory userIdHashFactory, String hubEntityId) {
         return new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId, coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId));
     }

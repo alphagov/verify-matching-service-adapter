@@ -6,8 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
@@ -57,9 +56,9 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
                 .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(idaAuthnStatement).build())
                 .build();
 
-        MatchingServiceRequestDto requestDto = mapper.map(request);
+        VerifyMatchingServiceRequestDto requestDto = mapper.map(request);
 
-        verify(matchingDatasetToMatchingDatasetDtoMapper).map(matchingDataset);
+        verify(matchingDatasetToMatchingDatasetDtoMapper).mapToVerifyMatchingDatasetDto(matchingDataset);
         assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(false);
         assertThat(requestDto.getLevelOfAssurance()).isEqualTo(levelOfAssuranceDto);
     }
@@ -74,7 +73,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
         Optional<AuthnContext> levelOfAssurance = request.getAuthnStatementAssertion().getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext);
         when(userIdHashFactory.hashId(request.getMatchingDatasetAssertion().getIssuerId(), request.getMatchingDatasetAssertion().getPersistentId().getNameId(), levelOfAssurance)).thenReturn(hashedPid);
 
-        MatchingServiceRequestDto requestDto = mapper.map(request);
+        VerifyMatchingServiceRequestDto requestDto = mapper.map(request);
 
         assertThat(requestDto.getHashedPid()).isEqualTo(hashedPid);
     }
@@ -87,7 +86,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
                 .withCycle3DataAssertion(aHubAssertion().withCycle3Data(cycle3Data).build())
                 .build();
 
-        MatchingServiceRequestDto requestDto = mapper.map(request);
+        VerifyMatchingServiceRequestDto requestDto = mapper.map(request);
 
         assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(true);
         assertThat(requestDto.getCycle3Dataset().get().getAttributes()).isEqualTo(cycle3DatasetDto.getAttributes());

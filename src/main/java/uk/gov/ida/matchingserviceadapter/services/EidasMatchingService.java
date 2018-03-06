@@ -7,28 +7,27 @@ import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.AttributeQueryValidationException;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
+import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
+import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
-import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
-import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 
 import javax.inject.Inject;
-import java.util.function.Function;
 
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 public class EidasMatchingService implements MatchingService {
 
     private final Validator<AttributeQuery> validator;
-    private final Function<MatchingServiceRequestContext, MatchingServiceRequestDto> transformer;
+    private final EidasMatchingRequestToMSRequestTransformer transformer;
     private final MatchingServiceProxy matchingServiceClient;
     private final MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
     @Inject
     public EidasMatchingService(Validator<AttributeQuery> validator,
-                                Function<MatchingServiceRequestContext, MatchingServiceRequestDto> transformer,
+                                EidasMatchingRequestToMSRequestTransformer transformer,
                                 MatchingServiceProxy matchingServiceClient,
                                 MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper) {
         this.validator = validator;
@@ -44,13 +43,13 @@ public class EidasMatchingService implements MatchingService {
             throw new AttributeQueryValidationException("Eidas Attribute Query was invalid: " + validationMessages);
         }
 
-        MatchingServiceRequestDto matchingServiceRequestDto = transformer.apply(request);
-        MatchingServiceResponseDto responseFromMatchingService = matchingServiceClient.makeMatchingServiceRequest(matchingServiceRequestDto);
+        UniversalMatchingServiceRequestDto universalMatchingServiceRequestDto = transformer.apply(request);
+        MatchingServiceResponseDto responseFromMatchingService = matchingServiceClient.makeMatchingServiceRequest(universalMatchingServiceRequestDto);
 
         return new VerifyMatchingServiceResponse(
             responseMapper.map(
                 responseFromMatchingService,
-                matchingServiceRequestDto.getHashedPid(),
+                universalMatchingServiceRequestDto.getHashedPid(),
                 request.getAttributeQuery().getID(),
                 request.getAttributeQuery().getSubject().getNameID().getNameQualifier(),
                 authnContextFactory.mapFromEidasToLoA(request.getAssertions().get(0).getAuthnStatements().get(0).getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef()),
