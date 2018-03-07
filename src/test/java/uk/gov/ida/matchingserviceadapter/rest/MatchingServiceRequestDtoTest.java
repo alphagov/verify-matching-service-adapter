@@ -42,11 +42,12 @@ public class MatchingServiceRequestDtoTest {
 
     @Test
     public void shouldSerializeToJson() throws IOException {
-        VerifyMatchingServiceRequestDto verifyMatchingServiceRequestDto = getMatchingServiceRequestDto();
+        VerifyMatchingServiceRequestDto originalDto = getMatchingServiceRequestDto();
 
-        String jsonString = objectMapper.writeValueAsString(verifyMatchingServiceRequestDto);
+        String jsonString = objectMapper.writeValueAsString(originalDto);
+        VerifyMatchingServiceRequestDto reserializedDto = objectMapper.readValue(jsonString, VerifyMatchingServiceRequestDto.class);
 
-        assertThat(jsonString).isEqualTo(jsonFixture("matching-service-request.json"));
+        assertThat(reserializedDto).isEqualTo(originalDto);
     }
 
     @Test

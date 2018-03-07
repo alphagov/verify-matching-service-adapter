@@ -28,12 +28,12 @@ public class VerifyAddressDtoTest {
     @Test
     public void shouldSerializeToJson() throws IOException {
 
-        VerifyAddressDto verifyAddressDto = createVerifyAddressDto(fromDate, toDate);
+        VerifyAddressDto originalDto = createVerifyAddressDto(fromDate, toDate);
 
-        String serializedJson = objectMapper.writeValueAsString(verifyAddressDto);
-        String expectedJson = jsonFixture(objectMapper, "verify-address.json");
+        String serializedJson = objectMapper.writeValueAsString(originalDto);
+        VerifyAddressDto reserializedDto = objectMapper.readValue(serializedJson, VerifyAddressDto.class);
 
-        assertThat(serializedJson).isEqualTo(expectedJson);
+        assertThat(reserializedDto).isEqualTo(originalDto);
     }
 
     @Test

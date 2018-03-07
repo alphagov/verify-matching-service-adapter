@@ -31,12 +31,12 @@ public class VerifyMatchingDatasetDtoTest {
     @Test
     public void shouldSerializeToJson() throws IOException {
 
-        MatchingDatasetDto verifyMatchingDatasetDto = createVerifyMatchingDatasetDto(date);
+        MatchingDatasetDto originalDto = createVerifyMatchingDatasetDto(date);
 
-        String serializedJson = objectMapper.writeValueAsString(verifyMatchingDatasetDto);
-        String expectedJson = jsonFixture(objectMapper, "verify-matching-dataset.json");
+        String serializedJson = objectMapper.writeValueAsString(originalDto);
+        MatchingDatasetDto reserializedDto = objectMapper.readValue(serializedJson, VerifyMatchingDatasetDto.class);
 
-        assertThat(serializedJson).isEqualTo(expectedJson);
+        assertThat(reserializedDto).isEqualTo(originalDto);
     }
 
     @Test

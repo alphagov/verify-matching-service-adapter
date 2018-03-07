@@ -35,12 +35,13 @@ public class UniversalMatchingDatasetDtoTest {
     @Test
     public void shouldSerializeToJson_withTwoAddresses() throws IOException {
 
-        MatchingDatasetDto universalMatchingDatasetDto = createUniversalMatchingDatasetDto_twoAddresses(date);
+        MatchingDatasetDto originalDto = createUniversalMatchingDatasetDto_twoAddresses(date);
 
-        String serializedJson = objectMapper.writeValueAsString(universalMatchingDatasetDto);
-        String expectedJson = jsonFixture(objectMapper, "universal-matching-dataset_two-addresses.json");
+        String serializedJson = objectMapper.writeValueAsString(originalDto);
 
-        assertThat(serializedJson).isEqualTo(expectedJson);
+        UniversalMatchingDatasetDto reserializedDto = objectMapper.readValue(serializedJson, UniversalMatchingDatasetDto.class);
+
+        assertThat(reserializedDto).isEqualTo(originalDto);
     }
 
     @Test

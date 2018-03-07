@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -10,7 +9,6 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@JsonPropertyOrder({ "verified", "from", "to" })
 public class UniversalAddressDto extends AddressDto {
     private DateTime from;
     private Optional<DateTime> to = Optional.absent();

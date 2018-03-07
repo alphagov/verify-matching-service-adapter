@@ -28,12 +28,13 @@ public class UniversalAddressDtoTest {
     @Test
     public void shouldSerializeToJson() throws IOException {
 
-        UniversalAddressDto universalAddressDto = createUniversalAddressDto(fromDate, toDate);
+        UniversalAddressDto originalDto = createUniversalAddressDto(fromDate, toDate);
 
-        String serializedJson = objectMapper.writeValueAsString(universalAddressDto);
-        String expectedJson = jsonFixture(objectMapper, "universal-address.json");
+        String serializedJson = objectMapper.writeValueAsString(originalDto);
 
-        assertThat(serializedJson).isEqualTo(expectedJson);
+        UniversalAddressDto reserializedDto = objectMapper.readValue(serializedJson, UniversalAddressDto.class);
+
+        assertThat(reserializedDto).isEqualTo(originalDto);
     }
 
     @Test

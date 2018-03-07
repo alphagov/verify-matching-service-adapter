@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.rest;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -9,10 +8,8 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
-
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
-@JsonPropertyOrder({ "matchingDataset" })
 public class VerifyMatchingServiceRequestDto extends MatchingServiceRequestDto {
 
     private VerifyMatchingDatasetDto matchingDataset;
