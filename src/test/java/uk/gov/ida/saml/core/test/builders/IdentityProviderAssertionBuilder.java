@@ -38,7 +38,7 @@ public class IdentityProviderAssertionBuilder {
                 authnStatement);
     }
 
-    public IdentityProviderAssertionBuilder withId(String id){
+    public IdentityProviderAssertionBuilder withId(String id) {
         this.id = id;
         return this;
     }

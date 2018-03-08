@@ -118,6 +118,6 @@ public class UnknownUserAttributeQueryHandlerTest {
                                                 .build())
                                 .build()
                 )
-                .build();
+                .buildForVerify();
     }
 }

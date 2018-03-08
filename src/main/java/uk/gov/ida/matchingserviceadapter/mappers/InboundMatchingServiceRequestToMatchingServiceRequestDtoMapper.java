@@ -2,18 +2,22 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import uk.gov.ida.matchingserviceadapter.domain.ProxyNodeAssertion;
+import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundEidasMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.domain.AuthnContext;
-import uk.gov.ida.saml.core.domain.Cycle3Dataset;
 import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
+import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
 
 import static com.google.common.base.Optional.absent;
 
@@ -39,30 +43,45 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
             matchingDatasetAssertion.getPersistentId().getNameId(),
             authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
 
-        Optional<HubAssertion> cycle3AttributeAssertion = attributeQuery.getCycle3AttributeAssertion();
-        Optional<Cycle3Dataset> cycle3Dataset = absent();
-        if (cycle3AttributeAssertion.isPresent()) {
-            cycle3Dataset = cycle3AttributeAssertion.get().getCycle3Data();
-        }
         AuthnContext authnContext = authnStatementAssertion.getAuthnStatement().get().getAuthnContext();
 
         VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
-
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
 
         return new VerifyMatchingServiceRequestDto(
                 matchingDatasetDto,
-                mapCycle3(cycle3Dataset),
+                extractCycle3Dataset(attributeQuery),
                 hashedPid,
                 attributeQuery.getId(),
                 levelOfAssurance);
     }
 
-    private Optional<Cycle3DatasetDto> mapCycle3(Optional<Cycle3Dataset> cycle3Dataset) {
-       if (!cycle3Dataset.isPresent()){
-           return absent();
-       }
+    public UniversalMatchingServiceRequestDto map(InboundEidasMatchingServiceRequest attributeQuery) {
+        ProxyNodeAssertion proxyNodeAssertion = attributeQuery.getMatchingDatasetAssertion();
 
-       return Optional.fromNullable(Cycle3DatasetDto.createFromData(cycle3Dataset.get().getAttributes()));
+        LevelOfAssurance levelOfAssurance = proxyNodeAssertion.getLevelOfAssurance();
+        AuthnContext authnContext = levelOfAssurance.toVerifyLevelOfAssurance();
+
+        String issuer = proxyNodeAssertion.getIssuer();
+        String personIdentifier = proxyNodeAssertion.getPersonIdentifier();
+        final String hashedPid = userIdHashFactory.hashId(issuer, personIdentifier, Optional.fromNullable(authnContext));
+
+        LevelOfAssuranceDto levelOfAssuranceDto = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
+
+        return new UniversalMatchingServiceRequestDto(
+                null,
+                extractCycle3Dataset(attributeQuery),
+                hashedPid,
+                attributeQuery.getId(),
+                levelOfAssuranceDto);
+    }
+
+    private Optional<Cycle3DatasetDto> extractCycle3Dataset(InboundMatchingServiceRequest attributeQuery) {
+        Optional<HubAssertion> cycle3AttributeAssertion = attributeQuery.getCycle3AttributeAssertion();
+        if (!cycle3AttributeAssertion.isPresent()) {
+           return absent();
+        }
+
+       return Optional.fromNullable(Cycle3DatasetDto.createFromData(cycle3AttributeAssertion.get().getCycle3Data().get().getAttributes()));
     }
 }

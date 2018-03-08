@@ -79,7 +79,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
                 .withAssertionConsumerServiceUrl("/foo")
                 .withRequestIssuerEntityId(authnRequestIssuerEntityId)
                 .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(authnStatement).build())
-                .build();
+                .buildForVerify();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withMatch().build();
         when(assertionFactory.createAssertionFromMatchingService(
             any(PersistentId.class),
@@ -108,7 +108,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
 
     @Test
     public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithNoMatch() {
-        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
+        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().buildForVerify();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withNoMatch().build();
 
         OutboundResponseFromMatchingService idaResponse = mapper.map(
@@ -124,7 +124,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
 
     @Test(expected = UnsupportedOperationException.class)
     public void map_shouldThrowExceptionIfNotNoMatchOrMatch() {
-        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
+        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().buildForVerify();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withCrappyResponse().build();
 
         mapper.map(

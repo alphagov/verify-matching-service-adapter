@@ -4,8 +4,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
+import uk.gov.ida.matchingserviceadapter.domain.ProxyNodeAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundEidasMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.HubAssertion;
@@ -28,6 +30,7 @@ public class InboundMatchingServiceRequestBuilder {
     private IdentityProviderAssertion matchingDatasetAssertion = anIdentityProviderAssertion().withMatchingDataset(
             aMatchingDataset().build()).withPersistentId(aPersistentId().build()).build();
     private IdentityProviderAssertion authnStatementAssertion = anIdentityProviderAssertion().withAuthnStatement(anIdentityProviderAuthnStatement().build()).build();
+    private ProxyNodeAssertion proxyNodeAssertion;
     private Optional<HubAssertion> cycle3AttributeAssertion = absent();
     private String requestIssuerEntityId = "issuer-id";
     private String assertionConsumerServiceUrl = "/foo";
@@ -37,7 +40,7 @@ public class InboundMatchingServiceRequestBuilder {
         return new InboundMatchingServiceRequestBuilder();
     }
 
-    public InboundVerifyMatchingServiceRequest build() {
+    public InboundVerifyMatchingServiceRequest buildForVerify() {
         Iterable<Attribute> requiredAttributes = userCreationAttributes.stream()
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(Collectors.toList());
@@ -53,6 +56,21 @@ public class InboundMatchingServiceRequestBuilder {
                 ImmutableList.copyOf(requiredAttributes));
     }
 
+    public InboundEidasMatchingServiceRequest buildForEidas() {
+        Iterable<Attribute> requiredAttributes = userCreationAttributes.stream()
+                .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
+                .collect(Collectors.toList());
+        return new InboundEidasMatchingServiceRequest(
+                id,
+                issuer,
+                proxyNodeAssertion,
+                cycle3AttributeAssertion,
+                DateTime.now(),
+                requestIssuerEntityId,
+                assertionConsumerServiceUrl,
+                ImmutableList.copyOf(requiredAttributes));
+    }
+
     public InboundMatchingServiceRequestBuilder withMatchingDatasetAssertion(IdentityProviderAssertion assertion) {
         this.matchingDatasetAssertion = assertion;
         return this;
@@ -60,6 +78,11 @@ public class InboundMatchingServiceRequestBuilder {
 
     public InboundMatchingServiceRequestBuilder withAuthnStatementAssertion(IdentityProviderAssertion assertion) {
         this.authnStatementAssertion = assertion;
+        return this;
+    }
+
+    public InboundMatchingServiceRequestBuilder withProxyNodeAssertion(ProxyNodeAssertion proxyNodeAssertion) {
+        this.proxyNodeAssertion = proxyNodeAssertion;
         return this;
     }
 

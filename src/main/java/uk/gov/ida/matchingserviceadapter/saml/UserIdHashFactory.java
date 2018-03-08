@@ -43,7 +43,7 @@ public class UserIdHashFactory {
         String persistentIdHash;
 
         final AuthnContext authnContext = context.toJavaUtil().orElseThrow(() -> new AuthnContextMissingException(String.format("Authn context absent for persistent id %s", persistentId)));
-        if(authnContext.equals(AuthnContext.LEVEL_2)) {
+        if (authnContext.equals(AuthnContext.LEVEL_2)) {
             // default behaviour - for LEVEL_2
             persistentIdHash = MessageFormat.format("{0}{1}{2}", issuerEntityId, msaEntityId, persistentId);
         } else {

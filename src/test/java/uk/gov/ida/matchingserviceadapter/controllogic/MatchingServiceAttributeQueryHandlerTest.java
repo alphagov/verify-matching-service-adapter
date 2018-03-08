@@ -35,7 +35,7 @@ public class MatchingServiceAttributeQueryHandlerTest {
 
     @Test
     public void handle_shouldPassMapperOutputToProxy() throws Exception {
-        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
+        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().buildForVerify();
         AuthnContext authnContext = attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext();
         String hashedPid = "pid";
         VerifyMatchingServiceRequestDto matchingServiceAttributeQuery = aMatchingServiceRequestDto().withHashedPid(hashedPid).buildVerifyMatchingServiceRequestDto();
