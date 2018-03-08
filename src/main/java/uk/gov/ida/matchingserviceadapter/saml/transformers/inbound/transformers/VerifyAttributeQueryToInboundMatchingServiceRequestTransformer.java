@@ -8,6 +8,7 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.security.ValidatedAttributeQuery;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
 import uk.gov.ida.saml.security.AssertionDecrypter;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer implements Function<AttributeQuery, InboundMatchingServiceRequest> {
+public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer implements Function<AttributeQuery, InboundVerifyMatchingServiceRequest> {
 
     private final SamlAttributeQueryValidator samlAttributeQueryValidator;
     private final AttributeQuerySignatureValidator attributeQuerySignatureValidator;
@@ -50,7 +51,7 @@ public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer impl
         this.hubEntityId = hubEntityId;
     }
 
-    public InboundMatchingServiceRequest apply(final AttributeQuery attributeQuery) {
+    public InboundVerifyMatchingServiceRequest apply(final AttributeQuery attributeQuery) {
         samlAttributeQueryValidator.validate(attributeQuery);
         ValidatedAttributeQuery validatedAttributeQuery = attributeQuerySignatureValidator.validate(attributeQuery);
 

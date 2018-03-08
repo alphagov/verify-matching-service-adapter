@@ -10,7 +10,7 @@ import uk.gov.ida.matchingserviceadapter.logging.MdcHelper;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SamlElementType;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 
@@ -18,13 +18,13 @@ import java.util.function.Function;
 
 public class DocumentToInboundMatchingServiceRequestMapper{
     private final SoapMessageManager soapMessageManager;
-    private final Function<AttributeQuery, InboundMatchingServiceRequest> attributeQueryTransformer;
+    private final Function<AttributeQuery, InboundVerifyMatchingServiceRequest> attributeQueryTransformer;
     private final ElementToOpenSamlXMLObjectTransformer<AttributeQuery> attributeQueryUnmarshaller;
 
     @Inject
     public DocumentToInboundMatchingServiceRequestMapper(
             SoapMessageManager soapMessageManager,
-            Function<AttributeQuery, InboundMatchingServiceRequest> attributeQueryTransformer,
+            Function<AttributeQuery, InboundVerifyMatchingServiceRequest> attributeQueryTransformer,
             ElementToOpenSamlXMLObjectTransformer<AttributeQuery> attributeQueryUnmarshaller
     ) {
         this.soapMessageManager = soapMessageManager;
@@ -32,13 +32,13 @@ public class DocumentToInboundMatchingServiceRequestMapper{
         this.attributeQueryUnmarshaller = attributeQueryUnmarshaller;
     }
 
-    public InboundMatchingServiceRequest getInboundMatchingServiceRequest(Document attributeQueryDocument) {
+    public InboundVerifyMatchingServiceRequest getInboundMatchingServiceRequest(Document attributeQueryDocument) {
         Element unwrappedMessage = soapMessageManager.unwrapSoapMessage(attributeQueryDocument, SamlElementType.AttributeQuery);
 
         return getInboundMatchingServiceRequest(unwrappedMessage);
     }
 
-    private InboundMatchingServiceRequest getInboundMatchingServiceRequest(Element unwrappedMessage) {
+    private InboundVerifyMatchingServiceRequest getInboundMatchingServiceRequest(Element unwrappedMessage) {
         AttributeQuery attributeQuery = attributeQueryUnmarshaller.apply(unwrappedMessage);
         MdcHelper.addContextToMdc(attributeQuery);
         try {

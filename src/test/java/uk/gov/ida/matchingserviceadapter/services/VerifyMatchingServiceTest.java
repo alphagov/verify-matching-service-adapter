@@ -10,7 +10,7 @@ import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQu
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +28,7 @@ public class VerifyMatchingServiceTest {
     @Mock
     private MatchingServiceRequestContext requestContext;
     @Mock
-    private InboundMatchingServiceRequest inboundRequest;
+    private InboundVerifyMatchingServiceRequest inboundRequest;
     @Mock
     private OutboundResponseFromMatchingService outboundResponse;
 

@@ -16,7 +16,7 @@ import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.UnknownUserCreationIdaStatus;
@@ -78,7 +78,7 @@ public class UnknownUserAttributeQueryHandlerTest {
         when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(SUCCESS));
 
-        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.handle(buildInboundMatchingServiceRequest());
+        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.handle(buildInboundVerifyMatchingServiceRequest());
 
         assertThat(response.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.Success);
     }
@@ -88,12 +88,12 @@ public class UnknownUserAttributeQueryHandlerTest {
         when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(FAILURE));
 
-        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.handle(buildInboundMatchingServiceRequest());
+        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.handle(buildInboundVerifyMatchingServiceRequest());
 
         assertThat(handle.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.CreateFailure);
     }
 
-    private InboundMatchingServiceRequest buildInboundMatchingServiceRequest(){
+    private InboundVerifyMatchingServiceRequest buildInboundVerifyMatchingServiceRequest(){
         return anInboundMatchingServiceRequest()
                 .withAuthnStatementAssertion(
                         anIdentityProviderAssertion()

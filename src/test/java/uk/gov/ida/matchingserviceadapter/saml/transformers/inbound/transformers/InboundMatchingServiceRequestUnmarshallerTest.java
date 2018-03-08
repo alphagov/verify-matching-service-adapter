@@ -15,6 +15,7 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import uk.gov.ida.matchingserviceadapter.saml.security.ValidatedAttributeQuery;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
@@ -127,7 +128,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     public void transform_shouldMapAssertions() throws Exception {
         AttributeQuery query = givenAValidAttributeQuery();
 
-        InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
+        InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
                 new ValidatedAttributeQuery(query),
                 givenASetOfValidatedHubAssertions(),
                 givenASetOfValidatedIdpAssertions());
@@ -143,7 +144,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     @Test
     public void transform_shouldMapAttributes() {
         AttributeQuery query = givenAValidAttributeQuery();
-        InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
+        InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
                 new ValidatedAttributeQuery(query),
                 givenASetOfValidatedHubAssertions(),
                 givenASetOfValidatedIdpAssertions());

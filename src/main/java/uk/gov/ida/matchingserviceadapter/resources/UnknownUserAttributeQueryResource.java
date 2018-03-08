@@ -12,6 +12,7 @@ import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 
 import javax.ws.rs.Consumes;
@@ -53,7 +54,7 @@ public class UnknownUserAttributeQueryResource {
 
         LOG.debug("AttributeQuery POSTED: {}", attributeQueryDocument);
 
-        InboundMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(attributeQueryDocument);
+        InboundVerifyMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(attributeQueryDocument);
 
         OutboundResponseFromUnknownUserCreationService samlResponse = getOutboundResponseFromMatchingService(hubMatchingServiceRequest);
         Element output = responseElementTransformer.apply(samlResponse);
@@ -62,7 +63,7 @@ public class UnknownUserAttributeQueryResource {
                 .build();
     }
 
-    private OutboundResponseFromUnknownUserCreationService getOutboundResponseFromMatchingService(InboundMatchingServiceRequest hubMatchingServiceRequest) {
+    private OutboundResponseFromUnknownUserCreationService getOutboundResponseFromMatchingService(InboundVerifyMatchingServiceRequest hubMatchingServiceRequest) {
         OutboundResponseFromUnknownUserCreationService response;
         try {
             response = attributeQueryHandler.handle(hubMatchingServiceRequest);

@@ -6,7 +6,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
 import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
 import javax.ws.rs.WebApplicationException;
@@ -27,13 +27,13 @@ public class VerifyMatchingService implements MatchingService {
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
 
         //TODO - eid-333 Make class match structure of EidasMatchingService
-        InboundMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(request.getAttributeQueryDocument());
+        InboundVerifyMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(request.getAttributeQueryDocument());
 
         OutboundResponseFromMatchingService samlResponse = getOutboundResponseFromMatchingService(hubMatchingServiceRequest);
         return new VerifyMatchingServiceResponse(samlResponse);
     }
 
-    private OutboundResponseFromMatchingService getOutboundResponseFromMatchingService(InboundMatchingServiceRequest hubMatchingServiceRequest) {
+    private OutboundResponseFromMatchingService getOutboundResponseFromMatchingService(InboundVerifyMatchingServiceRequest hubMatchingServiceRequest) {
         OutboundResponseFromMatchingService response;
         try {
             response = attributeQueryHandler.handle(hubMatchingServiceRequest);

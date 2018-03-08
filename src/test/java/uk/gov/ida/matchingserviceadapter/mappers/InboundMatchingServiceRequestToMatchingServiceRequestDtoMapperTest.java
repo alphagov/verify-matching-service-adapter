@@ -10,7 +10,7 @@ import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
 import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
@@ -51,7 +51,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
         IdentityProviderAuthnStatement idaAuthnStatement = anIdentityProviderAuthnStatement()
                 .withAuthnContext(levelOfAssurance)
                 .build();
-        InboundMatchingServiceRequest request = anInboundMatchingServiceRequest()
+        InboundVerifyMatchingServiceRequest request = anInboundMatchingServiceRequest()
                 .withMatchingDatasetAssertion(anIdentityProviderAssertion().withMatchingDataset(matchingDataset).build())
                 .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(idaAuthnStatement).build())
                 .build();
@@ -66,7 +66,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
     @Test
     public void map_shouldUseTheHashedPid() {
         MatchingDataset matchingDataset = aMatchingDataset().build();
-        InboundMatchingServiceRequest request = anInboundMatchingServiceRequest()
+        InboundVerifyMatchingServiceRequest request = anInboundMatchingServiceRequest()
                 .withMatchingDatasetAssertion(anIdentityProviderAssertion().withMatchingDataset(matchingDataset).build())
                 .build();
         String hashedPid = "a-hashed-pid";
@@ -82,7 +82,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
     public void map_shouldAddCycle3DatasetWhenPresent() {
         Cycle3Dataset cycle3Data = aCycle3Dataset().build();
         Cycle3DatasetDto cycle3DatasetDto = aCycle3DatasetDto().build();
-        InboundMatchingServiceRequest request = anInboundMatchingServiceRequest()
+        InboundVerifyMatchingServiceRequest request = anInboundMatchingServiceRequest()
                 .withCycle3DataAssertion(aHubAssertion().withCycle3Data(cycle3Data).build())
                 .build();
 

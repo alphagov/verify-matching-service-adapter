@@ -17,7 +17,7 @@ import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.saml.core.domain.AssertionRestrictions;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
@@ -54,7 +54,7 @@ public class UnknownUserAttributeQueryHandler {
         this.userAccountCreationAttributeExtractor = userAccountCreationAttributeExtractor;
     }
 
-    public OutboundResponseFromUnknownUserCreationService handle(InboundMatchingServiceRequest attributeQuery) {
+    public OutboundResponseFromUnknownUserCreationService handle(InboundVerifyMatchingServiceRequest attributeQuery) {
         IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
@@ -79,7 +79,7 @@ public class UnknownUserAttributeQueryHandler {
         return matchingServiceResponse;
     }
 
-    private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(final InboundMatchingServiceRequest attributeQuery, final String hashedPid, final List<Attribute> extractedUserAccountCreationAttributes) {
+    private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(final InboundVerifyMatchingServiceRequest attributeQuery, final String hashedPid, final List<Attribute> extractedUserAccountCreationAttributes) {
         final OutboundResponseFromUnknownUserCreationService matchingServiceResponse;
         if (!extractedUserAccountCreationAttributes.isEmpty()) {
             matchingServiceResponse = getMatchingServiceResponse(hashedPid, attributeQuery, extractedUserAccountCreationAttributes);
@@ -91,7 +91,7 @@ public class UnknownUserAttributeQueryHandler {
 
     private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(
         final String hashPid,
-        final InboundMatchingServiceRequest attributeQuery,
+        final InboundVerifyMatchingServiceRequest attributeQuery,
         final List<Attribute> userAttributesForAccountCreation) {
         AssertionRestrictions assertionRestrictions = new AssertionRestrictions(
             DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()),

@@ -15,7 +15,7 @@ import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfigur
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 import uk.gov.ida.saml.core.domain.AssertionRestrictions;
 import uk.gov.ida.saml.core.domain.AuthnContext;
@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.builders.InboundMatchingServiceRequestBuilder.anInboundMatchingServiceRequest;
 import static uk.gov.ida.matchingserviceadapter.builders.MatchingServiceAssertionBuilder.aMatchingServiceAssertion;
 import static uk.gov.ida.matchingserviceadapter.builders.MatchingServiceResponseDtoBuilder.aMatchingServiceResponseDto;
-import static uk.gov.ida.saml.core.test.builders.AssertionRestrictionsBuilder.anAssertionRestrictions;
 import static uk.gov.ida.saml.core.test.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 import static uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
 
@@ -76,7 +75,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
             .withAuthnContext(AuthnContext.LEVEL_2)
             .build();
         final String authnRequestIssuerEntityId = "authnRequestIssuerEntityId";
-        InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest()
+        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest()
                 .withAssertionConsumerServiceUrl("/foo")
                 .withRequestIssuerEntityId(authnRequestIssuerEntityId)
                 .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(authnStatement).build())
@@ -109,7 +108,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
 
     @Test
     public void map_shouldTranslateMatchingServiceResponseDtoToIdaResponseFromMatchingServiceWithNoMatch() {
-        InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
+        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withNoMatch().build();
 
         OutboundResponseFromMatchingService idaResponse = mapper.map(
@@ -125,7 +124,7 @@ public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapp
 
     @Test(expected = UnsupportedOperationException.class)
     public void map_shouldThrowExceptionIfNotNoMatchOrMatch() {
-        InboundMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
+        InboundVerifyMatchingServiceRequest attributeQuery = anInboundMatchingServiceRequest().build();
         MatchingServiceResponseDto response = aMatchingServiceResponseDto().withCrappyResponse().build();
 
         mapper.map(

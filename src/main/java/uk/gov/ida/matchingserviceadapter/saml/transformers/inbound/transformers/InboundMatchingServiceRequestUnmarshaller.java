@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.matchingserviceadapter.saml.security.ValidatedAttributeQuery;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
@@ -25,7 +25,7 @@ public class InboundMatchingServiceRequestUnmarshaller {
     }
 
     @SuppressWarnings("unchecked") // we know this cast will work
-    public InboundMatchingServiceRequest fromSaml(ValidatedAttributeQuery originalQuery, ValidatedAssertions validatedHubAssertions, ValidatedAssertions validatedIdpAssertions) {
+    public InboundVerifyMatchingServiceRequest fromSaml(ValidatedAttributeQuery originalQuery, ValidatedAssertions validatedHubAssertions, ValidatedAssertions validatedIdpAssertions) {
         String id = originalQuery.getID();
         String originalIssuer = originalQuery.getIssuer().getValue();
         Subject subject = originalQuery.getSubject();
@@ -53,7 +53,7 @@ public class InboundMatchingServiceRequestUnmarshaller {
         String authnRequestIssuerId = subject.getNameID().getSPNameQualifier();
         String assertionConsumerUrl = subject.getNameID().getNameQualifier();
 
-        return new InboundMatchingServiceRequest(
+        return new InboundVerifyMatchingServiceRequest(
                 id,
                 originalIssuer,
                 matchingDatasetAssertion,

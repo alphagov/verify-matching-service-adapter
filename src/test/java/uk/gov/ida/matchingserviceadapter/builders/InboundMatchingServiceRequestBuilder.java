@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
@@ -37,11 +37,11 @@ public class InboundMatchingServiceRequestBuilder {
         return new InboundMatchingServiceRequestBuilder();
     }
 
-    public InboundMatchingServiceRequest build() {
+    public InboundVerifyMatchingServiceRequest build() {
         Iterable<Attribute> requiredAttributes = userCreationAttributes.stream()
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(Collectors.toList());
-        return new InboundMatchingServiceRequest(
+        return new InboundVerifyMatchingServiceRequest(
                 id,
                 issuer,
                 matchingDatasetAssertion,
