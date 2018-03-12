@@ -16,7 +16,6 @@ public abstract class FeatureTestBase {
     protected SummaryGeneratingListener listener = new SummaryGeneratingListener();
     protected FilesLocator fileLocator = new ScenarioFilesLocator(null);
 
-
     @BeforeEach
     public void setUp() {
         application = new Application();

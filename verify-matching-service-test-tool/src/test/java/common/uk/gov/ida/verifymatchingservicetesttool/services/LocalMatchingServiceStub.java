@@ -37,11 +37,11 @@ public class LocalMatchingServiceStub {
 
     public static final String RELATIVE_MATCH_URL = "/local-matching/match";
     private static final String RELATIVE_ACCOUNT_CREATION_URL = "/local-matching/create-user";
-    private final static String BASE_URL_PATTERN = "http://localhost:%d";
-    private final static String MATCH_URL_PATTERN = BASE_URL_PATTERN + RELATIVE_MATCH_URL;
-    private final static String ACCOUNT_CREATION_URL_PATTERN = BASE_URL_PATTERN + RELATIVE_ACCOUNT_CREATION_URL;
+    private static final String BASE_URL_PATTERN = "http://localhost:%d";
+    private static final String MATCH_URL_PATTERN = BASE_URL_PATTERN + RELATIVE_MATCH_URL;
+    private static final String ACCOUNT_CREATION_URL_PATTERN = BASE_URL_PATTERN + RELATIVE_ACCOUNT_CREATION_URL;
 
-    private static WireMockServer server = new WireMockServer(wireMockConfig().dynamicPort());
+    private WireMockServer server = new WireMockServer(wireMockConfig().dynamicPort());
 
     public void start() {
         server.start();
