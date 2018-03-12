@@ -2,15 +2,18 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 
 import com.google.common.base.Optional;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.ida.matchingserviceadapter.builders.EidasMatchingDatasetBuilder;
+import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDtoTest;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.domain.Gender;
@@ -35,9 +38,8 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         matchingDatasetToMatchingDatasetDtoMapper = new MatchingDatasetToMatchingDatasetDtoMapper();
     }
 
-
     @Test
-    public void mapGender_shouldMapAbsent() throws Exception {
+    public void mapGender_shouldMapAbsent() {
         Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.absent();
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
 
@@ -45,7 +47,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void mapGender_shouldMapMale() throws Exception {
+    public void mapGender_shouldMapMale() {
         SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.MALE).build();
         Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.fromNullable(genderSimpleMdsValue);
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
@@ -58,7 +60,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void mapGender_shouldMapFemale() throws Exception {
+    public void mapGender_shouldMapFemale() {
         SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.FEMALE).build();
         Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.fromNullable(genderSimpleMdsValue);
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
@@ -68,7 +70,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void mapGender_shouldMapNotSpecified() throws Exception {
+    public void mapGender_shouldMapNotSpecified() {
         SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.NOT_SPECIFIED).build();
         Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.fromNullable(genderSimpleMdsValue);
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
@@ -78,10 +80,10 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void map_shouldMapGenericSimpleMdsValue() throws Exception {
+    public void map_shouldMapGenericSimpleMdsValue() {
         SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
         Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.fromNullable(simpleMdsValue);
-        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(simpleMdsValueOptional);
+        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.isPresent()).isEqualTo(true);
         assertThat(result.get().getValue()).isEqualTo("hello");
@@ -91,10 +93,10 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void map_shouldMapListOfGenericSimpleMdsValues() throws Exception {
+    public void map_shouldMapListOfGenericSimpleMdsValues() {
         SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
         List<SimpleMdsValue<String>> simpleMdsValueOptional = singletonList(simpleMdsValue);
-        List<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(simpleMdsValueOptional);
+        List<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getValue()).isEqualTo("hello");
@@ -104,9 +106,9 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void map_shouldMapGenericSimpleMdsValueAbsent() throws Exception {
+    public void map_shouldMapGenericSimpleMdsValueAbsent() {
         Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.absent();
-        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(simpleMdsValueOptional);
+        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.isPresent()).isEqualTo(false);
     }
@@ -160,7 +162,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void mapVerifyAddress_shouldMapAddress() throws Exception {
+    public void mapVerifyAddress_shouldMapAddress() {
         Address address = anAddress()
                 .withLines(singletonList("line1"))
                 .withVerified(false)
@@ -185,7 +187,50 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     }
 
     @Test
-    public void mapEidasAddress_shouldMapAddress() throws Exception {
+    public void mapEidasDatasetToUniversalDatasetDto_shouldMapNames() {
+        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
+                .withFirstName("input-first-name")
+                .withSurname("input-surname")
+                .build();
+
+        UniversalMatchingDatasetDto result =
+                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
+
+        assertThat(result.getFirstName().get().getValue()).isEqualTo(eidasMatchingDataset.getFirstName());
+        assertHasEidasDefaultValues(result.getFirstName().get());
+        assertThat(result.getMiddleNames().isPresent()).isFalse();
+        assertThat(result.getSurnames().get(0).getValue()).isEqualTo(eidasMatchingDataset.getSurname());
+        assertHasEidasDefaultValues(result.getSurnames().get(0));
+    }
+
+    @Test
+    public void mapEidasDatasetToUniversalDatasetDto_shouldMapGender() {
+        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
+                .withGender(Gender.MALE)
+                .build();
+
+        UniversalMatchingDatasetDto result =
+                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
+
+        assertThat(result.getGender().get().getValue()).isEqualTo(GenderDto.MALE);
+        assertHasEidasDefaultValues(result.getGender().get());
+    }
+
+    @Test
+    public void mapEidasDatasetToUniversalDatasetDto_shouldMapDateOfBirth() {
+        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
+                .withDateOfBirth(LocalDate.now())
+                .build();
+
+        UniversalMatchingDatasetDto result =
+                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
+
+        assertThat(result.getDateOfBirth().get().getValue()).isEqualTo(eidasMatchingDataset.getDateOfBirth());
+        assertHasEidasDefaultValues(result.getDateOfBirth().get());
+    }
+
+    @Test
+    public void mapEidasDatasetToUniversalDatasetDto_shouldMapAddresses() {
         Address address = anAddress()
                 .withLines(singletonList("line1"))
                 .withVerified(false)
@@ -195,8 +240,15 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
                 .withInternationalPostCode("int-post-code")
                 .withPostCode("postcode")
                 .build();
-        List<UniversalAddressDto> result = matchingDatasetToMatchingDatasetDtoMapper.mapEidasAddresses(singletonList(address));
 
+        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
+                .withAddress(address)
+                .build();
+
+        UniversalMatchingDatasetDto universalMatchingDatasetDto =
+                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
+
+        List<UniversalAddressDto> result = universalMatchingDatasetDto.getAddresses().get();
         assertThat(result.size()).isEqualTo(1);
         UniversalAddressDto addressDto = result.get(0);
         assertThat(addressDto.getLines().size()).isEqualTo(1);
@@ -207,5 +259,11 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         assertThat(addressDto.getTo()).isEqualTo(address.getTo());
         assertThat(addressDto.getInternationalPostCode()).isEqualTo(addressDto.getInternationalPostCode());
         assertThat(addressDto.getPostCode()).isEqualTo(addressDto.getPostCode());
+    }
+
+    private void assertHasEidasDefaultValues(SimpleMdsValueDto simpleMdsValueDto) {
+        assertThat(simpleMdsValueDto.getFrom()).isNull();
+        assertThat(simpleMdsValueDto.getTo()).isNull();
+        assertThat(simpleMdsValueDto.isVerified()).isTrue();
     }
 }

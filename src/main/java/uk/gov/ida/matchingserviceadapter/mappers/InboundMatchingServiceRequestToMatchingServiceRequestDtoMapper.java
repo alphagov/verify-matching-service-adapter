@@ -2,11 +2,13 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.matchingserviceadapter.domain.ProxyNodeAssertion;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundEidasMatchingServiceRequest;
@@ -39,7 +41,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         MatchingDataset matchingDataset = matchingDatasetAssertion.getMatchingDataset().get();
 
-        final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
+        String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
             matchingDatasetAssertion.getPersistentId().getNameId(),
             authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
 
@@ -58,18 +60,20 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
     public UniversalMatchingServiceRequestDto map(InboundEidasMatchingServiceRequest attributeQuery) {
         ProxyNodeAssertion proxyNodeAssertion = attributeQuery.getMatchingDatasetAssertion();
+        EidasMatchingDataset matchingDataset = proxyNodeAssertion.getEidasMatchingDataset();
 
         LevelOfAssurance levelOfAssurance = proxyNodeAssertion.getLevelOfAssurance();
         AuthnContext authnContext = levelOfAssurance.toVerifyLevelOfAssurance();
 
         String issuer = proxyNodeAssertion.getIssuer();
         String personIdentifier = proxyNodeAssertion.getPersonIdentifier();
-        final String hashedPid = userIdHashFactory.hashId(issuer, personIdentifier, Optional.fromNullable(authnContext));
+        String hashedPid = userIdHashFactory.hashId(issuer, personIdentifier, Optional.fromNullable(authnContext));
 
+        UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
         LevelOfAssuranceDto levelOfAssuranceDto = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
 
         return new UniversalMatchingServiceRequestDto(
-                null,
+                matchingDatasetDto,
                 extractCycle3Dataset(attributeQuery),
                 hashedPid,
                 attributeQuery.getId(),

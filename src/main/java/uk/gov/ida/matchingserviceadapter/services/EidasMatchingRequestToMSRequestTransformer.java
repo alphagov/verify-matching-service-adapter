@@ -91,7 +91,7 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
 
         // Current address
 
-        return new UniversalMatchingDatasetDto(  //FIXME
+        return new UniversalMatchingDatasetDto(
             Optional.fromNullable(firstName),
             Optional.absent(),
             Collections.singletonList(surname),
