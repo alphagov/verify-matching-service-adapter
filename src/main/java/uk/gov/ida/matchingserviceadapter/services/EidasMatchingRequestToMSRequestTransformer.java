@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter.services;
 
 import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.EidasLoa;
@@ -12,7 +13,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.helper.GenderDtoHelper;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.IdaConstants;
@@ -24,6 +25,7 @@ import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
 import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
 import uk.gov.ida.saml.core.extensions.eidas.Gender;
 import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
+import uk.gov.ida.saml.core.extensions.eidas.TransliterableString;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 
 import java.util.Collections;
@@ -84,10 +86,9 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
     }
 
     private UniversalMatchingDatasetDto extractUniversalMatchingDataset(List<Attribute> attributes) {
-
         SimpleMdsValueDto<LocalDate> dateOfBirth = extractSimpleMdsValue(attributes, Eidas_Attributes.DateOfBirth.NAME, DateOfBirth::getDateOfBirth);
-        SimpleMdsValueDto<String> firstName = extractSimpleMdsValue(attributes, Eidas_Attributes.FirstName.NAME, CurrentGivenName::getFirstName);
-        SimpleMdsValueDto<String> surname = extractSimpleMdsValue(attributes, Eidas_Attributes.FamilyName.NAME, CurrentFamilyName::getFamilyName);
+        TransliterableMdsValueDto firstName = extractTransliterableMdsValue(attributes, Eidas_Attributes.FirstName.NAME, CurrentGivenName::getFirstName);
+        TransliterableMdsValueDto surname = extractTransliterableMdsValue(attributes, Eidas_Attributes.FamilyName.NAME, CurrentFamilyName::getFamilyName);
 
         // Current address
 
@@ -97,11 +98,11 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
             Collections.singletonList(surname),
             Optional.fromNullable(extractSimpleMdsGenderValue(attributes)),
             Optional.fromNullable(dateOfBirth),
-            null
+            Optional.absent()
         );
     }
 
-    private UniversalMdsValueDto<GenderDto> extractSimpleMdsGenderValue(List<Attribute> attributes) {
+    private SimpleMdsValueDto<GenderDto> extractSimpleMdsGenderValue(List<Attribute> attributes) {
         String genderStr = getAttributeValue(attributes, Eidas_Attributes.Gender.NAME, Gender::getValue);
 
         if (genderStr == null) {
@@ -109,13 +110,20 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         }
 
         GenderDto genderDto = GenderDtoHelper.convertToVerifyGenderDto(genderStr);
-        return new UniversalMdsValueDto<>(genderDto);
+        return new SimpleMdsValueDto<>(genderDto, null, null, true);
     }
 
-    private <T, V> UniversalMdsValueDto<V> extractSimpleMdsValue(List<Attribute> attributes, String attributeName, Function<T, V> getContent) {
+    private <T, V> SimpleMdsValueDto<V> extractSimpleMdsValue(List<Attribute> attributes, String attributeName, Function<T, V> getContent) {
         V attributeValue = getAttributeValue(attributes, attributeName, getContent);
 
-        return attributeValue == null ? null : new UniversalMdsValueDto<V>(attributeValue);
+        return attributeValue == null ? null : new SimpleMdsValueDto<>(attributeValue, null, null, true);
+    }
+
+    private <T> TransliterableMdsValueDto extractTransliterableMdsValue(List<Attribute> attributes, String attributeName, Function<T, String> getContent) {
+        String latinScriptAttributeValue = getTransliterableAttributeValue(attributes, attributeName, getContent, true);
+        String nonLatinScriptValue = getTransliterableAttributeValue(attributes, attributeName, getContent, false);
+
+        return latinScriptAttributeValue == null && nonLatinScriptValue == null ? null : new TransliterableMdsValueDto(latinScriptAttributeValue, nonLatinScriptValue);
     }
 
     private Optional<Cycle3DatasetDto> extractCycle3Data(final Assertion hubAssertion) {
@@ -131,6 +139,24 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
             .map(a -> a.getAttributeValues().get(0))
             .map(value -> getContent.apply((T) value))
             .orElse(null);
+    }
+
+    private <T> String getTransliterableAttributeValue(List<Attribute> attributes, String attributeName,
+                                                       Function<T, String> getContent, Boolean isLatinScript) {
+        return attributes.stream()
+                .filter(a -> a.getName().equals(attributeName))
+                .findFirst()
+                .map(a -> getFirstTransliterableAttributeValue(a, isLatinScript))
+                .map(value -> getContent.apply((T) value))
+                .orElse(null);
+    }
+
+    private XMLObject getFirstTransliterableAttributeValue(Attribute attribute, Boolean isLatinScript) {
+        return attribute.getAttributeValues()
+                .stream()
+                .filter(value -> ((TransliterableString) value).isLatinScript() == isLatinScript)
+                .findFirst()
+                .orElse(null);
     }
 
     private boolean isHubAssertion(final Assertion assertion) {

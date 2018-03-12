@@ -8,11 +8,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.core.AttributeStatement;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
@@ -65,6 +68,31 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     }
 
     private Assertion makeAssertion() {
+        return makeAssertion(false);
+    }
+
+    private Assertion makeAssertionWithNonLatinScriptValues() {
+        return makeAssertion(true);
+    }
+
+    private Assertion makeAssertion(boolean withNonLatinScriptValues) {
+        Attribute currentGivenName = withNonLatinScriptValues ?
+                aCurrentGivenNameAttribute("Fred", "Φρεδ") :
+                aCurrentGivenNameAttribute("Fred");
+        Attribute currentFamilyName = withNonLatinScriptValues ?
+                aCurrentFamilyNameAttribute("Flintstone", "Φλινστων") :
+                aCurrentFamilyNameAttribute("Flintstone");
+
+        AttributeStatement attributeStatement = anEidasAttributeStatement(
+                currentGivenName,
+                currentFamilyName,
+                aPersonIdentifierAttribute(personIdentifier),
+                aGenderAttribute("MALE"),
+                aDateOfBirthAttribute(DOB),
+                aBirthNameAttribute("birth-name"),
+                aPlaceOfBirthAttribute("place-of-birth")
+            ).build();
+
         return anAssertion()
             .withIssuer(
                 anIssuer()
@@ -82,17 +110,8 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
                     )
                 .build()
             )
-            .addAttributeStatement(
-                anEidasAttributeStatement(
-                    aCurrentGivenNameAttribute("Fred"),
-                    aCurrentFamilyNameAttribute("Flintstone"),
-                    aPersonIdentifierAttribute(personIdentifier),
-                    aGenderAttribute("MALE"),
-                    aDateOfBirthAttribute(DOB),
-                    aBirthNameAttribute("birth-name"),
-                    aPlaceOfBirthAttribute("place-of-birth")
-                ).build()
-            ).buildUnencrypted();
+            .addAttributeStatement(attributeStatement)
+            .buildUnencrypted();
     }
 
     private Assertion makeCycle3Assertion() {
@@ -144,7 +163,19 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
         assertThat(extractValueFromOptional(matchingDatasetDto.getFirstName()), equalTo("Fred"));
         assertThat(extractValueFromOptional(matchingDatasetDto.getDateOfBirth()), equalTo(DOB));
         assertThat(matchingDatasetDto.getSurnames().get(0).getValue(), equalTo("Flintstone"));
+    }
 
+    @Test
+    public void shouldMapTransliterableDatasetValues() {
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertionWithNonLatinScriptValues()));
+
+        UniversalMatchingDatasetDto matchingDatasetDto = transform.apply(request).getMatchingDataset();
+
+        assertThat(matchingDatasetDto, notNullValue());
+        assertThat(matchingDatasetDto.getFirstName().get().getValue(), equalTo("Fred"));
+        assertThat(((TransliterableMdsValueDto) matchingDatasetDto.getFirstName().get()).getNonLatinScriptValue(), equalTo("Φρεδ"));
+        assertThat(matchingDatasetDto.getSurnames().get(0).getValue(), equalTo("Flintstone"));
+        assertThat(((TransliterableMdsValueDto) matchingDatasetDto.getSurnames().get(0)).getNonLatinScriptValue(), equalTo("Φλινστων"));
     }
 
     @Test

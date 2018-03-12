@@ -36,7 +36,7 @@ def dependencyVersions = [
         dropwizard: '1.1.4',
         ida_utils: '326',
         ida_test_utils: '35',
-        saml_extensions:"$opensaml-1.2a-38",
+        saml_extensions:"$opensaml-1.2a-42",
         saml_serializers:"$opensaml-28",
         saml_security:"$opensaml-51",
         saml_metadata_bindings:"$opensaml-66",
