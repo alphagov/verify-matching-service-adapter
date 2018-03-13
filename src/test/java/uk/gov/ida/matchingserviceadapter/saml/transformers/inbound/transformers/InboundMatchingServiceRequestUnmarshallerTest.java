@@ -39,7 +39,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
 import static uk.gov.ida.saml.core.test.builders.HubAssertionBuilder.aHubAssertion;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
 
 @RunWith(OpenSAMLMockitoRunner.class)

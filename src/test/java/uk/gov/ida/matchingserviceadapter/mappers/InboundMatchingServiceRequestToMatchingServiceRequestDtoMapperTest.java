@@ -32,7 +32,7 @@ import static uk.gov.ida.matchingserviceadapter.builders.InboundMatchingServiceR
 import static uk.gov.ida.matchingserviceadapter.builders.ProxyNodeAssertionBuilder.anProxyNodeAssertion;
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
 import static uk.gov.ida.saml.core.test.builders.HubAssertionBuilder.aHubAssertion;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 import static uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
 

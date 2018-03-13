@@ -1,4 +1,4 @@
-package uk.gov.ida.matchingserviceadapter.services;
+package uk.gov.ida.matchingserviceadapter.builders;
 
 import org.joda.time.LocalDate;
 import org.opensaml.saml.saml2.core.Attribute;

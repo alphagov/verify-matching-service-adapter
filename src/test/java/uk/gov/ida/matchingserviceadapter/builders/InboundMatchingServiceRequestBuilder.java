@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 import static uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
 import static uk.gov.ida.saml.core.test.builders.PersistentIdBuilder.aPersistentId;
