@@ -1,23 +1,23 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 public abstract class MatchingDatasetDto {
 
-    private Optional<SimpleMdsValueDto<String>> firstName = Optional.absent();
-    private Optional<SimpleMdsValueDto<String>> middleNames = Optional.absent();
+    private Optional<SimpleMdsValueDto<String>> firstName = Optional.empty();
+    private Optional<SimpleMdsValueDto<String>> middleNames = Optional.empty();
     private List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
-    private Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.absent();
-    private Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.absent();
+    private Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.empty();
+    private Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.empty();
 
     @SuppressWarnings("unused") // needed for JAXB
     protected MatchingDatasetDto() {

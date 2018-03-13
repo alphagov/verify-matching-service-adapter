@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.controllogic;
 
-import com.google.common.base.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -12,9 +11,10 @@ import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.PersistentId;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.saml.core.test.builders.PersistentIdBuilder.aPersistentId;
+import static uk.gov.ida.matchingserviceadapter.builders.PersistentIdBuilder.aPersistentId;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserIdHashFactoryTest {
@@ -54,6 +54,6 @@ public class UserIdHashFactoryTest {
         exception.expect(AuthnContextMissingException.class);
         exception.expectMessage(String.format("Authn context absent for persistent id %s", "pid"));
 
-        userIdHashFactory.hashId("", "pid", Optional.absent());
+        userIdHashFactory.hashId("", "pid", Optional.empty());
     }
 }

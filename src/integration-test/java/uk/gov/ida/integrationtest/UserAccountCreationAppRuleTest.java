@@ -20,6 +20,7 @@ import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 import org.opensaml.saml.saml2.core.AttributeValue;
 import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.xmlsec.algorithm.DigestAlgorithm;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
@@ -149,10 +150,9 @@ public class UserAccountCreationAppRuleTest {
         KeyPair signingKeyPair = new KeyPair(publicKey, privateKey);
         IdaKeyStore keyStore = new IdaKeyStore(signingKeyPair, Collections.singletonList(encryptionKeyPair));
 
-        assertionDecrypter = new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(
-                keyStore),
-                new EncryptionAlgorithmValidator(),
-                new DecrypterFactory());
+        IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
+        Decrypter decrypter = new DecrypterFactory().createDecrypter(idaKeyStoreCredentialRetriever.getDecryptingCredentials());
+        assertionDecrypter = new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter);
         setUpMatchingService();
     }
 

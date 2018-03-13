@@ -10,6 +10,7 @@ import net.shibboleth.utilities.java.support.component.ComponentInitializationEx
 import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.w3c.dom.Element;
@@ -34,9 +35,12 @@ import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceLocator;
 import uk.gov.ida.matchingserviceadapter.controllogic.ServiceLocator;
 import uk.gov.ida.matchingserviceadapter.controllogic.UnknownUserAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckMatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionResponseFactory;
@@ -62,9 +66,6 @@ import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.api.MsaTransformersFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributesBasedAttributeQueryDiscriminator;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.services.DelegatingMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
@@ -453,7 +454,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     public AssertionDecrypter getAssertionDecrypter(IdaKeyStore eidasKeystore) {
-        return new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(eidasKeystore), new EncryptionAlgorithmValidator(), new DecrypterFactory());
+        IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(eidasKeystore);
+        Decrypter decrypter = new DecrypterFactory().createDecrypter(idaKeyStoreCredentialRetriever.getDecryptingCredentials());
+        return new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter);
     }
 
     @Provides

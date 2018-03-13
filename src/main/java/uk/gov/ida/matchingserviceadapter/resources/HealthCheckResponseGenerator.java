@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterApplication;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckMatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
 import javax.ws.rs.core.Response;

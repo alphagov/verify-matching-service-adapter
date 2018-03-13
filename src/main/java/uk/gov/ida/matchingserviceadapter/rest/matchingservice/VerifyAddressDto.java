@@ -1,17 +1,17 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
 
 import java.util.List;
+import java.util.Optional;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class VerifyAddressDto extends AddressDto {
     private DateTime fromDate;
-    private Optional<DateTime> toDate = Optional.absent();
+    private Optional<DateTime> toDate = Optional.empty();
 
     @SuppressWarnings("unused") // needed for JAXB
     private VerifyAddressDto() {

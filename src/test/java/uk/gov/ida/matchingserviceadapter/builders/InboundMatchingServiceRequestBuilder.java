@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.builders;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -14,14 +13,13 @@ import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.fromNullable;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
-import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
-import static uk.gov.ida.saml.core.test.builders.PersistentIdBuilder.aPersistentId;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
+import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
+import static uk.gov.ida.matchingserviceadapter.builders.PersistentIdBuilder.aPersistentId;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 
 public class InboundMatchingServiceRequestBuilder {
 
@@ -31,7 +29,7 @@ public class InboundMatchingServiceRequestBuilder {
             aMatchingDataset().build()).withPersistentId(aPersistentId().build()).build();
     private IdentityProviderAssertion authnStatementAssertion = anIdentityProviderAssertion().withAuthnStatement(anIdentityProviderAuthnStatement().build()).build();
     private ProxyNodeAssertion proxyNodeAssertion;
-    private Optional<HubAssertion> cycle3AttributeAssertion = absent();
+    private Optional<HubAssertion> cycle3AttributeAssertion = Optional.empty();
     private String requestIssuerEntityId = "issuer-id";
     private String assertionConsumerServiceUrl = "/foo";
     private List<UserAccountCreationAttribute> userCreationAttributes = ImmutableList.of();
@@ -87,7 +85,7 @@ public class InboundMatchingServiceRequestBuilder {
     }
 
     public InboundMatchingServiceRequestBuilder withCycle3DataAssertion(HubAssertion cycle3DataAssertion) {
-        this.cycle3AttributeAssertion = fromNullable(cycle3DataAssertion);
+        this.cycle3AttributeAssertion = Optional.of(cycle3DataAssertion);
         return this;
     }
 

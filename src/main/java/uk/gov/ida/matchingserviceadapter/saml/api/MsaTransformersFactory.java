@@ -5,6 +5,7 @@ import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.BasicRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
+import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
 import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
@@ -12,16 +13,16 @@ import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
+import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.InboundMatchingServiceRequestUnmarshaller;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.VerifyAttributeQueryToInboundMatchingServiceRequestTransformer;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.ResponseToElementTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.HealthCheckResponseFromMatchingServiceTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.MatchingServiceAssertionToAssertionTransformer;
@@ -189,13 +190,16 @@ public class MsaTransformersFactory {
                 hubEntityId
         );
         SignatureValidator signatureValidator = getMetadataBackedSignatureValidator(metaDataResolver, certificateChainEvaluableCriterion);
+        IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
+        Decrypter decrypter = new DecrypterFactory().createDecrypter(idaKeyStoreCredentialRetriever.getDecryptingCredentials());
         return new VerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
                 new SamlAttributeQueryValidator(),
                 new AttributeQuerySignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
                 new SamlAssertionsSignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
                 new InboundMatchingServiceRequestUnmarshaller(hubAssertionTransformer, identityProviderAssertionTransformer),
                 new SamlAttributeQueryAssertionsValidator(getAssertionValidator(), getIdentityProviderAssertionValidator(), matchingServiceAdapterConfiguration, hubEntityId),
-                new AssertionDecrypter(new IdaKeyStoreCredentialRetriever(keyStore), new EncryptionAlgorithmValidator(), new DecrypterFactory()),
+
+            new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter),
                 hubEntityId);
     }
 

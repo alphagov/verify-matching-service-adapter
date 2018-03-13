@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.builders;
 
-import com.google.common.base.Optional;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
@@ -8,14 +7,15 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDt
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
-import static com.google.common.base.Optional.absent;
+import java.util.Optional;
+
 import static uk.gov.ida.matchingserviceadapter.builders.UniversalMatchingDatasetDtoBuilder.aUniversalMatchingDatasetDto;
 import static uk.gov.ida.matchingserviceadapter.builders.VerifyMatchingDatasetDtoBuilder.aVerifyMatchingDatasetDto;
 
 public class MatchingServiceRequestDtoBuilder {
 
     private String hashedPid = "random";
-    private Optional<Cycle3DatasetDto> cycle3Dataset = absent();
+    private Optional<Cycle3DatasetDto> cycle3Dataset = Optional.empty();
 
     public static MatchingServiceRequestDtoBuilder aMatchingServiceRequestDto() {
         return new MatchingServiceRequestDtoBuilder();

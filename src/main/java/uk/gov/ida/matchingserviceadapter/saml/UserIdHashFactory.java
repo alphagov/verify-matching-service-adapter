@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.saml;
 
-import com.google.common.base.Optional;
 import org.apache.commons.codec.binary.Hex;
 import org.opensaml.security.crypto.JCAConstants;
 import uk.gov.ida.matchingserviceadapter.exceptions.AuthnContextMissingException;
@@ -10,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
+import java.util.Optional;
 
 public class UserIdHashFactory {
 
@@ -42,7 +42,7 @@ public class UserIdHashFactory {
     private String idToHash(String issuerEntityId, String persistentId, Optional<AuthnContext> context) {
         String persistentIdHash;
 
-        final AuthnContext authnContext = context.toJavaUtil().orElseThrow(() -> new AuthnContextMissingException(String.format("Authn context absent for persistent id %s", persistentId)));
+        final AuthnContext authnContext = context.orElseThrow(() -> new AuthnContextMissingException(String.format("Authn context absent for persistent id %s", persistentId)));
         if (authnContext.equals(AuthnContext.LEVEL_2)) {
             // default behaviour - for LEVEL_2
             persistentIdHash = MessageFormat.format("{0}{1}{2}", issuerEntityId, msaEntityId, persistentId);

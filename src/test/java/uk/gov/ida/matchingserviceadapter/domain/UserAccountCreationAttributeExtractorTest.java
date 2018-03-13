@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
 import org.junit.Rule;
@@ -8,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.Attribute;
+import uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder;
 import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
@@ -20,12 +20,11 @@ import uk.gov.ida.saml.core.extensions.StringBasedMdsAttributeValue;
 import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
 import uk.gov.ida.saml.core.extensions.impl.PersonNameImpl;
 import uk.gov.ida.saml.core.test.OpenSAMLRunner;
-import uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static com.google.common.base.Optional.absent;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,7 +55,7 @@ public class UserAccountCreationAttributeExtractorTest {
         SimpleMdsValue<String> oldSurname2 = new SimpleMdsValue<>("OldSurname2", new DateTime(1990, 1, 30, 0, 0), new DateTime(2000, 1, 29, 0, 0), true);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withSurnameHistory(Arrays.asList(oldSurname1, oldSurname2, currentSurname)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> surnames = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("surname")).collect(toList());
         PersonNameImpl personName = (PersonNameImpl) surnames.get(0).getAttributeValues().get(0);
@@ -76,7 +75,7 @@ public class UserAccountCreationAttributeExtractorTest {
         Address oldAddress = new Address(Arrays.asList("old_line1", "old_line2", "old_line3"), "old_postCode", "old_internationalPostCode", "old_uprn", new DateTime(1990, 1, 30, 0, 0), new DateTime(2000, 1, 29, 0, 0), true);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withCurrentAddresses(singletonList(currentAddress)).withPreviousAddresses(Arrays.asList(oldAddress)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> addresses = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("currentaddress")).collect(toList());
         AddressImpl addressName = (AddressImpl) addresses.get(0).getAttributeValues().get(0);
@@ -94,7 +93,7 @@ public class UserAccountCreationAttributeExtractorTest {
         SimpleMdsValue<String> currentSurname = new SimpleMdsValue<>("CurrentSurname", null, null, false);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withSurnameHistory(singletonList(currentSurname)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> surnames = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("surname")).collect(toList());
         PersonNameImpl personName = (PersonNameImpl) surnames.get(0).getAttributeValues().get(0);
@@ -113,7 +112,7 @@ public class UserAccountCreationAttributeExtractorTest {
         Address currentAddress = new Address(Arrays.asList("line1", "line2", "line3"), "postCode", "internationalPostCode", "uprn", null, null, false);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withCurrentAddresses(singletonList(currentAddress)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> addresses = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("currentaddress")).collect(toList());
         AddressImpl addressName = (AddressImpl) addresses.get(0).getAttributeValues().get(0);
@@ -132,7 +131,7 @@ public class UserAccountCreationAttributeExtractorTest {
         SimpleMdsValue<String> oldSurname2 = new SimpleMdsValue<>("OldSurname2", new DateTime(1990, 1, 30, 0, 0), new DateTime(2000, 1, 29, 0, 0), true);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withSurnameHistory(Arrays.asList(oldSurname1, oldSurname2)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> surnames = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("surname")).collect(toList());
 
@@ -151,7 +150,7 @@ public class UserAccountCreationAttributeExtractorTest {
         SimpleMdsValue<String> oldSurname2 = new SimpleMdsValue<>("OldSurname2", new DateTime(1990, 1, 30, 0, 0), new DateTime(2000, 1, 29, 0, 0), true);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withSurnameHistory(Arrays.asList(oldSurname1, oldSurname2, currentSurname)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> surnames = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("surname")).collect(toList());
         List<Attribute>  verified = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("surname_verified")).collect(toList());
@@ -174,7 +173,7 @@ public class UserAccountCreationAttributeExtractorTest {
         Address oldAddress2 = new Address(Arrays.asList("old_line1", "old_line2", "old_line3"), "old_postCode_2", "old_internationalPostCode_2", "old_uprn", new DateTime(2000, 1, 30, 0, 0), new DateTime(2010, 1, 29, 0, 0), true);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().withCurrentAddresses(singletonList(currentAddress)).withPreviousAddresses(Arrays.asList(oldAddress, oldAddress2)).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         Attribute addressHistoryAttribute = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("addresshistory")).collect(toList()).get(0);
         List<AddressImpl> addresses = addressHistoryAttribute.getAttributeValues().stream().map(v -> (AddressImpl) v).collect(toList());
@@ -217,7 +216,7 @@ public class UserAccountCreationAttributeExtractorTest {
         SimpleMdsValue<String> surname = new SimpleMdsValue<>("CurrentSurname", null, null, true);
 
         MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset().addSurname(surname).build();
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), absent());
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.of(matchingDataset), Optional.empty());
 
         List<Attribute> attributes = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("surname")).collect(toList());
 
@@ -232,6 +231,6 @@ public class UserAccountCreationAttributeExtractorTest {
                 .map(attributeQueryAttributeFactory::createAttribute)
                 .collect(toList());
 
-        userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, absent(), absent());
+        userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, Optional.empty(), Optional.empty());
     }
 }

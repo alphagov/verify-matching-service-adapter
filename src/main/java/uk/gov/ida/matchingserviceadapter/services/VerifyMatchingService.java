@@ -3,11 +3,11 @@ package uk.gov.ida.matchingserviceadapter.services;
 import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
 import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
 import javax.ws.rs.WebApplicationException;
 

@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Before;
@@ -20,10 +19,13 @@ import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
 
+import java.util.Optional;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aBirthNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.services.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
@@ -153,7 +155,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
 
         UniversalMatchingServiceRequestDto lmsDto = transform.apply(request);
 
-        assertThat(lmsDto.getCycle3Dataset().orNull(), notNullValue());
+        assertTrue(lmsDto.getCycle3Dataset().isPresent());
         assertThat(lmsDto.getCycle3Dataset().get().getAttributes().size(), equalTo(1));
         assertThat(lmsDto.getCycle3Dataset().get().getAttributes().get("NI"), equalTo("12345"));
         // TODO - add the rest (e.g. gender and addresses)

@@ -1,13 +1,13 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
 @JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)

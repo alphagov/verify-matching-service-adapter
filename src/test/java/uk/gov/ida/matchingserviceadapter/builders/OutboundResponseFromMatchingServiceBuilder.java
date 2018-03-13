@@ -3,7 +3,7 @@ package uk.gov.ida.matchingserviceadapter.builders;
 import com.google.common.base.Optional;
 import org.joda.time.DateTime;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.saml.core.domain.MatchingServiceIdaStatus;
 
 import static com.google.common.base.Optional.absent;

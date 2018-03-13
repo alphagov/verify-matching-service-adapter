@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
 import org.junit.Test;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;

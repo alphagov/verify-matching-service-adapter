@@ -1,18 +1,19 @@
 package uk.gov.ida.matchingserviceadapter.builders;
 
-import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
 
+import java.util.Optional;
+
 public class EidasMatchingDatasetBuilder {
 
     private String firstName = "a-first-name";
     private String surname = "a-surname";
-    private Optional<Gender> gender = Optional.absent();
+    private Optional<Gender> gender = Optional.empty();
     private LocalDate dateOfBirth = LocalDate.now().withYear(2000);
-    private Optional<Address> address = Optional.absent();
+    private Optional<Address> address = Optional.empty();
 
     public static EidasMatchingDatasetBuilder anEidasMatchingDataset() {
         return new EidasMatchingDatasetBuilder();

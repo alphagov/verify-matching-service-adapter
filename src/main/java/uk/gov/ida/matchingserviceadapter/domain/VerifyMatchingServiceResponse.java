@@ -1,8 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
-
 public class VerifyMatchingServiceResponse implements MatchingServiceResponse {
     private OutboundResponseFromMatchingService outboundResponseFromMatchingService;
 

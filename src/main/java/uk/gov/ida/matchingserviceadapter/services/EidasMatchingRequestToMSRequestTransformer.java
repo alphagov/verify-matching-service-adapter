@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -29,6 +28,7 @@ import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,9 +51,9 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
       Map<Boolean, Assertion> assertions = matchingServiceRequestContext.getAssertions().stream()
             .collect(Collectors.toMap(this::isHubAssertion, Function.identity()));
         Assertion eidasAssertion = assertions.get(false);
-        Optional<Assertion> hubAssertion = Optional.fromNullable(assertions.get(true));
+        Optional<Assertion> hubAssertion = Optional.ofNullable(assertions.get(true));
 
-        Optional<Cycle3DatasetDto> cycle3Data = hubAssertion.transform(this::extractCycle3Data).transform(Optional::get);
+        Optional<Cycle3DatasetDto> cycle3Data = hubAssertion.map(this::extractCycle3Data);
         List<Attribute> attributes = eidasAssertion.getAttributeStatements().get(0).getAttributes();
 
         return new UniversalMatchingServiceRequestDto(extractUniversalMatchingDataset(attributes),
@@ -92,11 +92,11 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         // Current address
 
         return new UniversalMatchingDatasetDto(
-            Optional.fromNullable(firstName),
-            Optional.absent(),
+            Optional.of(firstName),
+            Optional.empty(),
             Collections.singletonList(surname),
-            Optional.fromNullable(extractSimpleMdsGenderValue(attributes)),
-            Optional.fromNullable(dateOfBirth),
+            Optional.of(extractSimpleMdsGenderValue(attributes)),
+            Optional.of(dateOfBirth),
             null
         );
     }
@@ -118,10 +118,11 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         return attributeValue == null ? null : new UniversalMdsValueDto<V>(attributeValue);
     }
 
-    private Optional<Cycle3DatasetDto> extractCycle3Data(final Assertion hubAssertion) {
+    private Cycle3DatasetDto extractCycle3Data(final Assertion hubAssertion) {
         return hubAssertionUnmarshaller.toHubAssertion(hubAssertion).getCycle3Data()
-            .transform(Cycle3Dataset::getAttributes)
-            .transform(Cycle3DatasetDto::createFromData);
+            .map(Cycle3Dataset::getAttributes)
+            .map(Cycle3DatasetDto::createFromData)
+            .get();
     }
 
     private <T, V> V getAttributeValue(List<Attribute> attributes, String attributeName, Function<T, V> getContent) {

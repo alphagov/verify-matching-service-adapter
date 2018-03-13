@@ -1,9 +1,9 @@
 package uk.gov.ida.matchingserviceadapter.resources;
 
 import org.w3c.dom.Element;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
 import javax.ws.rs.core.Response;
 import java.util.function.Function;
