@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 import com.google.inject.Inject;
 import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.matchingserviceadapter.domain.ProxyNodeAssertion;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
@@ -26,16 +27,18 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
     private final UserIdHashFactory userIdHashFactory;
     private final MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
+    private final Boolean isEidasEnabled;
 
-    @Inject
     public InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
         UserIdHashFactory userIdHashFactory,
-        MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper) {
+        MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
+        Boolean isEidasEnabled) {
         this.userIdHashFactory = userIdHashFactory;
         this.matchingDatasetToMatchingDatasetDtoMapper = matchingDatasetToMatchingDatasetDtoMapper;
+        this.isEidasEnabled = isEidasEnabled;
     }
 
-    public VerifyMatchingServiceRequestDto map(InboundVerifyMatchingServiceRequest attributeQuery) {
+    public MatchingServiceRequestDto map(InboundVerifyMatchingServiceRequest attributeQuery) {
         IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         MatchingDataset matchingDataset = matchingDatasetAssertion.getMatchingDataset().get();
@@ -45,10 +48,18 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
             authnStatementAssertion.getAuthnStatement().map(IdentityProviderAuthnStatement::getAuthnContext));
 
         AuthnContext authnContext = authnStatementAssertion.getAuthnStatement().get().getAuthnContext();
-
-        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
 
+        if(isEidasEnabled) {
+            UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
+            return new UniversalMatchingServiceRequestDto(
+                    matchingDatasetDto,
+                    extractCycle3Dataset(attributeQuery),
+                    hashedPid,
+                    attributeQuery.getId(),
+                    levelOfAssurance);
+        }
+        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
         return new VerifyMatchingServiceRequestDto(
                 matchingDatasetDto,
                 extractCycle3Dataset(attributeQuery),

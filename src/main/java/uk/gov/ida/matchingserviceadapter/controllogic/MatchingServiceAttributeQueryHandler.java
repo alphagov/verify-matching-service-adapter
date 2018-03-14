@@ -7,6 +7,7 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingServ
 import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.VerifyMatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
@@ -30,7 +31,7 @@ public class MatchingServiceAttributeQueryHandler {
     }
 
     public OutboundResponseFromMatchingService handle(InboundVerifyMatchingServiceRequest attributeQuery) {
-        VerifyMatchingServiceRequestDto matchingServiceAttributeQuery = queryDtoMapper.map(attributeQuery);
+        MatchingServiceRequestDto matchingServiceAttributeQuery = queryDtoMapper.map(attributeQuery);
         MatchingServiceResponseDto matchingServiceResponseDto = matchingServiceProxy.makeMatchingServiceRequest(matchingServiceAttributeQuery);
         LOG.info("Result from matching service for id " + attributeQuery.getId() + " is " + matchingServiceResponseDto.getResult());
         return dtoResponseMapper.map(

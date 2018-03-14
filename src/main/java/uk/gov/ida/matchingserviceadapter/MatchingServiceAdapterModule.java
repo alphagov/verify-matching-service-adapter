@@ -119,7 +119,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
         bind(PKIXParametersProvider.class).toInstance(new PKIXParametersProvider());
         bind(SoapMessageManager.class).toInstance(new SoapMessageManager());
         bind(X509CertificateFactory.class);
@@ -128,7 +127,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(IdaKeyStoreCredentialRetriever.class);
         bind(ExpiredCertificateMetadataFilter.class);
         bind(ExceptionResponseFactory.class);
-        bind(InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper.class);
         bind(MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper.class);
         bind(MatchingServiceAdapterMetadataRepository.class);
         bind(DocumentToInboundMatchingServiceRequestMapper.class);
@@ -150,6 +148,15 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     private UserIdHashFactory getUserIdHashFactory(MatchingServiceAdapterConfiguration configuration) {
         return new UserIdHashFactory(configuration.getEntityId());
+    }
+
+    @Provides
+    @Singleton
+    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper getInboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
+            UserIdHashFactory userIdHashFactory,
+            MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
+            MatchingServiceAdapterConfiguration configuration) {
+        return new InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(userIdHashFactory, matchingDatasetToMatchingDatasetDtoMapper, configuration.isEidasEnabled());
     }
 
     @Provides
