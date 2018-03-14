@@ -28,13 +28,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.builders.Cycle3DatasetDtoBuilder.aCycle3DatasetDto;
 import static uk.gov.ida.matchingserviceadapter.builders.EidasMatchingDatasetBuilder.anEidasMatchingDataset;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
 import static uk.gov.ida.matchingserviceadapter.builders.InboundMatchingServiceRequestBuilder.anInboundMatchingServiceRequest;
+import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
 import static uk.gov.ida.matchingserviceadapter.builders.ProxyNodeAssertionBuilder.anProxyNodeAssertion;
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
-import static uk.gov.ida.saml.core.test.builders.HubAssertionBuilder.aHubAssertion;
 import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
-import static uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement;
-import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
+import static uk.gov.ida.saml.core.test.builders.HubAssertionBuilder.aHubAssertion;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest {

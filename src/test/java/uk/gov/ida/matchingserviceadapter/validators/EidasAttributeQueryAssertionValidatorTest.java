@@ -128,7 +128,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
         assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
     }
 
-
     @Test
     public void shouldValidateSignature() throws Exception {
         setUpCertificateValidation();

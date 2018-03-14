@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.controllogic;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -10,6 +9,7 @@ import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.mappers.AuthnContextToLevelOfAssuranceDtoMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
@@ -18,7 +18,6 @@ import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.saml.core.domain.AssertionRestrictions;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
@@ -27,6 +26,7 @@ import uk.gov.ida.saml.core.domain.PersistentId;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Optional;
 
 public class UnknownUserAttributeQueryHandler {
     private static final Logger LOG = LoggerFactory.getLogger(UnknownUserAttributeQueryHandler.class);
@@ -59,7 +59,7 @@ public class UnknownUserAttributeQueryHandler {
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
             matchingDatasetAssertion.getPersistentId().getNameId(),
-            authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
+            authnStatementAssertion.getAuthnStatement().map(IdentityProviderAuthnStatement::getAuthnContext));
 
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext());
         UnknownUserCreationResponseDto unknownUserCreationResponseDto = matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssurance));

@@ -1,19 +1,20 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class AddressDto {
     private boolean verified;
-    private Optional<String> postCode = Optional.absent();
+    private Optional<String> postCode = Optional.empty();
     private List<String> lines;
-    private Optional<String> internationalPostCode = Optional.absent();
-    private Optional<String> uprn = Optional.absent();
+    private Optional<String> internationalPostCode = Optional.empty();
+    private Optional<String> uprn = Optional.empty();
 
     @SuppressWarnings("unused") // needed for JAXB
     protected AddressDto() {

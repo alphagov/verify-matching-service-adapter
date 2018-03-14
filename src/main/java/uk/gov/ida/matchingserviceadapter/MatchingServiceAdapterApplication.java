@@ -1,6 +1,7 @@
 package uk.gov.ida.matchingserviceadapter;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Throwables;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
@@ -39,6 +40,8 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
 
     @Override
     public final void initialize(Bootstrap<MatchingServiceAdapterConfiguration> bootstrap) {
+        bootstrap.getObjectMapper().registerModule(new Jdk8Module());
+
         // Enable variable substitution with environment variables
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(bootstrap.getConfigurationSourceProvider(),

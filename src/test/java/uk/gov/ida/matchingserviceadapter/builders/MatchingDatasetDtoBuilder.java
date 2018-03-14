@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.builders;
 
-import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
@@ -10,17 +9,15 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.fromNullable;
+import java.util.Optional;
 
 public abstract class MatchingDatasetDtoBuilder {
 
-    protected Optional<SimpleMdsValueDto<String>> firstname = fromNullable(SimpleMdsValueDtoBuilder.<String>aSimpleMdsValueDto().withValue("default-first-name").build());
-    protected Optional<SimpleMdsValueDto<String>> middleNames = absent();
+    protected Optional<SimpleMdsValueDto<String>> firstname = Optional.of(SimpleMdsValueDtoBuilder.<String>aSimpleMdsValueDto().withValue("default-first-name").build());
+    protected Optional<SimpleMdsValueDto<String>> middleNames = Optional.empty();
     protected List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
-    protected Optional<SimpleMdsValueDto<GenderDto>> gender = absent();
-    protected Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = absent();
+    protected Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.empty();
+    protected Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.empty();
 
     public abstract MatchingDatasetDto build();
 
@@ -29,12 +26,12 @@ public abstract class MatchingDatasetDtoBuilder {
     public abstract MatchingDatasetDtoBuilder withAddressHistory(Optional<List<UniversalAddressDto>> addressHistory);
 
     public MatchingDatasetDtoBuilder withFirstname(SimpleMdsValueDto<String> firstname) {
-        this.firstname = fromNullable(firstname);
+        this.firstname = Optional.ofNullable(firstname);
         return this;
     }
 
     public MatchingDatasetDtoBuilder withMiddleNames(SimpleMdsValueDto<String> middleNames) {
-        this.middleNames = fromNullable(middleNames);
+        this.middleNames = Optional.ofNullable(middleNames);
         return this;
     }
 
@@ -44,12 +41,12 @@ public abstract class MatchingDatasetDtoBuilder {
     }
 
     public MatchingDatasetDtoBuilder withGender(SimpleMdsValueDto<GenderDto> gender) {
-        this.gender = fromNullable(gender);
+        this.gender = Optional.ofNullable(gender);
         return this;
     }
 
     public MatchingDatasetDtoBuilder withDateOfBirth(SimpleMdsValueDto<LocalDate> dateOfBirth) {
-        this.dateOfBirth = fromNullable(dateOfBirth);
+        this.dateOfBirth = Optional.ofNullable(dateOfBirth);
         return this;
     }
 

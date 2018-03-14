@@ -7,13 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.controllogic.UnknownUserAttributeQueryHandler;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromUnknownUserCreationService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

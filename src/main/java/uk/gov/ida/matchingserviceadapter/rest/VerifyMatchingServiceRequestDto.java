@@ -1,15 +1,17 @@
 package uk.gov.ida.matchingserviceadapter.rest;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
+import java.util.Optional;
+
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
-@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class VerifyMatchingServiceRequestDto extends MatchingServiceRequestDto {
 
     private VerifyMatchingDatasetDto matchingDataset;

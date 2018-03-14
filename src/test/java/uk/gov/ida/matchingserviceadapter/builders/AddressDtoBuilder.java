@@ -1,22 +1,20 @@
 package uk.gov.ida.matchingserviceadapter.builders;
 
-import com.google.common.base.Optional;
 import org.joda.time.DateTime;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Optional.absent;
+import java.util.Optional;
 
 public class AddressDtoBuilder {
     private List<String> lines = new ArrayList<>();
-    private Optional<String> postCode = absent();
-    private Optional<String> internationalPostCode = absent();
-    private Optional<String> uprn = absent();
+    private Optional<String> postCode = Optional.empty();
+    private Optional<String> internationalPostCode = Optional.empty();
+    private Optional<String> uprn = Optional.empty();
     private DateTime fromDate = DateTime.parse("2001-01-01");
-    private Optional<DateTime> toDate = absent();
+    private Optional<DateTime> toDate = Optional.empty();
     private boolean verified = false;
 
     public VerifyAddressDto buildVerifyAddressDto() {
@@ -47,17 +45,17 @@ public class AddressDtoBuilder {
     }
 
     public AddressDtoBuilder withPostCode(final String postCode) {
-        this.postCode = Optional.fromNullable(postCode);
+        this.postCode = Optional.ofNullable(postCode);
         return this;
     }
 
     public AddressDtoBuilder withInternationalPostCode(final String internationalPostCode) {
-        this.internationalPostCode = Optional.fromNullable(internationalPostCode);
+        this.internationalPostCode = Optional.ofNullable(internationalPostCode);
         return this;
     }
 
     public AddressDtoBuilder withUPRN(final String uprn) {
-        this.uprn = Optional.fromNullable(uprn);
+        this.uprn = Optional.ofNullable(uprn);
         return this;
     }
 
@@ -67,7 +65,7 @@ public class AddressDtoBuilder {
     }
 
     public AddressDtoBuilder withToDate(final DateTime toDate) {
-        this.toDate = Optional.fromNullable(toDate);
+        this.toDate = Optional.ofNullable(toDate);
         return this;
     }
 

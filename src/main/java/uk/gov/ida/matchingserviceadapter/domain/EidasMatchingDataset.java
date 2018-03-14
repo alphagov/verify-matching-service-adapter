@@ -1,9 +1,10 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import com.google.common.base.Optional;
 import org.joda.time.LocalDate;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
+
+import java.util.Optional;
 
 public class EidasMatchingDataset {
 

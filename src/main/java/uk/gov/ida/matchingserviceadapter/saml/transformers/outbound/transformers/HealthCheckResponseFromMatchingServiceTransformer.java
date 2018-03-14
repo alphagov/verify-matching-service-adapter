@@ -2,7 +2,7 @@ package uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformer
 
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.Status;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
+import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.MatchingServiceIdaStatus;
 import uk.gov.ida.saml.core.transformers.outbound.IdaResponseToSamlResponseTransformer;

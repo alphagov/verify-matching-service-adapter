@@ -1,12 +1,12 @@
 package uk.gov.ida.matchingserviceadapter.builders;
 
-import com.google.common.base.Optional;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VerifyMatchingDatasetDtoBuilder extends MatchingDatasetDtoBuilder {
 
