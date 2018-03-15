@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers;
 
-import com.google.common.base.Optional;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Subject;
 import uk.gov.ida.matchingserviceadapter.saml.security.ValidatedAttributeQuery;
@@ -10,6 +9,8 @@ import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
+
+import java.util.Optional;
 
 public class InboundMatchingServiceRequestUnmarshaller {
 
@@ -32,7 +33,7 @@ public class InboundMatchingServiceRequestUnmarshaller {
 
         IdentityProviderAssertion matchingDatasetAssertion = null;
         IdentityProviderAssertion authnStatementAssertion = null;
-        Optional<HubAssertion> cycle3AttributeAssertion = Optional.absent();
+        Optional<HubAssertion> cycle3AttributeAssertion = Optional.empty();
 
         for (Assertion assertion : validatedHubAssertions.getAssertions()) {
             HubAssertion hubAssertion = hubAssertionUnmarshaller.toHubAssertion(assertion);

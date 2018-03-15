@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static uk.gov.ida.matchingserviceadapter.builders.PersistentIdBuilder.aPersistentId;
 import static uk.gov.ida.saml.core.test.builders.AssertionRestrictionsBuilder.anAssertionRestrictions;
-import static uk.gov.ida.saml.core.test.builders.PersistentIdBuilder.aPersistentId;
 
 public class MatchingServiceAssertionBuilder {
 

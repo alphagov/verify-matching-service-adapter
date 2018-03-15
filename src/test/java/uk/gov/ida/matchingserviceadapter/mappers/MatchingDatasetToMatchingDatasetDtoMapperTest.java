@@ -1,11 +1,11 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import com.google.common.base.Optional;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.EidasMatchingDatasetBuilder;
+import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
 import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
@@ -19,15 +19,15 @@ import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
-import uk.gov.ida.saml.core.test.builders.SimpleMdsValueBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.anAddress;
-import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
+import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
 
 public class MatchingDatasetToMatchingDatasetDtoMapperTest {
 
@@ -40,7 +40,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
 
     @Test
     public void mapGender_shouldMapAbsent() {
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.absent();
+        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.empty();
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
 
         assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(false);
@@ -49,7 +49,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     @Test
     public void mapGender_shouldMapMale() {
         SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.MALE).build();
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.fromNullable(genderSimpleMdsValue);
+        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.of(genderSimpleMdsValue);
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
 
         assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(true);
@@ -62,7 +62,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     @Test
     public void mapGender_shouldMapFemale() {
         SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.FEMALE).build();
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.fromNullable(genderSimpleMdsValue);
+        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.of(genderSimpleMdsValue);
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
 
         assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(true);
@@ -72,7 +72,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     @Test
     public void mapGender_shouldMapNotSpecified() {
         SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.NOT_SPECIFIED).build();
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.fromNullable(genderSimpleMdsValue);
+        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.of(genderSimpleMdsValue);
         Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
 
         assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(true);
@@ -82,7 +82,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     @Test
     public void map_shouldMapGenericSimpleMdsValue() {
         SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
-        Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.fromNullable(simpleMdsValue);
+        Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.of(simpleMdsValue);
         Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.isPresent()).isEqualTo(true);
@@ -107,7 +107,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
 
     @Test
     public void map_shouldMapGenericSimpleMdsValueAbsent() {
-        Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.absent();
+        Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.empty();
         Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
 
         assertThat(result.isPresent()).isEqualTo(false);

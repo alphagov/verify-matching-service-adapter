@@ -8,10 +8,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
+import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.OutboundResponseFromMatchingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

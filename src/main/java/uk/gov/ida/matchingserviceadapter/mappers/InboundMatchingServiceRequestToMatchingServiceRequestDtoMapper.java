@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.matchingserviceadapter.domain.ProxyNodeAssertion;
@@ -21,7 +20,7 @@ import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
 
-import static com.google.common.base.Optional.absent;
+import java.util.Optional;
 
 public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
@@ -43,7 +42,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
         String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
             matchingDatasetAssertion.getPersistentId().getNameId(),
-            authnStatementAssertion.getAuthnStatement().transform(IdentityProviderAuthnStatement::getAuthnContext));
+            authnStatementAssertion.getAuthnStatement().map(IdentityProviderAuthnStatement::getAuthnContext));
 
         AuthnContext authnContext = authnStatementAssertion.getAuthnStatement().get().getAuthnContext();
 
@@ -67,7 +66,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
 
         String issuer = proxyNodeAssertion.getIssuer();
         String personIdentifier = proxyNodeAssertion.getPersonIdentifier();
-        String hashedPid = userIdHashFactory.hashId(issuer, personIdentifier, Optional.fromNullable(authnContext));
+        String hashedPid = userIdHashFactory.hashId(issuer, personIdentifier, Optional.ofNullable(authnContext));
 
         UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
         LevelOfAssuranceDto levelOfAssuranceDto = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
@@ -83,9 +82,9 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
     private Optional<Cycle3DatasetDto> extractCycle3Dataset(InboundMatchingServiceRequest attributeQuery) {
         Optional<HubAssertion> cycle3AttributeAssertion = attributeQuery.getCycle3AttributeAssertion();
         if (!cycle3AttributeAssertion.isPresent()) {
-           return absent();
+           return Optional.empty();
         }
 
-       return Optional.fromNullable(Cycle3DatasetDto.createFromData(cycle3AttributeAssertion.get().getCycle3Data().get().getAttributes()));
+       return Optional.ofNullable(Cycle3DatasetDto.createFromData(cycle3AttributeAssertion.get().getCycle3Data().get().getAttributes()));
     }
 }

@@ -17,11 +17,11 @@ import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuild
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aGenderAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aPersonIdentifierAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.anAttributeStatement;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeStatementValidator.ATTRIBUTE_STATEMENT_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeStatementValidator.DATE_OF_BIRTH_IN_FUTURE;
 import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
 import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_NOT_ENUMERATED;
-import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
@@ -36,14 +36,26 @@ public class AttributeStatementValidatorTest {
 
     @Test
     public void shouldGenerateNoErrorsIfAttributeStatementIsValid() {
-        Messages messages = validator.validate(anEidasAttributeStatement().build(), messages());
-
+        AttributeStatement attributeStatement = anEidasAttributeStatement()
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute())
+            .build();
+        Messages messages = validator.validate(attributeStatement, messages());
         assertThat(messages.hasErrors()).isFalse();
     }
 
     @Test
     public void shouldGenerateNoErrorsIfAttributeStatementIsValidAndHasGenderAttribute() {
-        Messages messages = validator.validate(anEidasAttributeStatement().addAttribute(aGenderAttribute("Male")).build(), messages());
+        AttributeStatement attributeStatement = anEidasAttributeStatement()
+            .addAttribute(aCurrentGivenNameAttribute())
+            .addAttribute(aCurrentFamilyNameAttribute())
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute())
+            .addAttribute(aGenderAttribute("Male"))
+            .build();
+        Messages messages = validator.validate(attributeStatement, messages());
 
         assertThat(messages.hasErrors()).isFalse();
     }

@@ -50,6 +50,11 @@ import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEnc
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasEncryptedAssertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasEncryptedAssertionWithInvalidSignature;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentGivenNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aDateOfBirthAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aPersonIdentifierAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateInvalidSignatureMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.DEFAULT_INVALID_SIGNATURE_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.IDENTITY_ASSERTION;
@@ -69,7 +74,6 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
-import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
@@ -201,7 +205,12 @@ public class CountryEnabledIntegrationTest {
                                 anIssuer()
                                     .withIssuerId(STUB_IDP_ONE)
                                     .build())
-                            .addAttributeStatement(anEidasAttributeStatement().build())
+                            .addAttributeStatement(anEidasAttributeStatement()
+                                .addAttribute(aCurrentGivenNameAttribute())
+                                .addAttribute(aCurrentFamilyNameAttribute())
+                                .addAttribute(aPersonIdentifierAttribute())
+                                .addAttribute(aDateOfBirthAttribute())
+                                .build())
                             .addAuthnStatement(anEidasAuthnStatement().build())
                             .withSignature(anIdpSignature())
                             .withConditions(aConditions())

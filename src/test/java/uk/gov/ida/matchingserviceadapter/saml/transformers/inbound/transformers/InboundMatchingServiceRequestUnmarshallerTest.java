@@ -13,6 +13,7 @@ import org.opensaml.saml.saml2.core.Issuer;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
+import uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAuthnStatementBuilder;
 import uk.gov.ida.matchingserviceadapter.saml.security.ValidatedAttributeQuery;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
@@ -23,7 +24,6 @@ import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.extensions.PersonName;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestEntityIds;
-import uk.gov.ida.saml.core.test.builders.IdentityProviderAuthnStatementBuilder;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.hub.factories.AttributeFactory_1_1;
@@ -37,10 +37,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
 import static uk.gov.ida.saml.core.test.builders.HubAssertionBuilder.aHubAssertion;
 import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
-import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class InboundMatchingServiceRequestUnmarshallerTest {

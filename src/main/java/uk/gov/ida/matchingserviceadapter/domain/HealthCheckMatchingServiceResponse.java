@@ -1,7 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.HealthCheckResponseFromMatchingService;
-
 public class HealthCheckMatchingServiceResponse implements MatchingServiceResponse {
 
     private final HealthCheckResponseFromMatchingService healthCheckResponseFromMatchingService;

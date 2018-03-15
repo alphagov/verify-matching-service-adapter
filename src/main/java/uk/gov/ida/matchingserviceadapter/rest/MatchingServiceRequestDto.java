@@ -1,18 +1,20 @@
 package uk.gov.ida.matchingserviceadapter.rest;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Optional;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 
+import java.util.Optional;
+
 
 // CAUTION!!! CHANGES TO THIS CLASS WILL IMPACT MSA USERS
-@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class MatchingServiceRequestDto {
 
-    private Optional<Cycle3DatasetDto> cycle3Dataset = Optional.absent();
+    private Optional<Cycle3DatasetDto> cycle3Dataset = Optional.empty();
     private String hashedPid;
     private String matchId;
     private LevelOfAssuranceDto levelOfAssurance;

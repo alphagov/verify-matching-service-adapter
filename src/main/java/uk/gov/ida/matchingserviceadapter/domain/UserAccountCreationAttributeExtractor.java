@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.joda.time.LocalDate;
@@ -18,6 +17,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -146,7 +146,7 @@ public class UserAccountCreationAttributeExtractor {
             throw new WebApplicationException(new IllegalStateException(message), Response.Status.INTERNAL_SERVER_ERROR);
         }
         if (currentValues.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(currentValues.get(0));
     }
@@ -160,7 +160,7 @@ public class UserAccountCreationAttributeExtractor {
             throw new WebApplicationException(new IllegalStateException(message), Response.Status.INTERNAL_SERVER_ERROR);
         }
         if (currentValues.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(currentValues.get(0));
     }
