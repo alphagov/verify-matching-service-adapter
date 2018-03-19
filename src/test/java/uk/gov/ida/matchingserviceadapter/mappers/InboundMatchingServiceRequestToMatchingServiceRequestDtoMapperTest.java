@@ -45,11 +45,13 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
     @Mock
     private MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
 
-    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper mapper;
+    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper verifyOnlyMapper;
+    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper eidasEnabledMapper;
 
     @Before
     public void setUp() {
-        mapper = new InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(userIdHashFactory, matchingDatasetToMatchingDatasetDtoMapper);
+        eidasEnabledMapper = new InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(userIdHashFactory, matchingDatasetToMatchingDatasetDtoMapper, true);
+        verifyOnlyMapper = new InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(userIdHashFactory, matchingDatasetToMatchingDatasetDtoMapper, false);
     }
 
     @Test
@@ -71,9 +73,37 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
         String hashedPid = "a-hashed-pid";
         when(userIdHashFactory.hashId(any(), any(), any())).thenReturn(hashedPid);
 
-        VerifyMatchingServiceRequestDto requestDto = mapper.map(request);
+        VerifyMatchingServiceRequestDto requestDto = (VerifyMatchingServiceRequestDto) verifyOnlyMapper.map(request);
 
         assertThat(requestDto.getMatchingDataset()).isEqualTo(verifyMatchingDatasetDto);
+        assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(false);
+        assertThat(requestDto.getLevelOfAssurance()).isEqualTo(levelOfAssuranceDto);
+        assertThat(requestDto.getHashedPid()).isEqualTo(hashedPid);
+        assertThat(requestDto.getMatchId()).isEqualTo(request.getId());
+    }
+
+    @Test
+    public void map_verify_shouldMapTheFieldsToUniversalDtoWhenEidasEnabled() {
+        MatchingDataset matchingDataset = aMatchingDataset().build();
+        AuthnContext levelOfAssurance = AuthnContext.LEVEL_2;
+        LevelOfAssuranceDto levelOfAssuranceDto = LevelOfAssuranceDto.LEVEL_2;
+        IdentityProviderAuthnStatement idaAuthnStatement = anIdentityProviderAuthnStatement()
+                .withAuthnContext(levelOfAssurance)
+                .build();
+        InboundVerifyMatchingServiceRequest request = anInboundMatchingServiceRequest()
+                .withMatchingDatasetAssertion(anIdentityProviderAssertion().withMatchingDataset(matchingDataset).build())
+                .withAuthnStatementAssertion(anIdentityProviderAssertion().withAuthnStatement(idaAuthnStatement).build())
+                .buildForVerify();
+
+        UniversalMatchingDatasetDto universalMatchingDatasetDto = mock(UniversalMatchingDatasetDto.class);
+        when(matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset)).thenReturn(universalMatchingDatasetDto);
+
+        String hashedPid = "a-hashed-pid";
+        when(userIdHashFactory.hashId(any(), any(), any())).thenReturn(hashedPid);
+
+        UniversalMatchingServiceRequestDto requestDto = (UniversalMatchingServiceRequestDto) eidasEnabledMapper.map(request);
+
+        assertThat(requestDto.getMatchingDataset()).isEqualTo(universalMatchingDatasetDto);
         assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(false);
         assertThat(requestDto.getLevelOfAssurance()).isEqualTo(levelOfAssuranceDto);
         assertThat(requestDto.getHashedPid()).isEqualTo(hashedPid);
@@ -100,7 +130,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
         when(matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset))
                 .thenReturn(expectedMatchingDatasetDto);
 
-        UniversalMatchingServiceRequestDto requestDto = mapper.map(request);
+        UniversalMatchingServiceRequestDto requestDto = eidasEnabledMapper.map(request);
 
         assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(false);
         assertThat(requestDto.getLevelOfAssurance()).isEqualTo(levelOfAssuranceDto);
@@ -117,7 +147,21 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapperTest 
                 .withCycle3DataAssertion(aHubAssertion().withCycle3Data(cycle3Data).build())
                 .buildForVerify();
 
-        VerifyMatchingServiceRequestDto requestDto = mapper.map(request);
+        VerifyMatchingServiceRequestDto requestDto = (VerifyMatchingServiceRequestDto) verifyOnlyMapper.map(request);
+
+        assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(true);
+        assertThat(requestDto.getCycle3Dataset().get().getAttributes()).isEqualTo(cycle3DatasetDto.getAttributes());
+    }
+
+    @Test
+    public void map_verify_shouldAddCycle3DatasetToUniversalDtoWhenPresent() {
+        Cycle3Dataset cycle3Data = aCycle3Dataset().build();
+        Cycle3DatasetDto cycle3DatasetDto = aCycle3DatasetDto().build();
+        InboundVerifyMatchingServiceRequest request = anInboundMatchingServiceRequest()
+                .withCycle3DataAssertion(aHubAssertion().withCycle3Data(cycle3Data).build())
+                .buildForVerify();
+
+        UniversalMatchingServiceRequestDto requestDto = (UniversalMatchingServiceRequestDto) eidasEnabledMapper.map(request);
 
         assertThat(requestDto.getCycle3Dataset().isPresent()).isEqualTo(true);
         assertThat(requestDto.getCycle3Dataset().get().getAttributes()).isEqualTo(cycle3DatasetDto.getAttributes());

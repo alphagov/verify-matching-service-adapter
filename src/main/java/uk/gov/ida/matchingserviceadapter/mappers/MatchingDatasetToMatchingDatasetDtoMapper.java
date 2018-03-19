@@ -37,13 +37,27 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
                 mapVerifyAddresses(matchingDataset.getAddresses()));
     }
 
+    public UniversalMatchingDatasetDto mapToUniversalMatchingDatasetDto(MatchingDataset matchingDataset) {
+        Optional<SimpleMdsValue<String>> firstNameValue = !matchingDataset.getFirstNames().isEmpty() ? Optional.ofNullable(matchingDataset.getFirstNames().get(0)) : Optional.empty();
+        Optional<SimpleMdsValue<String>> middleNameValue = !matchingDataset.getMiddleNames().isEmpty() ? Optional.ofNullable(matchingDataset.getMiddleNames().get(0)) : Optional.empty();
+        Optional<SimpleMdsValue<LocalDate>> birthDateValue = !matchingDataset.getDateOfBirths().isEmpty() ? Optional.ofNullable(matchingDataset.getDateOfBirths().get(0)) : Optional.empty();
+
+        return new UniversalMatchingDatasetDto(
+                mapToMatchingDatasetDto(firstNameValue),
+                mapToMatchingDatasetDto(middleNameValue),
+                mapToMatchingDatasetDto(matchingDataset.getSurnames()),
+                mapGender(matchingDataset.getGender()),
+                mapToMatchingDatasetDto(birthDateValue),
+                Optional.ofNullable(mapToUniversalAddressDto(matchingDataset.getAddresses())));
+    }
+
     public UniversalMatchingDatasetDto mapToUniversalMatchingDatasetDto(EidasMatchingDataset matchingDataset) {
         Optional<SimpleMdsValueDto<String>> firstName = Optional.of(mapEidasValue(matchingDataset.getFirstName()));
         List<SimpleMdsValueDto<String>> surnames = Collections.singletonList(mapEidasValue(matchingDataset.getSurname()));
         Optional<SimpleMdsValueDto<GenderDto>> gender = mapEidasGender(matchingDataset.getGender());
         Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.of(mapEidasValue(matchingDataset.getDateOfBirth()));
         Optional<List<UniversalAddressDto>> addresses = matchingDataset.getAddress().isPresent() ?
-                Optional.of(mapEidasAddresses(Collections.singletonList(matchingDataset.getAddress().get()))) : Optional.empty();
+                Optional.of(mapToUniversalAddressDto(Collections.singletonList(matchingDataset.getAddress().get()))) : Optional.empty();
 
         return new UniversalMatchingDatasetDto(
                 firstName,
@@ -119,7 +133,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
         }));
     }
 
-    private List<UniversalAddressDto> mapEidasAddresses(List<Address> addresses) {
+    private List<UniversalAddressDto> mapToUniversalAddressDto(List<Address> addresses) {
         return addresses
                 .stream()
                 .map(input -> new UniversalAddressDto(input.getLines(),
