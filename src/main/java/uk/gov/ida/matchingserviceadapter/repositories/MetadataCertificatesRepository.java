@@ -10,7 +10,6 @@ import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.matchingserviceadapter.exceptions.InvalidSamlMetadataException;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @deprecated
@@ -33,21 +32,15 @@ public class MetadataCertificatesRepository {
     }
 
     public List<Certificate> getIdpSigningCertificates(String entityId) {
-        return getAndValidateCertificates(entityId, certificateExtractor::extractIdpSigningCertificates);
+        return certificateExtractor.extractIdpSigningCertificates(getEntityDescriptor(entityId));
     }
 
     public List<Certificate> getHubSigningCertificates(String hubId) {
-        return getAndValidateCertificates(hubId, certificateExtractor::extractHubSigningCertificates);
+        return certificateExtractor.extractHubSigningCertificates(getEntityDescriptor(hubId));
     }
 
     public List<Certificate> getHubEncryptionCertificates(String hubId) {
-        return getAndValidateCertificates(hubId, certificateExtractor::extractHubEncryptionCertificates);
-    }
-
-    private List<Certificate> getAndValidateCertificates(String entityId, Function<EntityDescriptor, List<Certificate>> extractor) {
-        EntityDescriptor entityDescriptor = getEntityDescriptor(entityId);
-        List<Certificate> certificates = extractor.apply(entityDescriptor);
-        return certificates;
+        return certificateExtractor.extractHubEncryptionCertificates(getEntityDescriptor(hubId));
     }
 
     private EntityDescriptor getEntityDescriptor(String entityId) {

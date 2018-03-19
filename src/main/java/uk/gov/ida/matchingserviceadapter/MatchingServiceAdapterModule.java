@@ -231,7 +231,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
         return eidasMetadataResolverRepository.map(eidasMetadataResolverRepositoryValue ->
             new EidasMatchingService(
-                new EidasAttributeQueryValidatorFactory(verifyMetadataResolver,
+                new EidasAttributeQueryValidatorFactory(
+                    verifyMetadataResolver,
                     verifyCertificateValidator,
                     x509CertificateFactory,
                     configuration,
@@ -519,18 +520,26 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private Optional<EidasTrustAnchorResolver> getEidasTrustAnchorResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
+    @Named("TrustAnchorClient")
+    private Client getEidasTrustAnchorClient(Environment environment, MatchingServiceAdapterConfiguration configuration) {
+        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
+
+        return new JerseyClientBuilder(environment)
+                .using(metadataConfiguration.getJerseyClientConfiguration())
+                .build(metadataConfiguration.getJerseyClientName());
+    }
+
+    @Provides
+    @Singleton
+    private Optional<EidasTrustAnchorResolver> getEidasTrustAnchorResolver(MatchingServiceAdapterConfiguration configuration, @Named("TrustAnchorClient") Client client) {
+        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
+
         if (configuration.isEidasEnabled()) {
-            EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
-
-            Client client = new JerseyClientBuilder(environment)
-                    .using(metadataConfiguration.getJerseyClientConfiguration())
-                    .build(metadataConfiguration.getJerseyClientName());
-
             return Optional.of(new EidasTrustAnchorResolver(metadataConfiguration.getTrustAnchorUri(),
                     client,
-                    metadataConfiguration.getTrustStoreConfiguration().getTrustStore()));
+                    metadataConfiguration.getTrustStore()));
         }
+
         return Optional.empty();
     }
 
