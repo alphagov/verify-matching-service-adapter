@@ -39,8 +39,8 @@ public class EidasMatchingService implements MatchingService {
 
     @Override
     public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
-        String identitySchemeEntityId = request.getAttributeQuery().getIssuer().getValue();
-        Validator<AttributeQuery> validator = attributeQueryValidatorFactory.build(identitySchemeEntityId);
+        String countryEntityId = request.getAssertions().get(0).getIssuer().getValue();
+        Validator<AttributeQuery> validator = attributeQueryValidatorFactory.build(countryEntityId);
         Messages validationMessages = validator.validate(request.getAttributeQuery(), messages());
         if (validationMessages.hasErrors()) {
             throw new AttributeQueryValidationException("Eidas Attribute Query was invalid: " + validationMessages);

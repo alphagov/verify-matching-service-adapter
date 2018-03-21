@@ -8,7 +8,6 @@ import org.opensaml.security.x509.BasicX509Credential;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.validation.messages.MessageImpl;
@@ -33,8 +32,6 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
 
     public EidasAttributeQueryValidator(MetadataResolver verifyMetadataResolver,
                                         MetadataResolver countryMetadataResolver,
-                                        CertificateValidator verifyHubCertificateValidator,
-                                        CertificateValidator countryMetadataCertificateValidator,
                                         CertificateExtractor certificateExtractor,
                                         X509CertificateFactory x509CertificateFactory,
                                         DateTimeComparator dateTimeComparator,
@@ -47,7 +44,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                 new IssuerValidator<>(DEFAULT_ISSUER_REQUIRED_MESSAGE, DEFAULT_ISSUER_EMPTY_MESSAGE, AttributeQuery::getIssuer),
                 new SamlDigitalSignatureValidator<>(
                     DEFAULT_INVALID_SIGNATURE_MESSAGE,
-                    attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, verifyHubCertificateValidator, certificateExtractor)
+                    attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, certificateExtractor)
                         .getHubSigningCertificates(attributeQuery.getIssuer().getValue()).stream()
                         .map(Certificate::getCertificate)
                         .map(x509CertificateFactory::createCertificate)
@@ -64,7 +61,6 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                     aqr -> assertionDecrypter.decryptAssertions(() -> getEncryptedAssertions(aqr)).get(0),
                     new EidasAttributeQueryAssertionValidator(
                         countryMetadataResolver,
-                        countryMetadataCertificateValidator, //no need for this?
                         certificateExtractor,
                         x509CertificateFactory,
                         dateTimeComparator,

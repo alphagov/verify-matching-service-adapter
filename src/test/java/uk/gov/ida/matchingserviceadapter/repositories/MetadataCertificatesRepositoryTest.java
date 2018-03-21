@@ -40,7 +40,6 @@ public class MetadataCertificatesRepositoryTest {
     public void setUp() throws Exception {
         repository = new MetadataCertificatesRepository(
                 metadataResolver,
-                certificateValidator,
                 extractor);
     }
 

@@ -115,7 +115,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("metadata.trustStore.store", metadataTrustStore.getAbsolutePath()),
             ConfigOverride.config("metadata.trustStore.trustStorePassword", metadataTrustStore.getPassword()),
             ConfigOverride.config("metadata.hubEntityId", HUB_ENTITY_ID),
-            ConfigOverride.config("metadata.url", "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
+            ConfigOverride.config("metadata.uri", "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
             ConfigOverride.config("hub.hubEntityId", HUB_ENTITY_ID),
             ConfigOverride.config("hub.trustStore.type", "file"),
             ConfigOverride.config("hub.trustStore.store", clientTrustStore.getAbsolutePath()),

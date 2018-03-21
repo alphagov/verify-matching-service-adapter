@@ -93,8 +93,6 @@ public class EidasAttributeQueryValidatorTest {
         validator = new EidasAttributeQueryValidator(
             verifyMetadataResolver,
             countryMetadataResolver,
-            verifyCertificateValidator,
-            countryCertificateValidator,
             certificateExtractor,
             x509CertificateFactory,
             new DateTimeComparator(Duration.ZERO),

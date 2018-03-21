@@ -277,14 +277,14 @@ class MatchingServiceAdapterModule extends AbstractModule {
         return new CertificateValidator(x509CertificateFactory, fixedCertificateChainValidator);
     }
 
-    @Provides
-    @Singleton
-    @Named("CountryCertificateValidator")
-    public Optional<CertificateValidator> getCountryCertificateValidator(
-        X509CertificateFactory x509CertificateFactory,
-        @Named("CountryFixedCertificateChainValidator") Optional<FixedCertificateChainValidator> fixedCertificateChainValidator) {
-        return fixedCertificateChainValidator.map(certificateChainValidator -> new CertificateValidator(x509CertificateFactory, certificateChainValidator));
-    }
+//    @Provides
+//    @Singleton
+//    @Named("CountryCertificateValidator")
+//    public Optional<CertificateValidator> getCountryCertificateValidator(
+//        X509CertificateFactory x509CertificateFactory,
+//        @Named("CountryFixedCertificateChainValidator") Optional<FixedCertificateChainValidator> fixedCertificateChainValidator) {
+//        return fixedCertificateChainValidator.map(certificateChainValidator -> new CertificateValidator(x509CertificateFactory, certificateChainValidator));
+//    }
 
     @Provides
     @Singleton
@@ -294,15 +294,15 @@ class MatchingServiceAdapterModule extends AbstractModule {
         CertificateChainValidator certificateChainValidator) {
         return new FixedCertificateChainValidator(keyStore, certificateChainValidator);
     }
-
-    @Provides
-    @Singleton
-    @Named("CountryFixedCertificateChainValidator")
-    public Optional<FixedCertificateChainValidator> getCountryFixedChainCertificateValidator(
-        @Named("CountryTrustStore") Optional<KeyStore> CountryTrustStore,
-        CertificateChainValidator certificateChainValidator) {
-        return CountryTrustStore.map(keyStore -> new FixedCertificateChainValidator(keyStore, certificateChainValidator));
-    }
+//
+//    @Provides
+//    @Singleton
+//    @Named("CountryFixedCertificateChainValidator")
+//    public Optional<FixedCertificateChainValidator> getCountryFixedChainCertificateValidator(
+//        @Named("CountryTrustStore") Optional<KeyStore> CountryTrustStore,
+//        CertificateChainValidator certificateChainValidator) {
+//        return CountryTrustStore.map(keyStore -> new FixedCertificateChainValidator(keyStore, certificateChainValidator));
+//    }
 
     @Provides
     @Singleton
@@ -327,8 +327,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MetadataCertificatesRepository getMetadataCertificateRepository(MetadataResolver metadataResolver, @Named("VerifyCertificateValidator") CertificateValidator certificateValidator) {
-        return new MetadataCertificatesRepository(metadataResolver, certificateValidator, new CertificateExtractor());
+    public MetadataCertificatesRepository getMetadataCertificateRepository(MetadataResolver metadataResolver) {
+        return new MetadataCertificatesRepository(metadataResolver, new CertificateExtractor());
     }
 
     @Provides
@@ -344,16 +344,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Named("VerifyTrustStoreConfiguration")
     public TrustStoreConfiguration getHubTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
         return configuration.getHubTrustStoreConfiguration();
-    }
-
-    @Provides
-    @Singleton
-    @Named("CountryTrustStore")
-    public Optional<KeyStore> getCountryTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
-        if (configuration.isEidasEnabled()) {
-            return Optional.of(configuration.getEuropeanIdentity().getMetadata().getTrustStore());
-        }
-        return Optional.empty();
     }
 
     @Provides

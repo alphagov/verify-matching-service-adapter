@@ -7,7 +7,6 @@ import org.opensaml.security.x509.BasicX509Credential;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
@@ -23,7 +22,6 @@ import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 public class EidasAttributeQueryAssertionValidator extends CompositeValidator<Assertion> {
 
     public EidasAttributeQueryAssertionValidator(final MetadataResolver metadataResolver,
-                                                 final CertificateValidator certificateValidator,
                                                  final CertificateExtractor certificateExtractor,
                                                  final X509CertificateFactory x509CertificateFactory,
                                                  final DateTimeComparator dateTimeComparator,
@@ -46,7 +44,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 //There's no need to do it again ourselves, and in fact we can't now that we won't have a country trust store.
                 new SamlDigitalSignatureValidator<>(
                     generateInvalidSignatureMessage(typeOfAssertion),
-                    assertion -> new MetadataCertificatesRepository(metadataResolver, certificateValidator, certificateExtractor)
+                    assertion -> new MetadataCertificatesRepository(metadataResolver, certificateExtractor)
                         .getIdpSigningCertificates(assertion.getIssuer().getValue()).stream()
                         .map(Certificate::getCertificate)
                         .map(x509CertificateFactory::createCertificate)

@@ -73,7 +73,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
     public void setUp() throws Exception {
         validator = new EidasAttributeQueryAssertionValidator(
             metadataResolver,
-            certificateValidator,
             certificateExtractor,
             x509CertificateFactory,
             new DateTimeComparator(org.joda.time.Duration.ZERO),

@@ -40,8 +40,6 @@ public class EidasAttributeQueryValidatorFactory {
         return new EidasAttributeQueryValidator(
                 verifyMetadataResolver,
                 eidasMetadataResolverRepository.getMetadataResolver(issuerEntityId),
-                verifyCertificateValidator,
-                null,
                 new CertificateExtractor(),
                 x509CertificateFactory,
                 new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),

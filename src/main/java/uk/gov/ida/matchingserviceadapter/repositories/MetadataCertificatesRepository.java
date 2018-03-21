@@ -18,16 +18,13 @@ import java.util.List;
 @Deprecated()
 public class MetadataCertificatesRepository {
     private final MetadataResolver metadataResolver;
-    private final CertificateValidator certificateValidator;
     private final CertificateExtractor certificateExtractor;
 
     @Inject
     public MetadataCertificatesRepository(
             MetadataResolver metadataResolver,
-            CertificateValidator certificateValidator,
             CertificateExtractor certificateExtractor) {
         this.metadataResolver = metadataResolver;
-        this.certificateValidator = certificateValidator;
         this.certificateExtractor = certificateExtractor;
     }
 

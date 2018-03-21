@@ -24,6 +24,7 @@ import uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
@@ -37,6 +38,8 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder.aSimpleStringAttribute;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
@@ -180,11 +183,12 @@ public class AssertionHelper {
                 );
     }
 
-    public static EncryptedAssertion anEidasEncryptedAssertionWithInvalidSignature() {
+    public static EncryptedAssertion anEidasEncryptedAssertionWithInvalidSignature(String assertionIssuerId) {
         return anAssertion()
+            .addAuthnStatement(AuthnStatementBuilder.anAuthnStatement().build())
             .withIssuer(
                 anIssuer()
-                    .withIssuerId(STUB_IDP_ONE)
+                    .withIssuerId(assertionIssuerId)
                     .build())
             .withSignature(aSignature()
                 .withSigningCredential(
@@ -193,12 +197,44 @@ public class AssertionHelper {
                         TEST_RP_PRIVATE_SIGNING_KEY
                     ).getSigningCredential()
                 ).build())
+            .withConditions(aConditions())
             .buildWithEncrypterCredential(
                 new TestCredentialFactory(
                     TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
                     TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
                 ).getEncryptingCredential()
             );
+    }
+
+    public static Subject anEidasSubject(String requestId, String assertionIssuerId, Signature assertionSignature) {
+        return aSubjectWithEncryptedAssertions(
+                singletonList(
+                        anAssertion()
+                                .withSubject(
+                                        aSubject().withSubjectConfirmation(
+                                                aSubjectConfirmation().withSubjectConfirmationData(
+                                                        aSubjectConfirmationData()
+                                                                .withInResponseTo(requestId)
+                                                                .build())
+                                                        .build())
+                                                .build()
+                                )
+                                .withIssuer(
+                                        anIssuer()
+                                                .withIssuerId(assertionIssuerId)
+                                                .build())
+                                .addAttributeStatement(anEidasAttributeStatement().build())
+                                .addAuthnStatement(anEidasAuthnStatement().build())
+                                .withSignature(assertionSignature)
+                                .withConditions(aConditions())
+                                .buildWithEncrypterCredential(
+                                        new TestCredentialFactory(
+                                                TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+                                                TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
+                                        ).getEncryptingCredential()
+                                )
+                ),
+                requestId, HUB_ENTITY_ID);
     }
 
     private static Subject anAssertionSubject(final String inResponseTo, boolean shouldBeExpired) {

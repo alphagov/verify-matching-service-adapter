@@ -20,21 +20,12 @@ public class EuropeanIdentityConfiguration {
     @JsonProperty
     private boolean enabled;
 
-    @NotNull
-    @Valid
-    @JsonProperty
-    private TrustStoreBackedMetadataConfiguration metadata;
-
     @Valid
     @JsonProperty
     private EidasMetadataConfiguration aggregatedMetadata;
 
     public String getHubConnectorEntityId() {
         return hubConnectorEntityId;
-    }
-
-    public MetadataResolverConfiguration getMetadata() {
-        return metadata;
     }
 
     public EidasMetadataConfiguration getAggregatedMetadata() {
