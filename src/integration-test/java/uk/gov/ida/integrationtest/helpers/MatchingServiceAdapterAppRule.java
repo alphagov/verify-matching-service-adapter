@@ -71,6 +71,8 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
     private static final String END_CERT = "\n-----END CERTIFICATE-----";
 
+    private String countryEntityId;
+
     public MatchingServiceAdapterAppRule(ConfigOverride... otherConfigOverrides) {
         this(false, otherConfigOverrides);
     }
@@ -87,6 +89,8 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         metadataTrustStore.create();
         countryMetadataTrustStore.create();
         clientTrustStore.create();
+
+        countryEntityId = "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
 
         JerseyGuiceUtils.reset();
         try {
@@ -147,7 +151,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.store", countryMetadataTrustStore.getAbsolutePath()),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.trustStorePassword", countryMetadataTrustStore.getPassword()),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataBaseUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_AGGREGATOR_PATH),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.minRefreshDelay", "60000"),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.maxRefreshDelay", "600000"),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.jerseyClientName", "trust-anchor-client"),
@@ -173,17 +176,23 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         return overrides.toArray(new ConfigOverride[overrides.size()]);
     }
 
+    public String getCountryEntityId() {
+        return countryEntityId;
+    }
+
     private static String getCertificate(String strippedCertificate) {
         String certificate = BEGIN_CERT + strippedCertificate + END_CERT;
         return Base64.encodeBase64String(certificate.getBytes());
     }
 
     private String buildTrustAnchorString() throws ParseException, JOSEException, CertificateEncodingException {
+        X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
         PrivateKey trustAnchorKey = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY));
-        X509Certificate trustAnchorCert = new X509CertificateFactory().createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);
+        X509Certificate trustAnchorCert = x509CertificateFactory.createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);
         Generator generator = new Generator(trustAnchorKey, trustAnchorCert);
-        HashMap<String, String> trustAnchorMap = new HashMap<>();
-        trustAnchorMap.put("test-country", CACertificates.TEST_METADATA_CA.replace(BEGIN_CERT, "").replace(END_CERT, "").replace("\n", ""));
+        HashMap<String, X509Certificate> trustAnchorMap = new HashMap<>();
+        X509Certificate metadataCACert = x509CertificateFactory.createCertificate(CACertificates.TEST_METADATA_CA.replace(BEGIN_CERT, "").replace(END_CERT, "").replace("\n", ""));
+        trustAnchorMap.put(countryEntityId, metadataCACert);
         return generator.generateFromMap(trustAnchorMap).serialize();
     }
 
@@ -203,7 +212,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
                 .build();
 
         return EntityDescriptorBuilder.anEntityDescriptor()
-                .withEntityId("test-country")
+                .withEntityId(countryEntityId)
                 .withIdpSsoDescriptor(idpSsoDescriptor)
                 .setAddDefaultSpServiceDescriptor(false)
                 .withValidUntil(DateTime.now().plusWeeks(2))

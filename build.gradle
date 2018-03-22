@@ -39,7 +39,7 @@ def dependencyVersions = [
         saml_extensions:"$opensaml-1.2a-42",
         saml_serializers:"$opensaml-28",
         saml_security:"$opensaml-58",
-        saml_metadata_bindings:"$opensaml-69",
+        saml_metadata_bindings:"$opensaml-72",
         saml_utils: "$opensaml-70",
         saml_test_utils:"$opensaml-46",
         saml_domain_objects: "$opensaml-44",
@@ -93,7 +93,7 @@ dependencies {
         "uk.gov.verify:saml-domain-objects:$dependencyVersions.saml_domain_objects",
         "uk.gov.verify:saml-utils:$dependencyVersions.saml_utils",
         "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml",
-        "uk.gov.ida.eidas:trust-anchor:1.0-13",
+        "uk.gov.ida.eidas:trust-anchor:1.0-17",
         "uk.gov.ida:validation:1.0.9-40"
 
     compile configurations.dropwizard,

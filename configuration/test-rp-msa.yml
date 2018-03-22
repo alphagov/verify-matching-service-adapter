@@ -107,37 +107,14 @@ returnStackTraceInResponse: true
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
-  metadata:
-    uri: ${COUNTRY_METADATA_URI}
-    trustStore:
-      path: ${TRUSTSTORE_PATH}/country_metadata_truststore.ts
-      password: ${TRUSTSTORE_PASSWORD}
-    minRefreshDelay: 5000
-    maxRefreshDelay: 600000
-    expectedEntityId: ${COUNTRY_EXPECTED_ENTITY_ID}
-    jerseyClientName: country-metadata-client
-    client:
-      timeout: 2s
-      timeToLive: 10m
-      cookiesEnabled: false
-      connectionTimeout: 1s
-      retries: 3
-      keepAlive: 60s
-      chunkedEncodingEnabled: false
-      validateAfterInactivityPeriod: 5s
-      tls:
-        protocol: TLSv1.2
-        verifyHostname: false
-        trustSelfSignedCertificates: true
   aggregatedMetadata:
     trustAnchorUri: ${TRUST_ANCHOR_URI}
     trustStore:
       path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
       password: ${TRUSTSTORE_PASSWORD}
-    metadataBaseUri: ${COUNTRY_METADATA_BASE_URI}
     minRefreshDelay: 5000
     maxRefreshDelay: 600000
-    jerseyClientName: country-metadata-client
+    jerseyClientName: trust-anchor-client
     client:
       timeout: 2s
       timeToLive: 10m

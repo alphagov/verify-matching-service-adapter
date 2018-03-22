@@ -5,7 +5,6 @@ import httpstub.HttpStubRule;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import io.dropwizard.util.Duration;
 import org.apache.http.HttpStatus;
 import org.joda.time.DateTime;
@@ -27,7 +26,6 @@ import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
 import org.opensaml.xmlsec.signature.Signature;
 import org.w3c.dom.Document;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
@@ -81,7 +79,6 @@ public class CountryEnabledIntegrationTest {
     private static final String MATCHING_REQUEST_PATH = "/matching-request";
     private static final SignatureAlgorithm SIGNATURE_ALGORITHM = new SignatureRSASHA1();
     private static final DigestAlgorithm DIGEST_ALGORITHM = new DigestSHA256();
-    private static final String COUNTRY_ENTITY_ID = "test-country";
 
     private static Client client;
     private static String msaMatchingUrl;
@@ -90,7 +87,7 @@ public class CountryEnabledIntegrationTest {
     public static final HttpStubRule localMatchingService = new HttpStubRule();
 
     @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> msaApplicationRule = new MatchingServiceAdapterAppRule(true,
+    public static final MatchingServiceAdapterAppRule msaApplicationRule = new MatchingServiceAdapterAppRule(true,
         ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH));
 
     @BeforeClass
@@ -135,7 +132,7 @@ public class CountryEnabledIntegrationTest {
             .withIssuer(anIssuer().withIssuerId(issuerId).build())
             .withSubject(
                 aSubjectWithEncryptedAssertions(
-                    singletonList(anEidasEncryptedAssertion(COUNTRY_ENTITY_ID)), REQUEST_ID, HUB_ENTITY_ID)
+                    singletonList(anEidasEncryptedAssertion(msaApplicationRule.getCountryEntityId())), REQUEST_ID, HUB_ENTITY_ID)
             )
             .withSignature(
                 aSignature()
@@ -161,7 +158,7 @@ public class CountryEnabledIntegrationTest {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(anEidasSubject(REQUEST_ID, COUNTRY_ENTITY_ID, invalidSignature))
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), invalidSignature))
             .withSignature(aHubSignature())
             .build();
 
@@ -175,7 +172,7 @@ public class CountryEnabledIntegrationTest {
         return AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(anEidasSubject(REQUEST_ID, COUNTRY_ENTITY_ID, anIdpSignature()))
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature()))
             .withSignature(aHubSignature())
             .build();
     }
