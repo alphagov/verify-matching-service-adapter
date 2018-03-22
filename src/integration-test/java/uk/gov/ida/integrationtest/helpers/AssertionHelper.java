@@ -68,8 +68,8 @@ public class AssertionHelper {
         return aValidSignature(STUB_IDP_PUBLIC_PRIMARY_CERT, STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY);
     }
 
-    public static Assertion anAuthnStatementAssertion() {
-        return anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "default-request-id");
+    public static Assertion anAuthnStatementAssertion(String inResponseTo) {
+        return anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, inResponseTo);
     }
 
     public static Assertion anAuthnStatementAssertion(String authnContext, String inResponseTo) {
@@ -143,7 +143,9 @@ public class AssertionHelper {
                         anAttributeStatement()
                                 .addAllAttributes(attributes)
                                 .build()
-                ).buildUnencrypted();
+                )
+//                .withConditions(aConditions())
+                .buildUnencrypted();
     }
 
     public static Assertion aCycle3Assertion(String attributeName, String attributeValue, String requestId) {

@@ -171,7 +171,7 @@ public class UserAccountCreationAppRuleTest {
                 .withAttributes(requiredAttributes)
                 .withIssuer(anIssuer().withIssuerId(applicationRule.getConfiguration().getHubEntityId()).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aCompleteMatchingDatasetAssertion(),
                         AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value")), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
@@ -215,7 +215,7 @@ public class UserAccountCreationAppRuleTest {
                 .withAttributes(requiredAttributes)
                 .withIssuer(anIssuer().withIssuerId(applicationRule.getConfiguration().getHubEntityId()).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         assertionWithOnlyFirstName()), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 
@@ -241,7 +241,7 @@ public class UserAccountCreationAppRuleTest {
                 .withAttributes(requiredAttributes)
                 .withIssuer(anIssuer().withIssuerId(applicationRule.getConfiguration().getHubEntityId()).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         assertionWithOnlyFirstName()
                         ), REQUEST_ID, HUB_ENTITY_ID))
                 .build();

@@ -92,7 +92,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aDefaultMatchingDatasetAssertion()), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
@@ -108,7 +108,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aDefaultMatchingDatasetAssertion(),
                         aCycle3DatasetAssertion("cycle-3-name", "cycle-3-value")
                 ), REQUEST_ID, HUB_ENTITY_ID))
@@ -127,7 +127,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aMatchingDatasetAssertionWithSignature(Collections.emptyList(),
                                 aSignature()
                                         .withSigningCredential(
@@ -155,7 +155,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(TestEntityIds.STUB_IDP_ONE).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aDefaultMatchingDatasetAssertion()), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 
@@ -175,7 +175,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aDefaultMatchingDatasetAssertion()), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
         Document attributeQueryDocument = getAttributeQueryToElementTransformer(signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID).apply(attributeQuery).getOwnerDocument();
@@ -192,7 +192,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aMatchingDatasetAssertion(Collections.emptyList(), true, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 
@@ -274,7 +274,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion(),
+                        anAuthnStatementAssertion("default-request-id"),
                         aMatchingDatasetAssertion(Collections.emptyList(), false, "wrong-request-id")), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 

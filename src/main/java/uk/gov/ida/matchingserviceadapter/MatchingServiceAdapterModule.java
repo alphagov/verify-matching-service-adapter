@@ -277,15 +277,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         return new CertificateValidator(x509CertificateFactory, fixedCertificateChainValidator);
     }
 
-//    @Provides
-//    @Singleton
-//    @Named("CountryCertificateValidator")
-//    public Optional<CertificateValidator> getCountryCertificateValidator(
-//        X509CertificateFactory x509CertificateFactory,
-//        @Named("CountryFixedCertificateChainValidator") Optional<FixedCertificateChainValidator> fixedCertificateChainValidator) {
-//        return fixedCertificateChainValidator.map(certificateChainValidator -> new CertificateValidator(x509CertificateFactory, certificateChainValidator));
-//    }
-
     @Provides
     @Singleton
     @Named("VerifyFixedCertificateChainValidator")
@@ -294,15 +285,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         CertificateChainValidator certificateChainValidator) {
         return new FixedCertificateChainValidator(keyStore, certificateChainValidator);
     }
-//
-//    @Provides
-//    @Singleton
-//    @Named("CountryFixedCertificateChainValidator")
-//    public Optional<FixedCertificateChainValidator> getCountryFixedChainCertificateValidator(
-//        @Named("CountryTrustStore") Optional<KeyStore> CountryTrustStore,
-//        CertificateChainValidator certificateChainValidator) {
-//        return CountryTrustStore.map(keyStore -> new FixedCertificateChainValidator(keyStore, certificateChainValidator));
-//    }
 
     @Provides
     @Singleton
@@ -510,21 +492,14 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("TrustAnchorClient")
-    private Client getEidasTrustAnchorClient(Environment environment, MatchingServiceAdapterConfiguration configuration) {
-        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
-
-        return new JerseyClientBuilder(environment)
-                .using(metadataConfiguration.getJerseyClientConfiguration())
-                .build(metadataConfiguration.getJerseyClientName());
-    }
-
-    @Provides
-    @Singleton
-    private Optional<EidasTrustAnchorResolver> getEidasTrustAnchorResolver(MatchingServiceAdapterConfiguration configuration, @Named("TrustAnchorClient") Client client) {
-        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
-
+    private Optional<EidasTrustAnchorResolver> getEidasTrustAnchorResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
         if (configuration.isEidasEnabled()) {
+            EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
+
+            Client client = new JerseyClientBuilder(environment)
+                    .using(metadataConfiguration.getJerseyClientConfiguration())
+                    .build(metadataConfiguration.getJerseyClientName());
+
             return Optional.of(new EidasTrustAnchorResolver(metadataConfiguration.getTrustAnchorUri(),
                     client,
                     metadataConfiguration.getTrustStore()));

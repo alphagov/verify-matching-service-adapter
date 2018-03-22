@@ -2,8 +2,6 @@ package uk.gov.ida.matchingserviceadapter.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
-import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
-import uk.gov.ida.saml.metadata.TrustStoreBackedMetadataConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
