@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import com.google.inject.Inject;
 import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
 import uk.gov.ida.matchingserviceadapter.domain.ProxyNodeAssertion;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
@@ -50,7 +49,7 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
         AuthnContext authnContext = authnStatementAssertion.getAuthnStatement().get().getAuthnContext();
         LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(authnContext);
 
-        if(isEidasEnabled) {
+        if (isEidasEnabled) {
             UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
             return new UniversalMatchingServiceRequestDto(
                     matchingDatasetDto,
@@ -59,13 +58,15 @@ public class InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper {
                     attributeQuery.getId(),
                     levelOfAssurance);
         }
-        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
-        return new VerifyMatchingServiceRequestDto(
-                matchingDatasetDto,
-                extractCycle3Dataset(attributeQuery),
-                hashedPid,
-                attributeQuery.getId(),
-                levelOfAssurance);
+        else {
+            VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
+            return new VerifyMatchingServiceRequestDto(
+                    matchingDatasetDto,
+                    extractCycle3Dataset(attributeQuery),
+                    hashedPid,
+                    attributeQuery.getId(),
+                    levelOfAssurance);
+        }
     }
 
     public UniversalMatchingServiceRequestDto map(InboundEidasMatchingServiceRequest attributeQuery) {
