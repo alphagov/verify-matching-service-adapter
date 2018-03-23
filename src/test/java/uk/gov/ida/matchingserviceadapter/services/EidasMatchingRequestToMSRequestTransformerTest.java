@@ -141,7 +141,6 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
 
         assertThat(lmsDto.getLevelOfAssurance(), notNullValue());
         assertThat(lmsDto.getLevelOfAssurance().name(), equalTo(LevelOfAssuranceDto.LEVEL_2.name()));
-
     }
 
     @Test
@@ -189,8 +188,6 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
         assertTrue(lmsDto.getCycle3Dataset().isPresent());
         assertThat(lmsDto.getCycle3Dataset().get().getAttributes().size(), equalTo(1));
         assertThat(lmsDto.getCycle3Dataset().get().getAttributes().get("NI"), equalTo("12345"));
-        // TODO - add the rest (e.g. gender and addresses)
-
     }
 
     private static <T> T extractValueFromOptional(Optional<SimpleMdsValueDto<T>> matchingDatasetDtoValue) {
