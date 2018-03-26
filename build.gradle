@@ -82,7 +82,7 @@ dependencies {
         "org.opensaml:opensaml-xmlsec-impl:$dependencyVersions.opensaml",
         'net.shibboleth.utilities:java-support:7.2.0'
 
-    ida "uk.gov.ida:dropwizard-saml:$dependencyVersions.opensaml-353",
+    ida "uk.gov.ida:dropwizard-saml:$dependencyVersions.opensaml-372",
         "uk.gov.ida:saml-metadata-bindings:$dependencyVersions.saml_metadata_bindings",
         "uk.gov.ida:common-utils:2.0.0-$dependencyVersions.ida_utils",
         "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
