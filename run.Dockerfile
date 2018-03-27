@@ -3,7 +3,7 @@ FROM govukverify/java8
 WORKDIR /app
 
 ADD configuration/local/msa.yml msa.yml
-ADD build/distributions/verify-matching-service-adapter-local.zip msa.zip
+ADD build/distributions/verify-matching-service-adapter-*-local.zip msa.zip
 
 RUN unzip msa.zip
 
