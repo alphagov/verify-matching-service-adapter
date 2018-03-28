@@ -21,13 +21,19 @@ public class LocalMatchingServiceConfiguration {
     @JsonProperty
     private URI accountCreationUrl;
 
+    @Valid
+    @JsonProperty
+    private Boolean usesUniversalDataset;
+
     @JsonCreator
     public LocalMatchingServiceConfiguration(
         @JsonProperty("matchUrl") URI matchUrl,
-        @JsonProperty("accountCreationUrl") URI accountCreationUrl
+        @JsonProperty("accountCreationUrl") URI accountCreationUrl,
+        @JsonProperty("usesUniversalDataset") Boolean usesUniversalDataset
     ) {
         this.matchUrl = matchUrl;
         this.accountCreationUrl = accountCreationUrl;
+        this.usesUniversalDataset = usesUniversalDataset;
     }
 
     public URI getMatchUrl() {
@@ -36,5 +42,9 @@ public class LocalMatchingServiceConfiguration {
 
     public URI getAccountCreationUrl() {
         return accountCreationUrl;
+    }
+
+    public Boolean getUsesUniversalDataset() {
+        return (usesUniversalDataset == null) ? false : usesUniversalDataset;
     }
 }

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
+import uk.gov.ida.verifymatchingservicetesttool.resolvers.FileUtilsResolver;
+import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -13,10 +15,11 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
+@ExtendWith(FileUtilsResolver.class)
 public class UserAccountCreationScenario extends ScenarioBase {
 
-    public UserAccountCreationScenario(ApplicationConfiguration configuration) {
-        super(configuration);
+    public UserAccountCreationScenario(ApplicationConfiguration configuration, FileUtils fileUtils) {
+        super(configuration, fileUtils);
     }
 
     @Test

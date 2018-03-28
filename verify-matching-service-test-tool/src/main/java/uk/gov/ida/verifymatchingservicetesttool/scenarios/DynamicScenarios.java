@@ -6,8 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
+import uk.gov.ida.verifymatchingservicetesttool.resolvers.FileUtilsResolver;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.FilesLocatorResolver;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.JsonValidatorResolver;
+import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
 import uk.gov.ida.verifymatchingservicetesttool.validators.JsonValidator;
 
@@ -29,6 +31,7 @@ import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.NO_MATCH
 @ExtendWith(ApplicationConfigurationResolver.class)
 @ExtendWith(FilesLocatorResolver.class)
 @ExtendWith(JsonValidatorResolver.class)
+@ExtendWith(FileUtilsResolver.class)
 public class DynamicScenarios extends ScenarioBase {
 
     private FilesLocator filesLocator;
@@ -37,9 +40,10 @@ public class DynamicScenarios extends ScenarioBase {
     public DynamicScenarios(
         ApplicationConfiguration configuration,
         FilesLocator filesLocator,
-        JsonValidator jsonValidator
+        JsonValidator jsonValidator,
+        FileUtils fileUtils
     ) {
-        super(configuration);
+        super(configuration, fileUtils);
         this.filesLocator = filesLocator;
         this.jsonValidator = jsonValidator;
     }
@@ -58,7 +62,7 @@ public class DynamicScenarios extends ScenarioBase {
 
     private Executable getExecutable(File file, boolean isMatch) {
         return () -> {
-            String jsonString = fileUtils.read(file);
+            String jsonString = FileUtils.read(file);
 
             jsonValidator.validate(String.format("Invalid JSON in file '%s'.", file.getName()), jsonString);
 

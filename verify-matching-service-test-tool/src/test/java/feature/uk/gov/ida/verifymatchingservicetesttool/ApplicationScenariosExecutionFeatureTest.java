@@ -15,8 +15,10 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 
 public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
+    private static final long NUMBER_OF_SCENARIOS = 8;
+
     @Test
-    public void shouldRunAllTestsThatArePartOfTheApplication() {
+    public void shouldRunAllTestsForLegacyDataSchemaWhenUniversalDatasetFlagMissing() {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -24,7 +26,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
             .withLocalMatchingServiceAccountCreationUrl(localMatchingService.getAccountCreationUrl())
             .build();
 
-        listener = new TestStatusPrintingListener();
+        TestStatusPrintingListener listener = new TestStatusPrintingListener();
         application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
@@ -33,8 +35,32 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         );
 
         assertThat(
-            listener.getSummary().getTestsStartedCount(),
-            is(8L)
+            listener.getTotalTests(),
+            is(NUMBER_OF_SCENARIOS)
+        );
+    }
+
+    @Test
+    public void shouldRunTwoSetsOfTestsWhenUniversalDatasetFlagIsTrue() {
+        localMatchingService.ensureDefaultMatchScenariosExist();
+
+        ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
+                .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+                .withLocalMatchingServiceAccountCreationUrl(localMatchingService.getAccountCreationUrl())
+                .withUsesUniversalDataSet(true)
+                .build();
+
+        TestStatusPrintingListener listener = new TestStatusPrintingListener();
+        application.execute(
+                listener,
+                selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
+                applicationConfiguration,
+                fileLocator
+        );
+
+        assertThat(
+                listener.getTotalTests(),
+                is(NUMBER_OF_SCENARIOS * 2)
         );
     }
 

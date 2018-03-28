@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
+import uk.gov.ida.verifymatchingservicetesttool.resolvers.FileUtilsResolver;
+import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -14,10 +16,11 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
+@ExtendWith(FileUtilsResolver.class)
 public class LevelOfAssuranceOneScenario extends ScenarioBase {
 
-    public LevelOfAssuranceOneScenario(ApplicationConfiguration configuration) {
-        super(configuration);
+    public LevelOfAssuranceOneScenario(ApplicationConfiguration configuration, FileUtils fileUtils) {
+        super(configuration, fileUtils);
     }
 
     @Test

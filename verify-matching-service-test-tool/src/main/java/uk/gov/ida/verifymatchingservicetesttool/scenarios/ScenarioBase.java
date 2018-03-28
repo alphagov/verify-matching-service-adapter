@@ -24,12 +24,13 @@ import static org.hamcrest.core.Is.is;
 @ExtendWith(ApplicationConfigurationResolver.class)
 public abstract class ScenarioBase {
 
-    protected FileUtils fileUtils = new FileUtils();
+    protected FileUtils fileUtils;
     protected Client client = ClientBuilder.newClient();
     protected ApplicationConfiguration configuration;
 
-    public ScenarioBase(ApplicationConfiguration configuration) {
+    public ScenarioBase(ApplicationConfiguration configuration, FileUtils fileUtils) {
         this.configuration = configuration;
+        this.fileUtils = fileUtils;
     }
 
     protected Map<String, String> readEntityAsMap(Response response) {

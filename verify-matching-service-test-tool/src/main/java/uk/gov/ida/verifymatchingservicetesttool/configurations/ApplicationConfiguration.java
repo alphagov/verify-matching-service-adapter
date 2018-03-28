@@ -30,4 +30,8 @@ public class ApplicationConfiguration {
     public URI getLocalMatchingServiceAccountCreationUrl() {
         return localMatchingService.getAccountCreationUrl();
     }
+
+    public Boolean getLocalMatchingServiceUsesUniversalDataSet() {
+        return localMatchingService.getUsesUniversalDataset();
+    }
 }

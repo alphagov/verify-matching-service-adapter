@@ -14,11 +14,15 @@ public class TestStatusPrintingListener extends SummaryGeneratingListener {
     private static final String RUNNING_TEST = "Running test : ";
     private static final String STATUS = "Status : ";
 
+    private long totalTests = 0;
+
     @Override
     public void testPlanExecutionFinished(TestPlan testPlan) {
         super.testPlanExecutionFinished(testPlan);
         long tests = testPlan.countTestIdentifiers(TestIdentifier::isTest);
         System.out.println("Test execution finished. Number of all tests: " + tests);
+
+        totalTests += tests;
     }
 
     @Override
@@ -39,6 +43,10 @@ public class TestStatusPrintingListener extends SummaryGeneratingListener {
             printFailureMessage(testIdentifier, testExecutionResult, color);
             System.out.println();
         }
+    }
+
+    public long getTotalTests() {
+        return totalTests;
     }
 
     private void printFailureMessage(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult, Color color) {
