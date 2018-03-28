@@ -62,6 +62,7 @@ configurations {
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    exclude group: "log4j", module: "log4j"
 }
 
 dependencies {
