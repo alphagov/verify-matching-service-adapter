@@ -10,6 +10,7 @@ import uk.gov.ida.validation.validators.CompositeValidator;
 import uk.gov.ida.validation.validators.FixedErrorValidator;
 import uk.gov.ida.validation.validators.PredicatedValidator;
 
+import javax.xml.namespace.QName;
 import java.time.Duration;
 import java.util.function.Predicate;
 
@@ -24,7 +25,8 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                                                  final String typeOfAssertion,
                                                  final String hubConnectorEntityId,
                                                  final Duration ttl,
-                                                 final Duration clockDelta) {
+                                                 final Duration clockDelta,
+                                                 final QName issuerRoleDescriptor) {
         super(
             false,
             new CompositeValidator<>(
@@ -34,7 +36,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                     generateEmptyIssuerMessage(typeOfAssertion),
                     Assertion::getIssuer
                 ),
-                new PredicatedValidator<>(generateInvalidSignatureMessage(typeOfAssertion), validateAssertionSignature(signatureValidator))
+                new PredicatedValidator<>(generateInvalidSignatureMessage(typeOfAssertion), validateAssertionSignature(signatureValidator, issuerRoleDescriptor))
             ),
             new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
             IssueInstantJodaDateTimeValidator(
@@ -43,25 +45,14 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 Assertion::getIssueInstant,
                 ttl,
                 clockDelta
-            ),
-            new CompositeValidator<>(
-                true,
-                new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(typeOfAssertion)),
-                new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
-            ),
-            new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId, dateTimeComparator),
-            new CompositeValidator<>(
-                true,
-                new FixedErrorValidator<>(a -> a.getAttributeStatements().size() != 1 , generateWrongNumberOfAttributeStatementsMessage(typeOfAssertion)),
-                new AttributeStatementValidator<>(a -> a.getAttributeStatements().get(0))
             )
         );
     }
 
-    private static Predicate<Assertion> validateAssertionSignature(SignatureValidator signatureValidator) {
+    private static Predicate<Assertion> validateAssertionSignature(SignatureValidator signatureValidator, QName issuerRoleDescriptor) {
         return assertion -> {
             try {
-                return signatureValidator.validate(assertion, assertion.getIssuer().getValue(), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+                return signatureValidator.validate(assertion, assertion.getIssuer().getValue(), issuerRoleDescriptor);
             } catch (SecurityException | SignatureException e) {
                 throw new RuntimeException(e);
             }
@@ -78,13 +69,5 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
 
     public static MessageImpl generateInvalidSignatureMessage(final String typeOfAssertion) {
         return globalMessage("invalid.signature", typeOfAssertion + " Assertion's signature was invalid.");
-    }
-
-    public static MessageImpl generateWrongNumberOfAuthnStatementsMessage(final String typeOfAssertion) {
-        return fieldMessage("authnStatements", "authnStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of authn statements.");
-    }
-
-    public static MessageImpl generateWrongNumberOfAttributeStatementsMessage(final String typeOfAssertion) {
-        return fieldMessage("attributeStatements", "attributeStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of attribute statements.");
     }
 }

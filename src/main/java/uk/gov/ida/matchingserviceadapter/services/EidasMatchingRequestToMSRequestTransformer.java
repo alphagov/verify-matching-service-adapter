@@ -14,46 +14,40 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.helper.GenderDtoHelper;
+import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaConstants.Eidas_Attributes;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
+import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentFamilyName;
 import uk.gov.ida.saml.core.extensions.eidas.CurrentGivenName;
 import uk.gov.ida.saml.core.extensions.eidas.DateOfBirth;
 import uk.gov.ida.saml.core.extensions.eidas.Gender;
 import uk.gov.ida.saml.core.extensions.eidas.PersonIdentifier;
 import uk.gov.ida.saml.core.extensions.eidas.TransliterableString;
-import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class EidasMatchingRequestToMSRequestTransformer implements Function<MatchingServiceRequestContext, UniversalMatchingServiceRequestDto> {
 
     private final UserIdHashFactory userIdHashFactory;
-    private final String hubEntityId;
-    private final HubAssertionUnmarshaller hubAssertionUnmarshaller;
+    private final HubAssertionExtractor hubAssertionExtractor;
 
     public EidasMatchingRequestToMSRequestTransformer(final UserIdHashFactory userIdHashFactory,
-        final String hubEntityId,
-        final HubAssertionUnmarshaller hubAssertionUnmarshaller) {
+        final HubAssertionExtractor hubAssertionExtractor) {
         this.userIdHashFactory = userIdHashFactory;
-        this.hubEntityId = hubEntityId;
-        this.hubAssertionUnmarshaller = hubAssertionUnmarshaller;
+        this.hubAssertionExtractor = hubAssertionExtractor;
     }
 
     @Override
     public UniversalMatchingServiceRequestDto apply(MatchingServiceRequestContext matchingServiceRequestContext) {
-      Map<Boolean, Assertion> assertions = matchingServiceRequestContext.getAssertions().stream()
-            .collect(Collectors.toMap(this::isHubAssertion, Function.identity()));
-        Assertion eidasAssertion = assertions.get(false);
-        Optional<Assertion> hubAssertion = Optional.ofNullable(assertions.get(true));
+        Assertion eidasAssertion = hubAssertionExtractor.getNonHubAssertions(matchingServiceRequestContext.getAssertions()).get(0);
+        Optional<HubAssertion> hubAssertion = hubAssertionExtractor.getHubAssertion(matchingServiceRequestContext.getAssertions());
 
         Optional<Cycle3DatasetDto> cycle3Data = hubAssertion.map(this::extractCycle3Data);
         List<Attribute> attributes = eidasAssertion.getAttributeStatements().get(0).getAttributes();
@@ -126,8 +120,8 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         return latinScriptAttributeValue == null && nonLatinScriptValue == null ? null : new TransliterableMdsValueDto(latinScriptAttributeValue, nonLatinScriptValue);
     }
 
-    private Cycle3DatasetDto extractCycle3Data(final Assertion hubAssertion) {
-        return hubAssertionUnmarshaller.toHubAssertion(hubAssertion).getCycle3Data()
+    private Cycle3DatasetDto extractCycle3Data(final HubAssertion hubAssertion) {
+        return hubAssertion.getCycle3Data()
             .map(Cycle3Dataset::getAttributes)
             .map(Cycle3DatasetDto::createFromData)
             .get();
@@ -158,9 +152,5 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
                 .filter(value -> ((TransliterableString) value).isLatinScript() == isLatinScript)
                 .findFirst()
                 .orElse(null);
-    }
-
-    private boolean isHubAssertion(final Assertion assertion) {
-        return assertion.getIssuer().getValue().equals(hubEntityId);
     }
 }

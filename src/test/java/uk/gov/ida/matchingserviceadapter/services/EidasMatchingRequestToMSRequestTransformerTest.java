@@ -16,6 +16,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDt
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
@@ -66,7 +67,8 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     public void setUp() {
         when(attributeQuery.getID()).thenReturn("the-aqr-id");
         when(pidHashFactory.hashId(issuerId, personIdentifier, Optional.of(levelOfAssurance.toVerifyLevelOfAssurance()))).thenReturn("the-hashed-pid");
-        transform = new EidasMatchingRequestToMSRequestTransformer(pidHashFactory, hubEntityId, new HubAssertionUnmarshaller(new Cycle3DatasetFactory(), hubEntityId));
+        transform = new EidasMatchingRequestToMSRequestTransformer(pidHashFactory,
+            new HubAssertionExtractor(hubEntityId, new HubAssertionUnmarshaller(new Cycle3DatasetFactory(), hubEntityId)));
     }
 
     private Assertion makeAssertion() {

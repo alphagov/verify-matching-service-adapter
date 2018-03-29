@@ -7,18 +7,11 @@ import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.Duration;
 import org.apache.http.HttpStatus;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
-import org.opensaml.saml.saml2.core.Audience;
-import org.opensaml.saml.saml2.core.AudienceRestriction;
-import org.opensaml.saml.saml2.core.Conditions;
-import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
-import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
-import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.xmlsec.algorithm.DigestAlgorithm;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
@@ -39,14 +32,18 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.net.URI;
 
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEncryptedAssertions;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasEncryptedAssertion;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCycle3Assertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSubject;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateInvalidSignatureMessage;
@@ -63,7 +60,6 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_P
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
-import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
@@ -120,15 +116,23 @@ public class CountryEnabledIntegrationTest {
     }
 
     @Test
+    public void shouldBeAbleToHandleEncryptedCycle3Assertions() throws JsonProcessingException {
+        localMatchingService.reset();
+        localMatchingService.register(MATCHING_REQUEST_PATH, 200, "application/json", "{\"result\": \"no-match\"}");
+        org.opensaml.saml.saml2.core.Response response = makeAttributeQueryRequest(msaMatchingUrl, aValidAttributeQueryWithCycle3Attributes(), SIGNATURE_ALGORITHM, DIGEST_ALGORITHM, HUB_ENTITY_ID);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(RESPONDER);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(NO_MATCH);
+        assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    @Test
     public void shouldNotProcessEidasAttributeQueryRequestContainingItsInvalidSignature() {
         String issuerId = HUB_ENTITY_ID;
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(
-                aSubjectWithEncryptedAssertions(
-                    singletonList(anEidasEncryptedAssertion(msaApplicationRule.getCountryEntityId())), REQUEST_ID, HUB_ENTITY_ID)
-            )
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature()))
             .withSignature(
                 aSignature()
                     .withSigningCredential(
@@ -172,6 +176,19 @@ public class CountryEnabledIntegrationTest {
             .build();
     }
 
+    private AttributeQuery aValidAttributeQueryWithCycle3Attributes() {
+        return AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(aSubjectWithEncryptedAssertions(
+                asList(
+                    aCycle3Assertion("NI", "123456", REQUEST_ID),
+                    anEidasEncryptedAssertion(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature())
+                ), REQUEST_ID, HUB_ENTITY_ID))
+            .withSignature(aHubSignature())
+            .build();
+    }
+
     private Response postResponse(String url, AttributeQuery attributeQuery) {
         Document soapEnvelope = new SoapMessageManager().wrapWithSoapEnvelope(new XmlObjectToElementTransformer<>().apply(attributeQuery));
         String xmlString = XmlUtils.writeToString(soapEnvelope);
@@ -201,17 +218,5 @@ public class CountryEnabledIntegrationTest {
                     STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
                 ).getSigningCredential()
             ).build();
-    }
-
-    private static Conditions aConditions() {
-        Conditions conditions = new ConditionsBuilder().buildObject();
-        conditions.setNotBefore(DateTime.now());
-        conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
-        AudienceRestriction audienceRestriction = new AudienceRestrictionBuilder().buildObject();
-        Audience audience = new AudienceBuilder().buildObject();
-        audience.setAudienceURI(HUB_SECONDARY_ENTITY_ID);
-        audienceRestriction.getAudiences().add(audience);
-        conditions.getAudienceRestrictions().add(audienceRestriction);
-        return conditions;
     }
 }

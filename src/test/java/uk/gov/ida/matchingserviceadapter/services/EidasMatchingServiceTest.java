@@ -21,6 +21,7 @@ import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOut
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
@@ -28,6 +29,7 @@ import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 import uk.gov.ida.validation.messages.Message;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -54,9 +56,12 @@ public class EidasMatchingServiceTest {
     @Mock
     private MatchingServiceProxy matchingServiceClient;
     @Mock
+    private HubAssertionExtractor hubAssertionExtractor;
+    @Mock
     private MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper;
     @Mock
     private EidasAttributeQueryValidatorFactory attributeQueryValidatorFactory;
+
 
     private static final String PID = "pid";
     private static final AttributeQuery ATTRIBUTE_QUERY = AttributeQueryBuilder.anAttributeQuery().build();
@@ -67,9 +72,10 @@ public class EidasMatchingServiceTest {
 
     @Before
     public void setup() {
-        service = new EidasMatchingService(attributeQueryValidatorFactory, transformer, matchingServiceClient, responseMapper);
+        service = new EidasMatchingService(attributeQueryValidatorFactory, transformer, matchingServiceClient, hubAssertionExtractor, responseMapper);
         request = new MatchingServiceRequestContext(document, ATTRIBUTE_QUERY, ImmutableList.of(ASSERTION));
-        when(attributeQueryValidatorFactory.build(request.getAttributeQuery().getIssuer().getValue())).thenReturn(validator);
+        when(hubAssertionExtractor.getNonHubAssertions(request.getAssertions())).thenReturn(ImmutableList.of(ASSERTION));
+        when(attributeQueryValidatorFactory.build(request.getAssertions().get(0).getIssuer().getValue())).thenReturn(validator);
     }
 
     @Test

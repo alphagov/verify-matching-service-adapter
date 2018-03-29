@@ -5,6 +5,7 @@ import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
+import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
 import uk.gov.ida.matchingserviceadapter.validators.exceptions.SamlResponseValidationException;
@@ -18,16 +19,19 @@ public class EidasAttributeQueryValidatorFactory {
     private final SignatureValidator verifySignatureValidator;
     private final MatchingServiceAdapterConfiguration configuration;
     private final AssertionDecrypter assertionDecrypter;
+    private final HubAssertionExtractor hubAssertionExtractor;
     private final EidasMetadataResolverRepository eidasMetadataResolverRepository;
 
     public EidasAttributeQueryValidatorFactory(SignatureValidator verifySignatureValidator,
                                                MatchingServiceAdapterConfiguration configuration,
                                                AssertionDecrypter assertionDecrypter,
+                                               HubAssertionExtractor hubAssertionExtractor,
                                                EidasMetadataResolverRepository eidasMetadataResolverRepository) {
 
         this.verifySignatureValidator = verifySignatureValidator;
         this.configuration = configuration;
         this.assertionDecrypter = assertionDecrypter;
+        this.hubAssertionExtractor = hubAssertionExtractor;
         this.eidasMetadataResolverRepository = eidasMetadataResolverRepository;
     }
 
@@ -37,6 +41,7 @@ public class EidasAttributeQueryValidatorFactory {
                 createCountrySignatureValidator(issuerEntityId),
                 new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),
                 assertionDecrypter,
+                hubAssertionExtractor,
                 configuration.getEuropeanIdentity().getHubConnectorEntityId()
         );
     }

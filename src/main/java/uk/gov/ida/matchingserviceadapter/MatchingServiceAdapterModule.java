@@ -58,11 +58,13 @@ import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseGenera
 import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCertificateChainValidator;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
+import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.api.MsaTransformersFactory;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers.EidasAttributesBasedAttributeQueryDiscriminator;
 import uk.gov.ida.matchingserviceadapter.services.DelegatingMatchingService;
+import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToMSRequestTransformer;
 import uk.gov.ida.matchingserviceadapter.services.EidasMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.HealthCheckMatchingService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
@@ -225,7 +227,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             AssertionDecrypter assertionDecrypter,
             UserIdHashFactory userIdHashFactory,
             MatchingServiceProxy matchingServiceClient,
-            @Named("HubEntityId") String hubEntityId,
+            HubAssertionExtractor hubAssertionExtractor,
             MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper,
             Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository) {
 
@@ -235,9 +237,11 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     verifySignatureValidator,
                     configuration,
                     assertionDecrypter,
+                    hubAssertionExtractor,
                     eidasMetadataResolverRepositoryValue),
-                new MsaTransformersFactory().getEidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId),
+                new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubAssertionExtractor),
                 matchingServiceClient,
+                hubAssertionExtractor,
                 responseMapper));
     }
 
@@ -519,5 +523,11 @@ class MatchingServiceAdapterModule extends AbstractModule {
         }
 
         return Optional.empty();
+    }
+
+    @Provides
+    @Singleton
+    private HubAssertionExtractor getHubAssertionExtractor(@Named("HubEntityId") String hubEntityId) {
+        return new HubAssertionExtractor(hubEntityId, new CoreTransformersFactory().getAssertionToHubAssertionTransformer(hubEntityId));
     }
 }

@@ -29,7 +29,6 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.MatchingServiceAuthnStatementToAuthnStatementTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.OutboundResponseFromMatchingServiceToSamlResponseTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.OutboundResponseFromUnknownUserCreationServiceToSamlResponseTransformer;
-import uk.gov.ida.matchingserviceadapter.services.EidasMatchingRequestToMSRequestTransformer;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
@@ -218,10 +217,5 @@ public class MsaTransformersFactory {
                     new AssertionAttributeStatementValidator(),
                     new BasicAssertionSubjectConfirmationValidator()
         );
-    }
-
-    public EidasMatchingRequestToMSRequestTransformer getEidasMatchingRequestToMSRequestTransformer(
-        UserIdHashFactory userIdHashFactory, String hubEntityId) {
-        return new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId, coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId));
     }
 }

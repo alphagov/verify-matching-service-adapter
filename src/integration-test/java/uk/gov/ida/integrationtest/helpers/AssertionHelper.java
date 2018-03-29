@@ -33,6 +33,8 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_S
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_ENCRYPTION_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
@@ -148,7 +150,7 @@ public class AssertionHelper {
                 .buildUnencrypted();
     }
 
-    public static Assertion aCycle3Assertion(String attributeName, String attributeValue, String requestId) {
+    public static EncryptedAssertion aCycle3Assertion(String attributeName, String attributeValue, String requestId) {
         return anAssertion()
             .withId("cycle3-assertion")
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -165,23 +167,36 @@ public class AssertionHelper {
                             .build()
                     ))
                     .build()
-            ).buildUnencrypted();
+            ).buildWithEncrypterCredential(
+                new TestCredentialFactory(
+                    TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+                    TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
+                ).getEncryptingCredential());
     }
 
-    public static EncryptedAssertion anEidasEncryptedAssertion(String issuerId) {
+    public static EncryptedAssertion anEidasEncryptedAssertion(String requestId, String issuerId, Signature assertionSignature) {
         return anAssertion()
-                .addAuthnStatement(AuthnStatementBuilder.anAuthnStatement().build())
+            .withSubject(
+                aSubject().withSubjectConfirmation(
+                    aSubjectConfirmation().withSubjectConfirmationData(
+                        aSubjectConfirmationData()
+                            .withInResponseTo(requestId)
+                            .build())
+                        .build())
+                    .build())
                 .withIssuer(
-                        anIssuer()
-                                .withIssuerId(issuerId)
-                                .build())
-                .withSignature(aValidSignature())
+                    anIssuer()
+                        .withIssuerId(issuerId)
+                        .build())
+                .addAttributeStatement(anEidasAttributeStatement().build())
+                .addAuthnStatement(anEidasAuthnStatement().build())
+                .withSignature(assertionSignature)
                 .withConditions(aConditions())
                 .buildWithEncrypterCredential(
-                        new TestCredentialFactory(
-                                TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
-                                TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
-                        ).getEncryptingCredential()
+                    new TestCredentialFactory(
+                        TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+                        TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
+                    ).getEncryptingCredential()
                 );
     }
 
@@ -210,32 +225,7 @@ public class AssertionHelper {
 
     public static Subject anEidasSubject(String requestId, String assertionIssuerId, Signature assertionSignature) {
         return aSubjectWithEncryptedAssertions(
-                singletonList(
-                        anAssertion()
-                                .withSubject(
-                                        aSubject().withSubjectConfirmation(
-                                                aSubjectConfirmation().withSubjectConfirmationData(
-                                                        aSubjectConfirmationData()
-                                                                .withInResponseTo(requestId)
-                                                                .build())
-                                                        .build())
-                                                .build()
-                                )
-                                .withIssuer(
-                                        anIssuer()
-                                                .withIssuerId(assertionIssuerId)
-                                                .build())
-                                .addAttributeStatement(anEidasAttributeStatement().build())
-                                .addAuthnStatement(anEidasAuthnStatement().build())
-                                .withSignature(assertionSignature)
-                                .withConditions(aConditions())
-                                .buildWithEncrypterCredential(
-                                        new TestCredentialFactory(
-                                                TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
-                                                TEST_RP_MS_PRIVATE_ENCRYPTION_KEY
-                                        ).getEncryptingCredential()
-                                )
-                ),
+                singletonList(anEidasEncryptedAssertion(requestId, assertionIssuerId, assertionSignature)),
                 requestId, HUB_ENTITY_ID);
     }
 
