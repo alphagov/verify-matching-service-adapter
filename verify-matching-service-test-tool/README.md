@@ -22,6 +22,8 @@ Open the `verify-matching-service-test-tool.yml` file.
 
 Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you created for your local matching service. Refer to the [guidance on matching requests for more information about matching and account creation URLs](http://alphagov.github.io/rp-onboarding-tech-docs/pages/ms/msBuild.html#respond-to-json-matching-requests).
 
+If your local matching service supports the universal matching dataset, set `usesUniversalDataset` to true.
+
 ## Run
 
 Run `bin/verify-matching-service-test-tool` to start the test tool.

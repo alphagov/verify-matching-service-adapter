@@ -3,6 +3,9 @@ MSA Release Notes
 
 ### Next
 
+* Added configuration option to Verify Matching Service Test Tool config to allow testing using the new universal dataset
+
+
 ### 2.2.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.1.0...2.2.0)
 
