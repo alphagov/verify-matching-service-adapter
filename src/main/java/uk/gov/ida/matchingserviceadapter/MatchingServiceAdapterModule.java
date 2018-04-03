@@ -6,6 +6,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
+import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
@@ -131,7 +132,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(UserAccountCreationAttributeExtractor.class);
         bind(UnknownUserAttributeQueryHandler.class);
 
-        bind(SigningKeyStore.class).to(MetadataPublicKeyStore.class).in(Singleton.class);
         bind(EncryptionKeyStore.class).to(MetadataPublicKeyStore.class).in(Singleton.class);
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
@@ -219,9 +219,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public Optional<EidasMatchingService> getEidasMatchingService(
-        MetadataResolver verifyMetadataResolver,
-        @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-        X509CertificateFactory x509CertificateFactory,
+        MetadataBackedSignatureValidator verifySignatureValidator,
         MatchingServiceAdapterConfiguration configuration,
         AssertionDecrypter assertionDecrypter,
         UserIdHashFactory userIdHashFactory,
@@ -233,8 +231,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         return eidasMetadataResolverRepository.map(eidasMetadataResolverRepositoryValue ->
             new EidasMatchingService(
                 new EidasAttributeQueryValidatorFactory(
-                    verifyMetadataResolver,
-                    x509CertificateFactory,
+                    verifySignatureValidator,
                     configuration,
                     assertionDecrypter,
                     eidasMetadataResolverRepositoryValue),

@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -8,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.Audience;
@@ -22,15 +20,13 @@ import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
-import org.opensaml.saml.saml2.metadata.EntityDescriptor;
-import uk.gov.ida.common.shared.security.Certificate;
-import uk.gov.ida.common.shared.security.X509CertificateFactory;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
+import org.opensaml.security.credential.Credential;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
+import uk.gov.ida.saml.core.test.validators.SingleCertificateSignatureValidator;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.Messages;
 
 import java.util.Arrays;
@@ -44,7 +40,6 @@ import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryVa
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.IDENTITY_ASSERTION;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
@@ -64,47 +59,27 @@ import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 public class EidasAttributeQueryValidatorTest {
     public static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
 
-    @Mock
-    private MetadataResolver verifyMetadataResolver;
+    private SignatureValidator verifySignatureValidator;
 
-    @Mock
-    private MetadataResolver countryMetadataResolver;
-
-    @Mock
-    private CertificateValidator verifyCertificateValidator;
-
-    @Mock
-    private CertificateValidator countryCertificateValidator;
-
-    @Mock
-    private CertificateExtractor certificateExtractor;
+    private SignatureValidator countrySignatureValidator;
 
     @Mock
     private AssertionDecrypter assertionDecrypter;
 
-    @Mock
-    private EntityDescriptor entityDescriptor;
-
-    private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryValidator validator;
 
     @Before
     public void setUp() throws Exception {
+        Credential verifySigningCredential = new TestCredentialFactory(TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT, TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY).getSigningCredential();
+        verifySignatureValidator = new SingleCertificateSignatureValidator(verifySigningCredential);
+        Credential countrySigningCredential = new TestCredentialFactory(TestCertificateStrings.TEST_PUBLIC_CERT, TestCertificateStrings.TEST_PRIVATE_KEY).getSigningCredential();
+        countrySignatureValidator = new SingleCertificateSignatureValidator(countrySigningCredential);
         validator = new EidasAttributeQueryValidator(
-            verifyMetadataResolver,
-            countryMetadataResolver,
-            certificateExtractor,
-            x509CertificateFactory,
-            new DateTimeComparator(Duration.ZERO),
+                verifySignatureValidator,
+                countrySignatureValidator,
+                new DateTimeComparator(Duration.ZERO),
             assertionDecrypter,
             HUB_CONNECTOR_ENTITY_ID);
-
-        when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(countryMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn((entityDescriptor));
-        when(certificateExtractor.extractHubSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(HUB_ENTITY_ID, TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT, Certificate.KeyUse.Signing)));
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
     }
 
     @Test

@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Audience;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
@@ -22,6 +21,9 @@ import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
+import uk.gov.ida.saml.core.test.TestCredentialFactory;
+import uk.gov.ida.saml.core.test.validators.SingleCertificateSignatureValidator;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.Message;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.AbstractValidator;
@@ -50,32 +52,20 @@ import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class EidasAttributeQueryAssertionValidatorTest {
-    @Mock
-    private MetadataResolver metadataResolver;
-
-    @Mock
-    private CertificateValidator certificateValidator;
-
-    @Mock
-    private CertificateExtractor certificateExtractor;
-
-    @Mock
-    private EntityDescriptor entityDescriptor;
+    private SignatureValidator signatureValidator;
 
     private static final String TYPE_OF_ASSERTION = "Identity";
     private static final String HUB_CONNECTOR_ENTITY_ID = "hubConnectorEntityId";
-    private X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
     private EidasAttributeQueryAssertionValidator validator;
     private static final Duration TTL = Duration.parse("PT999M");
     private static final Duration CLOCK_DELTA = Duration.parse("PT9M");
 
     @Before
     public void setUp() throws Exception {
+        signatureValidator = new SingleCertificateSignatureValidator(new TestCredentialFactory(TestCertificateStrings.TEST_PUBLIC_CERT, TestCertificateStrings.TEST_PRIVATE_KEY).getSigningCredential());
         validator = new EidasAttributeQueryAssertionValidator(
-            metadataResolver,
-            certificateExtractor,
-            x509CertificateFactory,
-            new DateTimeComparator(org.joda.time.Duration.ZERO),
+                signatureValidator,
+                new DateTimeComparator(org.joda.time.Duration.ZERO),
             TYPE_OF_ASSERTION,
             HUB_CONNECTOR_ENTITY_ID,
             TTL,
@@ -94,9 +84,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     @Test
     public void shouldValidateSubject() throws Exception {
-        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
         Assertion assertion = anAssertion().withSubject(null).buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
@@ -168,10 +155,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     @Test
     public void shouldGenerateErrorIfThereIsMoreThanOneAuthnStatement() throws Exception {
-        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
-
         Assertion assertion = anAssertion()
             .addAuthnStatement(anAuthnStatement().build())
             .addAuthnStatement(anAuthnStatement().build())
@@ -184,10 +167,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     @Test
     public void shouldGenerateErrorIfThereAreNoAuthnStatements() throws Exception {
-        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
-
         Assertion assertion = anAssertion().buildUnencrypted();
 
         Messages messages = validator.validate(assertion, messages());
@@ -197,10 +176,6 @@ public class EidasAttributeQueryAssertionValidatorTest {
 
     @Test
     public void shouldValidateAuthnStatement() throws Exception {
-        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
-
         Assertion assertion = anAssertion()
             .addAuthnStatement(anAuthnStatement().withAuthnInstant(DateTime.now().plusMinutes(10)).build())
             .buildUnencrypted();
@@ -221,9 +196,9 @@ public class EidasAttributeQueryAssertionValidatorTest {
     }
 
     private void setUpCertificateValidation() throws Exception {
-        when(metadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
+//        when(signatureValidator.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
+//        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
+//            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
     }
 
     private Conditions aConditions() {
