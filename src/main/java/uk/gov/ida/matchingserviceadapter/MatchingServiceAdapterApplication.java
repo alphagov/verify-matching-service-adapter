@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.base.Throwables;
+import com.google.inject.AbstractModule;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import io.dropwizard.Application;
@@ -10,6 +11,9 @@ import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
+import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.bundles.LoggingBundle;
 import uk.gov.ida.bundles.MonitoringBundle;
 import uk.gov.ida.bundles.ServiceStatusBundle;
@@ -20,10 +24,14 @@ import uk.gov.ida.matchingserviceadapter.resources.LocalMetadataResource;
 import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResource;
 import uk.gov.ida.matchingserviceadapter.resources.UnknownUserAttributeQueryResource;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.metadata.MetadataHealthCheck;
+import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
 
 import static com.hubspot.dropwizard.guicier.GuiceBundle.defaultBuilder;
 
 public class MatchingServiceAdapterApplication extends Application<MatchingServiceAdapterConfiguration> {
+
+    private MetadataResolverBundle<MatchingServiceAdapterConfiguration> metadataResolverBundle;
 
     public static void main(String[] args) {
         // running this method here stops the odd exceptions/double-initialisation that happens without it
@@ -49,6 +57,11 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
                 )
         );
 
+
+        metadataResolverBundle = new MetadataResolverBundle<>(MatchingServiceAdapterConfiguration::getMetadataConfiguration);
+        bootstrap.addBundle(metadataResolverBundle);
+
+
         // Built in Stage.DEVELOPMENT for lazy loading of Singleton objects,
         // this is required as we have Singletons which require the jersey
         // Environment (not available at initialize)
@@ -57,7 +70,13 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
         //
         // https://github.com/google/guice/issues/357
         GuiceBundle<MatchingServiceAdapterConfiguration> guiceBundle = defaultBuilder(MatchingServiceAdapterConfiguration.class)
-                .modules(new MatchingServiceAdapterModule())
+                .modules(new MatchingServiceAdapterModule(), new AbstractModule() {
+                    @Override
+                    protected void configure() {
+                        bind(MetadataResolver.class).toProvider(metadataResolverBundle.getMetadataResolverProvider()).asEagerSingleton();
+                        bind(ExplicitKeySignatureTrustEngine.class).toProvider(metadataResolverBundle.getSignatureTrustEngineProvider()).asEagerSingleton();
+                    }
+                })
                 .build();
         bootstrap.addBundle(guiceBundle);
         bootstrap.addBundle(new LoggingBundle());
@@ -77,6 +96,9 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
 
         environment.jersey().register(SamlOverSoapExceptionMapper.class);
         environment.jersey().register(ExceptionExceptionMapper.class);
+
+
+        environment.healthChecks().register("VerifyMetadataHealthCheck", new MetadataHealthCheck(metadataResolverBundle.getMetadataResolver(), configuration.getMetadataConfiguration().getExpectedEntityId()));
 
         MatchingServiceAdapterHealthCheck healthCheck = new MatchingServiceAdapterHealthCheck();
         environment.healthChecks().register(healthCheck.getName(), healthCheck);

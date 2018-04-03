@@ -178,18 +178,16 @@ public class MsaTransformersFactory {
     }
 
     public VerifyAttributeQueryToInboundMatchingServiceRequestTransformer getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-        final MetadataResolver metaDataResolver,
+        final MetadataBackedSignatureValidator signatureValidator,
         final IdaKeyStore keyStore,
         final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-        final String hubEntityId,
-        CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
+        final String hubEntityId) {
         HubAssertionUnmarshaller hubAssertionTransformer = coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId);
         IdentityProviderAssertionUnmarshaller identityProviderAssertionTransformer = new IdentityProviderAssertionUnmarshaller(
                 new MatchingDatasetUnmarshaller(new AddressFactory()),
                 new IdentityProviderAuthnStatementUnmarshaller(new AuthnContextFactory()),
                 hubEntityId
         );
-        SignatureValidator signatureValidator = getMetadataBackedSignatureValidator(metaDataResolver, certificateChainEvaluableCriterion);
         IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(keyStore);
         Decrypter decrypter = new DecrypterFactory().createDecrypter(idaKeyStoreCredentialRetriever.getDecryptingCredentials());
         return new VerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
@@ -201,19 +199,6 @@ public class MsaTransformersFactory {
 
             new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter),
                 hubEntityId);
-    }
-
-    private SignatureValidator getMetadataBackedSignatureValidator(MetadataResolver metadataResolver, CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) throws ComponentInitializationException {
-        BasicRoleDescriptorResolver basicRoleDescriptorResolver = new BasicRoleDescriptorResolver(metadataResolver);
-        basicRoleDescriptorResolver.initialize();
-        MetadataCredentialResolver metadataCredentialResolver = new MetadataCredentialResolver();
-        metadataCredentialResolver.setRoleDescriptorResolver(basicRoleDescriptorResolver);
-        metadataCredentialResolver.setKeyInfoCredentialResolver(DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver());
-        metadataCredentialResolver.initialize();
-        ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine = new ExplicitKeySignatureTrustEngine(
-                metadataCredentialResolver, DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver()
-        );
-        return MetadataBackedSignatureValidator.withCertificateChainValidation(explicitKeySignatureTrustEngine, certificateChainEvaluableCriterion);
     }
 
     private IdentityProviderAssertionValidator getIdentityProviderAssertionValidator() {
