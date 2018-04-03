@@ -6,12 +6,12 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import org.w3c.dom.Element;
 import uk.gov.ida.common.shared.configuration.DeserializablePublicKeyConfiguration;
 import uk.gov.ida.common.shared.configuration.PublicEncryptionKeyConfiguration;
@@ -79,7 +79,6 @@ import uk.gov.ida.saml.metadata.EidasTrustAnchorHealthCheck;
 import uk.gov.ida.saml.metadata.EidasTrustAnchorResolver;
 import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
-import uk.gov.ida.saml.metadata.MetadataHealthCheck;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
@@ -91,6 +90,7 @@ import uk.gov.ida.saml.security.EncryptionKeyStore;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
+import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SigningKeyStore;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
@@ -220,28 +220,31 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public Optional<EidasMatchingService> getEidasMatchingService(
-        MetadataResolver verifyMetadataResolver,
-        @Named("VerifyCertificateValidator") CertificateValidator verifyCertificateValidator,
-        X509CertificateFactory x509CertificateFactory,
-        MatchingServiceAdapterConfiguration configuration,
-        AssertionDecrypter assertionDecrypter,
-        UserIdHashFactory userIdHashFactory,
-        MatchingServiceProxy matchingServiceClient,
-        @Named("HubEntityId") String hubEntityId,
-        MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper,
-        Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository) {
+            MetadataBackedSignatureValidator verifySignatureValidator,
+            MatchingServiceAdapterConfiguration configuration,
+            AssertionDecrypter assertionDecrypter,
+            UserIdHashFactory userIdHashFactory,
+            MatchingServiceProxy matchingServiceClient,
+            @Named("HubEntityId") String hubEntityId,
+            MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper,
+            Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository) {
 
         return eidasMetadataResolverRepository.map(eidasMetadataResolverRepositoryValue ->
             new EidasMatchingService(
                 new EidasAttributeQueryValidatorFactory(
-                    verifyMetadataResolver,
-                    x509CertificateFactory,
+                    verifySignatureValidator,
                     configuration,
                     assertionDecrypter,
                     eidasMetadataResolverRepositoryValue),
                 new MsaTransformersFactory().getEidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubEntityId),
                 matchingServiceClient,
                 responseMapper));
+    }
+
+    @Provides
+    @Singleton
+    public MetadataBackedSignatureValidator verifyMetadataSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine, CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) {
+       return MetadataBackedSignatureValidator.withCertificateChainValidation(explicitKeySignatureTrustEngine, certificateChainEvaluableCriterion);
     }
 
     @Provides
@@ -295,7 +298,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyCertificateChainEvaluableCriterion")
     public CertificateChainEvaluableCriterion getCertificateChainEvaluableCriterion(
         CertificateChainValidator certificateChainValidator,
         @Named("VerifyTrustStore") KeyStore keyStore) {
@@ -415,17 +417,15 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     private Function<AttributeQuery, InboundVerifyMatchingServiceRequest> getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-        MetadataResolver metadataResolver,
-        IdaKeyStore keyStore,
-        MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-        @Named("VerifyCertificateChainEvaluableCriterion") CertificateChainEvaluableCriterion certificateChainEvaluableCriterion,
-        @Named("HubEntityId") String hubEntityId) throws ComponentInitializationException {
+            MetadataBackedSignatureValidator metadataBackedSignatureValidator,
+            IdaKeyStore keyStore,
+            MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+            @Named("HubEntityId") String hubEntityId) {
         return new MsaTransformersFactory().getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-            metadataResolver,
-            keyStore,
-            matchingServiceAdapterConfiguration,
-            hubEntityId,
-            certificateChainEvaluableCriterion);
+                metadataBackedSignatureValidator,
+                keyStore,
+                matchingServiceAdapterConfiguration,
+                hubEntityId);
     }
 
     @Provides
@@ -481,14 +481,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper inboundMapper,
         MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper outboundMapper) {
         return new MatchingServiceAttributeQueryHandler(proxy, inboundMapper, outboundMapper);
-    }
-
-    @Provides
-    @Singleton
-    private MetadataResolver getVerifyMetadataResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
-        MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(environment, configuration.getMetadataConfiguration());
-        environment.healthChecks().register("VerifyMetadataHealthCheck", new MetadataHealthCheck(metadataResolver, configuration.getMetadataConfiguration().getExpectedEntityId()));
-        return metadataResolver;
     }
 
     @Provides
