@@ -12,6 +12,7 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.bundles.LoggingBundle;
@@ -26,6 +27,7 @@ import uk.gov.ida.matchingserviceadapter.resources.UnknownUserAttributeQueryReso
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.metadata.MetadataHealthCheck;
 import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
+import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 
 import static com.hubspot.dropwizard.guicier.GuiceBundle.defaultBuilder;
 
@@ -75,6 +77,7 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
                     protected void configure() {
                         bind(MetadataResolver.class).toProvider(metadataResolverBundle.getMetadataResolverProvider()).asEagerSingleton();
                         bind(ExplicitKeySignatureTrustEngine.class).toProvider(metadataResolverBundle.getSignatureTrustEngineProvider()).asEagerSingleton();
+                        bind(MetadataCredentialResolver.class).toProvider(metadataResolverBundle.getMetadataCredentialResolverProvider()).asEagerSingleton();
                     }
                 })
                 .build();
