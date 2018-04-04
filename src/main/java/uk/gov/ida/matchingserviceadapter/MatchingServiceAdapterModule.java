@@ -114,11 +114,6 @@ import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Encryption;
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Signing;
 class MatchingServiceAdapterModule extends AbstractModule {
 
-
-    //We will also be able rip out this naming system for VerifyMetadataResolver vs  CountryMetadataResolver
-    //because CountryMetadataResolver will be no more.
-    //Also we will be able to get rid of CountryCertificateValidator and CountryFixedCertificateChainValidator because I don't think they're needed.
-
     @Override
     protected void configure() {
         bind(PKIXParametersProvider.class).toInstance(new PKIXParametersProvider());
@@ -126,7 +121,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(X509CertificateFactory.class);
         bind(KeyStoreLoader.class);
         bind(IdGenerator.class);
-        bind(IdaKeyStoreCredentialRetriever.class);
         bind(ExpiredCertificateMetadataFilter.class);
         bind(ExceptionResponseFactory.class);
         bind(MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper.class);
@@ -144,6 +138,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(MatchingServiceProxy.class).to(MatchingServiceProxyImpl.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
+    }
+
+    @Provides
+    @Singleton
+    public IdaKeyStoreCredentialRetriever getIdaKeyStoreCredentialRetriever(IdaKeyStore keyStore){
+        return new IdaKeyStoreCredentialRetriever(keyStore);
     }
 
     @Provides
