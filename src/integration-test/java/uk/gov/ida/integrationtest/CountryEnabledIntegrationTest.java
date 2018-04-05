@@ -49,11 +49,6 @@ import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEnc
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasEncryptedAssertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSubject;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
-import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
-import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentGivenNameAttribute;
-import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aDateOfBirthAttribute;
-import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aPersonIdentifierAttribute;
-import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.anEidasAttributeStatement;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryAssertionValidator.generateInvalidSignatureMessage;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.DEFAULT_INVALID_SIGNATURE_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.IDENTITY_ASSERTION;
