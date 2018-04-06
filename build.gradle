@@ -36,10 +36,10 @@ def dependencyVersions = [
         dropwizard: '1.1.4',
         ida_utils: '326',
         ida_test_utils: '35',
-        hub_saml: "$opensaml-120",
+        hub_saml: "$opensaml-121",
         dev_pki: '1.1.0-21',
         trust_anchor: '1.0-19',
-        saml_libs_version: "$opensaml-104"
+        saml_libs_version: "$opensaml-108"
 ]
 
 apply plugin: "idaJar"
