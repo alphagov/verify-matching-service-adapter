@@ -77,8 +77,7 @@ dependencies {
         "org.opensaml:opensaml-xmlsec-impl:$dependencyVersions.opensaml",
         'net.shibboleth.utilities:java-support:7.2.0'
 
-    ida "uk.gov.ida:dropwizard-saml:$dependencyVersions.opensaml-372",
-        "uk.gov.ida:saml-metadata-bindings:$dependencyVersions.saml_libs_version",
+    ida "uk.gov.ida:saml-metadata-bindings:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:common-utils:2.0.0-$dependencyVersions.ida_utils",
         "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
         "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
@@ -91,7 +90,6 @@ dependencies {
         "uk.gov.ida:validation:1.0.9-40"
 
     compile configurations.dropwizard,
-        configurations.saml,
         configurations.ida,
         'javax.inject:javax.inject:1',
         'javax.validation:validation-api:1.1.0.Final',
@@ -106,7 +104,10 @@ dependencies {
         'commons-lang:commons-lang:2.6',
         'org.apache.ws.commons:ws-commons-util:1.0.1',
         'com.google.code.findbugs:annotations:3.0.0',
-        'xml-apis:xml-apis:1.0.b2'
+        'xml-apis:xml-apis:1.0.b2',
+        configurations.saml   {
+            exclude group: 'uk.gov.ida', module: 'dropwizard-saml'
+        }
 
     runtime "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
 
