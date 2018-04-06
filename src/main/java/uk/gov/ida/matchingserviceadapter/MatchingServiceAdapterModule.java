@@ -82,6 +82,7 @@ import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
+import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.CertificateChainEvaluableCriterion;
@@ -234,7 +235,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
             new EidasMatchingService(
                 new EidasAttributeQueryValidatorFactory(
                     verifyMetadataResolver,
-                    verifyCertificateValidator,
                     x509CertificateFactory,
                     configuration,
                     assertionDecrypter,
@@ -517,7 +517,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     environment,
                     configuration.getEuropeanIdentity().getAggregatedMetadata(),
                     new DropwizardMetadataResolverFactory(),
-                    new Timer());
+                    new Timer(),
+                    new MetadataSignatureTrustEngineFactory());
             environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));
             return Optional.of(resolverRepository);
         }
