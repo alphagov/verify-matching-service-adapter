@@ -26,6 +26,6 @@ public class EidasAttributesBasedAttributeQueryDiscriminator implements Predicat
     }
 
     public boolean hasMetadataResolverForEntity(String entityId){
-        return eidasMetadataResolverRepository.getMetadataResolver(entityId) != null;
+        return eidasMetadataResolverRepository.getMetadataResolver(entityId).isPresent();
     }
 }
