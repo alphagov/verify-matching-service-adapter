@@ -18,6 +18,8 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureValidationParametersCriterion;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
+import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.Message;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
@@ -34,51 +36,19 @@ import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class SamlDigitalSignatureValidator<T extends SignableSAMLObject> extends CompositeValidator<T> {
 
-    public static final MessageImpl DEFAULT_SAML_SIGNATURE_PROFILE_MESSAGE = globalMessage("saml.signature.profile", "Open SAML signature profile validation failed.");
-
     public SamlDigitalSignatureValidator(
         Message message,
-        Function<T, Iterable<Credential>> credentialsProvider,
+        SignatureValidator signaturevalidator,
         Function<T, Issuer> valueProvider,
         QName role) {
         super(
             true,
-            new PredicatedValidator<>(DEFAULT_SAML_SIGNATURE_PROFILE_MESSAGE,
-                (Predicate<T>) signedObject -> {
-                    Signature signature = signedObject.getSignature();
-                    SAMLSignatureProfileValidator samlSignatureProfileValidator = new SAMLSignatureProfileValidator();
-                    try {
-                        samlSignatureProfileValidator.validate(signature);
-                        return true;
-                    } catch (SignatureException | ConstraintViolationException e) {
-                        return false;
-                    }
-                }
-            ),
             new PredicatedValidator<>(message,
                 (Predicate<T>) signableSAMLObject -> {
-                    KeyInfoCredentialResolver keyInfoCredResolver = DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver();
-                    List<Credential> credentials = new ArrayList<>();
-                    credentialsProvider.apply(signableSAMLObject).forEach(credentials::add);
-                    StaticCredentialResolver staticCredentialResolver = new StaticCredentialResolver(credentials);
-                    ExplicitKeySignatureTrustEngine trustEngine = new ExplicitKeySignatureTrustEngine(staticCredentialResolver, keyInfoCredResolver);
-                    SignatureValidationParameters signatureValidationParameters = new SignatureValidationParameters();
-                    signatureValidationParameters.setWhitelistedAlgorithms(Arrays.asList(
-                        SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1,
-                        SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256,
-                        SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA512,
-                        SignatureConstants.ALGO_ID_DIGEST_SHA1,//use saml security
-                        SignatureConstants.ALGO_ID_DIGEST_SHA256,
-                        SignatureConstants.ALGO_ID_DIGEST_SHA512
-                    ));
-                    CriteriaSet criteriaSet = new CriteriaSet();
-                    criteriaSet.add(new EntityIdCriterion(valueProvider.apply(signableSAMLObject).getValue()));
-                    criteriaSet.add(new EntityRoleCriterion(role));
-                    criteriaSet.add(new SignatureValidationParametersCriterion(signatureValidationParameters));
                     try {
-                        return trustEngine.validate(signableSAMLObject.getSignature(), criteriaSet);
-                    } catch (SecurityException e) {
-                        return false;
+                        return signaturevalidator.validate(signableSAMLObject, valueProvider.apply(signableSAMLObject).getValue(), role);
+                    } catch (SecurityException | SignatureException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             )

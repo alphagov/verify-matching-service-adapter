@@ -1,15 +1,10 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
-import org.opensaml.security.x509.BasicX509Credential;
-import uk.gov.ida.common.shared.security.Certificate;
-import uk.gov.ida.common.shared.security.X509CertificateFactory;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
-import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
 import uk.gov.ida.validation.validators.FixedErrorValidator;
@@ -30,10 +25,8 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
     public static final MessageImpl DEFAULT_INVALID_SIGNATURE_MESSAGE = globalMessage("invalid.signature", "Eidas Attribute Query's signature was invalid.");
     public static final String IDENTITY_ASSERTION = "Identity";
 
-    public EidasAttributeQueryValidator(MetadataResolver verifyMetadataResolver,
-                                        MetadataResolver countryMetadataResolver,
-                                        CertificateExtractor certificateExtractor,
-                                        X509CertificateFactory x509CertificateFactory,
+    public EidasAttributeQueryValidator(SignatureValidator verifySignatureValidator,
+                                        SignatureValidator countrySignatureValidator,
                                         DateTimeComparator dateTimeComparator,
                                         AssertionDecrypter assertionDecrypter,
                                         final String hubConnectorEntityId) {
@@ -43,15 +36,10 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                 true,
                 new IssuerValidator<>(DEFAULT_ISSUER_REQUIRED_MESSAGE, DEFAULT_ISSUER_EMPTY_MESSAGE, AttributeQuery::getIssuer),
                 new SamlDigitalSignatureValidator<>(
-                    DEFAULT_INVALID_SIGNATURE_MESSAGE,
-                    attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, certificateExtractor)
-                        .getHubSigningCertificates(attributeQuery.getIssuer().getValue()).stream()
-                        .map(Certificate::getCertificate)
-                        .map(x509CertificateFactory::createCertificate)
-                        .map(BasicX509Credential::new)
-                        .collect(Collectors.toList()),
-                    AttributeQuery::getIssuer,
-                    SPSSODescriptor.DEFAULT_ELEMENT_NAME
+                        DEFAULT_INVALID_SIGNATURE_MESSAGE,
+                        verifySignatureValidator,
+                        AttributeQuery::getIssuer,
+                        SPSSODescriptor.DEFAULT_ELEMENT_NAME
                 )
             ),
             new CompositeValidator<>(
@@ -60,10 +48,8 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                 new CompositeValidator<>(
                     aqr -> assertionDecrypter.decryptAssertions(() -> getEncryptedAssertions(aqr)).get(0),
                     new EidasAttributeQueryAssertionValidator(
-                        countryMetadataResolver,
-                        certificateExtractor,
-                        x509CertificateFactory,
-                        dateTimeComparator,
+                            countrySignatureValidator,
+                            dateTimeComparator,
                         IDENTITY_ASSERTION,
                         hubConnectorEntityId,
                         Duration.parse("PT20M"),
