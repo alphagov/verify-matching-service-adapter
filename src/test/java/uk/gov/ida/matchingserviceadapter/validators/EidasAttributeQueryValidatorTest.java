@@ -23,13 +23,14 @@ import org.opensaml.saml.saml2.core.impl.AudienceBuilder;
 import org.opensaml.saml.saml2.core.impl.AudienceRestrictionBuilder;
 import org.opensaml.saml.saml2.core.impl.ConditionsBuilder;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.opensaml.security.credential.Credential;
 import uk.gov.ida.common.shared.security.Certificate;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
+import uk.gov.ida.saml.core.test.validators.SingleCertificateSignatureValidator;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.validation.messages.Messages;
 
@@ -44,7 +45,6 @@ import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryVa
 import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.IDENTITY_ASSERTION;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
@@ -68,15 +68,6 @@ public class EidasAttributeQueryValidatorTest {
     private MetadataResolver verifyMetadataResolver;
 
     @Mock
-    private MetadataResolver countryMetadataResolver;
-
-    @Mock
-    private CertificateValidator verifyCertificateValidator;
-
-    @Mock
-    private CertificateValidator countryCertificateValidator;
-
-    @Mock
     private CertificateExtractor certificateExtractor;
 
     @Mock
@@ -90,9 +81,11 @@ public class EidasAttributeQueryValidatorTest {
 
     @Before
     public void setUp() throws Exception {
+        Credential countrySigningCredential = new TestCredentialFactory(TestCertificateStrings.TEST_PUBLIC_CERT, TestCertificateStrings.TEST_PRIVATE_KEY).getSigningCredential();
+        SingleCertificateSignatureValidator countrySignatureValidator = new SingleCertificateSignatureValidator(countrySigningCredential);
         validator = new EidasAttributeQueryValidator(
             verifyMetadataResolver,
-            countryMetadataResolver,
+            countrySignatureValidator,
             certificateExtractor,
             x509CertificateFactory,
             new DateTimeComparator(Duration.ZERO),
@@ -100,11 +93,8 @@ public class EidasAttributeQueryValidatorTest {
             HUB_CONNECTOR_ENTITY_ID);
 
         when(verifyMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn(entityDescriptor);
-        when(countryMetadataResolver.resolveSingle(any(CriteriaSet.class))).thenReturn((entityDescriptor));
         when(certificateExtractor.extractHubSigningCertificates(entityDescriptor))
             .thenReturn(Arrays.asList(new Certificate(HUB_ENTITY_ID, TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT, Certificate.KeyUse.Signing)));
-        when(certificateExtractor.extractIdpSigningCertificates(entityDescriptor))
-            .thenReturn(Arrays.asList(new Certificate(TEST_ENTITY_ID, TestCertificateStrings.TEST_PUBLIC_CERT, Certificate.KeyUse.Signing)));
     }
 
     @Test

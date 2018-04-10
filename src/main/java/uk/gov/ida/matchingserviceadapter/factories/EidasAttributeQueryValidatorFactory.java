@@ -11,6 +11,8 @@ import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator
 import uk.gov.ida.matchingserviceadapter.validators.exceptions.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.validators.Validator;
 
 public class EidasAttributeQueryValidatorFactory {
@@ -36,13 +38,18 @@ public class EidasAttributeQueryValidatorFactory {
     public Validator<AttributeQuery> build(String issuerEntityId) {
         return new EidasAttributeQueryValidator(
                 verifyMetadataResolver,
-                eidasMetadataResolverRepository.getMetadataResolver(issuerEntityId).orElseThrow(() ->
-                        new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + issuerEntityId)),
+                createCountrySignatureValidator(issuerEntityId),
                 new CertificateExtractor(),
                 x509CertificateFactory,
                 new DateTimeComparator(Duration.standardSeconds(configuration.getClockSkew())),
                 assertionDecrypter,
                 configuration.getEuropeanIdentity().getHubConnectorEntityId()
         );
+    }
+
+    private SignatureValidator createCountrySignatureValidator(String issuerEntityId) {
+        return eidasMetadataResolverRepository.getSignatureTrustEngine(issuerEntityId)
+                    .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
+                    .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + issuerEntityId));
     }
 }

@@ -32,6 +32,7 @@ import java.util.function.Predicate;
 
 import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
+@Deprecated
 public class SamlDigitalSignatureValidator<T extends SignableSAMLObject> extends CompositeValidator<T> {
 
     public static final MessageImpl DEFAULT_SAML_SIGNATURE_PROFILE_MESSAGE = globalMessage("saml.signature.profile", "Open SAML signature profile validation failed.");
