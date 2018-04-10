@@ -56,6 +56,7 @@ import uk.gov.ida.saml.security.CertificateChainEvaluableCriterion;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.EncrypterFactory;
 import uk.gov.ida.saml.security.EncryptionCredentialFactory;
+import uk.gov.ida.saml.security.EncryptionCredentialResolver;
 import uk.gov.ida.saml.security.EncryptionKeyStore;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
@@ -81,7 +82,7 @@ public class MsaTransformersFactory {
     }
 
     public ResponseToElementTransformer getResponseToElementTransformer(
-            EncryptionKeyStore encryptionKeyStore,
+            EncryptionCredentialResolver encryptionCredentialResolver,
             IdaKeyStore keyStore,
             EntityToEncryptForLocator entityToEnryptForLocator,
             MatchingServiceAdapterConfiguration configuration
@@ -92,7 +93,7 @@ public class MsaTransformersFactory {
             new DigestSHA256()
         );
         SamlResponseAssertionEncrypter assertionEncrypter = new SamlResponseAssertionEncrypter(
-                new EncryptionCredentialFactory(encryptionKeyStore),
+                encryptionCredentialResolver,
                 new EncrypterFactory(),
                 entityToEnryptForLocator);
         return new ResponseToElementTransformer(
@@ -112,7 +113,7 @@ public class MsaTransformersFactory {
     }
 
     public Function<OutboundResponseFromUnknownUserCreationService, Element> getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
-            final EncryptionKeyStore encryptionKeyStore,
+            final EncryptionCredentialResolver encryptionCredentialResolver,
             final IdaKeyStore keyStore,
             final EntityToEncryptForLocator entityToEncryptForLocator,
             MatchingServiceAdapterConfiguration configuration) {
@@ -123,7 +124,7 @@ public class MsaTransformersFactory {
                         createMatchingServiceAssertionToAssertionTransformer()
                 );
         Function<Response, Element> t2 = getResponseToElementTransformer(
-                encryptionKeyStore,
+                encryptionCredentialResolver,
                 keyStore,
                 entityToEncryptForLocator,
                 configuration);
@@ -131,7 +132,7 @@ public class MsaTransformersFactory {
     }
 
     public Function<OutboundResponseFromMatchingService, Element> getOutboundResponseFromMatchingServiceToElementTransformer(
-            final EncryptionKeyStore encryptionKeyStore,
+            final EncryptionCredentialResolver encryptionCredentialResolver,
             final IdaKeyStore keyStore,
             final EntityToEncryptForLocator entityToEncryptForLocator,
             MatchingServiceAdapterConfiguration configuration) {
@@ -141,7 +142,7 @@ public class MsaTransformersFactory {
                 createMatchingServiceAssertionToAssertionTransformer()
         );
         Function<Response, Element> t2 = getResponseToElementTransformer(
-                encryptionKeyStore,
+                encryptionCredentialResolver,
                 keyStore,
             entityToEncryptForLocator,
             configuration);
@@ -157,14 +158,14 @@ public class MsaTransformersFactory {
     }
 
     public Function<HealthCheckResponseFromMatchingService, Element> getHealthcheckResponseFromMatchingServiceToElementTransformer(
-            final EncryptionKeyStore encryptionKeyStore,
+            final EncryptionCredentialResolver encryptionCredentialResolver,
             final IdaKeyStore keyStore,
             final EntityToEncryptForLocator entityToEncryptForLocator,
             MatchingServiceAdapterConfiguration configuration
     ){
         Function<HealthCheckResponseFromMatchingService, Response> t1 = getHealthCheckResponseFromMatchingServiceToResponseTransformer();
         Function<Response, Element> t2 = getResponseToElementTransformer(
-                encryptionKeyStore,
+                encryptionCredentialResolver,
                 keyStore,
                 entityToEncryptForLocator,
                 configuration);

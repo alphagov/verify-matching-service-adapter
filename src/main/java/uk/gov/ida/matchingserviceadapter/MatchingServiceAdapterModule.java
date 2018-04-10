@@ -11,6 +11,8 @@ import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
+import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import org.w3c.dom.Element;
 import uk.gov.ida.common.shared.configuration.DeserializablePublicKeyConfiguration;
@@ -90,6 +92,7 @@ import uk.gov.ida.saml.security.EncryptionKeyStore;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
+import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SigningKeyStore;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
@@ -132,13 +135,17 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(UserAccountCreationAttributeExtractor.class);
         bind(UnknownUserAttributeQueryHandler.class);
 
-        bind(SigningKeyStore.class).to(MetadataPublicKeyStore.class).in(Singleton.class);
-        bind(EncryptionKeyStore.class).to(MetadataPublicKeyStore.class).in(Singleton.class);
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
         bind(MatchingServiceProxy.class).to(MatchingServiceProxyImpl.class).in(Singleton.class);
         bind(ManifestReader.class).toInstance(new ManifestReader());
         bind(MatchingDatasetToMatchingDatasetDtoMapper.class).toInstance(new MatchingDatasetToMatchingDatasetDtoMapper());
+    }
+
+    @Provides
+    @Singleton
+    private MetadataBackedEncryptionCredentialResolver hubEncryptionCredentialResolver(MetadataCredentialResolver metadataCredentialResolver) {
+        return new MetadataBackedEncryptionCredentialResolver(metadataCredentialResolver, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Provides
@@ -372,39 +379,48 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public Function<HealthCheckResponseFromMatchingService, Element> getHealthcheckResponseFromMatchingServiceToElementTransformer(
-        Injector injector
+        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
+        IdaKeyStore idaKeyStore,
+        EntityToEncryptForLocator entityToEncryptForLocator,
+        MatchingServiceAdapterConfiguration configuration
     ) {
         return new MsaTransformersFactory().getHealthcheckResponseFromMatchingServiceToElementTransformer(
-            injector.getInstance(EncryptionKeyStore.class),
-            injector.getInstance(IdaKeyStore.class),
-            injector.getInstance(EntityToEncryptForLocator.class),
-            injector.getInstance(MatchingServiceAdapterConfiguration.class)
+                encryptionCredentialResolver,
+                idaKeyStore,
+                entityToEncryptForLocator,
+                configuration
         );
     }
 
     @Provides
     @Singleton
     private Function<OutboundResponseFromMatchingService, Element> getOutboundResponseFromMatchingServiceToElementTransformer(
-        Injector injector
+        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
+        IdaKeyStore idaKeyStore,
+        EntityToEncryptForLocator entityToEncryptForLocator,
+        MatchingServiceAdapterConfiguration configuration
     ) {
         return new MsaTransformersFactory().getOutboundResponseFromMatchingServiceToElementTransformer(
-            injector.getInstance(EncryptionKeyStore.class),
-            injector.getInstance(IdaKeyStore.class),
-            injector.getInstance(EntityToEncryptForLocator.class),
-            injector.getInstance(MatchingServiceAdapterConfiguration.class)
+                encryptionCredentialResolver,
+                idaKeyStore,
+                entityToEncryptForLocator,
+                configuration
         );
     }
 
     @Provides
     @Singleton
     private Function<OutboundResponseFromUnknownUserCreationService, Element> getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
-        Injector injector
+        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
+        IdaKeyStore idaKeyStore,
+        EntityToEncryptForLocator entityToEncryptForLocator,
+        MatchingServiceAdapterConfiguration configuration
     ) {
         return new MsaTransformersFactory().getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
-            injector.getInstance(EncryptionKeyStore.class),
-            injector.getInstance(IdaKeyStore.class),
-            injector.getInstance(EntityToEncryptForLocator.class),
-            injector.getInstance(MatchingServiceAdapterConfiguration.class)
+            encryptionCredentialResolver,
+            idaKeyStore,
+            entityToEncryptForLocator,
+            configuration
         );
     }
 
