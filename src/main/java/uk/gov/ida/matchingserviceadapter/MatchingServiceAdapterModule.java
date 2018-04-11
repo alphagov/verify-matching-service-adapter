@@ -2,11 +2,9 @@ package uk.gov.ida.matchingserviceadapter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
@@ -52,15 +50,12 @@ import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatase
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxyImpl;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
-import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseGenerator;
-import uk.gov.ida.matchingserviceadapter.rest.MetadataPublicKeyStore;
 import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCertificateChainValidator;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
@@ -88,13 +83,11 @@ import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.CertificateChainEvaluableCriterion;
 import uk.gov.ida.saml.security.DecrypterFactory;
-import uk.gov.ida.saml.security.EncryptionKeyStore;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
 import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
-import uk.gov.ida.saml.security.SigningKeyStore;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.truststore.KeyStoreLoader;
@@ -315,12 +308,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public PublicKeyFactory getPublicKeyFactory(X509CertificateFactory x509CertificateFactory) {
         return new PublicKeyFactory(x509CertificateFactory);
-    }
-
-    @Provides
-    @Singleton
-    public MetadataCertificatesRepository getMetadataCertificateRepository(MetadataResolver metadataResolver) {
-        return new MetadataCertificatesRepository(metadataResolver, new CertificateExtractor());
     }
 
     @Provides
