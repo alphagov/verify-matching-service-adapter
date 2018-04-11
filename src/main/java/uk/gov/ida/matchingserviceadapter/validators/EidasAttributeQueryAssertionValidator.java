@@ -1,19 +1,17 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
-import org.opensaml.security.x509.BasicX509Credential;
-import uk.gov.ida.common.shared.security.Certificate;
-import uk.gov.ida.common.shared.security.X509CertificateFactory;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
-import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
+import org.opensaml.security.SecurityException;
+import org.opensaml.xmlsec.signature.support.SignatureException;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
 import uk.gov.ida.validation.validators.FixedErrorValidator;
+import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import java.time.Duration;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 import static uk.gov.ida.matchingserviceadapter.validators.IssueInstantValidator.IssueInstantJodaDateTimeValidator;
 import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
@@ -21,9 +19,7 @@ import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class EidasAttributeQueryAssertionValidator extends CompositeValidator<Assertion> {
 
-    public EidasAttributeQueryAssertionValidator(final MetadataResolver metadataResolver,
-                                                 final CertificateExtractor certificateExtractor,
-                                                 final X509CertificateFactory x509CertificateFactory,
+    public EidasAttributeQueryAssertionValidator(final SignatureValidator signatureValidator,
                                                  final DateTimeComparator dateTimeComparator,
                                                  final String typeOfAssertion,
                                                  final String hubConnectorEntityId,
@@ -38,21 +34,7 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                     generateEmptyIssuerMessage(typeOfAssertion),
                     Assertion::getIssuer
                 ),
-
-                //This needs to change. First of all, as Chris points out we should use opensaml
-                //Secondly, the metadataResolver already validates the certificate for us (See DropwizardMetadataResolverFactory.java)!
-                //There's no need to do it again ourselves, and in fact we can't now that we won't have a country trust store.
-                new SamlDigitalSignatureValidator<>(
-                    generateInvalidSignatureMessage(typeOfAssertion),
-                    assertion -> new MetadataCertificatesRepository(metadataResolver, certificateExtractor)
-                        .getIdpSigningCertificates(assertion.getIssuer().getValue()).stream()
-                        .map(Certificate::getCertificate)
-                        .map(x509CertificateFactory::createCertificate)
-                        .map(BasicX509Credential::new)
-                        .collect(Collectors.toList()),
-                    Assertion::getIssuer,
-                    IDPSSODescriptor.DEFAULT_ELEMENT_NAME
-                )
+                new PredicatedValidator<>(generateInvalidSignatureMessage(typeOfAssertion), validateAssertionSignature(signatureValidator))
             ),
             new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
             IssueInstantJodaDateTimeValidator(
@@ -74,6 +56,16 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
                 new AttributeStatementValidator<>(a -> a.getAttributeStatements().get(0))
             )
         );
+    }
+
+    private static Predicate<Assertion> validateAssertionSignature(SignatureValidator signatureValidator) {
+        return assertion -> {
+            try {
+                return signatureValidator.validate(assertion, assertion.getIssuer().getValue(), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+            } catch (SecurityException | SignatureException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     public static MessageImpl generateEmptyIssuerMessage(final String typeOfAssertion) {

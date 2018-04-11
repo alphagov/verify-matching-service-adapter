@@ -10,6 +10,7 @@ import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.repositories.MetadataCertificatesRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
+import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
 import uk.gov.ida.validation.validators.FixedErrorValidator;
@@ -31,7 +32,7 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
     public static final String IDENTITY_ASSERTION = "Identity";
 
     public EidasAttributeQueryValidator(MetadataResolver verifyMetadataResolver,
-                                        MetadataResolver countryMetadataResolver,
+                                        SignatureValidator countrySignatureValidator,
                                         CertificateExtractor certificateExtractor,
                                         X509CertificateFactory x509CertificateFactory,
                                         DateTimeComparator dateTimeComparator,
@@ -39,31 +40,29 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                                         final String hubConnectorEntityId) {
         super(
             false,
-            new CompositeValidator<>(
-                true,
-                new IssuerValidator<>(DEFAULT_ISSUER_REQUIRED_MESSAGE, DEFAULT_ISSUER_EMPTY_MESSAGE, AttributeQuery::getIssuer),
-                new SamlDigitalSignatureValidator<>(
-                    DEFAULT_INVALID_SIGNATURE_MESSAGE,
-                    attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, certificateExtractor)
-                        .getHubSigningCertificates(attributeQuery.getIssuer().getValue()).stream()
-                        .map(Certificate::getCertificate)
-                        .map(x509CertificateFactory::createCertificate)
-                        .map(BasicX509Credential::new)
-                        .collect(Collectors.toList()),
-                    AttributeQuery::getIssuer,
-                    SPSSODescriptor.DEFAULT_ELEMENT_NAME
-                )
-            ),
+                new CompositeValidator<>(
+                    true,
+                    new IssuerValidator<>(DEFAULT_ISSUER_REQUIRED_MESSAGE, DEFAULT_ISSUER_EMPTY_MESSAGE, AttributeQuery::getIssuer),
+                    new SamlDigitalSignatureValidator<>(
+                            DEFAULT_INVALID_SIGNATURE_MESSAGE,
+                            attributeQuery -> new MetadataCertificatesRepository(verifyMetadataResolver, certificateExtractor)
+                                    .getHubSigningCertificates(attributeQuery.getIssuer().getValue()).stream()
+                                    .map(Certificate::getCertificate)
+                                    .map(x509CertificateFactory::createCertificate)
+                                    .map(BasicX509Credential::new)
+                                    .collect(Collectors.toList()),
+                            AttributeQuery::getIssuer,
+                            SPSSODescriptor.DEFAULT_ELEMENT_NAME
+                    )
+                ),
             new CompositeValidator<>(
                 true,
                 new FixedErrorValidator<>(aqr -> getEncryptedAssertions(aqr).size() != 1, DEFAULT_ENCRYPTED_ASSERTIONS_MISSING_MESSAGE),
                 new CompositeValidator<>(
                     aqr -> assertionDecrypter.decryptAssertions(() -> getEncryptedAssertions(aqr)).get(0),
                     new EidasAttributeQueryAssertionValidator(
-                        countryMetadataResolver,
-                        certificateExtractor,
-                        x509CertificateFactory,
-                        dateTimeComparator,
+                            countrySignatureValidator,
+                            dateTimeComparator,
                         IDENTITY_ASSERTION,
                         hubConnectorEntityId,
                         Duration.parse("PT20M"),
