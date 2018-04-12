@@ -5,7 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.AttributeStatement;
+
+import uk.gov.ida.saml.core.IdaConstants.Eidas_Attributes;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
+import uk.gov.ida.validation.messages.Message;
 import uk.gov.ida.validation.messages.Messages;
 import uk.gov.ida.validation.validators.Validator;
 
@@ -22,6 +25,7 @@ import static uk.gov.ida.matchingserviceadapter.validators.AttributeStatementVal
 import static uk.gov.ida.matchingserviceadapter.validators.AttributeStatementValidator.DATE_OF_BIRTH_IN_FUTURE;
 import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
 import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_NOT_ENUMERATED;
+import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
 @RunWith(OpenSAMLMockitoRunner.class)
@@ -32,6 +36,10 @@ public class AttributeStatementValidatorTest {
     @Before
     public void setup() {
         validator = new AttributeStatementValidator<>(identity());
+    }
+
+    private static Message createExpectedMessage(String attributeName) {
+        return fieldMessage(attributeName, "attribute.missing", null);
     }
 
     @Test
@@ -77,7 +85,7 @@ public class AttributeStatementValidatorTest {
 
         Messages messages = validator.validate(attributeStatement, messages());
 
-        assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+        assertThat(messages.hasErrorLike(createExpectedMessage(Eidas_Attributes.FirstName.NAME))).isTrue();
     }
 
     @Test
@@ -90,7 +98,7 @@ public class AttributeStatementValidatorTest {
 
         Messages messages = validator.validate(attributeStatement, messages());
 
-        assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+        assertThat(messages.hasErrorLike(createExpectedMessage(Eidas_Attributes.FamilyName.NAME))).isTrue();
     }
 
     @Test
@@ -103,7 +111,7 @@ public class AttributeStatementValidatorTest {
 
         Messages messages = validator.validate(attributeStatement, messages());
 
-        assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+        assertThat(messages.hasErrorLike(createExpectedMessage(Eidas_Attributes.PersonIdentifier.NAME))).isTrue();
     }
 
     @Test
@@ -116,7 +124,7 @@ public class AttributeStatementValidatorTest {
 
         Messages messages = validator.validate(attributeStatement, messages());
 
-        assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+        assertThat(messages.hasErrorLike(createExpectedMessage(Eidas_Attributes.DateOfBirth.NAME))).isTrue();
     }
 
     @Test

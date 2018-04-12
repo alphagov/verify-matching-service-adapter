@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import static java.util.function.Function.identity;
 import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
+import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 
 public class AttributeStatementValidator<T> extends CompositeValidator<T> {
 
@@ -42,12 +43,15 @@ public class AttributeStatementValidator<T> extends CompositeValidator<T> {
     private static <R extends XMLObject> Validator<AttributeStatement> attributeValidator(String attributeName, Class<R> attributeClass, Validator<R> valueValidator) {
         return MatchingElementValidator.failOnMatchError((AttributeStatement as) -> as.getAttributes(),
             a -> a.getName().equals(attributeName),
-            new AttributeValidator<>(identity(), attributeClass, valueValidator));
+            new AttributeValidator<>(identity(), attributeClass, valueValidator),
+            fieldMessage(attributeName, "attribute.missing", "No attribute value found"),
+            fieldMessage(attributeName, "attribute.toomany", "More than one attribute value found"));
     }
 
     private static <R extends XMLObject> Validator<AttributeStatement> optionalAttributeValidator(String attributeName, Class<R> attributeClass, Validator<R> valueValidator) {
         return MatchingElementValidator.succeedOnMatchError((AttributeStatement as) -> as.getAttributes(),
             a -> a.getName().equals(attributeName),
-            new AttributeValidator<>(identity(), attributeClass, valueValidator));
+            new AttributeValidator<>(identity(), attributeClass, valueValidator),
+            fieldMessage(attributeName, "attribute.toomany", "More than one attribute value found"));
     }
 }

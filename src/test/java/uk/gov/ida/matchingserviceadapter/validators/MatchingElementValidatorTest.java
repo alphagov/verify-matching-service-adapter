@@ -14,11 +14,14 @@ import java.util.Collection;
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.NO_VALUE_MATCHING_FILTER;
+import static uk.gov.ida.matchingserviceadapter.validators.MatchingElementValidator.TOO_MANY_MATCHING_FILTER;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
+import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
 public class MatchingElementValidatorTest {
 
     private Message message = MessageImpl.globalMessage("string.length", "string.length.too.short");
+    private Message countErrorMessage = MessageImpl.globalMessage("element", "wrong.number.of.elements");
 
     private Validator<Collection<String>> validator;
 
@@ -42,6 +45,15 @@ public class MatchingElementValidatorTest {
         Messages messages = validator.validate(ImmutableList.of("bar"), messages());
 
         assertThat(messages.hasErrorLike(NO_VALUE_MATCHING_FILTER)).isTrue();
+    }
+
+    @Test
+    public void shouldPresentCustomMessageIfNoElementMatchesFilter() {
+        validator = MatchingElementValidator.failOnMatchError(identity(), s -> s.contains("foo"), lengthMoreThan3Validator, countErrorMessage, null);
+
+        Messages messages = validator.validate(ImmutableList.of("bar"), messages());
+
+        assertThat(messages.hasErrorLike(countErrorMessage)).isTrue();
     }
 
     @Test
@@ -78,4 +90,19 @@ public class MatchingElementValidatorTest {
         assertThat(messages.hasErrorLike(message)).isTrue();
     }
 
+    @Test
+    public void shouldGenerateErrorIfMoreThanOneElementPresent() {
+        Messages messages = validator.validate(ImmutableList.of("foo", "foo"), messages());
+
+        assertThat(messages.hasErrorLike(TOO_MANY_MATCHING_FILTER)).isTrue();
+    }
+
+    @Test
+    public void shouldPresentCustomMessageIfMoreThanOneElementPresent() {
+        validator = MatchingElementValidator.failOnMatchError(identity(), s -> s.contains("foo"), lengthMoreThan3Validator, null, countErrorMessage);
+
+        Messages messages = validator.validate(ImmutableList.of("foo", "foo"), messages());
+
+        assertThat(messages.hasErrorLike(countErrorMessage)).isTrue();
+    }
 }
