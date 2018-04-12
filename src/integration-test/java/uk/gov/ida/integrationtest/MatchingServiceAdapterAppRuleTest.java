@@ -110,7 +110,7 @@ public class MatchingServiceAdapterAppRuleTest {
                 .withSubject(aSubjectWithAssertions(asList(
                         anAuthnStatementAssertion("default-request-id"),
                         aDefaultMatchingDatasetAssertion(),
-                        aCycle3DatasetAssertion("cycle-3-name", "cycle-3-value")
+                        aCycle3DatasetAssertion("cycle-3-name", "cycle-3-value").buildUnencrypted()
                 ), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 
@@ -137,7 +137,7 @@ public class MatchingServiceAdapterAppRuleTest {
                                                 ).getSigningCredential()
                                         ).build(), false, REQUEST_ID
                         ),
-                        aCycle3DatasetAssertion("cycle-3-name", "cycle-3-value")
+                        aCycle3DatasetAssertion("cycle-3-name", "cycle-3-value").buildUnencrypted()
                 ), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 

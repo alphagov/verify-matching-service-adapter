@@ -29,9 +29,9 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
     public static final MessageImpl DEFAULT_ISSUER_REQUIRED_MESSAGE = fieldMessage("issuer", "issuer.empty", "Eidas Attribute Query issuer was not provided.");
     public static final MessageImpl DEFAULT_ISSUER_EMPTY_MESSAGE = fieldMessage("issuer", "issuer.empty", "Eidas Attribute Query issuer value was empty.");
     public static final MessageImpl DEFAULT_ENCRYPTED_ASSERTIONS_MISSING_MESSAGE = globalMessage("encrypted.assertions.cardinality", "There must be at least one EncryptedAssertion for eIDAS.");
+    public static final MessageImpl DEFAULT_ENCRYPTED_ASSERTIONS_TOO_MANY_MESSAGE = globalMessage("encrypted.assertions.cardinality", "There must be no more than one EncryptedAssertion for eIDAS.");
     public static final MessageImpl DEFAULT_TOO_MANY_CYCLE_3_ASSERTIONS_MESSAGE = globalMessage("encrypted.assertions.cardinality", "There must not be more than one Cycle 3 assertion.");
     public static final MessageImpl DEFAULT_INVALID_SIGNATURE_MESSAGE = globalMessage("invalid.signature", "Eidas Attribute Query's signature was invalid.");
-    public static final String IDENTITY_ASSERTION = "Identity";
 
     public EidasAttributeQueryValidator(SignatureValidator verifySignatureValidator,
                                         SignatureValidator countrySignatureValidator,
@@ -49,51 +49,29 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
             new CompositeValidator<>(
                 false,
                 (AttributeQuery aqr) -> assertionDecrypter.decryptAssertions(() -> getEncryptedAssertions(aqr)),
-                new CompositeValidator<>(
-                    true,
-                    hubAssertionExtractor::getNonHubAssertions,
-                    new FixedErrorValidator<>(assertions -> assertions.size() != 1, DEFAULT_ENCRYPTED_ASSERTIONS_MISSING_MESSAGE),
-                    new CompositeValidator<>(
-                        list -> list.get(0),
-                        new EidasAttributeQueryAssertionValidator(
-                            countrySignatureValidator,
-                            dateTimeComparator,
-                            IDENTITY_ASSERTION,
-                            hubConnectorEntityId,
-                            Duration.parse("PT20M"),
-                            Duration.parse("PT1M"),
-                            IDPSSODescriptor.DEFAULT_ELEMENT_NAME
-                        ),
-                        new CompositeValidator<>(
-                                true,
-                                new FixedErrorValidator<>(a -> a.getAuthnStatements().size() != 1, generateWrongNumberOfAuthnStatementsMessage(IDENTITY_ASSERTION)),
-                                new AuthnStatementValidator<>(a -> a.getAuthnStatements().get(0), dateTimeComparator)
-                        ),
-                        new ConditionsValidator<>(Assertion::getConditions, hubConnectorEntityId, dateTimeComparator),
-                        new CompositeValidator<>(
-                            true,
-                            new FixedErrorValidator<>(a -> a.getAttributeStatements().size() != 1 , generateWrongNumberOfAttributeStatementsMessage(IDENTITY_ASSERTION)),
-                            new AttributeStatementValidator<>(a -> a.getAttributeStatements().get(0))
-                        )
-                    )
+                MatchingElementValidator.failOnMatchError(
+                    assertions -> assertions,
+                    ((Predicate<Assertion>)hubAssertionExtractor::isHubAssertion).negate(),
+                    new CountryAssertionValidator(
+                        countrySignatureValidator,
+                        dateTimeComparator,
+                        hubConnectorEntityId
+                    ),
+                    DEFAULT_ENCRYPTED_ASSERTIONS_MISSING_MESSAGE,
+                    DEFAULT_ENCRYPTED_ASSERTIONS_TOO_MANY_MESSAGE
                 ),
-                new CompositeValidator<>(
-                    assertions -> (assertions.size() > 1),
-                    true,
-                    hubAssertionExtractor::getHubAssertions,
-                    new FixedErrorValidator<>(hubAssertions -> hubAssertions.size() > 1, DEFAULT_TOO_MANY_CYCLE_3_ASSERTIONS_MESSAGE),
-                    new CompositeValidator<>(
-                        list -> list.get(0),
-                        new EidasAttributeQueryAssertionValidator(
-                            verifySignatureValidator,
-                            dateTimeComparator,
-                            "Cycle 3",
-                            hubConnectorEntityId,
-                            Duration.parse("PT20M"),
-                            Duration.parse("PT1M"),
-                            SPSSODescriptor.DEFAULT_ELEMENT_NAME
-                        )
-                    )
+                MatchingElementValidator.succeedOnMatchError(
+                    assertions -> assertions,
+                    hubAssertionExtractor::isHubAssertion,
+                    new AssertionValidator(
+                        verifySignatureValidator,
+                        dateTimeComparator,
+                        "Cycle 3",
+                        Duration.parse("PT20M"),
+                        Duration.parse("PT1M"),
+                        SPSSODescriptor.DEFAULT_ELEMENT_NAME
+                    ),
+                    DEFAULT_TOO_MANY_CYCLE_3_ASSERTIONS_MESSAGE
                 )
             )
         );
@@ -107,14 +85,6 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                 throw new RuntimeException(e);
             }
         };
-    }
-
-    public static MessageImpl generateWrongNumberOfAuthnStatementsMessage(final String typeOfAssertion) {
-        return fieldMessage("authnStatements", "authnStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of authn statements.");
-    }
-
-    public static MessageImpl generateWrongNumberOfAttributeStatementsMessage(final String typeOfAssertion) {
-        return fieldMessage("attributeStatements", "attributeStatements.wrong.number", typeOfAssertion + " Assertion had wrong number of attribute statements.");
     }
 
     private static List<EncryptedAssertion> getEncryptedAssertions(AttributeQuery attributeQuery) {

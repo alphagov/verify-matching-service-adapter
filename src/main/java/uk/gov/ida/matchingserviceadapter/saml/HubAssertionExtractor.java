@@ -43,7 +43,7 @@ public class HubAssertionExtractor {
             .collect(Collectors.toList());
     }
 
-    private boolean isHubAssertion(final Assertion assertion) {
+    public boolean isHubAssertion(final Assertion assertion) {
           return assertion.getIssuer().getValue().equals(hubEntityId);
     }
 };

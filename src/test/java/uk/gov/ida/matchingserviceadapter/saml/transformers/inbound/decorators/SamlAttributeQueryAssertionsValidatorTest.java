@@ -55,7 +55,7 @@ public class SamlAttributeQueryAssertionsValidatorTest {
     }
 
     @Test
-    public void decorate_shouldValidateIdentityProviderAssertions() throws Exception {
+    public void decorate_shouldValidateIdentityProviderAssertions() {
         Assertion assertion = anAssertion().withId(UUID.randomUUID().toString()).withIssuer(anIssuer().withIssuerId("foo").build()).buildUnencrypted();
         AttributeQuery query = anAttributeQuery().build();
 
@@ -77,7 +77,7 @@ public class SamlAttributeQueryAssertionsValidatorTest {
     }
 
     @Test
-    public void decorate_shouldCallTheAssertionValidatorWithTheRequestIdAndEntityFromTheAttributeQuery() throws Exception {
+    public void decorate_shouldCallTheAssertionValidatorWithTheRequestIdAndEntityFromTheAttributeQuery() {
         final String attributeQueryIssuer = TestEntityIds.HUB_ENTITY_ID;
         final String requestId = "blah";
         Assertion assertion = anAssertion().withId(UUID.randomUUID().toString()).buildUnencrypted();
@@ -92,8 +92,8 @@ public class SamlAttributeQueryAssertionsValidatorTest {
     }
 
     @Test
-    public void decorate_shouldCallTheAssertionValidatorExpectingItselfAsTheRecipientWhenTheAssertionIsNotTheMatchingDatasetAssertion() throws Exception {
-        Assertion cycle3Assertion = aCycle3DatasetAssertion("foo", "bar");
+    public void decorate_shouldCallTheAssertionValidatorExpectingItselfAsTheRecipientWhenTheAssertionIsNotTheMatchingDatasetAssertion() {
+        Assertion cycle3Assertion = aCycle3DatasetAssertion("foo", "bar").buildUnencrypted();
         cycle3Assertion.setIssuer(anIssuer().withIssuerId(TestEntityIds.HUB_ENTITY_ID).build());
         cycle3Assertion.setSubject(aSubject()
                 .withSubjectConfirmation(
@@ -123,7 +123,7 @@ public class SamlAttributeQueryAssertionsValidatorTest {
     }
 
     @Test
-    public void decorate_shouldCallTheAssertionValidatorExpectingTheHubAsTheRecipientWhenTheAssertionIsTheMatchingDatasetAssertion() throws Exception {
+    public void decorate_shouldCallTheAssertionValidatorExpectingTheHubAsTheRecipientWhenTheAssertionIsTheMatchingDatasetAssertion() {
         Assertion assertion = anAssertion()
                 .addAttributeStatement(aMatchingDatasetAttributeStatement_1_1().build())
                 .withIssuer(anIssuer().withIssuerId(UUID.randomUUID().toString()).build())

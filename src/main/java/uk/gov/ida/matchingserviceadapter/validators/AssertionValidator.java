@@ -1,13 +1,11 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
 import org.opensaml.saml.saml2.core.Assertion;
-import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.security.SecurityException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
-import uk.gov.ida.validation.validators.FixedErrorValidator;
 import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import javax.xml.namespace.QName;
@@ -18,15 +16,15 @@ import static uk.gov.ida.matchingserviceadapter.validators.IssueInstantValidator
 import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
-public class EidasAttributeQueryAssertionValidator extends CompositeValidator<Assertion> {
+public class AssertionValidator extends CompositeValidator<Assertion> {
 
-    public EidasAttributeQueryAssertionValidator(final SignatureValidator signatureValidator,
-                                                 final DateTimeComparator dateTimeComparator,
-                                                 final String typeOfAssertion,
-                                                 final String hubConnectorEntityId,
-                                                 final Duration ttl,
-                                                 final Duration clockDelta,
-                                                 final QName issuerRoleDescriptor) {
+    public AssertionValidator(
+        final SignatureValidator signatureValidator,
+        final DateTimeComparator dateTimeComparator,
+        final String typeOfAssertion,
+        final Duration ttl,
+        final Duration clockDelta,
+        final QName issuerRoleDescriptor) {
         super(
             false,
             new CompositeValidator<>(
@@ -40,8 +38,8 @@ public class EidasAttributeQueryAssertionValidator extends CompositeValidator<As
             ),
             new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
             IssueInstantJodaDateTimeValidator(
-                globalMessage("expired.message", "Issue Instant time-to-live has been exceeded"),
-                globalMessage("issue.instance.in.future", "Issue Instant is in the future"),
+                fieldMessage("issueInstant","expired.message", "Issue Instant time-to-live has been exceeded"),
+                fieldMessage("issueInstant","issue.instance.in.future", "Issue Instant is in the future"),
                 Assertion::getIssueInstant,
                 ttl,
                 clockDelta

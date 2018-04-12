@@ -26,7 +26,7 @@ public class ConditionsValidator<T> extends CompositeValidator<T> {
             true,
             valueProvider,
             new RequiredValidator<>(DEFAULT_REQUIRED_MESSAGE),
-            new FixedErrorValidator<>(conditions -> conditions.getNotBefore() == null && conditions.getNotOnOrAfter() == null, DEFAULT_NOT_BEFORE_AND_NOT_ON_OR_AFTER_ARE_MISSING_MESSAGE),
+                new FixedErrorValidator<>(conditions -> conditions.getNotBefore() == null && conditions.getNotOnOrAfter() == null, DEFAULT_NOT_BEFORE_AND_NOT_ON_OR_AFTER_ARE_MISSING_MESSAGE),
             new CompositeValidator<>(
                 conditions -> conditions.getNotBefore() != null && conditions.getNotOnOrAfter() != null,
                 false,

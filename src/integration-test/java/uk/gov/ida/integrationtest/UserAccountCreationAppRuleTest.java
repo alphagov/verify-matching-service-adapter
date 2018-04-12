@@ -173,7 +173,7 @@ public class UserAccountCreationAppRuleTest {
                 .withSubject(aSubjectWithAssertions(asList(
                         anAuthnStatementAssertion("default-request-id"),
                         aCompleteMatchingDatasetAssertion(),
-                        AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value")), REQUEST_ID, HUB_ENTITY_ID))
+                        AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value").buildUnencrypted()), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
 
         Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
