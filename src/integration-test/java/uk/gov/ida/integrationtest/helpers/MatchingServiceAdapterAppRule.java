@@ -28,9 +28,12 @@ import uk.gov.ida.saml.core.test.builders.SignatureBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.IdpSsoDescriptorBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder;
+import uk.gov.ida.saml.metadata.ResourceEncoder;
 import uk.gov.ida.saml.metadata.test.factories.metadata.MetadataFactory;
 
 import javax.ws.rs.core.MediaType;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -41,6 +44,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.net.URLEncoder.*;
+import static java.nio.charset.StandardCharsets.*;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
@@ -52,6 +57,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.getPrimaryPublicEncryptionCert;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
+import static uk.gov.ida.saml.metadata.ResourceEncoder.*;
 
 public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingServiceAdapterConfiguration> {
 
@@ -59,6 +65,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     private static final String TRUST_ANCHOR_PATH = "/trust-anchor";
     private static final String METADATA_AGGREGATOR_PATH = "/metadata-aggregator";
     private static final String COUNTRY_METADATA_PATH = "/test-country";
+    private static final String METADATA_SOURCE_PATH = "/metadata-source";
 
     private static final HttpStubRule verifyMetadataServer = new HttpStubRule();
     private static final HttpStubRule metadataAggregatorServer = new HttpStubRule();
@@ -104,7 +111,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             trustAnchorServer.register(TRUST_ANCHOR_PATH, 200, MediaType.APPLICATION_OCTET_STREAM, buildTrustAnchorString());
 
             metadataAggregatorServer.reset();
-            metadataAggregatorServer.register(METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, testCountryMetadata);
+            metadataAggregatorServer.register(METADATA_SOURCE_PATH + "/" + entityIdAsResource(countryEntityId), 200, Constants.APPLICATION_SAMLMETADATA_XML, testCountryMetadata);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -155,6 +162,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
                 ConfigOverride.config("europeanIdentity.enabled", "true"),
 
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
+                    ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.store", countryMetadataTrustStore.getAbsolutePath()),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.trustStorePassword", countryMetadataTrustStore.getPassword()),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.minRefreshDelay", "60000"),
