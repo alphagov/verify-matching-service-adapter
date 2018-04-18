@@ -72,7 +72,13 @@ import uk.gov.ida.matchingserviceadapter.services.VerifyMatchingService;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
-import uk.gov.ida.saml.metadata.*;
+import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
+import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
+import uk.gov.ida.saml.metadata.EidasTrustAnchorHealthCheck;
+import uk.gov.ida.saml.metadata.EidasTrustAnchorResolver;
+import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
+import uk.gov.ida.saml.metadata.MetadataConfiguration;
+import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
@@ -511,8 +517,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     configuration.getEuropeanIdentity().getAggregatedMetadata(),
                     new DropwizardMetadataResolverFactory(),
                     new Timer(),
-                    new MetadataSignatureTrustEngineFactory(),
-                    new MetadataResolverConfigBuilder());
+                    new MetadataSignatureTrustEngineFactory());
             environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));
             return Optional.of(resolverRepository);
         }

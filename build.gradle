@@ -39,7 +39,7 @@ def dependencyVersions = [
         hub_saml: "$opensaml-123",
         dev_pki: '1.1.0-22',
         trust_anchor: '1.0-19',
-        saml_libs_version: "$opensaml-114"
+        saml_libs_version: "$opensaml-111"
 ]
 
 apply plugin: "idaJar"
