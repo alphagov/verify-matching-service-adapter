@@ -109,6 +109,7 @@ europeanIdentity:
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
   aggregatedMetadata:
     trustAnchorUri: ${TRUST_ANCHOR_URI}
+    metadataSourceUri: ${METADATA_SOURCE_URI}
     trustStore:
       path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
       password: ${TRUSTSTORE_PASSWORD}
