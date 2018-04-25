@@ -12,7 +12,7 @@ import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
-import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
+import uk.gov.ida.matchingserviceadapter.domain.VerifyUserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
@@ -71,7 +71,7 @@ public class UnknownUserAttributeQueryHandlerTest {
             assertionFactory,
             assertionLifetimeConfiguration,
             matchingServiceProxy,
-            new UserAccountCreationAttributeExtractor());
+            new VerifyUserAccountCreationAttributeExtractor());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class UnknownUserAttributeQueryHandlerTest {
         when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(SUCCESS));
 
-        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.handle(buildInboundVerifyMatchingServiceRequest());
+        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.createNewVerifyAccount(buildInboundVerifyMatchingServiceRequest());
 
         assertThat(response.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.Success);
     }
@@ -89,7 +89,7 @@ public class UnknownUserAttributeQueryHandlerTest {
         when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(FAILURE));
 
-        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.handle(buildInboundVerifyMatchingServiceRequest());
+        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.createNewVerifyAccount(buildInboundVerifyMatchingServiceRequest());
 
         assertThat(handle.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.CreateFailure);
     }

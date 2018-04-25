@@ -65,7 +65,7 @@ public class UnknownUserAttributeQueryResource {
     private OutboundResponseFromUnknownUserCreationService getOutboundResponseFromMatchingService(InboundVerifyMatchingServiceRequest hubMatchingServiceRequest) {
         OutboundResponseFromUnknownUserCreationService response;
         try {
-            response = attributeQueryHandler.handle(hubMatchingServiceRequest);
+            response = attributeQueryHandler.createNewVerifyAccount(hubMatchingServiceRequest);
         } catch (WebApplicationException e) {
             throw new SamlOverSoapException("The matching service returned a http error.", e, hubMatchingServiceRequest.getId());
         }
