@@ -53,7 +53,6 @@ public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer impl
     }
 
     public InboundVerifyMatchingServiceRequest apply(final AttributeQuery attributeQuery) {
-        String issuerId = attributeQuery.getIssuer().getValue();
         samlAttributeQueryValidator.validate(attributeQuery);
         ValidatedAttributeQuery validatedAttributeQuery = attributeQuerySignatureValidator.validate(attributeQuery);
 

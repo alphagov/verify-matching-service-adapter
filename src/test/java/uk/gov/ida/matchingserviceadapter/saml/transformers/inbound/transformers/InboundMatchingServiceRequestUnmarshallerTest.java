@@ -93,7 +93,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldTransformAttributeQueryId() {
+    public void shouldTransformAttributeQueryId() {
         AttributeQuery query = givenAValidAttributeQuery();
 
         InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
@@ -105,7 +105,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldTransformAttributeQueryIssueInstant() {
+    public void shouldTransformAttributeQueryIssueInstant() {
         DateTimeFreezer.freezeTime();
 
         AttributeQuery query = givenAValidAttributeQuery();
@@ -121,7 +121,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldMapIssuerId() {
+    public void shouldMapIssuerId() {
         AttributeQuery query = givenAValidAttributeQuery();
 
         InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
@@ -133,7 +133,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldMapAssertions() {
+    public void shouldMapAssertions() {
         AttributeQuery query = givenAValidAttributeQuery();
 
         InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
@@ -150,7 +150,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldMapAttributes() {
+    public void shouldMapAttributes() {
         AttributeQuery query = givenAValidAttributeQuery();
         InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
                 new ValidatedAttributeQuery(query),
