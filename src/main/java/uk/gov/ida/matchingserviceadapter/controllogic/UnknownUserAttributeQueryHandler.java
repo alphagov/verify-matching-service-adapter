@@ -38,7 +38,6 @@ public class UnknownUserAttributeQueryHandler {
     private final AssertionLifetimeConfiguration assertionLifetimeConfiguration;
     private final MatchingServiceProxy matchingServiceProxy;
     private final UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor;
-    private final UserAccountCreationAttributeExtractor userEidasAccountCreationAttributeExtractor;
 
     @Inject
     public UnknownUserAttributeQueryHandler(
@@ -54,8 +53,6 @@ public class UnknownUserAttributeQueryHandler {
         this.assertionLifetimeConfiguration = assertionLifetimeConfiguration;
         this.matchingServiceProxy = matchingServiceProxy;
         this.userAccountCreationAttributeExtractor = userAccountCreationAttributeExtractor;
-        userEidasAccountCreationAttributeExtractor = userAccountCreationAttributeExtractor;
-        //TODO Eidas specific version
     }
 
     public OutboundResponseFromUnknownUserCreationService createNewVerifyAccount(InboundVerifyMatchingServiceRequest attributeQuery) {
