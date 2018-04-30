@@ -2,14 +2,12 @@ package uk.gov.ida.matchingserviceadapter.factories;
 
 import org.joda.time.Duration;
 import org.opensaml.saml.saml2.core.AttributeQuery;
-import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateExtractor;
 import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator;
 import uk.gov.ida.matchingserviceadapter.validators.exceptions.SamlResponseValidationException;
-import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
+import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SignatureValidator;
@@ -20,13 +18,13 @@ public class EidasAttributeQueryValidatorFactory {
     private final MatchingServiceAdapterConfiguration configuration;
     private final AssertionDecrypter assertionDecrypter;
     private final HubAssertionExtractor hubAssertionExtractor;
-    private final EidasMetadataResolverRepository eidasMetadataResolverRepository;
+    private final MetadataResolverRepository eidasMetadataResolverRepository;
 
     public EidasAttributeQueryValidatorFactory(SignatureValidator verifySignatureValidator,
                                                MatchingServiceAdapterConfiguration configuration,
                                                AssertionDecrypter assertionDecrypter,
                                                HubAssertionExtractor hubAssertionExtractor,
-                                               EidasMetadataResolverRepository eidasMetadataResolverRepository) {
+                                               MetadataResolverRepository eidasMetadataResolverRepository) {
 
         this.verifySignatureValidator = verifySignatureValidator;
         this.configuration = configuration;

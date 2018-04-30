@@ -8,6 +8,7 @@ import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
+import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 
 import java.util.Optional;
@@ -16,13 +17,16 @@ public class InboundMatchingServiceRequestUnmarshaller {
 
     private final HubAssertionUnmarshaller hubAssertionUnmarshaller;
     private final IdentityProviderAssertionUnmarshaller identityProviderAssertionUnmarshaller;
+    private MetadataResolverRepository eidasMetadataResolverRepository;
 
     public InboundMatchingServiceRequestUnmarshaller(
             HubAssertionUnmarshaller hubAssertionUnmarshaller,
-            IdentityProviderAssertionUnmarshaller identityProviderAssertionUnmarshaller) {
+            IdentityProviderAssertionUnmarshaller identityProviderAssertionUnmarshaller,
+            MetadataResolverRepository eidasMetadataResolverRepository) {
 
         this.hubAssertionUnmarshaller = hubAssertionUnmarshaller;
         this.identityProviderAssertionUnmarshaller = identityProviderAssertionUnmarshaller;
+        this.eidasMetadataResolverRepository = eidasMetadataResolverRepository;
     }
 
     @SuppressWarnings("unchecked") // we know this cast will work
@@ -42,7 +46,7 @@ public class InboundMatchingServiceRequestUnmarshaller {
             }
         }
         for (Assertion assertion : validatedIdpAssertions.getAssertions()) {
-            IdentityProviderAssertion identityProviderAssertion = identityProviderAssertionUnmarshaller.fromAssertion(assertion);
+            IdentityProviderAssertion identityProviderAssertion = getIdentityProviderAssertion(assertion);
             if (identityProviderAssertion.getMatchingDataset().isPresent()) {
                 matchingDatasetAssertion = identityProviderAssertion;
             }
@@ -65,6 +69,16 @@ public class InboundMatchingServiceRequestUnmarshaller {
                 assertionConsumerUrl,
                 originalQuery.getAttributes()
         );
+    }
+
+    private IdentityProviderAssertion getIdentityProviderAssertion(Assertion assertion) {
+        return isFromEidasSource(assertion) ?
+                identityProviderAssertionUnmarshaller.fromCountryAssertion(assertion) :
+                identityProviderAssertionUnmarshaller.fromVerifyAssertion(assertion);
+    }
+
+    private boolean isFromEidasSource(Assertion assertion) {
+        return eidasMetadataResolverRepository.getMetadataResolver(assertion.getIssuer().getValue()).isPresent();
     }
 
 }

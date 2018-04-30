@@ -36,7 +36,7 @@ import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttrib
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.SURNAME_VERIFIED;
 
 @RunWith(OpenSAMLRunner.class)
-public class UserAccountCreationAttributeExtractorTest {
+public class VerifyUserAccountCreationAttributeExtractorTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();

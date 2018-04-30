@@ -59,14 +59,6 @@ public class UnknownUserAttributeQueryHandler {
     }
 
     public OutboundResponseFromUnknownUserCreationService createNewVerifyAccount(InboundVerifyMatchingServiceRequest attributeQuery) {
-        return createAccount(attributeQuery, userAccountCreationAttributeExtractor);
-    }
-
-    public OutboundResponseFromUnknownUserCreationService createNewEidasAccount(InboundVerifyMatchingServiceRequest attributeQuery) {
-        return createAccount(attributeQuery, userEidasAccountCreationAttributeExtractor);
-    }
-
-    private OutboundResponseFromUnknownUserCreationService createAccount(InboundVerifyMatchingServiceRequest attributeQuery, UserAccountCreationAttributeExtractor extractor) {
         IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
@@ -82,7 +74,7 @@ public class UnknownUserAttributeQueryHandler {
         Optional<MatchingDataset> matchingDataset = attributeQuery.getMatchingDatasetAssertion().getMatchingDataset();
 
         List<Attribute> extractedUserAccountCreationAttributes =
-                extractor.getUserAccountCreationAttributes(
+                userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(
                                 attributeQuery.getUserCreationAttributes(),
                         matchingDataset.orElse(null), attributeQuery.getCycle3AttributeAssertion().orElse(null)
                 );
