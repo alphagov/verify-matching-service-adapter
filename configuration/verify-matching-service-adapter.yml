@@ -28,24 +28,38 @@ metadata:
     type: encoded
     store: ${METADATA_TRUST_STORE}
     password: marshmallow
+  hubTrustStore:
+      type: encoded
+      store: ${HUB_FEDERATION_TRUST_STORE}
+      password: marshmallow
+  idpTrustStore:
+      type: encoded
+      store: ${IDP_FEDERATION_TRUST_STORE}
+      password: marshmallow
 
 signingKeys:
   primary:
     publicKey:
+      type: encoded
       cert: ${MSA_SIGNING_CERT_PRIMARY:-encoded-cert}
       name: signing.primary.crt
     privateKey:
+      type: encoded
       key: ${MSA_SIGNING_KEY_PRIMARY:-encoded-key}
   secondary:
     publicKey:
+      type: encoded
       cert: ${MSA_SIGNING_CERT_SECONDARY:-encoded-cert}
       name: signing.secondary.crt
     privateKey:
+      type: encoded
       key: ${MSA_SIGNING_KEY_SECONDARY:-encoded-key}
   
 encryptionKeys:
   - publicKey:
+      type: encoded
       cert: ${MSA_ENCRYPTION_CERT_PRIMARY:-encoded-cert}
       name: encryption.primary.crt
     privateKey:
+      type: encoded
       key: ${MSA_ENCRYPTION_KEY_PRIMARY:-encoded-key}
