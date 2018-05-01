@@ -1,23 +1,16 @@
 package uk.gov.ida.matchingserviceadapter.saml.api;
 
-import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import org.opensaml.saml.metadata.resolver.MetadataResolver;
-import org.opensaml.saml.metadata.resolver.impl.BasicRoleDescriptorResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.encryption.Decrypter;
-import org.opensaml.saml.security.impl.MetadataCredentialResolver;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
 import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
-import org.opensaml.xmlsec.config.DefaultSecurityConfigurationBootstrap;
-import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
-import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
@@ -33,9 +26,10 @@ import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
+import uk.gov.ida.saml.core.transformers.CountryMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAuthnStatementUnmarshaller;
-import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.outbound.OutboundAssertionToSubjectTransformer;
 import uk.gov.ida.saml.core.transformers.outbound.decorators.ResponseAssertionSigner;
@@ -50,13 +44,11 @@ import uk.gov.ida.saml.core.validators.subjectconfirmation.AssertionSubjectConfi
 import uk.gov.ida.saml.core.validators.subjectconfirmation.BasicAssertionSubjectConfirmationValidator;
 import uk.gov.ida.saml.hub.transformers.outbound.MatchingServiceIdaStatusMarshaller;
 import uk.gov.ida.saml.hub.transformers.outbound.UnknownUserCreationIdaStatusMarshaller;
+import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.AssertionDecrypter;
-import uk.gov.ida.saml.security.CertificateChainEvaluableCriterion;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.EncrypterFactory;
-import uk.gov.ida.saml.security.EncryptionCredentialFactory;
 import uk.gov.ida.saml.security.EncryptionCredentialResolver;
-import uk.gov.ida.saml.security.EncryptionKeyStore;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
@@ -64,7 +56,6 @@ import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.SignatureFactory;
-import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.saml.security.validators.issuer.IssuerValidator;
 import uk.gov.ida.saml.serializers.XmlObjectToBase64EncodedStringTransformer;
@@ -178,13 +169,16 @@ public class MsaTransformersFactory {
     }
 
     public VerifyAttributeQueryToInboundMatchingServiceRequestTransformer getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
-        final MetadataBackedSignatureValidator signatureValidator,
-        final IdaKeyStore keyStore,
-        final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-        final String hubEntityId) {
+            final MetadataBackedSignatureValidator signatureValidator,
+            final IdaKeyStore keyStore,
+            final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+            final MetadataResolverRepository eidasMetadataResolverRepository,
+            final String hubEntityId) {
         HubAssertionUnmarshaller hubAssertionTransformer = coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId);
+        AddressFactory addressFactory = new AddressFactory();
         IdentityProviderAssertionUnmarshaller identityProviderAssertionTransformer = new IdentityProviderAssertionUnmarshaller(
-                new MatchingDatasetUnmarshaller(new AddressFactory()),
+                new VerifyMatchingDatasetUnmarshaller(addressFactory),
+                new CountryMatchingDatasetUnmarshaller(addressFactory),
                 new IdentityProviderAuthnStatementUnmarshaller(new AuthnContextFactory()),
                 hubEntityId
         );
@@ -194,9 +188,8 @@ public class MsaTransformersFactory {
                 new SamlAttributeQueryValidator(),
                 new AttributeQuerySignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
                 new SamlAssertionsSignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
-                new InboundMatchingServiceRequestUnmarshaller(hubAssertionTransformer, identityProviderAssertionTransformer),
+                new InboundMatchingServiceRequestUnmarshaller(hubAssertionTransformer, identityProviderAssertionTransformer, eidasMetadataResolverRepository),
                 new SamlAttributeQueryAssertionsValidator(getAssertionValidator(), getIdentityProviderAssertionValidator(), matchingServiceAdapterConfiguration, hubEntityId),
-
             new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter),
                 hubEntityId);
     }

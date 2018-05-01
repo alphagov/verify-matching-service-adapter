@@ -27,15 +27,18 @@ import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.hub.factories.AttributeFactory_1_1;
+import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
@@ -58,11 +61,15 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     @Mock
     private IdentityProviderAssertionUnmarshaller identityProviderAssertionUnmarshaller;
 
+    @Mock
+    private EidasMetadataResolverRepository eidasMetadataResolverRepository;
+
     @Before
     public void setup() {
         unmarshaller = new InboundMatchingServiceRequestUnmarshaller(
                 hubAssertionUnmarshaller,
-                identityProviderAssertionUnmarshaller);
+                identityProviderAssertionUnmarshaller,
+                eidasMetadataResolverRepository);
 
         final IdentityProviderAssertion matchingDatasetAssertion = anIdentityProviderAssertion()
                 .withId(matchingDatasetAssertionId)
@@ -79,13 +86,14 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
                 .withCycle3Data(aCycle3Dataset().addCycle3Data("name", "value").build())
                 .build();
 
-        when(identityProviderAssertionUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(matchingDatasetAssertion, authnStatementAssertion);
+        when(identityProviderAssertionUnmarshaller.fromVerifyAssertion(any(Assertion.class))).thenReturn(matchingDatasetAssertion, authnStatementAssertion);
         when(hubAssertionUnmarshaller.toHubAssertion(any(Assertion.class))).thenReturn(cycle3DataMatchAssertion);
+        when(eidasMetadataResolverRepository.getMetadataResolver(anyString())).thenReturn(Optional.empty());
         openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
     }
 
     @Test
-    public void transform_shouldTransformAttributeQueryId() throws Exception {
+    public void shouldTransformAttributeQueryId() {
         AttributeQuery query = givenAValidAttributeQuery();
 
         InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
@@ -97,7 +105,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldTransformAttributeQueryIssueInstant() throws Exception {
+    public void shouldTransformAttributeQueryIssueInstant() {
         DateTimeFreezer.freezeTime();
 
         AttributeQuery query = givenAValidAttributeQuery();
@@ -113,7 +121,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldMapIssuerId() throws Exception {
+    public void shouldMapIssuerId() {
         AttributeQuery query = givenAValidAttributeQuery();
 
         InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
@@ -125,7 +133,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldMapAssertions() throws Exception {
+    public void shouldMapAssertions() {
         AttributeQuery query = givenAValidAttributeQuery();
 
         InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
@@ -142,7 +150,7 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     }
 
     @Test
-    public void transform_shouldMapAttributes() {
+    public void shouldMapAttributes() {
         AttributeQuery query = givenAValidAttributeQuery();
         InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
                 new ValidatedAttributeQuery(query),

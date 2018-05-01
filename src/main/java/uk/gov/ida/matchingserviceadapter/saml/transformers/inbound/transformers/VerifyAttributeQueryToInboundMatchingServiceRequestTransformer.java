@@ -7,7 +7,6 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.saml.security.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.saml.security.ValidatedAttributeQuery;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryAssertionsValidator;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.decorators.SamlAttributeQueryValidator;
@@ -27,7 +26,9 @@ public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer impl
     private final SamlAttributeQueryValidator samlAttributeQueryValidator;
     private final AttributeQuerySignatureValidator attributeQuerySignatureValidator;
     private final SamlAssertionsSignatureValidator samlAssertionsSignatureValidator;
+
     private final InboundMatchingServiceRequestUnmarshaller inboundMatchingServiceRequestUnmarshaller;
+
     private final SamlAttributeQueryAssertionsValidator samlAttributeQueryAssertionsValidator;
     private final AssertionDecrypter assertionDecrypter;
     private final String hubEntityId;
@@ -66,7 +67,7 @@ public class VerifyAttributeQueryToInboundMatchingServiceRequestTransformer impl
 
         ValidatedAssertions validatedHubAssertions = samlAssertionsSignatureValidator.validate(hubAssertions, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
         ValidatedAssertions validatedIdpAssertions = samlAssertionsSignatureValidator.validate(idpAssertions, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
-        return inboundMatchingServiceRequestUnmarshaller.fromSaml(validatedAttributeQuery, validatedHubAssertions, validatedIdpAssertions);
+        return this.inboundMatchingServiceRequestUnmarshaller.fromSaml(validatedAttributeQuery, validatedHubAssertions, validatedIdpAssertions);
     }
 
     private boolean isHubAssertion(Assertion assertion) {

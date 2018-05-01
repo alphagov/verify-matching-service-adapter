@@ -3,15 +3,15 @@ package uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.transformers
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Issuer;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
+import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 
 import java.util.Objects;
 import java.util.function.Predicate;
 
 public class EidasAttributesBasedAttributeQueryDiscriminator implements Predicate<MatchingServiceRequestContext> {
-    private final EidasMetadataResolverRepository eidasMetadataResolverRepository;
+    private final MetadataResolverRepository eidasMetadataResolverRepository;
 
-    public EidasAttributesBasedAttributeQueryDiscriminator(EidasMetadataResolverRepository eidasMetadataResolverRepository) {
+    public EidasAttributesBasedAttributeQueryDiscriminator(MetadataResolverRepository eidasMetadataResolverRepository) {
         this.eidasMetadataResolverRepository = eidasMetadataResolverRepository;
     }
 
