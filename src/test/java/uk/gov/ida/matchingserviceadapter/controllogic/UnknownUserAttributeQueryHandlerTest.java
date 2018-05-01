@@ -79,7 +79,7 @@ public class UnknownUserAttributeQueryHandlerTest {
         when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(SUCCESS));
 
-        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.createNewVerifyAccount(buildInboundVerifyMatchingServiceRequest());
+        OutboundResponseFromUnknownUserCreationService response = unknownUserAttributeQueryHandler.createAccount(buildInboundVerifyMatchingServiceRequest());
 
         assertThat(response.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.Success);
     }
@@ -89,7 +89,7 @@ public class UnknownUserAttributeQueryHandlerTest {
         when(matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssuranceDto)))
             .thenReturn(new UnknownUserCreationResponseDto(FAILURE));
 
-        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.createNewVerifyAccount(buildInboundVerifyMatchingServiceRequest());
+        OutboundResponseFromUnknownUserCreationService handle = unknownUserAttributeQueryHandler.createAccount(buildInboundVerifyMatchingServiceRequest());
 
         assertThat(handle.getStatus()).isEqualTo(UnknownUserCreationIdaStatus.CreateFailure);
     }

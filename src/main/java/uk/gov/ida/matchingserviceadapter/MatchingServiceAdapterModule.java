@@ -143,7 +143,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private MetadataBackedEncryptionCredentialResolver hubEncryptionCredentialResolver(MetadataCredentialResolver metadataCredentialResolver) {
+    public MetadataBackedEncryptionCredentialResolver hubEncryptionCredentialResolver(MetadataCredentialResolver metadataCredentialResolver) {
         return new MetadataBackedEncryptionCredentialResolver(metadataCredentialResolver, SPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
@@ -155,13 +155,13 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private UserIdHashFactory getUserIdHashFactory(MatchingServiceAdapterConfiguration configuration) {
+    public UserIdHashFactory getUserIdHashFactory(MatchingServiceAdapterConfiguration configuration) {
         return new UserIdHashFactory(configuration.getEntityId());
     }
 
     @Provides
     @Singleton
-    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper getInboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
+    public InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper getInboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
             UserIdHashFactory userIdHashFactory,
             MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
             MatchingServiceAdapterConfiguration configuration) {
@@ -397,7 +397,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private Function<OutboundResponseFromMatchingService, Element> getOutboundResponseFromMatchingServiceToElementTransformer(
+    public Function<OutboundResponseFromMatchingService, Element> getOutboundResponseFromMatchingServiceToElementTransformer(
             MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
             IdaKeyStore idaKeyStore,
             EntityToEncryptForLocator entityToEncryptForLocator,
@@ -413,7 +413,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private Function<OutboundResponseFromUnknownUserCreationService, Element> getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
+    public Function<OutboundResponseFromUnknownUserCreationService, Element> getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
             MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
             IdaKeyStore idaKeyStore,
             EntityToEncryptForLocator entityToEncryptForLocator,
@@ -429,13 +429,13 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private ElementToOpenSamlXMLObjectTransformer<AttributeQuery> getAttributeQueryTransformer() {
+    public ElementToOpenSamlXMLObjectTransformer<AttributeQuery> getAttributeQueryTransformer() {
         return new CoreTransformersFactory().getElementToOpenSamlXmlObjectTransformer();
     }
 
     @Provides
     @Singleton
-    private Function<AttributeQuery, InboundVerifyMatchingServiceRequest> getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
+    public Function<AttributeQuery, InboundVerifyMatchingServiceRequest> getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
             MetadataBackedSignatureValidator metadataBackedSignatureValidator,
             IdaKeyStore keyStore,
             MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
@@ -459,19 +459,19 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private ElementToOpenSamlXMLObjectTransformer<EntityDescriptor> getMetadataForSpTransformer() {
+    public ElementToOpenSamlXMLObjectTransformer<EntityDescriptor> getMetadataForSpTransformer() {
         return new CoreTransformersFactory().getElementToOpenSamlXmlObjectTransformer();
     }
 
     @Provides
     @Singleton
-    private KeyDescriptorsUnmarshaller getCertificatesToKeyDescriptorsTransformer() {
+    public KeyDescriptorsUnmarshaller getCertificatesToKeyDescriptorsTransformer() {
         return new CoreTransformersFactory().getCertificatesToKeyDescriptorsTransformer();
     }
 
     @Provides
     @Singleton
-    private Function<EntitiesDescriptor, Element> getEntityDescriptorToElementTransformer() {
+    public Function<EntitiesDescriptor, Element> getEntityDescriptorToElementTransformer() {
         return new CoreTransformersFactory().getXmlObjectToElementTransformer();
     }
 
@@ -507,7 +507,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private EidasTrustAnchorResolver getEidasTrustAnchorResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
+    public EidasTrustAnchorResolver getEidasTrustAnchorResolver(Environment environment, MatchingServiceAdapterConfiguration configuration) {
         if (configuration.isEidasEnabled()) {
             EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
 
@@ -525,7 +525,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private MetadataResolverRepository getEidasMetadataResolverRepository(
+    public MetadataResolverRepository getEidasMetadataResolverRepository(
             Environment environment,
             MatchingServiceAdapterConfiguration configuration,
             @Nullable EidasTrustAnchorResolver trustAnchorResolver) {
@@ -546,7 +546,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    private HubAssertionExtractor getHubAssertionExtractor(@Named("HubEntityId") String hubEntityId) {
+    public HubAssertionExtractor getHubAssertionExtractor(@Named("HubEntityId") String hubEntityId) {
         return new HubAssertionExtractor(hubEntityId, new CoreTransformersFactory().getAssertionToHubAssertionTransformer(hubEntityId));
     }
 }

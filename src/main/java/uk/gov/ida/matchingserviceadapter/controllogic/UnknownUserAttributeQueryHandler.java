@@ -55,7 +55,7 @@ public class UnknownUserAttributeQueryHandler {
         this.userAccountCreationAttributeExtractor = userAccountCreationAttributeExtractor;
     }
 
-    public OutboundResponseFromUnknownUserCreationService createNewVerifyAccount(InboundVerifyMatchingServiceRequest attributeQuery) {
+    public OutboundResponseFromUnknownUserCreationService createAccount(InboundVerifyMatchingServiceRequest attributeQuery) {
         IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
         IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
         final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
