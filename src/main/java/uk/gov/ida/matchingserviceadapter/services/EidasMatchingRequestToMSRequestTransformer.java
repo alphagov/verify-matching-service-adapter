@@ -84,14 +84,13 @@ public class EidasMatchingRequestToMSRequestTransformer implements Function<Matc
         TransliterableMdsValueDto firstName = extractTransliterableMdsValue(attributes, Eidas_Attributes.FirstName.NAME, CurrentGivenName::getFirstName);
         TransliterableMdsValueDto surname = extractTransliterableMdsValue(attributes, Eidas_Attributes.FamilyName.NAME, CurrentFamilyName::getFamilyName);
 
-        // Current address
-
         return new UniversalMatchingDatasetDto(
             Optional.ofNullable(firstName),
             Optional.empty(),
             Collections.singletonList(surname),
             Optional.ofNullable(extractSimpleMdsGenderValue(attributes)),
             Optional.ofNullable(dateOfBirth),
+            /* The address section is deliberately empty for now, until we start requesting addresses. See EID-572. */
             Optional.empty()
         );
     }
