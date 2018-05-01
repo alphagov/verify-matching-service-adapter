@@ -36,14 +36,14 @@ import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttrib
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.SURNAME_VERIFIED;
 
 @RunWith(OpenSAMLRunner.class)
-public class VerifyUserAccountCreationAttributeExtractorTest {
+public class UserAccountCreationAttributeExtractorTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     private final AttributeQueryAttributeFactory attributeQueryAttributeFactory1 = new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory());
     private final AttributeQueryAttributeFactory attributeQueryAttributeFactory = attributeQueryAttributeFactory1;
-    private UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor = new VerifyUserAccountCreationAttributeExtractor();
+    private UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor = new UserAccountCreationAttributeExtractor();
 
     @Test
     public void shouldReturnCurrentSurnamesWhenMatchingDatasetHasListOfSurnames() {

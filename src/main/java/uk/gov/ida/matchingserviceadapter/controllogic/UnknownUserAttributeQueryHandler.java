@@ -11,7 +11,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
-import uk.gov.ida.matchingserviceadapter.domain.VerifyUserAccountCreationAttributeExtractor;
+import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.mappers.AuthnContextToLevelOfAssuranceDtoMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
@@ -46,7 +46,7 @@ public class UnknownUserAttributeQueryHandler {
             MatchingServiceAssertionFactory matchingServiceAssertionFactory,
             AssertionLifetimeConfiguration assertionLifetimeConfiguration,
             MatchingServiceProxy matchingServiceProxy,
-            VerifyUserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor) {
+            UserAccountCreationAttributeExtractor userAccountCreationAttributeExtractor) {
         this.userIdHashFactory = userIdHashFactory;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
         this.matchingServiceAssertionFactory = matchingServiceAssertionFactory;

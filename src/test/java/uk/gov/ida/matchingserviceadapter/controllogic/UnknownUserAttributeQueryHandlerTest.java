@@ -12,7 +12,7 @@ import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
-import uk.gov.ida.matchingserviceadapter.domain.VerifyUserAccountCreationAttributeExtractor;
+import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
@@ -71,7 +71,7 @@ public class UnknownUserAttributeQueryHandlerTest {
             assertionFactory,
             assertionLifetimeConfiguration,
             matchingServiceProxy,
-            new VerifyUserAccountCreationAttributeExtractor());
+            new UserAccountCreationAttributeExtractor());
     }
 
     @Test

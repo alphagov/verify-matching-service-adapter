@@ -41,7 +41,7 @@ import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
-import uk.gov.ida.matchingserviceadapter.domain.VerifyUserAccountCreationAttributeExtractor;
+import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionResponseFactory;
 import uk.gov.ida.matchingserviceadapter.factories.EidasAttributeQueryValidatorFactory;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
@@ -131,7 +131,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(DocumentToInboundMatchingServiceRequestMapper.class);
         bind(IdGenerator.class);
         bind(MatchingServiceAssertionFactory.class);
-        bind(VerifyUserAccountCreationAttributeExtractor.class);
+        bind(UserAccountCreationAttributeExtractor.class);
         bind(UnknownUserAttributeQueryHandler.class);
 
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);

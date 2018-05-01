@@ -197,12 +197,56 @@ public class UserAccountCreationAppRuleTest {
                         ),
                         ADDRESS_HISTORY),
                 userAccountCreationAttributeFor(openSamlXmlObjectFactory.createSimpleMdsAttributeValue("cycle3Value"), CYCLE_3)
-                ));
+        ));
         Assertions.assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
         Assertions.assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
     }
 
+    @Test
+    public void shouldReturnCurrentAttributesWhenPassedEidasFullMatchingDataset() throws Exception {
+        List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
+                .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
+                .collect(toList());
+
+        AttributeQuery attributeQuery = anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withAttributes(requiredAttributes)
+                .withIssuer(anIssuer().withIssuerId(applicationRule.getConfiguration().getHubEntityId()).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion("default-request-id"),
+                        aCompleteMatchingDatasetAssertion(),
+                        AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value").buildUnencrypted()), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(CREATED);
+        OpenSamlXmlObjectFactory openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
+
+        ImmutableList<Attribute> attributes = ImmutableList.of(
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("CurrentSurname").build(), SURNAME),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), SURNAME_VERIFIED),
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("FirstName").build(), FIRST_NAME),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), FIRST_NAME_VERIFIED),
+                userAccountCreationAttributeFor(anAddressAttributeValue().addLines(ImmutableList.of("address line 1")).withVerified(false).build(), CURRENT_ADDRESS),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), CURRENT_ADDRESS_VERIFIED),
+                userAccountCreationAttributeFor(
+                        Arrays.asList(
+                                anAddressAttributeValue().addLines(ImmutableList.of("address line 1")).withVerified(false).build(),
+                                anAddressAttributeValue().addLines(ImmutableList.of("address line 2")).withVerified(true).build()
+                        ),
+                        ADDRESS_HISTORY),
+                userAccountCreationAttributeFor(openSamlXmlObjectFactory.createSimpleMdsAttributeValue("cycle3Value"), CYCLE_3)
+        );
+
+        assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), attributes);
+        Assertions.assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
+        Assertions.assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
+        assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
 
     @Test
     public void shouldReturnFailureResponseWhenAttributesRequestedDoNotExist(){

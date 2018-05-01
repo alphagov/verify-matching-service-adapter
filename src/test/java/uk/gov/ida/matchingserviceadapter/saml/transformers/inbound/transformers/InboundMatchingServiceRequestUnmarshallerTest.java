@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeQuery;
@@ -39,11 +40,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.jodatime.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
 import static uk.gov.ida.saml.core.test.builders.HubAssertionBuilder.aHubAssertion;
-import static uk.gov.ida.matchingserviceadapter.builders.IdentityProviderAssertionBuilder.anIdentityProviderAssertion;
 
 @RunWith(OpenSAMLMockitoRunner.class)
 public class InboundMatchingServiceRequestUnmarshallerTest {
@@ -53,7 +55,9 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
     private InboundMatchingServiceRequestUnmarshaller unmarshaller;
     private OpenSamlXmlObjectFactory openSamlXmlObjectFactory;
     private String matchingDatasetAssertionId = UUID.randomUUID().toString();
+    private String countryMatchingDatasetAssertionId = UUID.randomUUID().toString();
     private String authnStatementAssertionId = UUID.randomUUID().toString();
+    private String countryAuthnStatementAssertionId = UUID.randomUUID().toString();
     private String cycle3DataAssertionId = UUID.randomUUID().toString();
 
     @Mock
@@ -76,8 +80,18 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
                 .withMatchingDataset(aMatchingDataset().build())
                 .build();
 
+        final IdentityProviderAssertion countryMatchingDatasetAssertion = anIdentityProviderAssertion()
+                .withId(countryMatchingDatasetAssertionId)
+                .withMatchingDataset(aMatchingDataset().build())
+                .build();
+
         final IdentityProviderAssertion authnStatementAssertion = anIdentityProviderAssertion()
                 .withId(authnStatementAssertionId)
+                .withAuthnStatement(IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement().build())
+                .build();
+
+        final IdentityProviderAssertion countryAuthnStatementAssertion = anIdentityProviderAssertion()
+                .withId(countryAuthnStatementAssertionId)
                 .withAuthnStatement(IdentityProviderAuthnStatementBuilder.anIdentityProviderAuthnStatement().build())
                 .build();
 
@@ -87,6 +101,8 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
                 .build();
 
         when(identityProviderAssertionUnmarshaller.fromVerifyAssertion(any(Assertion.class))).thenReturn(matchingDatasetAssertion, authnStatementAssertion);
+        when(identityProviderAssertionUnmarshaller.fromCountryAssertion(any(Assertion.class))).thenReturn(countryMatchingDatasetAssertion, countryAuthnStatementAssertion);
+
         when(hubAssertionUnmarshaller.toHubAssertion(any(Assertion.class))).thenReturn(cycle3DataMatchAssertion);
         when(eidasMetadataResolverRepository.getMetadataResolver(anyString())).thenReturn(Optional.empty());
         openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
@@ -102,34 +118,6 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
                 givenASetOfValidatedIdpAssertions());
 
         assertThat(transformedQuery.getId()).isEqualTo(query.getID());
-    }
-
-    @Test
-    public void shouldTransformAttributeQueryIssueInstant() {
-        DateTimeFreezer.freezeTime();
-
-        AttributeQuery query = givenAValidAttributeQuery();
-
-        InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
-                new ValidatedAttributeQuery(query),
-                givenASetOfValidatedHubAssertions(),
-                givenASetOfValidatedIdpAssertions());
-
-        assertThat(transformedQuery.getIssueInstant()).isEqualTo(DateTime.now());
-
-        DateTimeFreezer.unfreezeTime();
-    }
-
-    @Test
-    public void shouldMapIssuerId() {
-        AttributeQuery query = givenAValidAttributeQuery();
-
-        InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
-                new ValidatedAttributeQuery(query),
-                givenASetOfValidatedHubAssertions(),
-                givenASetOfValidatedIdpAssertions());
-
-        assertThat(transformedQuery.getIssuer()).isEqualTo(query.getIssuer().getValue());
     }
 
     @Test
@@ -161,6 +149,53 @@ public class InboundMatchingServiceRequestUnmarshallerTest {
         PersonName personName = (PersonName) transformedQuery.getUserCreationAttributes().get(0).getAttributeValues().get(0);
         assertThat(personName.getValue()).isEqualTo(FIRST_NAME);
 
+    }
+
+    @Test
+    public void shouldTransformAttributeQueryIssueInstant() {
+        DateTimeFreezer.freezeTime();
+
+        AttributeQuery query = givenAValidAttributeQuery();
+
+        InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
+                new ValidatedAttributeQuery(query),
+                givenASetOfValidatedHubAssertions(),
+                givenASetOfValidatedIdpAssertions());
+
+        assertThat(transformedQuery.getIssueInstant()).isEqualTo(DateTime.now());
+
+        DateTimeFreezer.unfreezeTime();
+    }
+
+    @Test
+    public void shouldMapIssuerId() {
+        AttributeQuery query = givenAValidAttributeQuery();
+
+        InboundMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
+                new ValidatedAttributeQuery(query),
+                givenASetOfValidatedHubAssertions(),
+                givenASetOfValidatedIdpAssertions());
+
+        assertThat(transformedQuery.getIssuer()).isEqualTo(query.getIssuer().getValue());
+    }
+
+    @Test
+    public void shouldEidasMapAssertions() {
+        when(eidasMetadataResolverRepository.getMetadataResolver(any())).thenReturn(Optional.of(mock(MetadataResolver.class)));
+
+        AttributeQuery query = givenAValidAttributeQuery();
+
+        InboundVerifyMatchingServiceRequest transformedQuery = unmarshaller.fromSaml(
+                new ValidatedAttributeQuery(query),
+                givenASetOfValidatedHubAssertions(),
+                givenASetOfValidatedIdpAssertions());
+
+        assertThat(transformedQuery.getMatchingDatasetAssertion()).isNotNull();
+        assertThat(transformedQuery.getMatchingDatasetAssertion().getId()).isEqualTo(countryMatchingDatasetAssertionId);
+        assertThat(transformedQuery.getAuthnStatementAssertion()).isNotNull();
+        assertThat(transformedQuery.getAuthnStatementAssertion().getId()).isEqualTo(countryAuthnStatementAssertionId);
+        assertThat(transformedQuery.getCycle3AttributeAssertion().isPresent()).isEqualTo(true);
+        assertThat(transformedQuery.getCycle3AttributeAssertion().get().getId()).isEqualTo(cycle3DataAssertionId);
     }
 
     private ValidatedAssertions givenASetOfValidatedHubAssertions() {
