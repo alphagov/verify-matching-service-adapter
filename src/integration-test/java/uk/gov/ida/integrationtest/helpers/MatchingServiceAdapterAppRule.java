@@ -70,7 +70,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     private static final KeyStoreResource hubTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("hubCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource idpTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
-    private static final KeyStoreResource clientTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("interCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).withCertificate("idpCA", CACertificates.TEST_IDP_CA).build();
 
     private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
     private static final String END_CERT = "\n-----END CERTIFICATE-----";
@@ -94,7 +93,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         hubTrustStore.create();
         idpTrustStore.create();
         countryMetadataTrustStore.create();
-        clientTrustStore.create();
 
         countryEntityId = "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
 
@@ -124,7 +122,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         hubTrustStore.delete();
         idpTrustStore.delete();
         countryMetadataTrustStore.delete();
-        clientTrustStore.delete();
 
         super.after();
     }
@@ -157,10 +154,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             ConfigOverride.config("metadata.hubEntityId", HUB_ENTITY_ID),
             ConfigOverride.config("metadata.uri", "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
-            ConfigOverride.config("hub.hubEntityId", HUB_ENTITY_ID),
-            ConfigOverride.config("hub.trustStore.type", "file"),
-            ConfigOverride.config("hub.trustStore.store", clientTrustStore.getAbsolutePath()),
-            ConfigOverride.config("hub.trustStore.trustStorePassword", clientTrustStore.getPassword())
+            ConfigOverride.config("hub.hubEntityId", HUB_ENTITY_ID)
         ).collect(Collectors.toList());
 
         if (isCountryPresent) {

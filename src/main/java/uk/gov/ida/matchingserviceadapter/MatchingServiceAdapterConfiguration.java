@@ -15,8 +15,6 @@ import uk.gov.ida.matchingserviceadapter.configuration.MatchingServiceAdapterMet
 import uk.gov.ida.matchingserviceadapter.configuration.ServiceInfo;
 import uk.gov.ida.matchingserviceadapter.configuration.SigningKeysConfiguration;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
-import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -79,10 +77,6 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
     @Override
     public Duration getAssertionLifetime() {
         return matchingServiceAdapter.getAssertionLifetime();
-    }
-
-    public TrustStoreConfiguration getHubTrustStoreConfiguration() {
-        return hub.getTrustStore();
     }
 
     public String getEntityId() {
