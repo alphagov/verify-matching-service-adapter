@@ -28,12 +28,9 @@ import uk.gov.ida.saml.core.test.builders.SignatureBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.EntityDescriptorBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.IdpSsoDescriptorBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.KeyDescriptorBuilder;
-import uk.gov.ida.saml.metadata.ResourceEncoder;
 import uk.gov.ida.saml.metadata.test.factories.metadata.MetadataFactory;
 
 import javax.ws.rs.core.MediaType;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -44,8 +41,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.net.URLEncoder.*;
-import static java.nio.charset.StandardCharsets.*;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
@@ -57,7 +52,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SI
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.getPrimaryPublicEncryptionCert;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
-import static uk.gov.ida.saml.metadata.ResourceEncoder.*;
+import static uk.gov.ida.saml.metadata.ResourceEncoder.entityIdAsResource;
 
 public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingServiceAdapterConfiguration> {
 
@@ -72,6 +67,8 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     private static final HttpStubRule trustAnchorServer = new HttpStubRule();
 
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource hubTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("hubCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
+    private static final KeyStoreResource idpTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource countryMetadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("idpCA", CACertificates.TEST_IDP_CA).withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource clientTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("interCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).withCertificate("idpCA", CACertificates.TEST_IDP_CA).build();
 
@@ -94,6 +91,8 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     @Override
     protected void before() {
         metadataTrustStore.create();
+        hubTrustStore.create();
+        idpTrustStore.create();
         countryMetadataTrustStore.create();
         clientTrustStore.create();
 
@@ -122,6 +121,8 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     @Override
     protected void after() {
         metadataTrustStore.delete();
+        hubTrustStore.delete();
+        idpTrustStore.delete();
         countryMetadataTrustStore.delete();
         clientTrustStore.delete();
 
@@ -146,8 +147,14 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("signingKeys.secondary.publicKey.type", "encoded"),
             ConfigOverride.config("signingKeys.secondary.publicKey.cert", getCertificate(TEST_RP_PUBLIC_SIGNING_CERT)),
             ConfigOverride.config("metadata.trustStore.type", "file"),
-            ConfigOverride.config("metadata.trustStore.store", metadataTrustStore.getAbsolutePath()),
-            ConfigOverride.config("metadata.trustStore.trustStorePassword", metadataTrustStore.getPassword()),
+            ConfigOverride.config("metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+            ConfigOverride.config("metadata.trustStore.password", metadataTrustStore.getPassword()),
+            ConfigOverride.config("metadata.hubTrustStore.type", "file"),
+            ConfigOverride.config("metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
+            ConfigOverride.config("metadata.hubTrustStore.password", hubTrustStore.getPassword()),
+            ConfigOverride.config("metadata.idpTrustStore.type", "file"),
+            ConfigOverride.config("metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
+            ConfigOverride.config("metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             ConfigOverride.config("metadata.hubEntityId", HUB_ENTITY_ID),
             ConfigOverride.config("metadata.uri", "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
             ConfigOverride.config("hub.hubEntityId", HUB_ENTITY_ID),

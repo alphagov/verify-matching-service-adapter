@@ -11,10 +11,10 @@ import uk.gov.ida.matchingserviceadapter.configuration.EuropeanIdentityConfigura
 import uk.gov.ida.matchingserviceadapter.configuration.HubConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.KeyPairConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.LocalMatchingServiceConfiguration;
+import uk.gov.ida.matchingserviceadapter.configuration.MatchingServiceAdapterMetadataConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.ServiceInfo;
 import uk.gov.ida.matchingserviceadapter.configuration.SigningKeysConfiguration;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
-import uk.gov.ida.saml.metadata.TrustStoreBackedMetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 
 import javax.validation.Valid;
@@ -48,7 +48,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
     @NotNull
     @Valid
     @JsonProperty
-    private TrustStoreBackedMetadataConfiguration metadata;
+    private MatchingServiceAdapterMetadataConfiguration metadata;
 
     @NotNull
     @Valid

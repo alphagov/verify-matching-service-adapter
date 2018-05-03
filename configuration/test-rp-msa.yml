@@ -71,6 +71,12 @@ metadata:
   trustStore:
     path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
     password: ${TRUSTSTORE_PASSWORD}
+  hubTrustStore:
+      path: ${TRUSTSTORE_PATH}/ida_hub_truststore.ts
+      password: ${TRUSTSTORE_PASSWORD}
+  idpTrustStore:
+      path: ${TRUSTSTORE_PATH}/ida_idp_truststore.ts
+      password: ${TRUSTSTORE_PASSWORD}
   minRefreshDelay: 30000
   maxRefreshDelay: 1800000
   expectedEntityId: ${METADATA_ENTITY_ID}

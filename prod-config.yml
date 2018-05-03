@@ -74,6 +74,7 @@ hub:
 
 # Settings for obtaining Verify's metadata can be configured here.
 metadata:
+  environment: PRODUCTION
   url: https://www.signin.service.gov.uk/SAML2/metadata/federation
   trustStore:
     path: prod_ida_metadata.ts
