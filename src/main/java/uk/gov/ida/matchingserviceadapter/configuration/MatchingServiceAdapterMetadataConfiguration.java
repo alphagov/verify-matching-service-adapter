@@ -22,6 +22,7 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
     private final TrustStoreConfiguration idpTrustStore;
 
     @JsonCreator
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public MatchingServiceAdapterMetadataConfiguration(
         @JsonProperty("uri") @JsonAlias({ "url" }) URI uri,
         @JsonProperty("minRefreshDelay") Long minRefreshDelay,
