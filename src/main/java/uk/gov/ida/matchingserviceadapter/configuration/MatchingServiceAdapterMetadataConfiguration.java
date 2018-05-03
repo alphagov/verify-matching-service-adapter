@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.JerseyClientConfiguration;
+import uk.gov.ida.matchingserviceadapter.exceptions.UninitialisedKeyStoreException;
 import uk.gov.ida.saml.metadata.TrustStoreBackedMetadataConfiguration;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 import uk.gov.ida.saml.metadata.exception.EmptyTrustStoreException;
@@ -59,15 +60,14 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
     }
 
     private KeyStore validateTruststore(KeyStore trustStore) {
-        int trustStoreSize;
         try {
-            trustStoreSize = trustStore.size();
+            final int trustStoreSize = trustStore.size();
+            if (trustStoreSize == 0) {
+                throw new EmptyTrustStoreException();
+            }
+            return trustStore;
         } catch (KeyStoreException e) {
-            throw new RuntimeException(e);
+            throw new UninitialisedKeyStoreException(e);
         }
-        if (trustStoreSize == 0) {
-            throw new EmptyTrustStoreException();
-        }
-        return trustStore;
     }
 }

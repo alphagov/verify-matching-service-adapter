@@ -1,6 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.configuration;
 
 import io.dropwizard.servlets.assets.ResourceNotFoundException;
+import uk.gov.ida.matchingserviceadapter.exceptions.EnvironmentNotSupportedException;
 import uk.gov.ida.saml.metadata.KeyStoreLoader;
 import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 
@@ -36,7 +37,7 @@ public class DefaultHubTrustStoreConfiguration extends TrustStoreConfiguration {
                 trustStoreName = INTEGRATION_HUB_TRUSTSTORE_NAME;
                 break;
             default:
-                throw new RuntimeException("No trust store configured for Matching Service Adapter Environment: " + environment.name());
+                throw new EnvironmentNotSupportedException("No trust store configured for Matching Service Adapter Environment: " + environment.name());
         }
 
         InputStream trustStoreStream = getClass().getClassLoader().getResourceAsStream(trustStoreName);
