@@ -19,7 +19,8 @@
         "verified": true
       },
       "firstName": {
-        "value": "Joe",
+        "value": "Joá",
+        "nonLatinScriptValue": "Joá",
         "verified": true
       },
       "gender": {
@@ -28,12 +29,13 @@
       },
       "middleNames": {
         "value": "Bob Rob",
+        "nonLatinScriptValue": "Γεώργιος",
         "verified": true
       },
       "surnames": [
         {
-          "value": "Dou",
-          "latinScriptValue": "Γεώργιος",
+          "value": "Joey",
+          "nonLatinScriptValue": "Joey",
           "verified": true
         }
       ]

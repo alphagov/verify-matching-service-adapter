@@ -67,7 +67,6 @@
     },
     "firstName": {
       "value": "Joe",
-      "latinScriptValue": "Γεώργιος",
       "verified": true
     },
     "gender": {
@@ -76,13 +75,11 @@
     },
     "middleNames": {
       "value": "Bob Rob",
-      "latinScriptValue": "Γεώργιος",
       "verified": true
     },
     "surnames": [
       {
         "value": "Fred",
-        "latinScriptValue": "Γεώργιος",
         "verified": true
       },
       {
