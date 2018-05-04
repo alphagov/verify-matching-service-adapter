@@ -78,6 +78,7 @@ import uk.gov.ida.saml.metadata.MetadataConfiguration;
 import uk.gov.ida.saml.metadata.MetadataResolverConfigBuilder;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
+import uk.gov.ida.saml.metadata.factories.MetadataClientFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
@@ -482,7 +483,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     new DropwizardMetadataResolverFactory(),
                     new Timer(),
                     new MetadataSignatureTrustEngineFactory(),
-                    new MetadataResolverConfigBuilder());
+                    new MetadataResolverConfigBuilder(),
+                    new MetadataClientFactory()
+                );
             environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));
             return resolverRepository;
         }
