@@ -62,9 +62,6 @@ hub:
   ssoUrl: https://${SIGNIN_DOMAIN}/SAML2/SSO
   republishHubCertificatesInLocalMetadata: true
   hubEntityId: ${METADATA_ENTITY_ID}
-  trustStore:
-    path: ${TRUSTSTORE_PATH}/ida_truststore.ts
-    password: ${TRUSTSTORE_PASSWORD}
 
 metadata:
   url: https://${SIGNIN_DOMAIN}/SAML2/metadata/federation

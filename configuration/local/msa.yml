@@ -27,9 +27,6 @@ hub:
   ssoUrl: ${HUB_SSO_URL}
   republishHubCertificatesInLocalMetadata: true
   hubEntityId: https://dev-hub.local
-  trustStore:
-    path: data/pki/hub.ts
-    password: marshmallow
 
 metadata:
   url: ${METADATA_URL}

@@ -21,8 +21,6 @@ import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.common.shared.security.PublicKeyFileInputStreamFactory;
 import uk.gov.ida.common.shared.security.PublicKeyInputStreamFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
-import uk.gov.ida.common.shared.security.verification.CertificateChainValidator;
-import uk.gov.ida.common.shared.security.verification.PKIXParametersProvider;
 import uk.gov.ida.jerseyclient.ErrorHandlingClient;
 import uk.gov.ida.jerseyclient.JsonClient;
 import uk.gov.ida.jerseyclient.JsonResponseProcessor;
@@ -50,13 +48,11 @@ import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatase
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxyImpl;
-import uk.gov.ida.matchingserviceadapter.repositories.CertificateValidator;
 import uk.gov.ida.matchingserviceadapter.repositories.MatchingServiceAdapterMetadataRepository;
 import uk.gov.ida.matchingserviceadapter.resources.DelegatingMatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.HealthCheckResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.resources.VerifyMatchingServiceResponseGenerator;
-import uk.gov.ida.matchingserviceadapter.rest.configuration.verification.FixedCertificateChainValidator;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
@@ -81,12 +77,10 @@ import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
 import uk.gov.ida.saml.metadata.MetadataConfiguration;
 import uk.gov.ida.saml.metadata.MetadataResolverConfigBuilder;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
-import uk.gov.ida.saml.metadata.TrustStoreConfiguration;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
-import uk.gov.ida.saml.security.CertificateChainEvaluableCriterion;
 import uk.gov.ida.saml.security.DecrypterFactory;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
@@ -102,7 +96,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
 import java.security.KeyPair;
-import java.security.KeyStore;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +112,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(PKIXParametersProvider.class).toInstance(new PKIXParametersProvider());
         bind(SoapMessageManager.class).toInstance(new SoapMessageManager());
         bind(X509CertificateFactory.class);
         bind(KeyStoreLoader.class);
@@ -259,8 +251,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MetadataBackedSignatureValidator verifyMetadataSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine, CertificateChainEvaluableCriterion certificateChainEvaluableCriterion) {
-        return MetadataBackedSignatureValidator.withCertificateChainValidation(explicitKeySignatureTrustEngine, certificateChainEvaluableCriterion);
+    public MetadataBackedSignatureValidator verifyMetadataSignatureValidator(ExplicitKeySignatureTrustEngine explicitKeySignatureTrustEngine) {
+        return MetadataBackedSignatureValidator.withoutCertificateChainValidation(explicitKeySignatureTrustEngine);
     }
 
     @Provides
@@ -290,38 +282,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("VerifyCertificateValidator")
-    public CertificateValidator getCertificateValidator(
-            X509CertificateFactory x509CertificateFactory,
-            @Named("VerifyFixedCertificateChainValidator") FixedCertificateChainValidator fixedCertificateChainValidator) {
-        return new CertificateValidator(x509CertificateFactory, fixedCertificateChainValidator);
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyFixedCertificateChainValidator")
-    public FixedCertificateChainValidator getFixedChainCertificateValidator(
-            @Named("VerifyTrustStore") KeyStore keyStore,
-            CertificateChainValidator certificateChainValidator) {
-        return new FixedCertificateChainValidator(keyStore, certificateChainValidator);
-    }
-
-    @Provides
-    @Singleton
-    public CertificateChainValidator getCertificateChainValidator(PKIXParametersProvider pkixParametersProvider, X509CertificateFactory x509CertificateFactory) {
-        return new CertificateChainValidator(pkixParametersProvider, x509CertificateFactory);
-    }
-
-    @Provides
-    @Singleton
-    public CertificateChainEvaluableCriterion getCertificateChainEvaluableCriterion(
-            CertificateChainValidator certificateChainValidator,
-            @Named("VerifyTrustStore") KeyStore keyStore) {
-        return new CertificateChainEvaluableCriterion(certificateChainValidator, keyStore);
-    }
-
-    @Provides
-    @Singleton
     public PublicKeyFactory getPublicKeyFactory(X509CertificateFactory x509CertificateFactory) {
         return new PublicKeyFactory(x509CertificateFactory);
     }
@@ -332,20 +292,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     public JsonClient getMatchingServiceClient(Environment environment, MatchingServiceAdapterConfiguration configuration) {
         Client matchingServiceClient = new JerseyClientBuilder(environment).using(configuration.getMatchingServiceClientConfiguration()).build("MatchingServiceClient");
         return new JsonClient(new ErrorHandlingClient(matchingServiceClient), new JsonResponseProcessor(environment.getObjectMapper()));
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyTrustStoreConfiguration")
-    public TrustStoreConfiguration getHubTrustStoreConfiguration(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.getHubTrustStoreConfiguration();
-    }
-
-    @Provides
-    @Singleton
-    @Named("VerifyTrustStore")
-    public KeyStore getVerifyKeyStore(@Named("VerifyTrustStoreConfiguration") TrustStoreConfiguration trustStoreConfiguration) {
-        return trustStoreConfiguration.getTrustStore();
     }
 
     @Provides

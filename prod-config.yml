@@ -68,9 +68,6 @@ encryptionKeys:
 # if necessary.
 hub:
   ssoUrl: https://www.signin.service.gov.uk/SAML2/SSO
-  trustStore:
-    path: prod_ida_hub.ts
-    password: puppet
 
 # Settings for obtaining Verify's metadata can be configured here.
 metadata:
