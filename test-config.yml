@@ -68,9 +68,6 @@ encryptionKeys:
 # if necessary.
 hub:
   ssoUrl: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
-  trustStore:
-    path: test_ida_hub.ts
-    password: puppet
 
 # Settings for obtaining Verify's metadata can be configured here.
 metadata:

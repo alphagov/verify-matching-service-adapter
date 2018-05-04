@@ -16,10 +16,6 @@ localMatchingService:
 
 hub:
   ssoUrl: http://localhost:${FRONTEND_PORT:-50300}/SAML2/SSO
-  trustStore:
-    type: encoded
-    store: ${HUB_TRUST_STORE}
-    password: marshmallow
 
 metadata:
   url: ${METADATA_URL:-http://localhost:55000/metadata.xml}
