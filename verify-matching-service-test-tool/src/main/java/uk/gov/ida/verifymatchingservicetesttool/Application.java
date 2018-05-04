@@ -53,10 +53,7 @@ public class Application {
         Collection<TestExecutionSummary> testSummaries = new HashSet<>();
 
         if (applicationConfiguration.getLocalMatchingServiceUsesUniversalDataSet()) {
-            FileUtilsResolver.setFileUtils(new FileUtils("verify"));
-            testSummaries.add(executeTestRun(listener, request));
-
-            FileUtilsResolver.setFileUtils(new FileUtils("eidas"));
+            FileUtilsResolver.setFileUtils(new FileUtils("universal-dataset"));
             testSummaries.add(executeTestRun(listener, request));
         } else {
             FileUtilsResolver.setFileUtils(new FileUtils("legacy"));

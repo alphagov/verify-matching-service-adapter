@@ -22,7 +22,13 @@ Open the `verify-matching-service-test-tool.yml` file.
 
 Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you created for your local matching service. Refer to the [guidance on matching requests for more information about matching and account creation URLs](http://alphagov.github.io/rp-onboarding-tech-docs/pages/ms/msBuild.html#respond-to-json-matching-requests).
 
+The tool offers scenarios for two JSON schemas:
+
+* legacy matching dataset - you will use this if your service does not support European identities and you have not enabled this functionality in your version of the Matching Service Adapter (MSA)
+* universal matching dataset - you will use this if your service supports European identities and you have enabled this functionality in your version of the MSA
+
 If your local matching service supports the universal matching dataset, set `usesUniversalDataset` to true.
+
 
 ## Run
 
@@ -42,14 +48,31 @@ NB: the 'examplesFolder' should be the relative path of the folder containing th
 
 ## Test scenarios
 
-The tool will run 6 default test scenarios:
+The tool will run the following scenarios:
 
-* Simple request with level of assurance 1 
-* Complex request with level of assurance 1
-* Simple request with level of assurance 2
-* Complex request with level of assurance 2
-* Simple request with address missing optional fields
-* Simple user account creation request
+For the legacy matching dataset (if `usesUniversalDataset` is set to false)
+* LoA1 - Minimum data set (first name, surname, DOB, a single address) 
+* LoA2 - Minimum data set (first name, surname, DOB, a single address) 
+* LoA1 - Extended data set (historical names, gender, historical addresses, some unverified, with at least one verified address) 
+* LoA2 - Extended data set (historical names, gender, historical addresses, some unverified, with at least one verified address) 
+* User account creation functionality
+
+For universal matching dataset (if `usesUniversalDataset` is set to true)
+
+The universal matching dataset supports assertions from both GOV.UK Verify identity providers (IdP) and identities from other European countries.
+
+The following scenarios allow you to test your matching service against assertions from GOV.UK Verify IdPs:
+* LoA1 - Minimum data set (first name, surname, DOB, a single address) 
+* LoA2 - Minimum data set (first name, surname, DOB, a single address) 
+* LoA1 - Extended data set (historical names, gender, addresses, some unverified) 
+* LoA2 - Extended data set (historical names, gender, addresses, some unverified) 
+* User account creation functionality
+
+The following scenarios allow you to test your matching service against assertions from other European countries:
+
+* eIDAS - LoA2 - Standard data set (first name, surname, DOB) 
+* eIDAS - LoA2 - Standard data set - special characters in name fields (first name with special characters, surname with special characters, DOB) 
+* eIDAS - LoA2 - Standard data set - transliteration provided for name fields (first name in original script, first name in latin script, surname in original script, surname in latin script, DOB)
 
 ### Adding additional scenarios
 

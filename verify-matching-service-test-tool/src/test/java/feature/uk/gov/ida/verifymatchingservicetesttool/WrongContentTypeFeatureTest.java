@@ -3,7 +3,7 @@ package feature.uk.gov.ida.verifymatchingservicetesttool;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
-import uk.gov.ida.verifymatchingservicetesttool.scenarios.OptionalAddressFieldsExcludedScenario;
+import uk.gov.ida.verifymatchingservicetesttool.scenarios.LevelOfAssuranceOneScenario;
 
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
 import static common.uk.gov.ida.verifymatchingservicetesttool.services.LocalMatchingServiceStub.RELATIVE_MATCH_URL;
@@ -21,11 +21,12 @@ public class WrongContentTypeFeatureTest extends FeatureTestBase {
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+                .withUsesUniversalDataSet(true)
             .build();
 
         application.execute(
             listener,
-            selectClass(OptionalAddressFieldsExcludedScenario.class),
+            selectClass(LevelOfAssuranceOneScenario.class),
             applicationConfiguration,
             fileLocator
         );

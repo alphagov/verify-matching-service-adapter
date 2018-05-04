@@ -15,7 +15,7 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 
 public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
-    private static final long NUMBER_OF_SCENARIOS = 8;
+    private static final long NUMBER_OF_SCENARIOS = 10;
 
     @Test
     public void shouldRunAllTestsForLegacyDataSchemaWhenUniversalDatasetFlagMissing() {
@@ -41,7 +41,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void shouldRunTwoSetsOfTestsWhenUniversalDatasetFlagIsTrue() {
+    public void shouldRunAllTestsForUniversalDatasetWhenUniversalDatasetFlagIsTrue() {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -60,7 +60,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
         assertThat(
                 listener.getTotalTests(),
-                is(NUMBER_OF_SCENARIOS * 2)
+                is(NUMBER_OF_SCENARIOS)
         );
     }
 

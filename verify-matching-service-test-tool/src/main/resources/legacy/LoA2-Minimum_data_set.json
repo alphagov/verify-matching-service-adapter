@@ -5,7 +5,13 @@
   "matchingDataset": {
     "addresses": [
       {
-        "lines": [],
+        "fromDate": "2005-05-14T00:00:00.000Z",
+        "internationalPostCode": "GB1 2PF",
+        "lines": [
+          "10 George Street"
+        ],
+        "postCode": "GB1 2PF",
+        "uprn": "833F1187-9F33-A7E27B3F211E",
         "verified": true
       }
     ],
@@ -15,22 +21,12 @@
     },
     "firstName": {
       "value": "Joe",
-      "latinScriptValue": "Γεώργιος",
-      "verified": true
-    },
-    "gender": {
-      "value": "MALE",
-      "verified": true
-    },
-    "middleNames": {
-      "value": "Bob Rob",
-      "latinScriptValue": "Γεώργιος",
       "verified": true
     },
     "surnames": [
       {
+        "from": "2010-01-20T00:00:00.000Z",
         "value": "Dou",
-        "latinScriptValue": "Γεώργιος",
         "verified": true
       }
     ]
