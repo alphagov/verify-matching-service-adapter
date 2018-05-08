@@ -24,7 +24,7 @@ import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.aPersonName_1_1;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
 
-public class TestToolExamplesSchemaTests extends BaseTestToolInterfaceTest {
+public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
     private static final String REQUEST_ID = "default-match-id";
     private static final String PID = "default-pid";
 
