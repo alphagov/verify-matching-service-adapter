@@ -73,10 +73,6 @@
       "value": "MALE",
       "verified": true
     },
-    "middleNames": {
-      "value": "Bob Rob",
-      "verified": true
-    },
     "surnames": [
       {
         "value": "Fred",

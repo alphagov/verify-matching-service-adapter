@@ -15,7 +15,7 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 
 public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
-    private static final long NUMBER_OF_SCENARIOS = 9;
+    private static final long NUMBER_OF_SCENARIOS = 10;
 
     @Test
     public void shouldRunAllTestsForLegacyDataSchemaWhenUniversalDatasetFlagMissing() {

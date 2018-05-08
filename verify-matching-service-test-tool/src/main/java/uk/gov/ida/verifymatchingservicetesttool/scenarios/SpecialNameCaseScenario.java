@@ -24,18 +24,23 @@ public class SpecialNameCaseScenario extends ScenarioBase {
     }
 
     @Test
-    @DisplayName("Simple request with special characters in names")
-    public void runForSimpleCase() throws Exception {
+    @DisplayName("Simple request with non-Latin name values and transliteration")
+    public void runForSimpleCaseWithNonLatinNameValuesAndTransliteration() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
                 .request(APPLICATION_JSON)
-                .post(Entity.json(fileUtils.readFromResources("special-name-case.json")));
+                .post(Entity.json(fileUtils.readFromResources("special-name-case-with-non-latin-name.json")));
 
         validateMatchNoMatch(response);
     }
 
     @Test
-    public void foo() {
+    @DisplayName("Simple request with non-ASCII Latin characters from ISO/IEC 8859-15")
+    public void runForSimpleCaseWithNonASCIILatinCharacters() throws Exception {
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
+                .request(APPLICATION_JSON)
+                .post(Entity.json(fileUtils.readFromResources("special-name-case.json")));
 
+        validateMatchNoMatch(response);
     }
 }
 

@@ -19,23 +19,23 @@
         "verified": true
       },
       "firstName": {
-        "value": "Joá",
-        "nonLatinScriptValue": "Joá",
+        "value": "Šarlota",
+        "nonLatinScriptValue": "Šarlota",
         "verified": true
       },
       "gender": {
-        "value": "MALE",
+        "value": "FEMALE",
         "verified": true
       },
       "middleNames": {
-        "value": "Bob Rob",
-        "nonLatinScriptValue": "Γεώργιος",
+        "value": "Snježana",
+        "nonLatinScriptValue": "Snježana",
         "verified": true
       },
       "surnames": [
         {
-          "value": "Joey",
-          "nonLatinScriptValue": "Joey",
+          "value": "Jõey",
+          "nonLatinScriptValue": "Jõey",
           "verified": true
         }
       ]

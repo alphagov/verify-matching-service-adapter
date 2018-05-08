@@ -19,18 +19,24 @@
         "verified": true
       },
       "firstName": {
-        "value": "Šarlota",
-        "nonLatinScriptValue": "Šarlota",
+        "value": "Georgios",
+        "nonLatinScriptValue": "Γεώργιος",
+        "verified": true
+      },
+      "middleName": {
+        "value": "Xanthi",
+        "nonLatinScriptValue": "Ξάνθη",
         "verified": true
       },
       "gender": {
-        "value": "FEMALE",
+        "value": "MALE",
         "verified": true
       },
+
       "surnames": [
         {
-          "value": "Jõey",
-          "nonLatinScriptValue": "Jõey",
+          "value": "Panathinaikos",
+          "nonLatinScriptValue": "Παναθηναϊκός",
           "verified": true
         }
       ]
