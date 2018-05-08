@@ -334,7 +334,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             EntityToEncryptForLocator entityToEncryptForLocator,
             MatchingServiceAdapterConfiguration configuration
     ) {
-        return new MsaTransformersFactory().getHealthcheckResponseFromMatchingServiceToElementTransformer(
+        return new MsaTransformersFactory(configuration).getHealthcheckResponseFromMatchingServiceToElementTransformer(
                 encryptionCredentialResolver,
                 idaKeyStore,
                 entityToEncryptForLocator,
@@ -350,7 +350,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             EntityToEncryptForLocator entityToEncryptForLocator,
             MatchingServiceAdapterConfiguration configuration
     ) {
-        return new MsaTransformersFactory().getOutboundResponseFromMatchingServiceToElementTransformer(
+        return new MsaTransformersFactory(configuration).getOutboundResponseFromMatchingServiceToElementTransformer(
                 encryptionCredentialResolver,
                 idaKeyStore,
                 entityToEncryptForLocator,
@@ -366,7 +366,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             EntityToEncryptForLocator entityToEncryptForLocator,
             MatchingServiceAdapterConfiguration configuration
     ) {
-        return new MsaTransformersFactory().getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
+        return new MsaTransformersFactory(configuration).getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
                 encryptionCredentialResolver,
                 idaKeyStore,
                 entityToEncryptForLocator,
@@ -385,13 +385,13 @@ class MatchingServiceAdapterModule extends AbstractModule {
     public Function<AttributeQuery, InboundVerifyMatchingServiceRequest> getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
             MetadataBackedSignatureValidator metadataBackedSignatureValidator,
             IdaKeyStore keyStore,
-            MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
+            MatchingServiceAdapterConfiguration configuration,
             MetadataResolverRepository eidasMetadataResolverRepository,
             @Named("HubEntityId") String hubEntityId) {
-        return new MsaTransformersFactory().getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
+        return new MsaTransformersFactory(configuration).getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
                 metadataBackedSignatureValidator,
                 keyStore,
-                matchingServiceAdapterConfiguration,
+                configuration,
                 eidasMetadataResolverRepository,
                 hubEntityId
         );
