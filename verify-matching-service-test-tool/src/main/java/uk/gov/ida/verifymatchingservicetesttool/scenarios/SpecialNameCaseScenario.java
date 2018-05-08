@@ -30,7 +30,7 @@ public class SpecialNameCaseScenario extends ScenarioBase {
                 .request(APPLICATION_JSON)
                 .post(Entity.json(fileUtils.readFromResources("special-name-case-with-non-latin-name.json")));
 
-        validateMatchNoMatch(response);
+        assertMatchNoMatch(response);
     }
 
     @Test
@@ -40,7 +40,7 @@ public class SpecialNameCaseScenario extends ScenarioBase {
                 .request(APPLICATION_JSON)
                 .post(Entity.json(fileUtils.readFromResources("special-name-case.json")));
 
-        validateMatchNoMatch(response);
+        assertMatchNoMatch(response);
     }
 }
 

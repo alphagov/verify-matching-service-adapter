@@ -30,7 +30,7 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("LoA2-simple-case.json")));
 
-        validateMatchNoMatch(response);
+        assertMatchNoMatch(response);
     }
 
     @Test
@@ -49,6 +49,6 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(jsonString));
 
-        validateMatchNoMatch(response);
+        assertMatchNoMatch(response);
     }
 }

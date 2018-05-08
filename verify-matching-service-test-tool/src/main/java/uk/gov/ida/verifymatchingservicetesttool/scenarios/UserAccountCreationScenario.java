@@ -30,6 +30,6 @@ public class UserAccountCreationScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("user-account-creation.json")));
 
-        validateSuccessFailure(response);
+        assertSuccessFailure(response);
     }
 }

@@ -28,6 +28,6 @@ public class OptionalAddressFieldsExcludedScenario extends ScenarioBase {
             .request(APPLICATION_JSON)
             .post(Entity.json(fileUtils.readFromResources("simple-case-excluding-optional-address-fields.json")));
 
-        validateMatchNoMatch(response);
+        assertMatchNoMatch(response);
     }
 }
