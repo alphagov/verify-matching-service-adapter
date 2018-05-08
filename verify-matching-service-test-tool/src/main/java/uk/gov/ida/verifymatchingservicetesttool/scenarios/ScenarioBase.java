@@ -56,4 +56,8 @@ public abstract class ScenarioBase {
         assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
         assertThat(result.get("result"), anyOf(CoreMatchers.is("success"), is("failure")));
     }
+
+    public ApplicationConfiguration getConfiguration() {
+        return configuration;
+    }
 }
