@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.apache.commons.codec.binary.Base64;
 import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
@@ -32,7 +31,6 @@ import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder;
 import uk.gov.ida.integrationtest.helpers.AssertionHelper;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
@@ -44,6 +42,7 @@ import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.builders.AddressAttributeBuilder_1_1;
 import uk.gov.ida.saml.core.test.builders.AddressAttributeValueBuilder_1_1;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
+import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 import uk.gov.ida.saml.core.test.builders.DateAttributeBuilder_1_1;
 import uk.gov.ida.saml.core.test.builders.GenderAttributeBuilder_1_1;
 import uk.gov.ida.saml.metadata.test.factories.metadata.MetadataFactory;
@@ -69,8 +68,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
 import static uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder.aUserAccountCreationAttributeValue;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCycle3Assertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEncryptedAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aValidCountrySignature;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aValidHubSignature;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aValidIdpSignature;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasEncryptedAssertion;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.ADDRESS_HISTORY;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.CURRENT_ADDRESS;
@@ -86,6 +91,7 @@ import static uk.gov.ida.saml.core.domain.SamlStatusCode.CREATED;
 import static uk.gov.ida.saml.core.domain.SamlStatusCode.CREATE_FAILURE;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP_MS;
 import static uk.gov.ida.saml.core.test.builders.AddressAttributeValueBuilder_1_1.anAddressAttributeValue;
@@ -126,7 +132,7 @@ public class UserAccountCreationAppRuleTest {
     }
 
     @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule(
+    public static final MatchingServiceAdapterAppRule applicationRule = new MatchingServiceAdapterAppRule(true,
         ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH),
         ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:" + localMatchingService.getPort() + UNKNOWN_USER_MATCHING_PATH)
     );
@@ -209,22 +215,13 @@ public class UserAccountCreationAppRuleTest {
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(toList());
 
-        AttributeQuery attributeQuery = anAttributeQuery()
-                .withId(REQUEST_ID)
-                .withAttributes(requiredAttributes)
-                .withIssuer(anIssuer().withIssuerId(applicationRule.getConfiguration().getHubEntityId()).build())
-                .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion("default-request-id"),
-                        aCompleteMatchingDatasetAssertion(),
-                        AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value").buildUnencrypted()), REQUEST_ID, HUB_ENTITY_ID))
-                .build();
-
+        AttributeQuery attributeQuery = aValidEidasAttributeQueryRequest(requiredAttributes);
         Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
-        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
         assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(CREATED);
         OpenSamlXmlObjectFactory openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
+        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
 
         ImmutableList<Attribute> attributes = ImmutableList.of(
                 userAccountCreationAttributeFor(aPersonNameValue().withValue("CurrentSurname").build(), SURNAME),
@@ -380,4 +377,17 @@ public class UserAccountCreationAppRuleTest {
         return AssertionHelper.aMatchingDatasetAssertion(attributes, false, REQUEST_ID);
     }
 
+    private AttributeQuery aValidEidasAttributeQueryRequest(List<Attribute> attributes) {
+        return AttributeQueryBuilder.anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+                .withSubject(aSubjectWithEncryptedAssertions(
+                        asList(
+                                aCycle3Assertion("NI", "123456", REQUEST_ID),
+                                anEidasEncryptedAssertion(REQUEST_ID, applicationRule.getCountryEntityId(), aValidCountrySignature(), HUB_CONNECTOR_ENTITY_ID)
+                        ), REQUEST_ID, HUB_ENTITY_ID))
+                .withSignature(aValidHubSignature())
+                .withAttributes(attributes)
+                .build();
+    }
 }

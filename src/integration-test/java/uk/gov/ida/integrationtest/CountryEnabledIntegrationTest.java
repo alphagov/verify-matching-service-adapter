@@ -54,6 +54,8 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PRIVA
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
@@ -230,8 +232,8 @@ public class CountryEnabledIntegrationTest {
         return aSignature()
             .withSigningCredential(
                 new TestCredentialFactory(
-                    STUB_IDP_PUBLIC_PRIMARY_CERT,
-                    STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY
+                    STUB_COUNTRY_PUBLIC_PRIMARY_CERT,
+                    STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY
                 ).getSigningCredential()
             ).build();
     }

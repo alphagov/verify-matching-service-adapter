@@ -50,7 +50,8 @@ public class SamlAttributeQueryAssertionsValidatorTest {
                 assertionValidator,
                 identityProviderAssertionValidator,
                 configuration,
-                TestEntityIds.HUB_ENTITY_ID
+                TestEntityIds.HUB_ENTITY_ID,
+                TestEntityIds.HUB_CONNECTOR_ENTITY_ID
         );
     }
 

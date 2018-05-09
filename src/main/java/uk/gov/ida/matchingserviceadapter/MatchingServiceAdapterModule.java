@@ -265,6 +265,16 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
+    @Named("HubConnectorEntityId")
+    public String getHubConnectorEntityId(MatchingServiceAdapterConfiguration configuration) {
+        if (configuration.isEidasEnabled()) {
+            return configuration.getEuropeanIdentity().getHubConnectorEntityId();
+        }
+        return "connector-entity-id-not-set";
+    }
+
+    @Provides
+    @Singleton
     @Named("HubFederationId")
     public String getHubFederationId(MatchingServiceAdapterConfiguration configuration) {
         return configuration.getMetadataConfiguration().getHubFederationId();
@@ -387,13 +397,15 @@ class MatchingServiceAdapterModule extends AbstractModule {
             IdaKeyStore keyStore,
             MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
             MetadataResolverRepository eidasMetadataResolverRepository,
-            @Named("HubEntityId") String hubEntityId) {
+            @Named("HubEntityId") String hubEntityId,
+            @Named("HubConnectorEntityId") String hubConnectorEntityId) {
         return new MsaTransformersFactory().getVerifyAttributeQueryToInboundMatchingServiceRequestTransformer(
                 metadataBackedSignatureValidator,
                 keyStore,
                 matchingServiceAdapterConfiguration,
                 eidasMetadataResolverRepository,
-                hubEntityId
+                hubEntityId,
+                hubConnectorEntityId
         );
     }
 

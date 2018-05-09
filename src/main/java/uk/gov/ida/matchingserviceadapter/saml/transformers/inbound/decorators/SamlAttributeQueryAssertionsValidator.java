@@ -16,18 +16,21 @@ public class SamlAttributeQueryAssertionsValidator {
     private final IdentityProviderAssertionValidator identityProviderAssertionValidator;
     private final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
     private final String hubEntityId;
+    private final String hubConnectorEntityId;
 
     @Inject
     public SamlAttributeQueryAssertionsValidator(
             AssertionValidator assertionValidator,
             IdentityProviderAssertionValidator identityProviderAssertionValidator,
             MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
-            @Named("HubEntityId") String hubEntityId) {
+            @Named("HubEntityId") String hubEntityId,
+            @Named("HubConnectorEntityId") String hubConnectorEntityId) {
 
         this.assertionValidator = assertionValidator;
         this.identityProviderAssertionValidator = identityProviderAssertionValidator;
         this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
         this.hubEntityId = hubEntityId;
+        this.hubConnectorEntityId = hubConnectorEntityId;
     }
 
     public void validateHubAssertions(ValidatedAttributeQuery attributeQuery, List<Assertion> assertions) {
@@ -47,5 +50,14 @@ public class SamlAttributeQueryAssertionsValidator {
                     hubEntityId);
         }
         identityProviderAssertionValidator.validateConsistency(assertions);
+    }
+
+    public void validateCountryAssertions(ValidatedAttributeQuery attributeQuery, List<Assertion> assertions) {
+        for (Assertion assertion : assertions) {
+            assertionValidator.validate(
+                    assertion,
+                    attributeQuery.getID(),
+                    hubConnectorEntityId);
+        }
     }
 }

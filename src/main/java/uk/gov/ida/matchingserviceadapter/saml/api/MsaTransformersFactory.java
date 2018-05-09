@@ -173,7 +173,8 @@ public class MsaTransformersFactory {
             final IdaKeyStore keyStore,
             final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration,
             final MetadataResolverRepository eidasMetadataResolverRepository,
-            final String hubEntityId) {
+            final String hubEntityId,
+            final String hubConnectorEntityId) {
         HubAssertionUnmarshaller hubAssertionTransformer = coreTransformersFactory.getAssertionToHubAssertionTransformer(hubEntityId);
         AddressFactory addressFactory = new AddressFactory();
         IdentityProviderAssertionUnmarshaller identityProviderAssertionTransformer = new IdentityProviderAssertionUnmarshaller(
@@ -189,7 +190,8 @@ public class MsaTransformersFactory {
                 new AttributeQuerySignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
                 new SamlAssertionsSignatureValidator(new SamlMessageSignatureValidator(signatureValidator)),
                 new InboundMatchingServiceRequestUnmarshaller(hubAssertionTransformer, identityProviderAssertionTransformer, eidasMetadataResolverRepository),
-                new SamlAttributeQueryAssertionsValidator(getAssertionValidator(), getIdentityProviderAssertionValidator(), matchingServiceAdapterConfiguration, hubEntityId),
+                new SamlAttributeQueryAssertionsValidator(getAssertionValidator(), getIdentityProviderAssertionValidator(), matchingServiceAdapterConfiguration, hubEntityId, hubConnectorEntityId),
+                eidasMetadataResolverRepository,
             new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter),
                 hubEntityId);
     }

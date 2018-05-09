@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
@@ -213,7 +214,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
 
     private EntityDescriptor buildTestCountryEntityDescriptor() throws Exception {
         KeyDescriptor signingKeyDescriptor = KeyDescriptorBuilder.aKeyDescriptor()
-                .withX509ForSigning(STUB_IDP_PUBLIC_PRIMARY_CERT)
+                .withX509ForSigning(STUB_COUNTRY_PUBLIC_PRIMARY_CERT)
                 .build();
 
         IDPSSODescriptor idpSsoDescriptor = IdpSsoDescriptorBuilder.anIdpSsoDescriptor()

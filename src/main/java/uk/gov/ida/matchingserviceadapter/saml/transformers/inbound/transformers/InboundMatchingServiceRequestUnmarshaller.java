@@ -30,7 +30,7 @@ public class InboundMatchingServiceRequestUnmarshaller {
     }
 
     @SuppressWarnings("unchecked") // we know this cast will work
-    public InboundVerifyMatchingServiceRequest fromSaml(ValidatedAttributeQuery originalQuery, ValidatedAssertions validatedHubAssertions, ValidatedAssertions validatedIdpAssertions) {
+    public InboundVerifyMatchingServiceRequest fromSaml(ValidatedAttributeQuery originalQuery, ValidatedAssertions validatedHubAssertions, ValidatedAssertions validatedIdpAssertions, ValidatedAssertions validatedCountryAssertions) {
         String id = originalQuery.getID();
         String originalIssuer = originalQuery.getIssuer().getValue();
         Subject subject = originalQuery.getSubject();
@@ -54,6 +54,15 @@ public class InboundMatchingServiceRequestUnmarshaller {
                 authnStatementAssertion = identityProviderAssertion;
             }
         }
+        for (Assertion assertion : validatedCountryAssertions.getAssertions()) {
+            IdentityProviderAssertion countryAssertion = getCountryAssertion(assertion);
+            if (countryAssertion.getMatchingDataset().isPresent()) {
+                matchingDatasetAssertion = countryAssertion;
+            }
+            if (countryAssertion.getAuthnStatement().isPresent()) {
+                authnStatementAssertion = countryAssertion;
+            }
+        }
 
         String authnRequestIssuerId = subject.getNameID().getSPNameQualifier();
         String assertionConsumerUrl = subject.getNameID().getNameQualifier();
@@ -72,13 +81,10 @@ public class InboundMatchingServiceRequestUnmarshaller {
     }
 
     private IdentityProviderAssertion getIdentityProviderAssertion(Assertion assertion) {
-        return isFromEidasSource(assertion) ?
-                identityProviderAssertionUnmarshaller.fromCountryAssertion(assertion) :
-                identityProviderAssertionUnmarshaller.fromVerifyAssertion(assertion);
+        return identityProviderAssertionUnmarshaller.fromVerifyAssertion(assertion);
     }
 
-    private boolean isFromEidasSource(Assertion assertion) {
-        return eidasMetadataResolverRepository.getMetadataResolver(assertion.getIssuer().getValue()).isPresent();
+    private IdentityProviderAssertion getCountryAssertion(Assertion assertion) {
+        return identityProviderAssertionUnmarshaller.fromCountryAssertion(assertion);
     }
-
 }
