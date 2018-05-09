@@ -2,8 +2,13 @@ package uk.gov.ida.integrationtest.TestToolInterfaceMatching;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+
+import io.dropwizard.testing.junit.DropwizardAppRule;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
+import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 
@@ -27,6 +32,12 @@ import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder
 public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
     private static final String REQUEST_ID = "default-match-id";
     private static final String PID = "default-pid";
+
+    @ClassRule
+    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> appRule = new MatchingServiceAdapterAppRule(false, configRules);
+
+    @Override
+    protected DropwizardAppRule<MatchingServiceAdapterConfiguration> getAppRule() { return appRule; }
 
     @Test
     public void shouldProduceLoA2SimpleCase() throws Exception {

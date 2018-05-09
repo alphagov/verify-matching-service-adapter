@@ -40,8 +40,8 @@ import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 public abstract class BaseTestToolInterfaceTest {
     private final SignatureAlgorithm signatureAlgorithmForHub = new SignatureRSASHA1();
     private final DigestAlgorithm digestAlgorithmForHub = new DigestSHA256();
-    protected final String MATCHING_SERVICE_URI = "http://localhost:" + applicationRule.getLocalPort() + "/matching-service/POST";
-    protected final String UNKNOWN_USER_URI = "http://localhost:" + applicationRule.getLocalPort() + "/unknown-user-attribute-query";
+    protected String MATCHING_SERVICE_URI;
+    protected String UNKNOWN_USER_URI;
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper().setDateFormat(ISO8601DateFormat.getDateInstance());
     protected static final Integer yesterday = 1;
     protected static final Integer inRange405to100 = 100;
@@ -54,11 +54,10 @@ public abstract class BaseTestToolInterfaceTest {
     @ClassRule
     public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig().port(1234));
 
-    @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule(
+    protected static ConfigOverride[] configRules = new ConfigOverride[] {
         ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:1234/match"),
         ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:1234/user-account-creation")
-    );
+    };
 
     @BeforeClass
     public static void setUp() {
@@ -69,6 +68,14 @@ public abstract class BaseTestToolInterfaceTest {
     @Before
     public void reset() {
         wireMockRule.resetRequests();
+    }
+
+    protected abstract DropwizardAppRule<MatchingServiceAdapterConfiguration> getAppRule();
+
+    @Before
+    public void setUris() {
+        MATCHING_SERVICE_URI = "http://localhost:" + getAppRule().getLocalPort() + "/matching-service/POST";
+        UNKNOWN_USER_URI = "http://localhost:" + getAppRule().getLocalPort() + "/unknown-user-attribute-query";
     }
 
     protected void assertThatRequestThatWillBeSentIsEquivalentToFile(AttributeQuery attributeQuery, Path file) throws Exception {

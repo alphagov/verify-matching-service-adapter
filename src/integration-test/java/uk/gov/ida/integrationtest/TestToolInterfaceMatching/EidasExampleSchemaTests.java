@@ -2,59 +2,90 @@ package uk.gov.ida.integrationtest.TestToolInterfaceMatching;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.LocalDate;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.security.credential.Credential;
+
+import io.dropwizard.testing.junit.DropwizardAppRule;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
+import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.saml.core.extensions.IdaAuthnContext;
+import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
+import uk.gov.ida.saml.metadata.test.factories.metadata.TestCredentialFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static java.util.Arrays.asList;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aMatchingDatasetAssertion;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEncryptedAssertions;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentGivenNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aDateOfBirthAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aGenderAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aPersonIdentifierAttribute;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AddressAttributeBuilder_1_1.anAddressAttribute;
 import static uk.gov.ida.saml.core.test.builders.AddressAttributeValueBuilder_1_1.anAddressAttributeValue;
+import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
+import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
+import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.DateAttributeBuilder_1_1.aDate_1_1;
 import static uk.gov.ida.saml.core.test.builders.DateAttributeValueBuilder.aDateValue;
 import static uk.gov.ida.saml.core.test.builders.GenderAttributeBuilder_1_1.aGender_1_1;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.aPersonName_1_1;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
+import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 
 public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
-    private static final String REQUEST_ID = "default-match-id";
+    private static final String REQUEST_ID = "default-request-id";
     private static final String PID = "default-pid";
+
+    private static final Credential MSA_ENCRYPTION_CREDENTIAL = new TestCredentialFactory(
+        TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+        null)
+        .getEncryptingCredential();
+
+    private static final Credential COUNTRY_SIGNING_CREDENTIAL = new TestCredentialFactory(
+            TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT, // TODO: change this to Stub Country
+            TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY)
+            .getSigningCredential();
+
+    @ClassRule
+    public static final MatchingServiceAdapterAppRule appRule = new MatchingServiceAdapterAppRule(true, configRules);
+
+    @Override
+    protected DropwizardAppRule<MatchingServiceAdapterConfiguration> getAppRule() { return appRule; }
 
     @Test
     public void shouldProduceLoA2SimpleCase() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(aSubjectWithAssertions(asList(
-                anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, REQUEST_ID),
-                aMatchingDatasetAssertion(asList(
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Joe")
-                            .withVerified(true)
-                            .build())
-                        .buildAsFirstname(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Dou")
-                            .withVerified(true)
-                            .build())
-                        .buildAsSurname(),
-                    aGender_1_1().withValue("Male").withVerified(true).build(),
-                    aDate_1_1().addValue(
-                        aDateValue()
-                            .withValue("1980-05-24")
-                            .withVerified(true)
-                            .build()).buildAsDateOfBirth()
-                ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
+            .withSubject(aSubjectWithEncryptedAssertions(asList(
+                anEidasAssertion()
+                    .withConditions(
+                        aConditions()
+                        .validFor(Duration.standardMinutes(10))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .build())
+                    .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
+                    .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
+                    .withoutAttributeStatements()
+                    .addAttributeStatement(anAttributeStatement().addAllAttributes(asList(
+                        aCurrentGivenNameAttribute("Joe"),
+                        aCurrentFamilyNameAttribute("Dou"),
+                        aGenderAttribute("Male"),
+                        aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
+                        aPersonIdentifierAttribute(PID)
+                    )).build()
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
             .build();
 
         Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/eidas/LoA2-simple-case.json");
@@ -67,42 +98,40 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(aSubjectWithAssertions(asList(
-                anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, REQUEST_ID),
-                aMatchingDatasetAssertion(asList(
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Joe")
-                            .withVerified(true)
-                            .build())
-                        .buildAsFirstname(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Dou")
-                            .withVerified(true)
-                            .build())
-                        .buildAsSurname(),
-                    aGender_1_1().withValue("Male").withVerified(true).withFrom(null).withTo(null).build(),
-                    aDate_1_1().addValue(
-                        aDateValue()
-                            .withValue("1980-05-24")
-                            .withVerified(true)
-                            .build()).buildAsDateOfBirth(),
-                    anAddressAttribute().addAddress(
-                        anAddressAttributeValue()
-                            .withPostcode(null)
-                            .withInternationalPostcode(null)
-                            .withUprn(null)
-                            .withVerified(true)
-                            .build())
-                        .buildCurrentAddress()
-                ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
+            .withSubject(aSubjectWithEncryptedAssertions(asList(
+                anEidasAssertion()
+                    .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
+                    .withConditions(
+                        aConditions()
+                        .validFor(Duration.standardMinutes(10))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .build())
+                    .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
+                    .withoutAttributeStatements()
+                    .addAttributeStatement(anAttributeStatement().addAllAttributes(asList(
+                        aCurrentGivenNameAttribute("Joe"),
+                        aCurrentFamilyNameAttribute("Dou"),
+                        aGenderAttribute("Male"),
+                        aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
+                        aPersonIdentifierAttribute(PID),
+                        anAddressAttribute().addAddress(
+                            anAddressAttributeValue()
+                                .withInternationalPostcode(null)
+                                .withPostcode(null)
+                                .withUprn(null)
+                                .withVerified(true)
+                                .build())
+                            .buildCurrentAddress()
+                    )).build()
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
             .build();
 
         Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/eidas/simple-case-excluding-optional-address-fields.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
+
+/*
     @Test
     public void shouldProduceLoA1SimpleCase() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
