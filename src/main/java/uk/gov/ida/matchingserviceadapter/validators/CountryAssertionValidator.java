@@ -1,14 +1,13 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import java.time.Duration;
-
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
-
 import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.Message;
 import uk.gov.ida.validation.validators.CompositeValidator;
 import uk.gov.ida.validation.validators.FixedErrorValidator;
+
+import java.time.Duration;
 
 import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 
@@ -29,7 +28,8 @@ public class CountryAssertionValidator extends CompositeValidator<Assertion> {
                 IDENTITY_ASSERTION_TYPE_NAME,
                 MAXIMUM_AGE_OF_ASSERTION,
                 CLOCK_DELTA,
-                IDPSSODescriptor.DEFAULT_ELEMENT_NAME
+                IDPSSODescriptor.DEFAULT_ELEMENT_NAME,
+                hubConnectorEntityId
             ),
             new CompositeValidator<>(
                 true,

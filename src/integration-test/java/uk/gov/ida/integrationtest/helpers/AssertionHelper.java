@@ -25,31 +25,29 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_PUBLIC_SIGNING_CERT;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_ENCRYPTION_CERT;
-import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_ENCRYPTION_KEY;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
-import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_SECONDARY_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_IDP_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anEidasAttributeStatement;
-import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
-import static uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder.aSimpleStringAttribute;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextBuilder.anAuthnContext;
 import static uk.gov.ida.saml.core.test.builders.AuthnContextClassRefBuilder.anAuthnContextClassRef;
 import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anAuthnStatement;
+import static uk.gov.ida.saml.core.test.builders.AuthnStatementBuilder.anEidasAuthnStatement;
 import static uk.gov.ida.saml.core.test.builders.IPAddressAttributeBuilder.anIPAddress;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
+import static uk.gov.ida.saml.core.test.builders.SimpleStringAttributeBuilder.aSimpleStringAttribute;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
@@ -66,8 +64,12 @@ public class AssertionHelper {
                 ).build();
     }
 
-    private static Signature aValidSignature() {
+    public static Signature aValidIdpSignature() {
         return aValidSignature(STUB_IDP_PUBLIC_PRIMARY_CERT, STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY);
+    }
+
+    public static Signature aValidHubSignature() {
+        return aValidSignature(HUB_TEST_PUBLIC_SIGNING_CERT, HUB_TEST_PRIVATE_SIGNING_KEY);
     }
 
     public static Assertion anAuthnStatementAssertion(String inResponseTo) {
@@ -130,7 +132,7 @@ public class AssertionHelper {
     }
 
     public static Assertion aMatchingDatasetAssertion(List<Attribute> attributes, boolean shouldBeExpired, String requestId) {
-        return aMatchingDatasetAssertionWithSignature(attributes, aValidSignature(), shouldBeExpired, requestId);
+        return aMatchingDatasetAssertionWithSignature(attributes, aValidIdpSignature(), shouldBeExpired, requestId);
     }
 
     public static Assertion aMatchingDatasetAssertionWithSignature(List<Attribute> attributes, Signature signature, boolean shouldBeExpired, String requestId) {
@@ -157,7 +159,7 @@ public class AssertionHelper {
             .withSubject(
                 anAssertionSubject(requestId, false)
             )
-            .withSignature(aValidSignature(HUB_TEST_PUBLIC_SIGNING_CERT, HUB_TEST_PRIVATE_SIGNING_KEY))
+            .withSignature(aValidHubSignature())
             .addAttributeStatement(
                 anAttributeStatement()
                     .addAllAttributes(asList(
@@ -174,13 +176,14 @@ public class AssertionHelper {
                 ).getEncryptingCredential());
     }
 
-    public static EncryptedAssertion anEidasEncryptedAssertion(String requestId, String issuerId, Signature assertionSignature) {
+    public static EncryptedAssertion anEidasEncryptedAssertion(String requestId, String issuerId, Signature assertionSignature, String recipient) {
         return anAssertion()
             .withSubject(
                 aSubject().withSubjectConfirmation(
                     aSubjectConfirmation().withSubjectConfirmationData(
                         aSubjectConfirmationData()
                             .withInResponseTo(requestId)
+                            .withRecipient(recipient)
                             .build())
                         .build())
                     .build())
@@ -223,9 +226,9 @@ public class AssertionHelper {
             );
     }
 
-    public static Subject anEidasSubject(String requestId, String assertionIssuerId, Signature assertionSignature) {
+    public static Subject anEidasSubject(String requestId, String assertionIssuerId, Signature assertionSignature, String recipient) {
         return aSubjectWithEncryptedAssertions(
-                singletonList(anEidasEncryptedAssertion(requestId, assertionIssuerId, assertionSignature)),
+                singletonList(anEidasEncryptedAssertion(requestId, assertionIssuerId, assertionSignature, recipient)),
                 requestId, HUB_ENTITY_ID);
     }
 
@@ -254,7 +257,7 @@ public class AssertionHelper {
         conditions.setNotOnOrAfter(DateTime.now().plusMinutes(10));
         AudienceRestriction audienceRestriction= new AudienceRestrictionBuilder().buildObject();
         Audience audience = new AudienceBuilder().buildObject();
-        audience.setAudienceURI(HUB_SECONDARY_ENTITY_ID);
+        audience.setAudienceURI(HUB_CONNECTOR_ENTITY_ID);
         audienceRestriction.getAudiences().add(audience);
         conditions.getAudienceRestrictions().add(audienceRestriction);
         return conditions;

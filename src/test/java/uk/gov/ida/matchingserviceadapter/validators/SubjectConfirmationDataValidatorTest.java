@@ -11,11 +11,14 @@ import uk.gov.ida.validation.messages.Messages;
 
 import static java.util.function.Function.identity;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ida.matchingserviceadapter.validators.StringValidators.STRING_VALUE_NOT_ENUMERATED;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.IN_RESPONSE_TO_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_INVALID;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.NOT_ON_OR_AFTER_NOT_PRESENT;
+import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.RECIPIENT_INVALID;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.RECIPIENT_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.SUBJECT_CONFIRMATION_DATA_NOT_PRESENT;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
 
@@ -26,12 +29,12 @@ public class SubjectConfirmationDataValidatorTest {
 
     @Before
     public void setup() {
-        validator = new SubjectConfirmationDataValidator<>(identity(), new DateTimeComparator(Duration.ZERO));
+        validator = new SubjectConfirmationDataValidator<>(identity(), new DateTimeComparator(Duration.ZERO), HUB_CONNECTOR_ENTITY_ID);
     }
 
     @Test
     public void shouldGenerateNoErrorsWhenSubjectConfirmationDataIsValid() {
-        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().build();
+        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withRecipient(HUB_CONNECTOR_ENTITY_ID).build();
 
         Messages messages = validator.validate(subjectConfirmationData, messages());
 
@@ -79,6 +82,15 @@ public class SubjectConfirmationDataValidatorTest {
         Messages messages = validator.validate(subjectConfirmationData, messages());
 
         assertThat(messages.hasErrorLike(RECIPIENT_NOT_PRESENT)).isTrue();
+    }
+
+    @Test
+    public void shouldGenerateErrorWhenSubjectConfirmationDataRecipientIsWrong() throws Exception {
+        SubjectConfirmationData subjectConfirmationData = aSubjectConfirmationData().withNotBefore(DateTime.now()).withRecipient("wrong-recipient").build();
+
+        Messages messages = validator.validate(subjectConfirmationData, messages());
+
+        assertThat(messages.hasErrorLike(RECIPIENT_INVALID)).isTrue();
     }
 
 }

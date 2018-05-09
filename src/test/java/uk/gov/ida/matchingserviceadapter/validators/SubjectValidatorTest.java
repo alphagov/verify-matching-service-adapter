@@ -18,6 +18,7 @@ import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.NAME
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.NAME_ID_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.SUBJECT_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectValidator.WRONG_NUMBER_OF_SUBJECT_CONFIRMATIONS;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
@@ -29,13 +30,13 @@ public class SubjectValidatorTest {
 
     @Before
     public void setUp() {
-        subjectValidator = new SubjectValidator(identity(), new DateTimeComparator(Duration.ZERO));
+        subjectValidator = new SubjectValidator(identity(), new DateTimeComparator(Duration.ZERO), HUB_CONNECTOR_ENTITY_ID);
     }
 
     @Test
     public void shouldGenerateNoErrorsWhenSubjectIsValid() {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData()
+            aSubjectConfirmationData().withRecipient(HUB_CONNECTOR_ENTITY_ID)
                 .build()).build();
         Subject subject = aSubject()
             .withSubjectConfirmation(subjectConfirmation)

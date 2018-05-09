@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.SUBJECT_CONFIRMATION_DATA_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationValidator.SUBJECT_CONFIRMATION_NOT_PRESENT;
 import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationValidator.WRONG_SUBJECT_CONFIRMATION_METHOD;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
 import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.validation.messages.MessagesImpl.messages;
@@ -24,13 +25,13 @@ public class SubjectConfirmationValidatorTest {
 
     @Before
     public void setup() {
-        validator = new SubjectConfirmationValidator<>(identity(), new DateTimeComparator(Duration.ZERO));
+        validator = new SubjectConfirmationValidator<>(identity(), new DateTimeComparator(Duration.ZERO), HUB_CONNECTOR_ENTITY_ID);
     }
 
     @Test
     public void shouldGenerateNoErrorsWhenSubjectConfirmationIsValid() {
         SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-            aSubjectConfirmationData()
+            aSubjectConfirmationData().withRecipient(HUB_CONNECTOR_ENTITY_ID)
                 .build()).build();
 
         Messages messages = validator.validate(subjectConfirmation, messages());

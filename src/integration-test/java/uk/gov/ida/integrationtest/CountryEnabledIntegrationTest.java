@@ -1,5 +1,6 @@
 package uk.gov.ida.integrationtest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import helpers.JerseyClientConfigurationBuilder;
 import httpstub.HttpStubRule;
 import io.dropwizard.client.JerseyClientBuilder;
@@ -32,23 +33,21 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.net.URI;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCycle3Assertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEncryptedAssertions;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasEncryptedAssertion;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCycle3Assertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSubject;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.matchingserviceadapter.validators.AssertionValidator.generateInvalidSignatureMessage;
-import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.DEFAULT_INVALID_SIGNATURE_MESSAGE;
 import static uk.gov.ida.matchingserviceadapter.validators.CountryAssertionValidator.IDENTITY_ASSERTION_TYPE_NAME;
+import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.DEFAULT_INVALID_SIGNATURE_MESSAGE;
+import static uk.gov.ida.matchingserviceadapter.validators.SubjectConfirmationDataValidator.RECIPIENT_INVALID;
 import static uk.gov.ida.saml.core.domain.SamlStatusCode.MATCH;
 import static uk.gov.ida.saml.core.domain.SamlStatusCode.NO_MATCH;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PRIVATE_SIGNING_KEY;
@@ -59,6 +58,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_P
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
@@ -132,7 +132,7 @@ public class CountryEnabledIntegrationTest {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature()))
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature(), HUB_CONNECTOR_ENTITY_ID))
             .withSignature(
                 aSignature()
                     .withSigningCredential(
@@ -157,7 +157,7 @@ public class CountryEnabledIntegrationTest {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), invalidSignature))
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), invalidSignature, HUB_CONNECTOR_ENTITY_ID))
             .withSignature(aHubSignature())
             .build();
 
@@ -167,11 +167,27 @@ public class CountryEnabledIntegrationTest {
         assertThat(response.readEntity(String.class)).contains(generateInvalidSignatureMessage(IDENTITY_ASSERTION_TYPE_NAME).getRenderedMessage());
     }
 
+    @Test
+    public void shouldNotProcessEidasAttributeQueryRequestContainingAnAssertionWithInvalidRecipient() {
+        String issuerId = HUB_ENTITY_ID;
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(issuerId).build())
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature(), "wrong-recipient"))
+            .withSignature(aHubSignature())
+            .build();
+
+        Response response = postResponse(msaMatchingUrl, attributeQuery);
+
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertThat(response.readEntity(String.class)).contains(RECIPIENT_INVALID.getRenderedMessage());
+    }
+
     private AttributeQuery aValidAttributeQuery() {
         return AttributeQueryBuilder.anAttributeQuery()
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature()))
+            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature(), HUB_CONNECTOR_ENTITY_ID))
             .withSignature(aHubSignature())
             .build();
     }
@@ -183,7 +199,7 @@ public class CountryEnabledIntegrationTest {
             .withSubject(aSubjectWithEncryptedAssertions(
                 asList(
                     aCycle3Assertion("NI", "123456", REQUEST_ID),
-                    anEidasEncryptedAssertion(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature())
+                    anEidasEncryptedAssertion(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anIdpSignature(), HUB_CONNECTOR_ENTITY_ID)
                 ), REQUEST_ID, HUB_ENTITY_ID))
             .withSignature(aHubSignature())
             .build();

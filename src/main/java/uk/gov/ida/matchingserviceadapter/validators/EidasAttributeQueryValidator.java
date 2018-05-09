@@ -3,7 +3,6 @@ package uk.gov.ida.matchingserviceadapter.validators;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
-import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import org.opensaml.security.SecurityException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
@@ -12,7 +11,6 @@ import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.SignatureValidator;
 import uk.gov.ida.validation.messages.MessageImpl;
 import uk.gov.ida.validation.validators.CompositeValidator;
-import uk.gov.ida.validation.validators.FixedErrorValidator;
 import uk.gov.ida.validation.validators.PredicatedValidator;
 
 import java.time.Duration;
@@ -21,6 +19,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
 import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
@@ -69,7 +68,8 @@ public class EidasAttributeQueryValidator extends CompositeValidator<AttributeQu
                         "Cycle 3",
                         Duration.parse("PT20M"),
                         Duration.parse("PT1M"),
-                        SPSSODescriptor.DEFAULT_ELEMENT_NAME
+                        SPSSODescriptor.DEFAULT_ELEMENT_NAME,
+                        HUB_ENTITY_ID
                     ),
                     DEFAULT_TOO_MANY_CYCLE_3_ASSERTIONS_MESSAGE
                 )

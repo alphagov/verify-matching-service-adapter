@@ -24,7 +24,8 @@ public class AssertionValidator extends CompositeValidator<Assertion> {
         final String typeOfAssertion,
         final Duration ttl,
         final Duration clockDelta,
-        final QName issuerRoleDescriptor) {
+        final QName issuerRoleDescriptor,
+        final String hubConnectorEntityId) {
         super(
             false,
             new CompositeValidator<>(
@@ -36,7 +37,7 @@ public class AssertionValidator extends CompositeValidator<Assertion> {
                 ),
                 new PredicatedValidator<>(generateInvalidSignatureMessage(typeOfAssertion), validateAssertionSignature(signatureValidator, issuerRoleDescriptor))
             ),
-            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator),
+            new SubjectValidator<>(Assertion::getSubject, dateTimeComparator, hubConnectorEntityId),
             IssueInstantJodaDateTimeValidator(
                 fieldMessage("issueInstant","expired.message", "Issue Instant time-to-live has been exceeded"),
                 fieldMessage("issueInstant","issue.instance.in.future", "Issue Instant is in the future"),

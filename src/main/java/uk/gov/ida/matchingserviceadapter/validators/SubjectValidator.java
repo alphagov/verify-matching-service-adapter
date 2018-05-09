@@ -23,7 +23,7 @@ public class SubjectValidator<T> extends CompositeValidator<T> {
 
     public static final Set<String> VALID_IDENTIFIERS = ImmutableSet.of(NameID.PERSISTENT);
 
-    public SubjectValidator(Function<T, Subject> valueProvider, DateTimeComparator dateTimeComparator) {
+    public SubjectValidator(Function<T, Subject> valueProvider, DateTimeComparator dateTimeComparator, String hubConnectorEntityId) {
         super(
             true,
             valueProvider,
@@ -31,7 +31,7 @@ public class SubjectValidator<T> extends CompositeValidator<T> {
             new FixedErrorValidator<>(subject -> subject.getSubjectConfirmations().size() != 1, WRONG_NUMBER_OF_SUBJECT_CONFIRMATIONS),
             new RequiredValidator<>(NAME_ID_NOT_PRESENT, Subject::getNameID),
             new FixedErrorValidator<>(subject -> !VALID_IDENTIFIERS.contains(subject.getNameID().getFormat()), NAME_ID_IN_WRONG_FORMAT),
-            new SubjectConfirmationValidator<>(subject -> subject.getSubjectConfirmations().get(0), dateTimeComparator)
+            new SubjectConfirmationValidator<>(subject -> subject.getSubjectConfirmations().get(0), dateTimeComparator, hubConnectorEntityId)
         );
     }
 
