@@ -10,24 +10,18 @@ import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfigur
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertionFactory;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
+import uk.gov.ida.matchingserviceadapter.domain.TranslatedAttributeQueryRequest;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
-import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
-import uk.gov.ida.matchingserviceadapter.mappers.AuthnContextToLevelOfAssuranceDtoMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
-import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 import uk.gov.ida.saml.core.domain.AssertionRestrictions;
-import uk.gov.ida.saml.core.domain.IdentityProviderAssertion;
-import uk.gov.ida.saml.core.domain.IdentityProviderAuthnStatement;
-import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.PersistentId;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Optional;
+
+import static uk.gov.ida.matchingserviceadapter.mappers.AuthnContextToLevelOfAssuranceDtoMapper.map;
 
 public class UnknownUserAttributeQueryHandler {
     private static final Logger LOG = LoggerFactory.getLogger(UnknownUserAttributeQueryHandler.class);
@@ -55,62 +49,53 @@ public class UnknownUserAttributeQueryHandler {
         this.userAccountCreationAttributeExtractor = userAccountCreationAttributeExtractor;
     }
 
-    public OutboundResponseFromUnknownUserCreationService createAccount(InboundVerifyMatchingServiceRequest attributeQuery) {
-        IdentityProviderAssertion matchingDatasetAssertion = attributeQuery.getMatchingDatasetAssertion();
-        IdentityProviderAssertion authnStatementAssertion = attributeQuery.getAuthnStatementAssertion();
-        final String hashedPid = userIdHashFactory.hashId(matchingDatasetAssertion.getIssuerId(),
-                matchingDatasetAssertion.getPersistentId().getNameId(),
-                authnStatementAssertion.getAuthnStatement().map(IdentityProviderAuthnStatement::getAuthnContext));
-
-        LevelOfAssuranceDto levelOfAssurance = AuthnContextToLevelOfAssuranceDtoMapper.map(attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext());
-        UnknownUserCreationResponseDto unknownUserCreationResponseDto = matchingServiceProxy.makeUnknownUserCreationRequest(new UnknownUserCreationRequestDto(hashedPid, levelOfAssurance));
-        if (unknownUserCreationResponseDto.getResult().equalsIgnoreCase(UnknownUserCreationResponseDto.FAILURE)) {
-            return OutboundResponseFromUnknownUserCreationService.createFailure(attributeQuery.getId(), matchingServiceAdapterConfiguration.getEntityId());
+    public OutboundResponseFromUnknownUserCreationService createAccount(TranslatedAttributeQueryRequest attributeQuery, UnknownUserCreationResponseDto userCreationResponseDto) {
+        if (userCreationResponseDto.getResult().equalsIgnoreCase(UnknownUserCreationResponseDto.FAILURE)) {
+            return OutboundResponseFromUnknownUserCreationService.createFailure(attributeQuery.getMatchingServiceRequestDto().getMatchId(), matchingServiceAdapterConfiguration.getEntityId());
         }
 
-        Optional<MatchingDataset> matchingDataset = attributeQuery.getMatchingDatasetAssertion().getMatchingDataset();
-
-        List<Attribute> extractedUserAccountCreationAttributes =
+        /*List<Attribute> extractedUserAccountCreationAttributes =
                 userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(
                                 attributeQuery.getUserCreationAttributes(),
                         matchingDataset.orElse(null), attributeQuery.getCycle3AttributeAssertion().orElse(null)
-                );
+                );*/
+        List<Attribute> extractedUserAccountCreationAttributes = attributeQuery.getUserAccountCreationAttributes();
 
-        final OutboundResponseFromUnknownUserCreationService matchingServiceResponse = getMatchingServiceResponse(attributeQuery, hashedPid, extractedUserAccountCreationAttributes);
-        LOG.info(MessageFormat.format("Result from unknown attribute query request for id {0} is {1}", attributeQuery.getId(), matchingServiceResponse.getStatus()));
+        final OutboundResponseFromUnknownUserCreationService matchingServiceResponse = getMatchingServiceResponse(attributeQuery, attributeQuery.getMatchingServiceRequestDto().getHashedPid(), extractedUserAccountCreationAttributes);
+        LOG.info(MessageFormat.format("Result from unknown attribute query request for id {0} is {1}", attributeQuery.getMatchingServiceRequestDto().getMatchId(), matchingServiceResponse.getStatus()));
 
         return matchingServiceResponse;
     }
 
-    private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(final InboundVerifyMatchingServiceRequest attributeQuery, final String hashedPid, final List<Attribute> extractedUserAccountCreationAttributes) {
+    private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(final TranslatedAttributeQueryRequest attributeQuery, final String hashedPid, final List<Attribute> extractedUserAccountCreationAttributes) {
         final OutboundResponseFromUnknownUserCreationService matchingServiceResponse;
         if (!extractedUserAccountCreationAttributes.isEmpty()) {
-            matchingServiceResponse = getMatchingServiceResponse(hashedPid, attributeQuery, extractedUserAccountCreationAttributes);
+            matchingServiceResponse = getAccountCreationResponse(hashedPid, attributeQuery, extractedUserAccountCreationAttributes);
         } else {
-            matchingServiceResponse = OutboundResponseFromUnknownUserCreationService.createNoAttributeFailure(attributeQuery.getId(), matchingServiceAdapterConfiguration.getEntityId());
+            matchingServiceResponse = OutboundResponseFromUnknownUserCreationService.createNoAttributeFailure(attributeQuery.getMatchingServiceRequestDto().getMatchId(), matchingServiceAdapterConfiguration.getEntityId());
         }
         return matchingServiceResponse;
     }
 
-    private OutboundResponseFromUnknownUserCreationService getMatchingServiceResponse(
+    private OutboundResponseFromUnknownUserCreationService getAccountCreationResponse(
         final String hashPid,
-        final InboundVerifyMatchingServiceRequest attributeQuery,
+        final TranslatedAttributeQueryRequest attributeQuery,
         final List<Attribute> userAttributesForAccountCreation) {
         AssertionRestrictions assertionRestrictions = new AssertionRestrictions(
             DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()),
-            attributeQuery.getId(),
+            attributeQuery.getMatchingServiceRequestDto().getMatchId(),
             attributeQuery.getAssertionConsumerServiceUrl());
 
         MatchingServiceAssertion assertion = matchingServiceAssertionFactory.createAssertionFromMatchingService(
             new PersistentId(hashPid),
             matchingServiceAdapterConfiguration.getEntityId(),
             assertionRestrictions,
-            attributeQuery.getAuthnStatementAssertion().getAuthnStatement().get().getAuthnContext(),
+            map(attributeQuery.getMatchingServiceRequestDto().getLevelOfAssurance()),
             attributeQuery.getAuthnRequestIssuerId(),
             userAttributesForAccountCreation);
         return OutboundResponseFromUnknownUserCreationService.createSuccess(
             assertion,
-            attributeQuery.getId(),
+            attributeQuery.getMatchingServiceRequestDto().getMatchId(),
             matchingServiceAdapterConfiguration.getEntityId()
         );
     }

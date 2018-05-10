@@ -27,7 +27,6 @@ import uk.gov.ida.jerseyclient.JsonResponseProcessor;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.CertificateStore;
 import uk.gov.ida.matchingserviceadapter.configuration.KeyPairConfiguration;
-import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceLocator;
 import uk.gov.ida.matchingserviceadapter.controllogic.ServiceLocator;
 import uk.gov.ida.matchingserviceadapter.controllogic.UnknownUserAttributeQueryHandler;
@@ -217,10 +216,11 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public VerifyMatchingService getVerifyMatchingService(
-            MatchingServiceAttributeQueryHandler attributeQueryHandler,
-            DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper
+            DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper,
+            InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper dtoMapper,
+            MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper dtoResponseMapper
     ) {
-        return new VerifyMatchingService(attributeQueryHandler, documentToInboundMatchingServiceRequestMapper);
+        return new VerifyMatchingService(documentToInboundMatchingServiceRequestMapper, dtoMapper, dtoResponseMapper);
     }
 
     @Provides
@@ -230,7 +230,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
             MatchingServiceAdapterConfiguration configuration,
             AssertionDecrypter assertionDecrypter,
             UserIdHashFactory userIdHashFactory,
-            MatchingServiceProxy matchingServiceClient,
             HubAssertionExtractor hubAssertionExtractor,
             MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper responseMapper,
             MetadataResolverRepository metadataResolverRepository) {
@@ -244,7 +243,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
                                 hubAssertionExtractor,
                                 metadataResolverRepository),
                         new EidasMatchingRequestToMSRequestTransformer(userIdHashFactory, hubAssertionExtractor),
-                        matchingServiceClient,
                         hubAssertionExtractor,
                         responseMapper) :
                 null;
@@ -441,15 +439,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public MetadataConfiguration metadataConfiguration(MatchingServiceAdapterConfiguration msaConfiguration) {
         return msaConfiguration.getMetadataConfiguration();
-    }
-
-    @Provides
-    @Singleton
-    public MatchingServiceAttributeQueryHandler matchingServiceAttributeQueryHandler(
-            MatchingServiceProxy proxy,
-            InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper inboundMapper,
-            MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper outboundMapper) {
-        return new MatchingServiceAttributeQueryHandler(proxy, inboundMapper, outboundMapper);
     }
 
     @Provides

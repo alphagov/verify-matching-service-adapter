@@ -7,6 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.TranslatedAttributeQueryRequest;
+import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.services.MatchingService;
 
@@ -25,13 +30,16 @@ public class MatchingServiceResource {
     private static final Logger LOG = LoggerFactory.getLogger(MatchingServiceResource.class);
 
     private final MatchingService matchingService;
+    private final MatchingServiceProxy matchingServiceClient;
     private final MatchingServiceResponseGenerator<MatchingServiceResponse> responseGenerator;
 
     @Inject
     public MatchingServiceResource(
-        MatchingService matchingService,
-        MatchingServiceResponseGenerator<MatchingServiceResponse> responseGenerator) {
+            MatchingService matchingService,
+            MatchingServiceProxy matchingServiceClient,
+            MatchingServiceResponseGenerator<MatchingServiceResponse> responseGenerator) {
         this.matchingService = matchingService;
+        this.matchingServiceClient = matchingServiceClient;
         this.responseGenerator = responseGenerator;
     }
 
@@ -41,7 +49,13 @@ public class MatchingServiceResource {
     public Response receiveSoapRequest(Document attributeQueryDocument) {
         LOG.debug("AttributeQuery POSTED: {}", attributeQueryDocument);
 
-        MatchingServiceResponse matchingServiceResponse = matchingService.handle(new MatchingServiceRequestContext(attributeQueryDocument));
+        MatchingServiceRequestContext requestContext = new MatchingServiceRequestContext(attributeQueryDocument);
+        TranslatedAttributeQueryRequest translatedAttributeQueryRequest = matchingService.translate(requestContext);
+        MatchingServiceResponseDto responseFromMatchingService = null;
+        if (!translatedAttributeQueryRequest.isHealthCheck()) {
+            responseFromMatchingService = matchingServiceClient.makeMatchingServiceRequest(translatedAttributeQueryRequest.getMatchingServiceRequestDto());
+        }
+        MatchingServiceResponse matchingServiceResponse = matchingService.createOutboundResponse(requestContext, translatedAttributeQueryRequest, responseFromMatchingService);
         return responseGenerator.generateResponse(matchingServiceResponse);
     }
 }

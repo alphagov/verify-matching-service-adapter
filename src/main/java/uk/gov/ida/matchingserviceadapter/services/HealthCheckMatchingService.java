@@ -8,6 +8,8 @@ import uk.gov.ida.matchingserviceadapter.domain.HealthCheckMatchingServiceRespon
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.TranslatedAttributeQueryRequest;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
 import java.io.IOException;
@@ -26,8 +28,13 @@ public class HealthCheckMatchingService implements MatchingService {
     }
 
     @Override
-    public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
-        String requestId = request.getAttributeQuery().getID();
+    public TranslatedAttributeQueryRequest translate(MatchingServiceRequestContext request) {
+        return new TranslatedAttributeQueryRequest(null, null, null, null, userAccountCreationAttributes, true);
+    }
+
+    @Override
+    public MatchingServiceResponse createOutboundResponse(MatchingServiceRequestContext requestContext, TranslatedAttributeQueryRequest request, MatchingServiceResponseDto response) {
+        String requestId = request.getMatchingServiceRequestDto().getMatchId();
         LOG.info("Responding to health check with id '{}'.", requestId);
 
         String manifestVersionNumber = "UNKNOWN_VERSION_NUMBER";
@@ -38,9 +45,9 @@ public class HealthCheckMatchingService implements MatchingService {
         }
 
         return new HealthCheckMatchingServiceResponse(new HealthCheckResponseFromMatchingService(
-            matchingServiceAdapterConfiguration.getEntityId(),
-            requestId,
-            manifestVersionNumber
+                matchingServiceAdapterConfiguration.getEntityId(),
+                requestId,
+                manifestVersionNumber
         ));
     }
 }

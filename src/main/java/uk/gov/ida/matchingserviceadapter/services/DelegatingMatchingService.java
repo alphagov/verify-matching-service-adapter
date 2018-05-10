@@ -8,7 +8,9 @@ import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.controllogic.ServiceLocator;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
+import uk.gov.ida.matchingserviceadapter.domain.TranslatedAttributeQueryRequest;
 import uk.gov.ida.matchingserviceadapter.logging.MdcHelper;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SamlElementType;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
@@ -32,17 +34,27 @@ public class DelegatingMatchingService implements MatchingService {
     }
 
     @Override
-    public MatchingServiceResponse handle(MatchingServiceRequestContext requestContext) {
+    public TranslatedAttributeQueryRequest translate(MatchingServiceRequestContext requestContext) {
         AttributeQuery attributeQuery = unwrapAttributeQuery(requestContext.getAttributeQueryDocument());
         requestContext.setAttributeQuery(attributeQuery);
         requestContext.setAssertions(decryptAssertions(attributeQuery));
 
+        MatchingService delegateService = getDelegateMatchingService(requestContext);
+
+        return delegateService.translate(requestContext);
+    }
+
+    private MatchingService getDelegateMatchingService(MatchingServiceRequestContext requestContext) {
         MatchingService delegateService = matchingServiceLocator.findServiceFor(requestContext);
         if (delegateService == null) {
             throw new IllegalStateException("No delegate found to handle Matching Service Request");
         }
+        return delegateService;
+    }
 
-        return delegateService.handle(requestContext);
+    @Override
+    public MatchingServiceResponse createOutboundResponse(MatchingServiceRequestContext requestContext, TranslatedAttributeQueryRequest request, MatchingServiceResponseDto response) {
+        return getDelegateMatchingService(requestContext).createOutboundResponse(requestContext, request, response);
     }
 
     private AttributeQuery unwrapAttributeQuery(Document attributeQueryDocument) {

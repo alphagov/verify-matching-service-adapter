@@ -79,7 +79,7 @@ public class DelegatingMatchingServiceTest {
         exception.expectMessage("No delegate found to handle Matching Service Request");
 
         MatchingServiceRequestContext requestContext = new MatchingServiceRequestContext(attributeQueryDocument);
-        service.handle(requestContext);
+        service.translate(requestContext);
     }
 
     @SuppressWarnings("unchecked")
@@ -89,14 +89,14 @@ public class DelegatingMatchingServiceTest {
         MatchingServiceRequestContext requestContext = new MatchingServiceRequestContext(attributeQueryDocument);
         when(serviceLocator.findServiceFor(requestContext)).thenReturn(delegate);
 
-        service.handle(requestContext);
+        service.translate(requestContext);
 
         assertThat(requestContext.getAttributeQuery(), sameInstance(attributeQuery));
         assertThat(requestContext.getAssertions(), equalTo(Collections.emptyList()));
 
         verify(serviceLocator).findServiceFor(requestContext);
         verify(assertionDecrypter).decryptAssertions(any(ValidatedEncryptedAssertionContainer.class));
-        verify(delegate).handle(requestContext);
+        verify(delegate).translate(requestContext);
         verifyNoMoreInteractions(delegate, serviceLocator, assertionDecrypter);
     }
 
@@ -116,7 +116,7 @@ public class DelegatingMatchingServiceTest {
         when(subjectConfirmationData.getUnknownXMLObjects(EncryptedAssertion.DEFAULT_ELEMENT_NAME)).thenReturn(Arrays.asList(encryptedAssertion));
         when(attributeQuery.getSubject()).thenReturn(subject);
 
-        service.handle(requestContext);
+        service.translate(requestContext);
 
         assertThat(requestContext.getAttributeQuery(), sameInstance(attributeQuery));
         assertThat(requestContext.getAssertions(), equalTo(Collections.emptyList()));
@@ -126,7 +126,7 @@ public class DelegatingMatchingServiceTest {
         assertThat(encryptedAssertionContainerArgumentCaptor.getValue().getEncryptedAssertions(), equalTo(Arrays.asList(encryptedAssertion)));
 
         verify(serviceLocator).findServiceFor(requestContext);
-        verify(delegate).handle(requestContext);
+        verify(delegate).translate(requestContext);
         verifyNoMoreInteractions(delegate, serviceLocator);
     }
 }

@@ -1,28 +1,19 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.w3c.dom.Document;
-import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
-import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
-import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
-import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
-import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VerifyMatchingServiceTest {
 
+    /*@Mock
+    private DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper;
     @Mock
-    private MatchingServiceAttributeQueryHandler attributeQueryHandler;
+    private MatchingServiceProxy matchingServiceProxy;
     @Mock
-    private DocumentToInboundMatchingServiceRequestMapper requestMapper;
+    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper requestMapper;
     @Mock
     private Document attributeQueryDocument;
     @Mock
@@ -36,7 +27,7 @@ public class VerifyMatchingServiceTest {
 
     @Before
     public void setup() {
-        service = new VerifyMatchingService(attributeQueryHandler, requestMapper);
+        service = new VerifyMatchingService(documentToInboundMatchingServiceRequestMapper, requestMapper, );
         when(requestContext.getAttributeQueryDocument()).thenReturn(attributeQueryDocument);
         when(requestMapper.getInboundMatchingServiceRequest(attributeQueryDocument)).thenReturn(inboundRequest);
         when(attributeQueryHandler.handle(inboundRequest)).thenReturn(outboundResponse);
@@ -44,9 +35,16 @@ public class VerifyMatchingServiceTest {
 
     @Test
     public void shouldReturnCorrectResponse() {
-        VerifyMatchingServiceResponse response = (VerifyMatchingServiceResponse)service.handle(requestContext);
+        VerifyMatchingServiceResponse response = (VerifyMatchingServiceResponse)service.translate(requestContext);
 
         assertThat(response.getOutboundResponseFromMatchingService()).isEqualTo(outboundResponse);
     }
+
+    @Test
+    public void shouldReturnCorrectResponse() {
+        VerifyMatchingServiceResponse response = (VerifyMatchingServiceResponse)service.translate(requestContext);
+
+        assertThat(response.getOutboundResponseFromMatchingService()).isEqualTo(outboundResponse);
+    }*/
 
 }

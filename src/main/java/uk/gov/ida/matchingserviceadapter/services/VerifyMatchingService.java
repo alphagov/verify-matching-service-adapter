@@ -1,45 +1,52 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-import uk.gov.ida.matchingserviceadapter.controllogic.MatchingServiceAttributeQueryHandler;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceResponse;
-import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
+import uk.gov.ida.matchingserviceadapter.domain.TranslatedAttributeQueryRequest;
 import uk.gov.ida.matchingserviceadapter.domain.VerifyMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
-import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
+import uk.gov.ida.matchingserviceadapter.mappers.InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
+import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
 
-import javax.ws.rs.WebApplicationException;
+import static uk.gov.ida.matchingserviceadapter.mappers.AuthnContextToLevelOfAssuranceDtoMapper.map;
 
 public class VerifyMatchingService implements MatchingService {
-    private MatchingServiceAttributeQueryHandler attributeQueryHandler;
     private DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper;
+    private InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper inboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
+    private final MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper dtoResponseMapper;
 
     public VerifyMatchingService(
-        MatchingServiceAttributeQueryHandler attributeQueryHandler,
-        DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper
-    ) {
-        this.attributeQueryHandler = attributeQueryHandler;
+            DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper,
+            InboundMatchingServiceRequestToMatchingServiceRequestDtoMapper inboundMatchingServiceRequestToMatchingServiceRequestDtoMapper,
+            MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper dtoResponseMapper) {
+        this.inboundMatchingServiceRequestToMatchingServiceRequestDtoMapper = inboundMatchingServiceRequestToMatchingServiceRequestDtoMapper;
         this.documentToInboundMatchingServiceRequestMapper = documentToInboundMatchingServiceRequestMapper;
+        this.dtoResponseMapper = dtoResponseMapper;
     }
 
     @Override
-    public MatchingServiceResponse handle(MatchingServiceRequestContext request) {
+    public TranslatedAttributeQueryRequest translate(MatchingServiceRequestContext request) {
 
         InboundVerifyMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(request.getAttributeQueryDocument());
-
-        OutboundResponseFromMatchingService samlResponse = getOutboundResponseFromMatchingService(hubMatchingServiceRequest);
-        return new VerifyMatchingServiceResponse(samlResponse);
+        return new TranslatedAttributeQueryRequest(inboundMatchingServiceRequestToMatchingServiceRequestDtoMapper.map(hubMatchingServiceRequest),
+                hubMatchingServiceRequest.getIssuer(),
+                hubMatchingServiceRequest.getAssertionConsumerServiceUrl(),
+                hubMatchingServiceRequest.getAuthnRequestIssuerId(),
+                userAccountCreationAttributes, false
+        );
     }
 
-    private OutboundResponseFromMatchingService getOutboundResponseFromMatchingService(InboundVerifyMatchingServiceRequest hubMatchingServiceRequest) {
-        OutboundResponseFromMatchingService response;
-        try {
-            response = attributeQueryHandler.handle(hubMatchingServiceRequest);
-        } catch (WebApplicationException e) {
-            throw new SamlOverSoapException("The matching service returned a http error.", e, hubMatchingServiceRequest.getId());
-        }
-        return response;
+    @Override
+    public MatchingServiceResponse createOutboundResponse(MatchingServiceRequestContext requestContext, TranslatedAttributeQueryRequest request, MatchingServiceResponseDto response) {
+        return new VerifyMatchingServiceResponse(dtoResponseMapper.map(
+                response,
+                request.getMatchingServiceRequestDto().getHashedPid(),
+                request.getMatchingServiceRequestDto().getMatchId(),
+                request.getAssertionConsumerServiceUrl(),
+                map(request.getMatchingServiceRequestDto().getLevelOfAssurance()),
+                request.getAuthnRequestIssuerId())
+        );
     }
-
 }

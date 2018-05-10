@@ -7,12 +7,18 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.controllogic.UnknownUserAttributeQueryHandler;
+import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceRequestContext;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
+import uk.gov.ida.matchingserviceadapter.domain.TranslatedAttributeQueryRequest;
 import uk.gov.ida.matchingserviceadapter.mappers.DocumentToInboundMatchingServiceRequestMapper;
+import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
+import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationRequestDto;
+import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.SamlOverSoapException;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.inbound.InboundVerifyMatchingServiceRequest;
+import uk.gov.ida.matchingserviceadapter.services.MatchingService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -34,17 +40,23 @@ public class UnknownUserAttributeQueryResource {
     private final Function<OutboundResponseFromUnknownUserCreationService, Element> responseElementTransformer;
     private final SoapMessageManager soapMessageManager;
     private final UnknownUserAttributeQueryHandler attributeQueryHandler;
+    private final MatchingService matchingService;
+    private final MatchingServiceProxy matchingServiceProxy;
 
     @Inject
     public UnknownUserAttributeQueryResource(
             DocumentToInboundMatchingServiceRequestMapper documentToInboundMatchingServiceRequestMapper,
             Function<OutboundResponseFromUnknownUserCreationService, Element> responseElementTransformer,
             SoapMessageManager soapMessageManager,
-            UnknownUserAttributeQueryHandler attributeQueryHandler) {
+            UnknownUserAttributeQueryHandler attributeQueryHandler,
+            MatchingService matchingService,
+            MatchingServiceProxy matchingServiceProxy) {
         this.documentToInboundMatchingServiceRequestMapper = documentToInboundMatchingServiceRequestMapper;
         this.responseElementTransformer = responseElementTransformer;
         this.soapMessageManager = soapMessageManager;
         this.attributeQueryHandler = attributeQueryHandler;
+        this.matchingService = matchingService;
+        this.matchingServiceProxy = matchingServiceProxy;
     }
 
     @POST
@@ -52,6 +64,15 @@ public class UnknownUserAttributeQueryResource {
     public Response receiveUnknownUserRequest(Document attributeQueryDocument) {
 
         LOG.debug("AttributeQuery POSTED: {}", attributeQueryDocument);
+
+        MatchingServiceRequestContext requestContext = new MatchingServiceRequestContext(attributeQueryDocument);
+
+        TranslatedAttributeQueryRequest translatedRequest = matchingService.translate(requestContext);
+        UnknownUserCreationResponseDto unknownUserCreationResponseDto = matchingServiceProxy.makeUnknownUserCreationRequest(
+                new UnknownUserCreationRequestDto(
+                        translatedRequest.getMatchingServiceRequestDto().getHashedPid(),
+                        translatedRequest.getMatchingServiceRequestDto().getLevelOfAssurance())
+        );
 
         InboundVerifyMatchingServiceRequest hubMatchingServiceRequest = documentToInboundMatchingServiceRequestMapper.getInboundMatchingServiceRequest(attributeQueryDocument);
 
