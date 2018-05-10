@@ -39,7 +39,7 @@ def dependencyVersions = [
         hub_saml: "$opensaml-15546",
         dev_pki: '1.1.0-22',
         trust_anchor: '1.0-21',
-        saml_libs_version: "$opensaml-128"
+        saml_libs_version: "$opensaml-131"
 ]
 
 apply plugin: "idaJar"
@@ -171,7 +171,7 @@ task intTest(type: Test) {
 
 run {
     int debug_port = System.getenv("TEST_RP_MSA_PORT") != null ? Integer.parseInt(System.getenv("TEST_RP_MSA_PORT")) + 2 : 50212
-    String debug = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$debug_port" 
+    String debug = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$debug_port"
     applicationDefaultJvmArgs = [debug]
     args = ["server", "configuration/verify-matching-service-adapter.yml"]
 }
