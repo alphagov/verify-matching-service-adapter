@@ -67,6 +67,10 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
     @JsonProperty
     private EuropeanIdentityConfiguration europeanIdentity;
 
+    @Valid
+    @JsonProperty
+    private boolean shouldSignWithSHA1 = false;
+
     protected MatchingServiceAdapterConfiguration() {
     }
 
@@ -138,6 +142,10 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     public EuropeanIdentityConfiguration getEuropeanIdentity() {
         return europeanIdentity;
+    }
+
+    public boolean shouldSignWithSHA1() {
+        return shouldSignWithSHA1;
     }
 
     public static JerseyClientConfiguration getDefaultJerseyClientConfiguration(boolean verifyHostname, boolean trustSelfSignedCertificates) {
