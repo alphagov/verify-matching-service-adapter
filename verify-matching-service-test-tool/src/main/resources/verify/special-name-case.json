@@ -3,27 +3,39 @@
     "levelOfAssurance": "LEVEL_1",
     "matchId": "default-match-id",
     "matchingDataset": {
-      "addresses": [],
+      "addresses": [
+        {
+          "internationalPostCode": "GB1 2PF",
+          "lines": [
+            "10 George Street"
+          ],
+          "postCode": "GB1 2PF",
+          "uprn": "833F1187-9F33-A7E27B3F211E",
+          "verified": true
+        }
+      ],
       "dateOfBirth": {
         "value": "1980-05-24",
         "verified": true
       },
       "firstName": {
-        "value": "Joe",
+        "value": "Šarlota",
+        "nonLatinScriptValue": "Šarlota",
         "verified": true
       },
       "gender": {
-        "value": "MALE",
+        "value": "FEMALE",
         "verified": true
       },
       "middleNames": {
-        "value": "Bob Rob",
+        "value": "Snježana",
+        "nonLatinScriptValue": "Snježana",
         "verified": true
       },
       "surnames": [
         {
-          "from": "2015-05-14T00:00:00.000Z",
-          "value": "Dou",
+          "value": "Jõey",
+          "nonLatinScriptValue": "Jõey",
           "verified": true
         }
       ]

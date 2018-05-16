@@ -105,21 +105,6 @@
           },
           "type": "object"
         },
-        "middleNames": {
-          "properties": {
-            "from": {
-              "format": "DATE_TIME",
-              "type": "string"
-            },
-            "value": {
-              "type": "string"
-            },
-            "verified": {
-              "type": "boolean"
-            }
-          },
-          "type": "object"
-        },
         "surnames": {
           "items": {
             "properties": {

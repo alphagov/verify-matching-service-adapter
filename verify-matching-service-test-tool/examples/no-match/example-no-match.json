@@ -11,11 +11,11 @@
       }
     ],
     "dateOfBirth": {
-      "value": "1980-05-24",
+      "value": "1983-06-21",
       "verified": true
     },
     "firstName": {
-      "value": "Joe",
+      "value": "Jack",
       "verified": true
     },
     "gender": {
@@ -23,13 +23,13 @@
       "verified": true
     },
     "middleNames": {
-      "value": "Bob Rob",
+      "value": "",
       "verified": true
     },
     "surnames": [
       {
         "from": "2010-01-20T00:00:00.000Z",
-        "value": "Dou",
+        "value": "Griffin",
         "verified": true
       }
     ]

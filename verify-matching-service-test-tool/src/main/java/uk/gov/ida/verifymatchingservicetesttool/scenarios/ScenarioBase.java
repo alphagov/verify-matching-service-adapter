@@ -37,7 +37,7 @@ public abstract class ScenarioBase {
         return response.readEntity(new GenericType<Map<String, String>>() {{ }});
     }
 
-    protected void validateMatchNoMatch(Response response) {
+    protected void assertMatchNoMatch(Response response) {
         assertThat(response.getHeaderString("Content-Type"), containsString(APPLICATION_JSON));
         assertThat(response.getStatus(), is(OK.getStatusCode()));
 
@@ -47,7 +47,7 @@ public abstract class ScenarioBase {
         assertThat(result.get("result"), anyOf(is("match"), is("no-match")));
     }
 
-    public void validateSuccessFailure(Response response){
+    public void assertSuccessFailure(Response response){
         assertThat(response.getHeaderString("Content-Type"), containsString(APPLICATION_JSON));
         assertThat(response.getStatus(), Is.is(OK.getStatusCode()));
 
@@ -55,5 +55,9 @@ public abstract class ScenarioBase {
 
         assertThat(result.keySet(), is(new HashSet<String>() {{ add("result"); }}));
         assertThat(result.get("result"), anyOf(CoreMatchers.is("success"), is("failure")));
+    }
+
+    public ApplicationConfiguration getConfiguration() {
+        return configuration;
     }
 }
