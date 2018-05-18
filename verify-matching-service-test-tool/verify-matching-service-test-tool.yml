@@ -1,4 +1,4 @@
 localMatchingService:
-  matchUrl: http://localhost:50130/local-matching/match
-  accountCreationUrl: http://localhost:50130/local-matching/create-user
+  matchUrl: http://localhost:50130/test-rp/matching-service/POST
+  accountCreationUrl: http://localhost:50130/test-rp/unknown-user/POST
   usesUniversalDataset: false
