@@ -134,7 +134,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-simple-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-Minimum_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -184,7 +184,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-simple-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-Minimum_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -325,7 +325,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-extensive-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-Extended_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -466,7 +466,7 @@ public class TestToolExamplesSchemaTests {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-extensive-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-Extended_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -488,7 +488,7 @@ public class TestToolExamplesSchemaTests {
         List<LoggedRequest> requests = findAll(RequestPatternBuilder.allRequests());
         assertThat(requests.size()).isEqualTo(1);
 
-        Path filePath = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/user-account-creation.json");
+        Path filePath = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/user_account_creation.json");
 
         Map requestSent = objectMapper.readValue(requests.get(0).getBodyAsString(), Map.class);
         Map requestExpected = objectMapper.readValue(readExpectedJson(filePath), Map.class);
