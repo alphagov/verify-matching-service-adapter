@@ -3,8 +3,10 @@ package uk.gov.ida.matchingserviceadapter.saml.api;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.encryption.Decrypter;
+import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
 import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
+import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA256;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
@@ -77,9 +79,13 @@ public class MsaTransformersFactory {
             EntityToEncryptForLocator entityToEnryptForLocator,
             MatchingServiceAdapterConfiguration configuration
     ) {
+        SignatureAlgorithm signatureAlgorithm = configuration.shouldSignWithSHA1() ?
+                new SignatureRSASHA1() :
+                new SignatureRSASHA256();
+
         SignatureFactory signatureFactory = new SignatureFactory(
             new IdaKeyStoreCredentialRetriever(keyStore),
-            new SignatureRSASHA1(),
+                signatureAlgorithm,
             new DigestSHA256()
         );
         SamlResponseAssertionEncrypter assertionEncrypter = new SamlResponseAssertionEncrypter(
