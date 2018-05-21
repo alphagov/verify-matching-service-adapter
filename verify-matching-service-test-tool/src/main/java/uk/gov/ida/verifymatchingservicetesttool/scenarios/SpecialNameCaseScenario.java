@@ -24,21 +24,21 @@ public class SpecialNameCaseScenario extends ScenarioBase {
     }
 
     @Test
-    @DisplayName("Simple request with non-Latin name values and transliteration")
+    @DisplayName("eIDAS - LoA2 - Standard data set - transliteration provided for name fields")
     public void runForSimpleCaseWithNonLatinNameValuesAndTransliteration() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
                 .request(APPLICATION_JSON)
-                .post(Entity.json(fileUtils.readFromResources("special-name-case-with-non-latin-name.json")));
+                .post(Entity.json(fileUtils.readFromResources("eIDAS-LoA2-Standard_data_set-transliteration_provided_for_name_fields.json")));
 
         assertMatchNoMatch(response);
     }
 
     @Test
-    @DisplayName("Simple request with non-ASCII Latin characters from ISO/IEC 8859-15")
+    @DisplayName("eIDAS - LoA2 - Standard data set - special characters in name fields")
     public void runForSimpleCaseWithNonASCIILatinCharacters() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
                 .request(APPLICATION_JSON)
-                .post(Entity.json(fileUtils.readFromResources("special-name-case.json")));
+                .post(Entity.json(fileUtils.readFromResources("eIDAS-LoA2-Standard_data_set-special_characters_in_name_fields.json")));
 
         assertMatchNoMatch(response);
     }

@@ -57,21 +57,12 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
                         .buildAsFirstname(),
                     aPersonName_1_1().addValue(
                         aPersonNameValue()
-                            .withValue("Bob Rob")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build())
-                        .buildAsMiddlename(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
                             .withValue("Dou")
                             .withVerified(true)
                             .withFrom(new DateTime(2010, 1, 20, 0, 0, DateTimeZone.UTC))
                             .withTo(null)
                             .build())
                         .buildAsSurname(),
-                    aGender_1_1().withValue("Male").withVerified(true).withFrom(null).withTo(null).build(),
                     aDate_1_1().addValue(
                         aDateValue()
                             .withValue("1980-05-24")
@@ -93,65 +84,7 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-simple-case.json");
-
-        assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
-    }
-
-    @Test
-    public void shouldProduceLoA2SimpleExcludingOptionalAddressFieldsCase() throws Exception {
-        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
-            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-            .withSubject(aSubjectWithAssertions(asList(
-                anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, REQUEST_ID),
-                aMatchingDatasetAssertion(asList(
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Joe")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build())
-                        .buildAsFirstname(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Bob Rob")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build())
-                        .buildAsMiddlename(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
-                            .withValue("Dou")
-                            .withVerified(true)
-                            .withFrom(new DateTime(2010, 01, 20, 0, 0, DateTimeZone.UTC))
-                            .withTo(null)
-                            .build())
-                        .buildAsSurname(),
-                    aGender_1_1().withValue("Male").withVerified(true).withFrom(null).withTo(null).build(),
-                    aDate_1_1().addValue(
-                        aDateValue()
-                            .withValue("1980-05-24")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build()).buildAsDateOfBirth(),
-                    anAddressAttribute().addAddress(
-                        anAddressAttributeValue()
-                            .withFrom(new DateTime(2005, 5, 14, 0, 0, DateTimeZone.UTC))
-                            .withInternationalPostcode(null)
-                            .withPostcode(null)
-                            .withUprn(null)
-                            .withVerified(true)
-                            .withTo(null)
-                            .build())
-                        .buildCurrentAddress()
-                ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
-            .build();
-
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/simple-case-excluding-optional-address-fields.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-Minimum_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -174,21 +107,12 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
                         .buildAsFirstname(),
                     aPersonName_1_1().addValue(
                         aPersonNameValue()
-                            .withValue("Bob Rob")
-                            .withVerified(true)
-                            .withFrom(null)
-                            .withTo(null)
-                            .build())
-                        .buildAsMiddlename(),
-                    aPersonName_1_1().addValue(
-                        aPersonNameValue()
                             .withValue("Dou")
                             .withVerified(true)
                             .withFrom(new DateTime(2015, 5, 14, 0, 0, DateTimeZone.UTC))
                             .withTo(null)
                             .build())
                         .buildAsSurname(),
-                    aGender_1_1().withValue("Male").withVerified(true).withFrom(null).withTo(null).build(),
                     aDate_1_1().addValue(
                         aDateValue()
                             .withValue("1980-05-24")
@@ -210,7 +134,7 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-simple-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-Minimum_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -351,7 +275,7 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-extensive-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA1-Extended_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -492,7 +416,7 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
                 ), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-extensive-case.json");
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/LoA2-Extended_data_set.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
@@ -509,7 +433,7 @@ public class LegacyExampleSchemaTests extends BaseTestToolInterfaceTest {
             ), REQUEST_ID, HUB_ENTITY_ID, PID))
             .build();
 
-        Path filePath = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/user-account-creation.json");
+        Path filePath = Paths.get("verify-matching-service-test-tool/src/main/resources/legacy/user_account_creation.json");
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, filePath, UNKNOWN_USER_URI);
     }

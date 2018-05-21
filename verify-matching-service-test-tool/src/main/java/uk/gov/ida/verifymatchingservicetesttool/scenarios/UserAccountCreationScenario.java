@@ -24,11 +24,11 @@ public class UserAccountCreationScenario extends ScenarioBase {
     }
 
     @Test
-    @DisplayName("Simple user account creation request")
+    @DisplayName("User account creation")
     public void runForUserAccountCreation() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceAccountCreationUrl())
             .request(APPLICATION_JSON)
-            .post(Entity.json(fileUtils.readFromResources("user-account-creation.json")));
+            .post(Entity.json(fileUtils.readFromResources("user_account_creation.json")));
 
         assertSuccessFailure(response);
     }

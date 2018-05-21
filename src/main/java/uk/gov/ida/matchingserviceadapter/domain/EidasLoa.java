@@ -9,7 +9,7 @@ public enum EidasLoa {
 
     SUBSTANTIAL("http://eidas.europa.eu/LoA/substantial", LevelOfAssuranceDto.LEVEL_2),
 
-    HIGH("http://eidas.europa.eu/LoA/high", LevelOfAssuranceDto.LEVEL_3);
+    HIGH("http://eidas.europa.eu/LoA/high", LevelOfAssuranceDto.LEVEL_2);
 
     private final String valueUri;
     private final LevelOfAssuranceDto verifyLoa;

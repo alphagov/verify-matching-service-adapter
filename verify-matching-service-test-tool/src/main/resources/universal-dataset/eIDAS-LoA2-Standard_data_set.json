@@ -1,0 +1,21 @@
+{
+  "hashedPid": "01892b3b114d767d10aa16c4423d4d3588c0bffd3d893e32e5ca1eadd5337099",
+  "levelOfAssurance": "LEVEL_2",
+  "matchId": "default-match-id",
+  "matchingDataset": {
+    "dateOfBirth": {
+      "value": "1980-05-24",
+      "verified": true
+    },
+    "firstName": {
+      "value": "Joe",
+      "verified": true
+    },
+    "surnames": [
+      {
+        "value": "Dou",
+        "verified": true
+      }
+    ]
+  }
+}

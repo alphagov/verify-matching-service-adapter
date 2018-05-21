@@ -41,7 +41,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void shouldRunTwoSetsOfTestsWhenUniversalDatasetFlagIsTrue() {
+    public void shouldRunAllTestsForUniversalDatasetWhenUniversalDatasetFlagIsTrue() {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -60,7 +60,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
         assertThat(
                 listener.getTotalTests(),
-                is(NUMBER_OF_SCENARIOS * 2)
+                is(NUMBER_OF_SCENARIOS)
         );
     }
 

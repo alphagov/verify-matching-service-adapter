@@ -3,6 +3,7 @@ package uk.gov.ida.verifymatchingservicetesttool.scenarios;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import uk.gov.ida.verifymatchingservicetesttool.checkers.UniversalDatasetOnlyChecker;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.FileUtilsResolver;
@@ -24,19 +25,19 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
     }
 
     @Test
-    @DisplayName("Simple request with level of assurance 2")
+    @DisplayName("LoA2 - Minimum data set")
     public void runForWhenAllElementsAreVerifiedAndNoMultipleValues() throws Exception {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
-            .post(Entity.json(fileUtils.readFromResources("LoA2-simple-case.json")));
+            .post(Entity.json(fileUtils.readFromResources("LoA2-Minimum_data_set.json")));
 
         assertMatchNoMatch(response);
     }
 
     @Test
-    @DisplayName("Complex request with level of assurance 2")
+    @DisplayName("LoA2 - Extended data set")
     public void runForComplexCase() throws Exception {
-        String jsonString = fileUtils.readFromResources("LoA2-extensive-case.json")
+        String jsonString = fileUtils.readFromResources("LoA2-Extended_data_set.json")
             .replace("%yesterdayDate%", Instant.now().minus(1, DAYS).toString())
             .replace("%within405days-100days%", Instant.now().minus(100, DAYS).toString())
             .replace("%within405days-101days%", Instant.now().minus(150, DAYS).toString())
@@ -48,6 +49,17 @@ public class LevelOfAssuranceTwoScenario extends ScenarioBase {
         Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
             .request(APPLICATION_JSON)
             .post(Entity.json(jsonString));
+
+        assertMatchNoMatch(response);
+    }
+
+    @Test
+    @ExtendWith(UniversalDatasetOnlyChecker.class)
+    @DisplayName("eIDAS - LoA2 - Standard data set")
+    public void runForWhenEidasAllElementsAreVerifiedAndNoMultipleValues() throws Exception {
+        Response response = client.target(configuration.getLocalMatchingServiceMatchUrl())
+                .request(APPLICATION_JSON)
+                .post(Entity.json(fileUtils.readFromResources("eIDAS-LoA2-Standard_data_set.json")));
 
         assertMatchNoMatch(response);
     }

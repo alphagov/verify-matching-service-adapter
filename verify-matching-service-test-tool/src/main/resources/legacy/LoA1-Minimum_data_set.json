@@ -5,6 +5,7 @@
     "matchingDataset": {
       "addresses": [
         {
+          "fromDate": "2005-05-14T00:00:00.000Z",
           "internationalPostCode": "GB1 2PF",
           "lines": [
             "10 George Street"
@@ -19,19 +20,13 @@
         "verified": true
       },
       "firstName": {
-        "value": "Georgios",
-        "nonLatinScriptValue": "Γεώργιος",
+        "value": "Joe",
         "verified": true
       },
-      "gender": {
-        "value": "MALE",
-        "verified": true
-      },
-
       "surnames": [
         {
-          "value": "Panathinaikos",
-          "nonLatinScriptValue": "Παναθηναϊκός",
+          "from": "2015-05-14T00:00:00.000Z",
+          "value": "Dou",
           "verified": true
         }
       ]

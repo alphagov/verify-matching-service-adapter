@@ -19,6 +19,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingD
 import uk.gov.ida.matchingserviceadapter.saml.HubAssertionExtractor;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.test.OpenSAMLMockitoRunner;
+import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.core.transformers.inbound.HubAssertionUnmarshaller;
 import uk.gov.ida.saml.hub.domain.LevelOfAssurance;
@@ -72,14 +73,14 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     }
 
     private Assertion makeAssertion() {
-        return makeAssertion(false);
+        return makeAssertion(false).buildUnencrypted();
     }
 
     private Assertion makeAssertionWithNonLatinScriptValues() {
-        return makeAssertion(true);
+        return makeAssertion(true).buildUnencrypted();
     }
 
-    private Assertion makeAssertion(boolean withNonLatinScriptValues) {
+    private AssertionBuilder makeAssertion(boolean withNonLatinScriptValues) {
         Attribute currentGivenName = withNonLatinScriptValues ?
                 aCurrentGivenNameAttribute("Fred", "Φρεδ") :
                 aCurrentGivenNameAttribute("Fred");
@@ -114,8 +115,7 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
                     )
                 .build()
             )
-            .addAttributeStatement(attributeStatement)
-            .buildUnencrypted();
+            .addAttributeStatement(attributeStatement);
     }
 
     private Assertion makeCycle3Assertion() {
@@ -138,6 +138,27 @@ public class EidasMatchingRequestToMSRequestTransformerTest {
     @Test
     public void shouldMapLoaCorrectly() {
         MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(makeAssertion()));
+
+        UniversalMatchingServiceRequestDto lmsDto = transform.apply(request);
+
+        assertThat(lmsDto.getLevelOfAssurance(), notNullValue());
+        assertThat(lmsDto.getLevelOfAssurance().name(), equalTo(LevelOfAssuranceDto.LEVEL_2.name()));
+    }
+
+    @Test
+    public void shouldMapHighToLoaTwo() {
+        Assertion assertion = makeAssertion(false)
+            .withoutAuthnStatements()
+            .addAuthnStatement(anAuthnStatement()
+                .withAuthnContext(anAuthnContext()
+                    .withAuthnContextClassRef(anAuthnContextClassRef()
+                        .withAuthnContextClasRefValue(LevelOfAssurance.HIGH.toString())
+                        .build()
+                    ).build()
+                ).build()
+            ).buildUnencrypted();
+
+        MatchingServiceRequestContext request = new MatchingServiceRequestContext(null, attributeQuery, asList(assertion));
 
         UniversalMatchingServiceRequestDto lmsDto = transform.apply(request);
 
