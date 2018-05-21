@@ -78,4 +78,62 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
 
         assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
     }
+
+    @Test
+    public void shouldProduceLoA2StandardDatasetWithTransliterationProvidedForNameFields() throws Exception {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(aSubjectWithEncryptedAssertions(asList(
+                anEidasAssertion()
+                    .withConditions(
+                        aConditions()
+                        .validFor(Duration.standardMinutes(10))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .build())
+                    .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
+                    .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
+                    .withoutAttributeStatements()
+                    .addAttributeStatement(anAttributeStatement().addAllAttributes(asList(
+                        aCurrentGivenNameAttribute("Georgios", "Γεώργιος"),
+                        aCurrentFamilyNameAttribute("Panathinaikos", "Παναθηναϊκός"),
+                        aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
+                        aPersonIdentifierAttribute(PID)
+                    )).build()
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
+            .build();
+
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/universal-dataset/eIDAS-LoA2-Standard_data_set-transliteration_provided_for_name_fields.json");
+
+        assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
+    }
+
+    @Test
+    public void shouldProduceLoA2StandardDatasetWithSpecialCharactersInNameFields() throws Exception {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+            .withId(REQUEST_ID)
+            .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+            .withSubject(aSubjectWithEncryptedAssertions(asList(
+                anEidasAssertion()
+                    .withConditions(
+                        aConditions()
+                        .validFor(Duration.standardMinutes(10))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .build())
+                    .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
+                    .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
+                    .withoutAttributeStatements()
+                    .addAttributeStatement(anAttributeStatement().addAllAttributes(asList(
+                        aCurrentGivenNameAttribute("Šarlota"),
+                        aCurrentFamilyNameAttribute("Snježana"),
+                        aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
+                        aPersonIdentifierAttribute(PID)
+                    )).build()
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
+            .build();
+
+        Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/universal-dataset/eIDAS-LoA2-Standard_data_set-special_characters_in_name_fields.json");
+
+        assertThatRequestThatWillBeSentIsEquivalentToFile(attributeQuery, path);
+    }
 }
