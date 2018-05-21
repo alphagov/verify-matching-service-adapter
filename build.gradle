@@ -33,7 +33,7 @@ project.version = "$gradle.ext.version_number-$build_number"
 
 def dependencyVersions = [
         opensaml:"$opensaml",
-        dropwizard: '1.1.4',
+        dropwizard: '1.3.2',
         ida_utils: '326',
         ida_test_utils: '35',
         hub_saml: "$opensaml-15551",
@@ -67,7 +67,8 @@ dependencies {
         'io.dropwizard.metrics:metrics-annotation:3.1.2',
         "io.dropwizard:dropwizard-client:$dependencyVersions.dropwizard",
         'com.hubspot.dropwizard:dropwizard-guicier:1.0.0.6',
-        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
+        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard",
+        "org.assertj:assertj-core:3.9.1"
 
     saml "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
         "org.opensaml:opensaml-security-api:$dependencyVersions.opensaml",
@@ -119,7 +120,7 @@ dependencies {
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.mockito:mockito-core:1.10.19',
-        'org.assertj:assertj-core:3.8.0',
+        'org.assertj:assertj-core:3.9.1',
         'org.assertj:assertj-joda-time:1.1.0',
         'com.google.code.findbugs:jsr305:3.0.1',
         "uk.gov.ida:hub-saml-test-utils:$dependencyVersions.hub_saml",
