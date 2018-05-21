@@ -95,7 +95,9 @@ public abstract class BaseTestToolInterfaceTest {
         // These first two are not strictly necessary, as they are implied by the recursive field comparison,
         // but they mean that we see a much more useful error message if field names are different.
         assertThat(requestSent.keySet()).containsExactlyInAnyOrder(requestExpected.keySet().toArray());
-        assertThat(((Map)requestSent.get("matchingDataset")).keySet()).containsExactlyInAnyOrder(((Map)requestExpected.get("matchingDataset")).keySet().toArray());
+        if (requestExpected.containsKey("matchingDataset")) {
+            assertThat(((Map)requestSent.get("matchingDataset")).keySet()).containsExactlyInAnyOrder(((Map)requestExpected.get("matchingDataset")).keySet().toArray());
+        }
 
         assertThat(requestSent).isEqualToComparingFieldByFieldRecursively(requestExpected);
     }

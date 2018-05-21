@@ -94,7 +94,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         idpTrustStore.create();
         countryMetadataTrustStore.create();
 
-        countryEntityId = "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
+        countryEntityId = "https://localhost:12345" + METADATA_AGGREGATOR_PATH + COUNTRY_METADATA_PATH;
 
         JerseyGuiceUtils.reset();
         try {
