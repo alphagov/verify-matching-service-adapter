@@ -38,7 +38,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aMatchingDatasetAssertion;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCycle3Assertion;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;

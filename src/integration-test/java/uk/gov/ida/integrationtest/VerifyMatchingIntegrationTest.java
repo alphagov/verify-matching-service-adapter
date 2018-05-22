@@ -2,7 +2,6 @@ package uk.gov.ida.integrationtest;
 
 import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -19,7 +18,6 @@ import org.w3c.dom.Document;
 import uk.gov.ida.common.CommonUrls;
 import uk.gov.ida.common.ServiceNameDto;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.TestEntityIds;
@@ -59,11 +57,9 @@ import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;
-import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationBuilder.aSubjectConfirmation;
-import static uk.gov.ida.saml.core.test.builders.SubjectConfirmationDataBuilder.aSubjectConfirmationData;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
 
-public class MatchingServiceAdapterAppRuleTest {
+public class VerifyMatchingIntegrationTest {
     private static final String REQUEST_ID = "default-request-id";
     private static final String MATCHING_REQUEST_PATH = "/matching-request";
 
@@ -71,7 +67,7 @@ public class MatchingServiceAdapterAppRuleTest {
     public static final HttpStubRule localMatchingService = new HttpStubRule();
 
     @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule(
+    public static final MatchingServiceAdapterAppRule applicationRule = new MatchingServiceAdapterAppRule(
         ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH)
     );
 
@@ -281,7 +277,7 @@ public class MatchingServiceAdapterAppRuleTest {
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo'");
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Bearer subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo' (default-request-id)");
     }
 
     @Test
@@ -290,26 +286,14 @@ public class MatchingServiceAdapterAppRuleTest {
             .withId(REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
             .withSubject(aSubjectWithAssertions(asList(
-                anAssertion()
-                    .withSubject(
-                        aSubject()
-                            .withSubjectConfirmation(
-                                aSubjectConfirmation()
-                                    .withSubjectConfirmationData(
-                                        aSubjectConfirmationData().withInResponseTo("wrong-request-id").build()
-                                    )
-                                .build()
-                            )
-                        .build()
-                    )
-                    .buildUnencrypted(),
+                anAuthnStatementAssertion("wrong-request-id"),
                 aMatchingDatasetAssertion(Collections.emptyList(), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID))
             .build();
 
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo'");
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Bearer subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo' (default-request-id)");
     }
 
     @Test
