@@ -4,6 +4,7 @@ import org.joda.time.LocalDate;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.MatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 
@@ -13,9 +14,9 @@ import java.util.Optional;
 
 public abstract class MatchingDatasetDtoBuilder {
 
-    protected Optional<SimpleMdsValueDto<String>> firstname = Optional.of(SimpleMdsValueDtoBuilder.<String>aSimpleMdsValueDto().withValue("default-first-name").build());
+    protected Optional<TransliterableMdsValueDto> firstname = Optional.of(new TransliterableMdsValueDto("default-first-name", null));
     protected Optional<SimpleMdsValueDto<String>> middleNames = Optional.empty();
-    protected List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
+    protected List<TransliterableMdsValueDto> surnames = new ArrayList<>();
     protected Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.empty();
     protected Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.empty();
 
@@ -25,7 +26,7 @@ public abstract class MatchingDatasetDtoBuilder {
 
     public abstract MatchingDatasetDtoBuilder withAddressHistory(Optional<List<UniversalAddressDto>> addressHistory);
 
-    public MatchingDatasetDtoBuilder withFirstname(SimpleMdsValueDto<String> firstname) {
+    public MatchingDatasetDtoBuilder withFirstname(TransliterableMdsValueDto firstname) {
         this.firstname = Optional.ofNullable(firstname);
         return this;
     }
@@ -35,7 +36,7 @@ public abstract class MatchingDatasetDtoBuilder {
         return this;
     }
 
-    public MatchingDatasetDtoBuilder addSurname(SimpleMdsValueDto<String> surname) {
+    public MatchingDatasetDtoBuilder addSurname(TransliterableMdsValueDto surname) {
         this.surnames.add(surname);
         return this;
     }
@@ -50,7 +51,7 @@ public abstract class MatchingDatasetDtoBuilder {
         return this;
     }
 
-    public MatchingDatasetDtoBuilder withSurnameHistory(final List<SimpleMdsValueDto<String>> surnameHistory) {
+    public MatchingDatasetDtoBuilder withSurnameHistory(final List<TransliterableMdsValueDto> surnameHistory) {
         this.surnames = surnameHistory;
         return this;
     }

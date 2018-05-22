@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_HISTORICAL_FROM_DATE;
+import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_HISTORICAL_TO_DATE;
+
 public class AddressBuilder {
 
     private List<String> lines = new ArrayList<>();
@@ -17,8 +20,14 @@ public class AddressBuilder {
     private Optional<DateTime> toDate = Optional.empty();
     private boolean verified = false;
 
-    public static AddressBuilder anAddress() {
+    public static AddressBuilder aCurrentAddress() {
         return new AddressBuilder();
+    }
+
+    public static AddressBuilder aHistoricalAddress() {
+        return new AddressBuilder()
+                .withFromDate(DEFAULT_HISTORICAL_FROM_DATE)
+                .withToDate(DEFAULT_HISTORICAL_TO_DATE);
     }
 
     public Address build() {

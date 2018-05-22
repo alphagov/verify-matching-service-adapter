@@ -1,27 +1,31 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
+import com.google.inject.Inject;
+import org.opensaml.saml.saml2.core.Audience;
 import org.opensaml.saml.saml2.core.AudienceRestriction;
-import uk.gov.ida.validation.messages.MessageImpl;
-import uk.gov.ida.validation.validators.CompositeValidator;
-import uk.gov.ida.validation.validators.FixedErrorValidator;
-import uk.gov.ida.validation.validators.RequiredValidator;
+import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 
-import java.util.function.Function;
+import java.util.List;
 
-import static uk.gov.ida.validation.messages.MessageImpl.fieldMessage;
-import static uk.gov.ida.validation.messages.MessageImpl.globalMessage;
 
-public class AudienceRestrictionValidator<T> extends CompositeValidator<T> {
-    public static final MessageImpl DEFAULT_REQUIRED_MESSAGE = fieldMessage("audienceRestriction", "audienceRestriction.empty", "The audience restriction was not provided.");
-    public static final MessageImpl DEFAULT_AUDIENCES_MUST_CONTAIN_ONE_AUDIENCE_MESSAGE = globalMessage("audienceRestriction.audiences.audience", "There must be 1 audience.");
+public class AudienceRestrictionValidator {
+    @Inject
+    public AudienceRestrictionValidator() {
+    }
 
-    public AudienceRestrictionValidator(final Function<T, AudienceRestriction> valueProvider, final String audienceUri) {
-        super(
-            true,
-            valueProvider,
-            new RequiredValidator<>(DEFAULT_REQUIRED_MESSAGE),
-            new FixedErrorValidator<>(audienceRestriction -> audienceRestriction.getAudiences().size() != 1, DEFAULT_AUDIENCES_MUST_CONTAIN_ONE_AUDIENCE_MESSAGE),
-            new AudienceValidator<>(audienceRestriction -> audienceRestriction.getAudiences().get(0), audienceUri)
-        );
+    public void validate(List<AudienceRestriction> audienceRestrictions, String entityId) {
+        if (audienceRestrictions == null || audienceRestrictions.size() != 1) {
+            throw new SamlResponseValidationException("Exactly one audience restriction is expected.");
+        }
+
+        List<Audience> audiences = audienceRestrictions.get(0).getAudiences();
+        if (audiences == null || audiences.size() != 1) {
+            throw new SamlResponseValidationException("Exactly one audience is expected.");
+        }
+
+        String audience = audiences.get(0).getAudienceURI();
+        if (!entityId.equals(audience)) {
+            throw new SamlResponseValidationException(String.format("Audience must match entity ID. Expected %s but was %s", entityId, audience));
+        }
     }
 }

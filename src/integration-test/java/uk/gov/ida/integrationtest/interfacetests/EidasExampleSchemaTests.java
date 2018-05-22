@@ -10,7 +10,6 @@ import org.opensaml.security.credential.Credential;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
-import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
 import uk.gov.ida.saml.metadata.test.factories.metadata.TestCredentialFactory;
 
@@ -19,29 +18,33 @@ import java.nio.file.Paths;
 
 import static java.util.Arrays.asList;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEncryptedAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSignature;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentGivenNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aDateOfBirthAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aPersonIdentifierAttribute;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anEidasAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder.anAttributeStatement;
 import static uk.gov.ida.saml.core.test.builders.ConditionsBuilder.aConditions;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
+import static uk.gov.ida.saml.core.test.builders.ResponseBuilder.DEFAULT_REQUEST_ID;
 import static uk.gov.ida.saml.core.test.builders.SignatureBuilder.aSignature;
 
 public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
-    private static final String REQUEST_ID = "default-match-id";
     private static final String PID = "default-pid";
 
     private static final Credential MSA_ENCRYPTION_CREDENTIAL = new TestCredentialFactory(
-        TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
+        TEST_RP_MS_PUBLIC_ENCRYPTION_CERT,
         null)
         .getEncryptingCredential();
 
     private static final Credential COUNTRY_SIGNING_CREDENTIAL = new TestCredentialFactory(
-            TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT, // TODO: change this to Stub Country
-            TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_PRIVATE_KEY)
+            STUB_COUNTRY_PUBLIC_PRIMARY_CERT,
+            STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY)
             .getSigningCredential();
 
     @ClassRule
@@ -53,7 +56,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
     @Test
     public void shouldProduceLoA2StandardDataset() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
+            .withId(DEFAULT_REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
             .withSubject(aSubjectWithEncryptedAssertions(asList(
                 anEidasAssertion()
@@ -63,7 +66,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                         .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
-                    .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
+                    .withSignature(anEidasSignature())
                     .withoutAttributeStatements()
                     .addAttributeStatement(anAttributeStatement().addAllAttributes(asList(
                         aCurrentGivenNameAttribute("Joe"),
@@ -71,7 +74,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                         aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
                         aPersonIdentifierAttribute(PID)
                     )).build()
-                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), DEFAULT_REQUEST_ID, HUB_ENTITY_ID))
             .build();
 
         Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/universal-dataset/eIDAS-LoA2-Standard_data_set.json");
@@ -82,7 +85,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
     @Test
     public void shouldProduceLoA2StandardDatasetWithTransliterationProvidedForNameFields() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
+            .withId(DEFAULT_REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
             .withSubject(aSubjectWithEncryptedAssertions(asList(
                 anEidasAssertion()
@@ -100,7 +103,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                         aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
                         aPersonIdentifierAttribute(PID)
                     )).build()
-                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), DEFAULT_REQUEST_ID, HUB_ENTITY_ID))
             .build();
 
         Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/universal-dataset/eIDAS-LoA2-Standard_data_set-transliteration_provided_for_name_fields.json");
@@ -111,7 +114,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
     @Test
     public void shouldProduceLoA2StandardDatasetWithSpecialCharactersInNameFields() throws Exception {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
+            .withId(DEFAULT_REQUEST_ID)
             .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
             .withSubject(aSubjectWithEncryptedAssertions(asList(
                 anEidasAssertion()
@@ -129,7 +132,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                         aDateOfBirthAttribute(new LocalDate(1980, 5, 24)),
                         aPersonIdentifierAttribute(PID)
                     )).build()
-                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), REQUEST_ID, HUB_ENTITY_ID))
+                ).buildWithEncrypterCredential(MSA_ENCRYPTION_CREDENTIAL)), DEFAULT_REQUEST_ID, HUB_ENTITY_ID))
             .build();
 
         Path path = Paths.get("verify-matching-service-test-tool/src/main/resources/universal-dataset/eIDAS-LoA2-Standard_data_set-special_characters_in_name_fields.json");

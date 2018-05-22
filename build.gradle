@@ -45,6 +45,7 @@ def dependencyVersions = [
 apply plugin: "idaJar"
 
 repositories {
+    mavenLocal()
     maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
 }
 
@@ -89,10 +90,12 @@ dependencies {
         "uk.gov.ida:saml-security:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:saml-extensions:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version",
-        "uk.gov.ida:saml-utils:$dependencyVersions.saml_libs_version",
+        //"uk.gov.ida:saml-utils:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml",
         "uk.gov.ida.eidas:trust-anchor:$dependencyVersions.trust_anchor",
         "uk.gov.ida:validation:1.0.9-40"
+
+    compile("uk.gov.ida:saml-utils:3.3.0-SNAPSHOT") { force = true }
 
     compile configurations.dropwizard,
         configurations.ida,

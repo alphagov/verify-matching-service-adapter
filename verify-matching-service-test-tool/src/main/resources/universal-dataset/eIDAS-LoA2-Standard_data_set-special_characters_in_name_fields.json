@@ -1,7 +1,7 @@
 {
   "hashedPid": "220133ae81575644649cfdb2ca8ca2c47a56d40117a01b768a2d357f912a9901",
   "levelOfAssurance": "LEVEL_2",
-  "matchId": "default-match-id",
+  "matchId": "default-request-id",
   "matchingDataset": {
     "dateOfBirth": {
       "value": "1980-05-24",
@@ -16,6 +16,7 @@
         "value": "Snježana",
         "verified": true
       }
-    ]
+    ],
+    "addresses": []
   }
 }

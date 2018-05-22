@@ -9,7 +9,6 @@ import uk.gov.ida.saml.core.domain.PersistentId;
 
 import java.util.List;
 
-@Deprecated
 public class MatchingServiceAssertion extends OutboundAssertion {
     private MatchingServiceAuthnStatement authnStatement;
     private String audience;

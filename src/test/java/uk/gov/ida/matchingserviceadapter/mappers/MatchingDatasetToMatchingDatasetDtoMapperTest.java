@@ -1,372 +1,115 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.ida.matchingserviceadapter.builders.EidasMatchingDatasetBuilder;
-import uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
-import uk.gov.ida.matchingserviceadapter.domain.EidasMatchingDataset;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.AddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
-import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
-import uk.gov.ida.saml.core.domain.Address;
-import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
-import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.anAddress;
-import static uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder.aMatchingDataset;
+import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.aCurrentAddress;
+import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.aHistoricalAddress;
+import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_FROM_DATE;
+import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_HISTORICAL_FROM_DATE;
+import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_HISTORICAL_TO_DATE;
+import static uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder.aMatchingDataset;
 
 public class MatchingDatasetToMatchingDatasetDtoMapperTest {
 
-    private MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
-
-    @Before
-    public void setup() {
-        matchingDatasetToMatchingDatasetDtoMapper = new MatchingDatasetToMatchingDatasetDtoMapper();
-    }
+    private MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper = new MatchingDatasetToMatchingDatasetDtoMapper();
 
     @Test
-    public void mapGender_shouldMapAbsent() {
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.empty();
-        Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
-
-        assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(false);
-    }
-
-    @Test
-    public void mapGender_shouldMapMale() {
-        SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.MALE).build();
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.of(genderSimpleMdsValue);
-        Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
-
-        assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(true);
-        assertThat(simpleMdsValueDtoOptional.get().getValue()).isEqualTo(GenderDto.MALE);
-        assertThat(simpleMdsValueDtoOptional.get().getFrom()).isEqualTo(genderSimpleMdsValue.getFrom());
-        assertThat(simpleMdsValueDtoOptional.get().getTo()).isEqualTo(genderSimpleMdsValue.getTo());
-        assertThat(simpleMdsValueDtoOptional.get().isVerified()).isEqualTo(genderSimpleMdsValue.isVerified());
-    }
-
-    @Test
-    public void mapGender_shouldMapFemale() {
-        SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.FEMALE).build();
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.of(genderSimpleMdsValue);
-        Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
-
-        assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(true);
-        assertThat(simpleMdsValueDtoOptional.get().getValue()).isEqualTo(GenderDto.FEMALE);
-    }
-
-    @Test
-    public void mapGender_shouldMapNotSpecified() {
-        SimpleMdsValue<Gender> genderSimpleMdsValue = SimpleMdsValueBuilder.<Gender>aSimpleMdsValue().withValue(Gender.NOT_SPECIFIED).build();
-        Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional = Optional.of(genderSimpleMdsValue);
-        Optional<SimpleMdsValueDto<GenderDto>> simpleMdsValueDtoOptional = matchingDatasetToMatchingDatasetDtoMapper.mapGender(simpleMdsValueOptional);
-
-        assertThat(simpleMdsValueDtoOptional.isPresent()).isEqualTo(true);
-        assertThat(simpleMdsValueDtoOptional.get().getValue()).isEqualTo(GenderDto.NOT_SPECIFIED);
-    }
-
-    @Test
-    public void map_shouldMapGenericSimpleMdsValue() {
-        SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
-        Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.of(simpleMdsValue);
-        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
-
-        assertThat(result.isPresent()).isEqualTo(true);
-        assertThat(result.get().getValue()).isEqualTo("hello");
-        assertThat(result.get().getFrom()).isEqualTo(simpleMdsValue.getFrom());
-        assertThat(result.get().getTo()).isEqualTo(simpleMdsValue.getTo());
-        assertThat(result.get().isVerified()).isEqualTo(simpleMdsValue.isVerified());
-    }
-
-    @Test
-    public void map_shouldMapListOfGenericSimpleMdsValues() {
-        SimpleMdsValue<String> simpleMdsValue = SimpleMdsValueBuilder.<String>aSimpleMdsValue().withValue("hello").build();
-        List<SimpleMdsValue<String>> simpleMdsValueOptional = singletonList(simpleMdsValue);
-        List<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getValue()).isEqualTo("hello");
-        assertThat(result.get(0).getFrom()).isEqualTo(simpleMdsValue.getFrom());
-        assertThat(result.get(0).getTo()).isEqualTo(simpleMdsValue.getTo());
-        assertThat(result.get(0).isVerified()).isEqualTo(simpleMdsValue.isVerified());
-    }
-
-    @Test
-    public void map_shouldMapGenericSimpleMdsValueAbsent() {
-        Optional<SimpleMdsValue<String>> simpleMdsValueOptional = Optional.empty();
-        Optional<SimpleMdsValueDto<String>> result = matchingDatasetToMatchingDatasetDtoMapper.mapToMatchingDatasetDto(simpleMdsValueOptional);
-
-        assertThat(result.isPresent()).isEqualTo(false);
-    }
-
-    @Test
-    public void map_shouldCombineCurrentAndPreviousAddressesFromAMatchingDatasetToSingleAddressField() {
-        String currentAddressLine = "line-1";
-        String previousAddressLine = "previousAddressLine";
-        List<Address> currentAddress = singletonList(new AddressFactory().create(singletonList(currentAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
-        List<Address> previousAddress = singletonList(new AddressFactory().create(singletonList(previousAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
+    public void shouldMapToVerifyMatchingDatasetDto() {
+        LocalDate dob = new LocalDate(1970, 1, 2);
+        LocalDate oldDob = new LocalDate(1970, 2, 1);
         MatchingDataset matchingDataset = aMatchingDataset()
-                .withCurrentAddresses(currentAddress)
-                .withPreviousAddresses(previousAddress)
+                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Joe").withVerifiedStatus(true).build())
+                .addFirstname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("Bob").build())
+                .addSurname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Bloggs").withVerifiedStatus(true).build())
+                .addSurname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("Smith").build())
+                .addDateOfBirth(SimpleMdsValueBuilder.<LocalDate>aCurrentSimpleMdsValue().withValue(dob).build())
+                .addDateOfBirth(SimpleMdsValueBuilder.<LocalDate>aHistoricalSimpleMdsValue().withValue(oldDob).build())
+                .withCurrentAddresses(asList(aCurrentAddress().withPostCode("AA12BB").build()))
+                .withPreviousAddresses(asList(aHistoricalAddress().withPostCode("CC12DD").build()))
+                .withGender(SimpleMdsValueBuilder.<Gender>aCurrentSimpleMdsValue().withValue(Gender.NOT_SPECIFIED).build())
                 .build();
 
         VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
 
-        List<VerifyAddressDto> addresses = matchingDatasetDto.getAddresses();
-        assertThat(addresses).hasSize(2);
-
-        List<String> addressLines = new ArrayList<>();
-        for(AddressDto addressDto : addresses){
-            addressLines.add(addressDto.getLines().get(0));
-        }
-        assertThat(addressLines).contains(currentAddressLine);
-        assertThat(addressLines).contains(previousAddressLine);
+        // Check that only the current first name is included
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, DEFAULT_FROM_DATE, null, true));
+        // Check entire surname history is included
+        assertThat(matchingDatasetDto.getSurnames().size()).isEqualTo(2);
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Bloggs", null, DEFAULT_FROM_DATE, null, true));
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Smith", null, DEFAULT_HISTORICAL_FROM_DATE, DEFAULT_HISTORICAL_TO_DATE, false));
+        // Check that only the current date of birth is included
+        assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, DEFAULT_FROM_DATE, null, false));
+        // Check entire address history is included
+        assertThat(matchingDatasetDto.getAddresses().size()).isEqualTo(2);
+        assertThat(matchingDatasetDto.getAddresses().stream().filter(a -> a.getPostCode().equals(Optional.of("AA12BB"))).findFirst()).isPresent();
+        assertThat(matchingDatasetDto.getAddresses().stream().filter(a -> a.getPostCode().equals(Optional.of("CC12DD"))).findFirst()).isPresent();
+        // Check that gender is included
+        assertThat(matchingDatasetDto.getGender()).contains(new SimpleMdsValueDto<>(GenderDto.NOT_SPECIFIED, DEFAULT_FROM_DATE, null, false));
     }
 
     @Test
-    public void mapVerify_shouldPutCurrentAddressBeforePreviousAddressesWhenMappingToASingleAddressField() {
-        String currentAddressLine = "line-1";
-        String previousAddressLine = "previousAddressLine";
-        List<Address> currentAddress = singletonList(new AddressFactory().create(singletonList(currentAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
-        List<Address> previousAddress = singletonList(new AddressFactory().create(singletonList(previousAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
+    public void shouldMapToUniversalMatchingDatasetDto() {
+        LocalDate dob = new LocalDate(1970, 1, 2);
+        LocalDate oldDob = new LocalDate(1970, 2, 1);
         MatchingDataset matchingDataset = aMatchingDataset()
-            .withPreviousAddresses(previousAddress)
-            .withCurrentAddresses(currentAddress)
-            .build();
-
-        VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
-
-        List<VerifyAddressDto> addresses = matchingDatasetDto.getAddresses();
-        assertThat(addresses).hasSize(2);
-
-        List<String> addressLines = new ArrayList<>();
-        for(AddressDto addressDto : addresses){
-            addressLines.add(addressDto.getLines().get(0));
-        }
-        assertThat(addressLines.get(0)).isEqualTo(currentAddressLine);
-        assertThat(addressLines.get(1)).isEqualTo(previousAddressLine);
-    }
-
-    @Test
-    public void mapVerifyDatasetToUniversalDatasetDto_shouldPutCurrentAddressBeforePreviousAddressesWhenMappingToASingleAddressField() {
-        String currentAddressLine = "line-1";
-        String previousAddressLine = "previousAddressLine";
-        List<Address> currentAddress = singletonList(new AddressFactory().create(singletonList(currentAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
-        List<Address> previousAddress = singletonList(new AddressFactory().create(singletonList(previousAddressLine), "post-code", "international-postcode", "uprn", DateTime.parse("1999-03-15"), DateTime.parse("2000-02-09"), true));
-        MatchingDataset matchingDataset = aMatchingDataset()
-                .withPreviousAddresses(previousAddress)
-                .withCurrentAddresses(currentAddress)
+                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Joe").build())
+                .addFirstname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("Bob").build())
+                .addSurname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Bloggs").build())
+                .addSurname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("Smith").build())
+                .addDateOfBirth(SimpleMdsValueBuilder.<LocalDate>aCurrentSimpleMdsValue().withValue(dob).build())
+                .addDateOfBirth(SimpleMdsValueBuilder.<LocalDate>aHistoricalSimpleMdsValue().withValue(oldDob).build())
+                .withCurrentAddresses(asList(aCurrentAddress().withPostCode("AA12BB").build()))
+                .withPreviousAddresses(asList(aHistoricalAddress().withPostCode("CC12DD").build()))
+                .withGender(SimpleMdsValueBuilder.<Gender>aCurrentSimpleMdsValue().withValue(Gender.NOT_SPECIFIED).build())
                 .build();
 
         UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
 
-        Optional<List<UniversalAddressDto>> addresses = matchingDatasetDto.getAddresses();
-        assertThat(addresses.get()).hasSize(2);
-
-        List<String> addressLines = new ArrayList<>();
-        for(AddressDto addressDto : addresses.get()){
-            addressLines.add(addressDto.getLines().get(0));
-        }
-        assertThat(addressLines.get(0)).isEqualTo(currentAddressLine);
-        assertThat(addressLines.get(1)).isEqualTo(previousAddressLine);
+        // Check that only the current first name is included
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, DEFAULT_FROM_DATE, null, false));
+        // Check entire surname history is included
+        assertThat(matchingDatasetDto.getSurnames().size()).isEqualTo(2);
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Bloggs", null, DEFAULT_FROM_DATE, null, false));
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Smith", null, DEFAULT_HISTORICAL_FROM_DATE, DEFAULT_HISTORICAL_TO_DATE, false));
+        // Check that only the current date of birth is included
+        assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, DEFAULT_FROM_DATE, null, false));
+        // Check entire address history is included
+        assertThat(matchingDatasetDto.getAddresses()).isPresent();
+        assertThat(matchingDatasetDto.getAddresses().get().size()).isEqualTo(2);
+        assertThat(matchingDatasetDto.getAddresses().get().stream().filter(a -> a.getPostCode().equals(Optional.of("AA12BB"))).findFirst()).isPresent();
+        assertThat(matchingDatasetDto.getAddresses().get().stream().filter(a -> a.getPostCode().equals(Optional.of("CC12DD"))).findFirst()).isPresent();
+        // Check that gender is included
+        assertThat(matchingDatasetDto.getGender()).contains(new SimpleMdsValueDto<>(GenderDto.NOT_SPECIFIED, DEFAULT_FROM_DATE, null, false));
     }
 
     @Test
-    public void mapVerifyAddress_shouldMapAddress() {
-        Address address = anAddress()
-                .withLines(singletonList("line1"))
-                .withVerified(false)
-                .withUPRN("uprn")
-                .withFromDate(DateTime.now())
-                .withToDate(DateTime.now().plusDays(1))
-                .withInternationalPostCode("int-post-code")
-                .withPostCode("postcode")
-                .build();
-        List<VerifyAddressDto> result = matchingDatasetToMatchingDatasetDtoMapper.mapVerifyAddresses(singletonList(address));
-
-        assertThat(result).hasSize(1);
-        VerifyAddressDto addressDto = result.get(0);
-        assertThat(addressDto.getLines()).hasSize(1);
-        assertThat(addressDto.getLines().get(0)).isEqualTo(address.getLines().get(0));
-        assertThat(addressDto.isVerified()).isEqualTo(address.isVerified());
-        assertThat(addressDto.getUPRN()).isEqualTo(address.getUPRN());
-        assertThat(addressDto.getFromDate()).isEqualTo(address.getFrom());
-        assertThat(addressDto.getToDate()).isEqualTo(address.getTo());
-        assertThat(addressDto.getInternationalPostCode()).isEqualTo(addressDto.getInternationalPostCode());
-        assertThat(addressDto.getPostCode()).isEqualTo(addressDto.getPostCode());
-    }
-
-    @Test
-    public void mapEidasDatasetToUniversalDatasetDto_shouldMapNames() {
-        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
-                .withFirstName("input-first-name")
-                .withSurname("input-surname")
+    public void shouldMapToUniversalMatchingDatasetDtoWithTypicalEidasDataset() {
+        LocalDate dob = new LocalDate(1970, 1, 2);
+        MatchingDataset matchingDataset = aMatchingDataset()
+                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Joe").withFrom(null).withVerifiedStatus(true).build())
+                .addSurname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Bloggs").withFrom(null).withVerifiedStatus(true).build())
+                .addDateOfBirth(SimpleMdsValueBuilder.<LocalDate>aCurrentSimpleMdsValue().withValue(dob).withFrom(null).withVerifiedStatus(true).build())
                 .build();
 
-        UniversalMatchingDatasetDto result =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
+        UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
 
-        assertThat(result.getFirstName().get().getValue()).isEqualTo(eidasMatchingDataset.getFirstName());
-        assertHasEidasDefaultValues(result.getFirstName().get());
-        assertThat(result.getMiddleNames().isPresent()).isFalse();
-        assertThat(result.getSurnames().get(0).getValue()).isEqualTo(eidasMatchingDataset.getSurname());
-        assertHasEidasDefaultValues(result.getSurnames().get(0));
-    }
-
-    @Test
-    public void mapVerifyDatasetToUniversalDatasetDto_shouldMapNames() {
-        MatchingDataset matchingDataset = MatchingDatasetBuilder.aFullyPopulatedMatchingDataset().build();
-
-        UniversalMatchingDatasetDto result =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
-
-        assertValueEqual(result.getFirstName().get(), matchingDataset.getFirstNames().get(0));
-        assertValueEqual(result.getMiddleNames().get(), matchingDataset.getMiddleNames().get(0));
-        assertValueEqual(result.getSurnames().get(0), matchingDataset.getSurnames().get(0));
-    }
-
-    @Test
-    public void mapEidasDatasetToUniversalDatasetDto_shouldMapGender() {
-        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
-                .withGender(Gender.MALE)
-                .build();
-
-        UniversalMatchingDatasetDto result =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
-
-        assertThat(result.getGender().get().getValue()).isEqualTo(GenderDto.MALE);
-        assertHasEidasDefaultValues(result.getGender().get());
-    }
-
-    @Test
-    public void mapVerifyDatasetToUniversalDatasetDto_shouldMapGender() {
-        MatchingDataset matchingDataset = MatchingDatasetBuilder.aFullyPopulatedMatchingDataset()
-                .build();
-
-        UniversalMatchingDatasetDto result =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
-
-        assertThat(result.getGender().get().getValue()).isEqualTo(GenderDto.FEMALE);
-        assertAreEquivalent(result.getGender().get(), matchingDataset.getGender().get());
-    }
-
-    @Test
-    public void mapEidasDatasetToUniversalDatasetDto_shouldMapDateOfBirth() {
-        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
-                .withDateOfBirth(LocalDate.now())
-                .build();
-
-        UniversalMatchingDatasetDto result =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
-
-        assertThat(result.getDateOfBirth().get().getValue()).isEqualTo(eidasMatchingDataset.getDateOfBirth());
-        assertHasEidasDefaultValues(result.getDateOfBirth().get());
-    }
-
-    @Test
-    public void mapVerifyDatasetToUniversalDatasetDto_shouldMapDateOfBirth() {
-        MatchingDataset matchingDataset = MatchingDatasetBuilder.aFullyPopulatedMatchingDataset()
-                .build();
-
-        UniversalMatchingDatasetDto result =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
-
-        assertValueEqual(result.getDateOfBirth().get(), matchingDataset.getDateOfBirths().get(0));
-    }
-    @Test
-    public void mapVerifyDatasetToUniversalDatasetDto_shouldMapAddresses() {
-        Address address = anAddress()
-                .withLines(singletonList("line1"))
-                .withVerified(false)
-                .withUPRN("uprn")
-                .withFromDate(DateTime.now())
-                .withToDate(DateTime.now().plusDays(1))
-                .withInternationalPostCode("int-post-code")
-                .withPostCode("postcode")
-                .build();
-
-        MatchingDataset matchingDataset = MatchingDatasetBuilder.aMatchingDataset()
-                .withCurrentAddresses(singletonList(address))
-                .build();
-
-        UniversalMatchingDatasetDto universalMatchingDatasetDto =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
-
-        List<UniversalAddressDto> result = universalMatchingDatasetDto.getAddresses().get();
-
-        assertThat(result).hasSize(1);
-        UniversalAddressDto addressDto = result.get(0);
-        assertThat(addressDto.getLines()).hasSize(1);
-        assertThat(addressDto.getLines().get(0)).isEqualTo(address.getLines().get(0));
-        assertThat(addressDto.isVerified()).isEqualTo(address.isVerified());
-        assertThat(addressDto.getUPRN()).isEqualTo(address.getUPRN());
-        assertThat(addressDto.getFrom()).isEqualTo(address.getFrom());
-        assertThat(addressDto.getTo()).isEqualTo(address.getTo());
-        assertThat(addressDto.getInternationalPostCode()).isEqualTo(addressDto.getInternationalPostCode());
-        assertThat(addressDto.getPostCode()).isEqualTo(addressDto.getPostCode());
-    }
-
-    @Test
-    public void mapEidasDatasetToUniversalDatasetDto_shouldMapAddresses() {
-        Address address = anAddress()
-                .withLines(singletonList("line1"))
-                .withVerified(false)
-                .withUPRN("uprn")
-                .withFromDate(DateTime.now())
-                .withToDate(DateTime.now().plusDays(1))
-                .withInternationalPostCode("int-post-code")
-                .withPostCode("postcode")
-                .build();
-
-        EidasMatchingDataset eidasMatchingDataset = EidasMatchingDatasetBuilder.anEidasMatchingDataset()
-                .withAddress(address)
-                .build();
-
-        UniversalMatchingDatasetDto universalMatchingDatasetDto =
-                matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(eidasMatchingDataset);
-
-        List<UniversalAddressDto> result = universalMatchingDatasetDto.getAddresses().get();
-        assertThat(result).hasSize(1);
-        UniversalAddressDto addressDto = result.get(0);
-        assertThat(addressDto.getLines()).hasSize(1);
-        assertThat(addressDto.getLines().get(0)).isEqualTo(address.getLines().get(0));
-        assertThat(addressDto.isVerified()).isEqualTo(address.isVerified());
-        assertThat(addressDto.getUPRN()).isEqualTo(address.getUPRN());
-        assertThat(addressDto.getFrom()).isEqualTo(address.getFrom());
-        assertThat(addressDto.getTo()).isEqualTo(address.getTo());
-        assertThat(addressDto.getInternationalPostCode()).isEqualTo(addressDto.getInternationalPostCode());
-        assertThat(addressDto.getPostCode()).isEqualTo(addressDto.getPostCode());
-    }
-
-    private void assertHasEidasDefaultValues(SimpleMdsValueDto simpleMdsValueDto) {
-        assertThat(simpleMdsValueDto.getFrom()).isNull();
-        assertThat(simpleMdsValueDto.getTo()).isNull();
-        assertThat(simpleMdsValueDto.isVerified()).isTrue();
-    }
-
-    private void assertAreEquivalent(SimpleMdsValueDto simpleMdsValueDto, SimpleMdsValue simpleMdsValue) {
-        assertThat(simpleMdsValueDto.getFrom()).isEqualTo(simpleMdsValue.getFrom());
-        assertThat(simpleMdsValueDto.getTo()).isEqualTo(simpleMdsValue.getTo());
-        assertThat(simpleMdsValueDto.isVerified()).isEqualTo(simpleMdsValue.isVerified());
-    }
-
-    private void assertValueEqual(SimpleMdsValueDto simpleMdsValueDto, SimpleMdsValue simpleMdsValue) {
-        assertAreEquivalent(simpleMdsValueDto, simpleMdsValue);
-        assertThat(simpleMdsValueDto.getValue()).isEqualTo(simpleMdsValue.getValue());
+        // eIDAS matching datasets will never have a from or to date and will always be verified
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, null, null, true));
+        assertThat(matchingDatasetDto.getSurnames()).containsOnly(new TransliterableMdsValueDto("Bloggs", null, null, null, true));
+        assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, null, null, true));
     }
 }

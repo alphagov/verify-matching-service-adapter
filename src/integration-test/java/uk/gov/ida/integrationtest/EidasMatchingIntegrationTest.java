@@ -43,9 +43,6 @@ import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aValidEidasAttr
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSignature;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSubject;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
-import static uk.gov.ida.matchingserviceadapter.validators.AssertionValidator.generateInvalidSignatureMessage;
-import static uk.gov.ida.matchingserviceadapter.validators.CountryAssertionValidator.IDENTITY_ASSERTION_TYPE_NAME;
-import static uk.gov.ida.matchingserviceadapter.validators.EidasAttributeQueryValidator.DEFAULT_INVALID_SIGNATURE_MESSAGE;
 import static uk.gov.ida.saml.core.domain.SamlStatusCode.MATCH;
 import static uk.gov.ida.saml.core.domain.SamlStatusCode.NO_MATCH;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PRIVATE_SIGNING_KEY;
@@ -140,7 +137,7 @@ public class EidasMatchingIntegrationTest {
         Response response = postResponse(msaMatchingUrl, attributeQuery);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        assertThat(response.readEntity(String.class)).contains(DEFAULT_INVALID_SIGNATURE_MESSAGE.getRenderedMessage());
+        assertThat(response.readEntity(String.class)).contains("Signature was not valid.");
     }
 
     @Test
@@ -157,7 +154,7 @@ public class EidasMatchingIntegrationTest {
         Response response = postResponse(msaMatchingUrl, attributeQuery);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        assertThat(response.readEntity(String.class)).contains(generateInvalidSignatureMessage(IDENTITY_ASSERTION_TYPE_NAME).getRenderedMessage());
+        assertThat(response.readEntity(String.class)).contains("Signature was not valid.");
     }
 
     @Test
