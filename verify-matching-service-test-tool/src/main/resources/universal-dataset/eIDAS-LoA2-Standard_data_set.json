@@ -1,5 +1,5 @@
 {
-  "hashedPid": "f8b5be711023fb45e7a13f323f1667767b0a7ef0584aec9550047655d8ce441b",
+  "hashedPid": "220133ae81575644649cfdb2ca8ca2c47a56d40117a01b768a2d357f912a9901",
   "levelOfAssurance": "LEVEL_2",
   "matchId": "default-match-id",
   "matchingDataset": {
@@ -13,7 +13,6 @@
     },
     "surnames": [
       {
-        "from": "2010-01-20T00:00:00.000Z",
         "value": "Dou",
         "verified": true
       }

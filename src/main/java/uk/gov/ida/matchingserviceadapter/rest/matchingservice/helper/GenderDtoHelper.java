@@ -10,7 +10,7 @@ public class GenderDtoHelper {
         if (UNSPECIFIED_VALUE.equals(universalGenderString)) {
             return GenderDto.NOT_SPECIFIED;
         } else {
-            return GenderDto.valueOf(universalGenderString);
+            return GenderDto.valueOf(universalGenderString.toUpperCase());
         }
     }
 }

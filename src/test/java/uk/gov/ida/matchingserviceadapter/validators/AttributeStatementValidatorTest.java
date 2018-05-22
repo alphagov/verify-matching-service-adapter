@@ -51,7 +51,7 @@ public class AttributeStatementValidatorTest {
             .addAttribute(aDateOfBirthAttribute())
             .build();
         Messages messages = validator.validate(attributeStatement, messages());
-        assertThat(messages.hasErrors()).isFalse();
+        assertThat(messages.getErrors()).isEmpty();
     }
 
     @Test
@@ -65,7 +65,21 @@ public class AttributeStatementValidatorTest {
             .build();
         Messages messages = validator.validate(attributeStatement, messages());
 
-        assertThat(messages.hasErrors()).isFalse();
+        assertThat(messages.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void shouldGenerateNoErrorsIfAttrbuteStatementContainsTranslieratedNames() {
+        AttributeStatement attributeStatement = anEidasAttributeStatement()
+            .addAttribute(aCurrentGivenNameAttribute("Georgios", "Γεώργιος"))
+            .addAttribute(aCurrentFamilyNameAttribute("Panathinaikos", "Παναθηναϊκός"))
+            .addAttribute(aPersonIdentifierAttribute())
+            .addAttribute(aDateOfBirthAttribute())
+            .addAttribute(aGenderAttribute("Male"))
+            .build();
+        Messages messages = validator.validate(attributeStatement, messages());
+
+        assertThat(messages.getErrors()).isEmpty();
     }
 
     @Test
