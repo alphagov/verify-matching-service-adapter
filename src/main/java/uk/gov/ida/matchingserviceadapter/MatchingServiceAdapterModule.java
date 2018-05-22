@@ -121,7 +121,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(SubjectValidator.class);
         bind(AudienceRestrictionValidator.class);
         bind(ConditionsValidator.class);
-        bind(AttributeQueryService.class);
+        //bind(AttributeQueryService.class);
 
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
@@ -193,8 +193,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public MatchingServiceDtoMapper getInboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
-        MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
-        MatchingServiceAdapterConfiguration configuration
+            MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
+            MatchingServiceAdapterConfiguration configuration
     ) {
         return new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, configuration.isEidasEnabled());
     }
@@ -202,55 +202,68 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public VerifyAssertionService getVerifyAssertionService(
-        InstantValidator instantValidator,
-        SubjectValidator subjectValidator,
-        ConditionsValidator conditionsValidator,
-        SamlAssertionsSignatureValidator signatureValidator,
-        Cycle3DatasetFactory cycle3DatasetFactory,
-        VerifyMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-        @Named("HubEntityId") String hubEntityId
+            InstantValidator instantValidator,
+            SubjectValidator subjectValidator,
+            ConditionsValidator conditionsValidator,
+            SamlAssertionsSignatureValidator signatureValidator,
+            Cycle3DatasetFactory cycle3DatasetFactory,
+            VerifyMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
+            @Named("HubEntityId") String hubEntityId
     ) {
         return new VerifyAssertionService(instantValidator, subjectValidator, conditionsValidator, signatureValidator, cycle3DatasetFactory, hubEntityId, matchingDatasetUnmarshaller);
     }
 
     @Provides
     @Singleton
+    public AttributeQueryService getAttributeQueryService(
+            AttributeQuerySignatureValidator attributeQuerySignatureValidator,
+            InstantValidator instantValidator,
+            VerifyAssertionService verifyAssertionService,
+            EidasAssertionService eidasAssertionService,
+            UserIdHashFactory userIdHashFactory,
+            @Named("HubEntityId") String hubEntityId
+    ) {
+        return new AttributeQueryService(attributeQuerySignatureValidator, instantValidator, verifyAssertionService, eidasAssertionService, userIdHashFactory, hubEntityId);
+    }
+
+    @Provides
+    @Singleton
     public EidasAssertionService getCountryAssertionService(
-        InstantValidator instantValidator,
-        SubjectValidator subjectValidator,
-        ConditionsValidator conditionsValidator,
-        SamlAssertionsSignatureValidator hubSignatureValidator,
-        Cycle3DatasetFactory cycle3DatasetFactory,
-        MetadataResolverRepository eidasMetadataRepository,
-        EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-        @Named("HubConnectorEntityId") String hubConnectorEntityId,
-        @Named("HubEntityId") String hubEntityId
+            InstantValidator instantValidator,
+            SubjectValidator subjectValidator,
+            ConditionsValidator conditionsValidator,
+            SamlAssertionsSignatureValidator hubSignatureValidator,
+            Cycle3DatasetFactory cycle3DatasetFactory,
+            MetadataResolverRepository eidasMetadataRepository,
+            EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
+            @Named("HubConnectorEntityId") String hubConnectorEntityId,
+            @Named("HubEntityId") String hubEntityId
     ) {
         return new EidasAssertionService(instantValidator,
-            subjectValidator,
-            conditionsValidator,
-            hubSignatureValidator,
-            cycle3DatasetFactory,
-            eidasMetadataRepository,
-            hubConnectorEntityId,
-            hubEntityId,
-            matchingDatasetUnmarshaller);
+                subjectValidator,
+                conditionsValidator,
+                hubSignatureValidator,
+                cycle3DatasetFactory,
+                eidasMetadataRepository,
+                hubConnectorEntityId,
+                hubEntityId,
+                matchingDatasetUnmarshaller);
     }
 
     @Provides
     @Singleton
     public MatchingResponseGenerator getResponseGenerator(
-        SoapMessageManager soapMessageManager,
-        Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
-        ManifestReader manifestReader,
-        Function<OutboundResponseFromMatchingService, Element> responseElementTransformer,
-        MatchingServiceAdapterConfiguration configuration
+            SoapMessageManager soapMessageManager,
+            Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer,
+            ManifestReader manifestReader,
+            Function<OutboundResponseFromMatchingService, Element> responseElementTransformer,
+            MatchingServiceAdapterConfiguration configuration
     ) {
         return new MatchingResponseGenerator(soapMessageManager,
-            responseElementTransformer,
-            healthCheckResponseTransformer,
-            manifestReader,
-            configuration.getEntityId());
+                responseElementTransformer,
+                healthCheckResponseTransformer,
+                manifestReader,
+                configuration.getEntityId());
     }
 
     @Provides
@@ -316,72 +329,72 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public CertificateStore getCertificateStore(MatchingServiceAdapterConfiguration configuration) {
         List<Certificate> publicSigningCertificates = configuration.getSigningKeys().stream()
-            .map(KeyPairConfiguration::getPublicKey)
-            .map(key -> cert(key.getName(), key.getCert(), Signing))
-            .collect(Collectors.toList());
+                .map(KeyPairConfiguration::getPublicKey)
+                .map(key -> cert(key.getName(), key.getCert(), Signing))
+                .collect(Collectors.toList());
 
         List<Certificate> publicEncryptionCertificates = Stream.of(configuration.getEncryptionKeys().get(0).getPublicKey())
-            .map(key -> cert(key.getName(), key.getCert(), Encryption))
-            .collect(Collectors.toList());
+                .map(key -> cert(key.getName(), key.getCert(), Encryption))
+                .collect(Collectors.toList());
 
         return new CertificateStore(
-            publicEncryptionCertificates,
-            publicSigningCertificates);
+                publicEncryptionCertificates,
+                publicSigningCertificates);
     }
 
     private Certificate cert(String keyName, String cert, Certificate.KeyUse keyUse) {
         String certBody = cert
-            .replace("-----BEGIN CERTIFICATE-----", "")
-            .replace("-----END CERTIFICATE-----", "")
-            .replace(" ", "");
+                .replace("-----BEGIN CERTIFICATE-----", "")
+                .replace("-----END CERTIFICATE-----", "")
+                .replace(" ", "");
         return new Certificate(keyName, certBody, keyUse);
     }
 
     @Provides
     @Singleton
     public Function<HealthCheckResponseFromMatchingService, Element> getHealthcheckResponseFromMatchingServiceToElementTransformer(
-        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
-        IdaKeyStore idaKeyStore,
-        EntityToEncryptForLocator entityToEncryptForLocator,
-        MatchingServiceAdapterConfiguration configuration
+            MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
+            IdaKeyStore idaKeyStore,
+            EntityToEncryptForLocator entityToEncryptForLocator,
+            MatchingServiceAdapterConfiguration configuration
     ) {
         return new MsaTransformersFactory().getHealthcheckResponseFromMatchingServiceToElementTransformer(
-            encryptionCredentialResolver,
-            idaKeyStore,
-            entityToEncryptForLocator,
-            configuration
+                encryptionCredentialResolver,
+                idaKeyStore,
+                entityToEncryptForLocator,
+                configuration
         );
     }
 
     @Provides
     @Singleton
     public Function<OutboundResponseFromMatchingService, Element> getOutboundResponseFromMatchingServiceToElementTransformer(
-        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
-        IdaKeyStore idaKeyStore,
-        EntityToEncryptForLocator entityToEncryptForLocator,
-        MatchingServiceAdapterConfiguration configuration
+            MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
+            IdaKeyStore idaKeyStore,
+            EntityToEncryptForLocator entityToEncryptForLocator,
+            MatchingServiceAdapterConfiguration configuration
     ) {
         return new MsaTransformersFactory().getOutboundResponseFromMatchingServiceToElementTransformer(
-            encryptionCredentialResolver,
-            idaKeyStore,
-            entityToEncryptForLocator,
-            configuration
+                encryptionCredentialResolver,
+                idaKeyStore,
+                entityToEncryptForLocator,
+                configuration
         );
     }
 
     @Provides
     @Singleton
     public Function<OutboundResponseFromUnknownUserCreationService, Element> getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
-        MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
-        IdaKeyStore idaKeyStore,
-        EntityToEncryptForLocator entityToEncryptForLocator,
-        MatchingServiceAdapterConfiguration configuration
+            MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver,
+            IdaKeyStore idaKeyStore,
+            EntityToEncryptForLocator entityToEncryptForLocator,
+            MatchingServiceAdapterConfiguration configuration
     ) {
         return new MsaTransformersFactory().getOutboundResponseFromUnknownUserCreationServiceToElementTransformer(
-            encryptionCredentialResolver,
-            idaKeyStore,
-            entityToEncryptForLocator,
-            configuration
+                encryptionCredentialResolver,
+                idaKeyStore,
+                entityToEncryptForLocator,
+                configuration
         );
     }
 
@@ -420,12 +433,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public IdaKeyStore getIdaKeyStore(MatchingServiceAdapterConfiguration configuration) {
         List<KeyPair> encryptionKeyPairs = configuration.getEncryptionKeys().stream()
-            .map(pair -> new KeyPair(pair.getPublicKey().getPublicKey(), pair.getPrivateKey().getPrivateKey()))
-            .collect(Collectors.toList());
+                .map(pair -> new KeyPair(pair.getPublicKey().getPublicKey(), pair.getPrivateKey().getPrivateKey()))
+                .collect(Collectors.toList());
 
         KeyPair signingKeyPair = new KeyPair(
-            configuration.getSigningKeys().get(0).getPublicKey().getPublicKey(),
-            configuration.getSigningKeys().get(0).getPrivateKey().getPrivateKey()
+                configuration.getSigningKeys().get(0).getPublicKey().getPublicKey(),
+                configuration.getSigningKeys().get(0).getPrivateKey().getPrivateKey()
         );
 
         return new IdaKeyStore(signingKeyPair, encryptionKeyPairs);
@@ -444,8 +457,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
         EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
         return new JerseyClientBuilder(environment)
-            .using(metadataConfiguration.getJerseyClientConfiguration())
-            .build(metadataConfiguration.getJerseyClientName());
+                .using(metadataConfiguration.getJerseyClientConfiguration())
+                .build(metadataConfiguration.getJerseyClientName());
     }
 
     @Provides
@@ -460,21 +473,21 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     public MetadataResolverRepository getEidasMetadataResolverRepository(
-        Environment environment,
-        MatchingServiceAdapterConfiguration configuration,
-        @Nullable EidasTrustAnchorResolver trustAnchorResolver,
-        @Nullable Client client
+            Environment environment,
+            MatchingServiceAdapterConfiguration configuration,
+            @Nullable EidasTrustAnchorResolver trustAnchorResolver,
+            @Nullable Client client
     ) {
         if (!configuration.isEidasEnabled()) return new DisabledMetadataResolverRepository();
 
         EidasMetadataResolverRepository resolverRepository = new EidasMetadataResolverRepository(
-            trustAnchorResolver,
-            configuration.getEuropeanIdentity().getAggregatedMetadata(),
-            new DropwizardMetadataResolverFactory(),
-            new Timer(),
-            new MetadataSignatureTrustEngineFactory(),
-            new MetadataResolverConfigBuilder(),
-            client
+                trustAnchorResolver,
+                configuration.getEuropeanIdentity().getAggregatedMetadata(),
+                new DropwizardMetadataResolverFactory(),
+                new Timer(),
+                new MetadataSignatureTrustEngineFactory(),
+                new MetadataResolverConfigBuilder(),
+                client
         );
 
         environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));

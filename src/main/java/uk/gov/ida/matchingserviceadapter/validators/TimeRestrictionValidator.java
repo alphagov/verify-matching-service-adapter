@@ -27,7 +27,7 @@ public class TimeRestrictionValidator {
     }
 
     public void validateNotBefore(DateTime notBefore) {
-        if (notBefore != null && dateTimeComparator.isAfterNow(notBefore)) {
+        if (notBefore != null && dateTimeComparator.isAfterSkewedNow(notBefore)) {
             throw new SamlResponseValidationException(String.format(
                     "Assertion is not valid before %s",
                     notBefore.withZone(UTC).toString(dateHourMinuteSecond())

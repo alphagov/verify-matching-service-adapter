@@ -54,10 +54,15 @@ public class EidasAssertionService extends AssertionService {
 
     @Override
     void validate(String expectedInResponseTo, List<Assertion> assertions) {
-        Map<Boolean, List<Assertion>> assertionMap = assertions.stream().collect(Collectors.groupingBy(this::isCountryAssertion));
-
-        assertionMap.get(true).forEach(a -> validateCountryAssertion(expectedInResponseTo, a));
-        assertionMap.getOrDefault(false, Collections.emptyList()).forEach(a -> validateCycle3Assertion(a, expectedInResponseTo, hubEntityId));
+        for (Assertion assertion : assertions){
+            if(isCountryAssertion(assertion)){
+                validateCountryAssertion(assertion, expectedInResponseTo);
+            }else if(isHubAssertion(assertion)){
+                validateCycle3Assertion(assertion, expectedInResponseTo, hubEntityId);
+            }else{
+                throw new SamlResponseValidationException("Unknown Issuer for eIDAS Assertion: "+assertion.getIssuer().getValue());
+            }
+        }
     }
 
     @Override
@@ -79,7 +84,7 @@ public class EidasAssertionService extends AssertionService {
                 matchingDatasetUnmarshaller.fromAssertion(countryAssertion));
     }
 
-    private void validateCountryAssertion(String expectedInResponseTo, Assertion assertion) {
+    private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
         metadataResolverRepository.getSignatureTrustEngine(assertion.getIssuer().getValue())
                 .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
                 .map(SamlMessageSignatureValidator::new)
@@ -95,5 +100,8 @@ public class EidasAssertionService extends AssertionService {
         return metadataResolverRepository.getResolverEntityIds().contains(assertion.getIssuer().getValue());
     }
 
+    public Boolean isHubAssertion(Assertion assertion) {
+        return assertion.getIssuer().getValue().equals(hubEntityId);
+    }
 
 }

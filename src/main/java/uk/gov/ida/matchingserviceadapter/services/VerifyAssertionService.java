@@ -49,12 +49,12 @@ public class VerifyAssertionService extends AssertionService {
                 .collect(Collectors.groupingBy(this::classifyAssertion));
 
         List<Assertion> authnAssertions = assertionMap.get(AUTHN_ASSERTION);
-        if (authnAssertions.isEmpty() || authnAssertions.size() != 1) {
+        if (authnAssertions == null || authnAssertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one authn statement is expected.");
         }
 
         List<Assertion> mdsAssertions = assertionMap.get(MDS_ASSERTION);
-        if (mdsAssertions.isEmpty() || mdsAssertions.size() != 1) {
+        if (mdsAssertions == null || mdsAssertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one matching dataset assertion is expected.");
         }
 

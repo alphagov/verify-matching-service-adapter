@@ -47,6 +47,8 @@ import static uk.gov.ida.saml.core.domain.SamlStatusCode.MATCH;
 import static uk.gov.ida.saml.core.domain.SamlStatusCode.NO_MATCH;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.HEADLESS_RP_PUBLIC_SIGNING_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PRIVATE_SIGNING_KEY;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.HUB_TEST_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
@@ -168,8 +170,8 @@ public class EidasMatchingIntegrationTest {
                         aSignature()
                                 .withSigningCredential(
                                         new TestCredentialFactory(
-                                                HEADLESS_RP_PUBLIC_SIGNING_CERT,
-                                                HEADLESS_RP_PRIVATE_SIGNING_KEY
+                                                HUB_TEST_PUBLIC_SIGNING_CERT,
+                                                HUB_TEST_PRIVATE_SIGNING_KEY
                                         ).getSigningCredential()
                                 ).build()
                 )
@@ -178,6 +180,7 @@ public class EidasMatchingIntegrationTest {
         Response response = postResponse(msaMatchingUrl, attributeQuery);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertThat(response.readEntity(String.class)).contains("Unknown Issuer for eIDAS Assertion");
     }
 
     private Response postResponse(String url, AttributeQuery attributeQuery) {

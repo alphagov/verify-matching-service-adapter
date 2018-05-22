@@ -30,6 +30,7 @@ import static uk.gov.ida.matchingserviceadapter.services.VerifyAssertionServiceT
 import static uk.gov.ida.matchingserviceadapter.services.VerifyAssertionServiceTest.anIdpSignature;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY;
+import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.STUB_COUNTRY_ONE;
 import static uk.gov.ida.saml.core.test.builders.AssertionBuilder.anAssertion;
 import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
@@ -72,7 +73,8 @@ public class AttributeQueryServiceTest {
                 instantValidator,
                 verifyAssertionService,
                 eidasAssertionService,
-                userIdHashFactory
+                userIdHashFactory,
+                HUB_ENTITY_ID
         );
         doNothing().when(attributeQuerySignatureValidator).validate(any());
         doNothing().when(instantValidator).validate(any(), any());
