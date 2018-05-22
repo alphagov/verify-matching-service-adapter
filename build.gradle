@@ -56,6 +56,11 @@ configurations {
 }
 
 configurations.all {
+    resolutionStrategy {
+        // Need to enforce use of AssertJ 3.9.1 to override the dependency on 3.8.0 from saml-extensions
+        // TODO - Remove compile-time dependency on configurations.test_deps for saml-extensions
+        force 'org.assertj:assertj-core:3.9.1'
+    }
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
@@ -67,8 +72,7 @@ dependencies {
         'io.dropwizard.metrics:metrics-annotation:3.1.2',
         "io.dropwizard:dropwizard-client:$dependencyVersions.dropwizard",
         'com.hubspot.dropwizard:dropwizard-guicier:1.0.0.6',
-        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard",
-        "org.assertj:assertj-core:3.9.1"
+        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
 
     saml "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
         "org.opensaml:opensaml-security-api:$dependencyVersions.opensaml",
