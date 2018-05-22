@@ -49,7 +49,7 @@ import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
 
 
-public class MatchingServiceAdapterFailingMetadataAppRuleTest {
+public class FailingMetadataIntegrationTest {
     private static final String METADATA_PATH = "/uk/gov/ida/saml/metadata/federation";
 
     @ClassRule
