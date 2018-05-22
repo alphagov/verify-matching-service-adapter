@@ -1,4 +1,4 @@
-package uk.gov.ida.integrationtest.TestToolInterfaceMatching;
+package uk.gov.ida.integrationtest.interfacetests;
 
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;

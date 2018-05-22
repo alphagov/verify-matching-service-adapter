@@ -1,4 +1,4 @@
-package uk.gov.ida.integrationtest.TestToolInterfaceMatching;
+package uk.gov.ida.integrationtest.interfacetests;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.findAll;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
@@ -34,7 +34,6 @@ import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 
 public abstract class BaseTestToolInterfaceTest {
