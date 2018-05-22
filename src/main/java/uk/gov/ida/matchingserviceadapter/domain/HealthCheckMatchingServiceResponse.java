@@ -1,6 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-public class HealthCheckMatchingServiceResponse implements MatchingServiceResponse {
+public class HealthCheckMatchingServiceResponse {
 
     private final HealthCheckResponseFromMatchingService healthCheckResponseFromMatchingService;
 

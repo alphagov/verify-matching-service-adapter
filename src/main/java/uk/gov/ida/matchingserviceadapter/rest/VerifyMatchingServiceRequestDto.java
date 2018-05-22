@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.rest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;

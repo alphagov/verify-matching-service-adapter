@@ -1,7 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
 import org.opensaml.saml.saml2.core.Attribute;
-import uk.gov.ida.saml.core.domain.HubAssertion;
+import uk.gov.ida.saml.core.domain.Cycle3Dataset;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 
 import javax.inject.Inject;
@@ -18,7 +18,7 @@ public class UserAccountCreationAttributeExtractor {
 
     public List<Attribute> getUserAccountCreationAttributes(List<Attribute> requestedAttributes,
                                                             MatchingDataset matchingDataset,
-                                                            HubAssertion cycle3Assertion) {
+                                                            Optional<Cycle3Dataset> cycle3Assertion) {
         if (matchingDataset == null) {
             throw new IllegalArgumentException("User Account Creation requires a matching dataset.");
         }

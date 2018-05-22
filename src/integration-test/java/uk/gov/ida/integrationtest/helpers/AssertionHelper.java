@@ -283,7 +283,7 @@ public class AssertionHelper {
     private static Subject anAssertionSubject(final String inResponseTo, boolean shouldBeExpired) {
         final DateTime notOnOrAfter;
         if (shouldBeExpired) {
-            notOnOrAfter = DateTime.now();
+            notOnOrAfter = DateTime.now().minusMinutes(5);
         } else {
             notOnOrAfter = DateTime.now().plus(1000000);
         }

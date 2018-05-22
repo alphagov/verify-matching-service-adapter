@@ -1,6 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.configuration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;

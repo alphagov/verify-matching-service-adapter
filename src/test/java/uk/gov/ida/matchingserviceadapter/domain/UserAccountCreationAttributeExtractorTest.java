@@ -7,19 +7,17 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.Attribute;
-import uk.gov.ida.matchingserviceadapter.builders.MatchingDatasetBuilder;
 import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
-import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
-import uk.gov.ida.saml.core.domain.PersistentId;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.extensions.StringBasedMdsAttributeValue;
 import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
 import uk.gov.ida.saml.core.extensions.impl.PersonNameImpl;
 import uk.gov.ida.saml.core.test.OpenSAMLRunner;
+import uk.gov.ida.saml.core.test.builders.MatchingDatasetBuilder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -190,16 +188,15 @@ public class UserAccountCreationAttributeExtractorTest {
     }
 
     @Test
-    public void shouldReturnRequiredCycle3AttributesWhenValuesExistInCycle3Assertion(){
+    public void shouldReturnRequiredCycle3AttributesWhenValuesExistInCycle3Dataset(){
         List<Attribute> accountCreationAttributes = Arrays.asList(CYCLE_3).stream()
                 .map(attributeQueryAttributeFactory::createAttribute)
                 .collect(toList());
 
         ImmutableMap<String, String> build = ImmutableMap.<String, String>builder().put("cycle3Key", "cycle3Value").build();
         Cycle3Dataset cycle3Dataset = Cycle3Dataset.createFromData(build);
-        HubAssertion hubAssertion =new HubAssertion("1", "issuerId", DateTime.now(), new PersistentId("1"), null, Optional.of(cycle3Dataset));
 
-        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, mock(MatchingDataset.class), Optional.of(hubAssertion).orElse(null));
+        List<Attribute> userAttributesForAccountCreation = userAccountCreationAttributeExtractor.getUserAccountCreationAttributes(accountCreationAttributes, mock(MatchingDataset.class), Optional.of(cycle3Dataset));
 
         List<Attribute> cycle_3 = userAttributesForAccountCreation.stream().filter(a -> a.getName().equals("cycle_3")).collect(toList());
         StringBasedMdsAttributeValue personName = (StringBasedMdsAttributeValue) cycle_3.get(0).getAttributeValues().get(0);

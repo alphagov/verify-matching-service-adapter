@@ -195,7 +195,7 @@ public class VerifyMatchingIntegrationTest {
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Bearer subject confirmation datas NotOnOrAfter timestamp");
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Assertion is not valid on or after");
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
     }
 
@@ -277,7 +277,7 @@ public class VerifyMatchingIntegrationTest {
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Bearer subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo' (default-request-id)");
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("'InResponseTo' must match requestId. Expected default-request-id but was wrong-request-id");
     }
 
     @Test
@@ -293,7 +293,7 @@ public class VerifyMatchingIntegrationTest {
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("Bearer subject confirmation data's 'InResponseTo' attribute (wrong-request-id) was not the same as the Response's 'InResponseTo' (default-request-id)");
+        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("'InResponseTo' must match requestId. Expected default-request-id but was wrong-request-id");
     }
 
     @Test
