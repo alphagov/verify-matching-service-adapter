@@ -82,8 +82,6 @@ public class MatchingDatasetDtoMapperTest {
                 Optional.empty(),
                 matchingDataset);
 
-        VerifyMatchingDatasetDto verifyMatchingDatasetDto = mock(VerifyMatchingDatasetDto.class);
-        when(matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset)).thenReturn(verifyMatchingDatasetDto);
 
         MatchingServiceRequestDto requestDto = new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, true)
                 .map("a-request-id", "a-hashed-pid", assertionData);
@@ -104,8 +102,6 @@ public class MatchingDatasetDtoMapperTest {
                 Optional.of(cycle3Dataset),
                 matchingDataset);
 
-        VerifyMatchingDatasetDto verifyMatchingDatasetDto = mock(VerifyMatchingDatasetDto.class);
-        when(matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset)).thenReturn(verifyMatchingDatasetDto);
 
         MatchingServiceRequestDto requestDto = new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, true)
                 .map("a-request-id", "a-hashed-pid", assertionData);

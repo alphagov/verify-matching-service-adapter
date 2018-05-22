@@ -92,7 +92,6 @@ public class UnknownUserResponseGeneratorTest {
     public void setup() {
         when(assertionLifetimeConfiguration.getAssertionLifetime()).thenReturn(Duration.days(2));
         when(configuration.getEntityId()).thenReturn(ENTITY_ID);
-        when(userIdHashFactory.hashId(issuerId, nameId, Optional.of(authnContext))).thenReturn(hashedPid);
         when(idGenerator.getId()).thenReturn(TEST_ID);
 
         unknownUserResponseGenerator = new UnknownUserResponseGenerator(

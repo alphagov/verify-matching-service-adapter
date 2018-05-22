@@ -27,7 +27,7 @@ public class InstantValidator {
                     PeriodFormat.getDefault().print(age.toPeriod())));
         }
 
-        if (!dateTimeComparator.isBeforeNow(instant)) {
+        if (dateTimeComparator.isAfterSkewedNow(instant)) {
             throw new SamlResponseValidationException(String.format("%s is in the future %s",
                     instantName,
                     instant.withZone(UTC).toString(dateHourMinuteSecond())));
