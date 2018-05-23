@@ -20,9 +20,9 @@ public class UniversalMatchingDatasetDto extends MatchingDatasetDto {
     }
 
     public UniversalMatchingDatasetDto(
-            Optional<SimpleMdsValueDto<String>> firstName,
+            Optional<TransliterableMdsValueDto> firstName,
             Optional<SimpleMdsValueDto<String>> middleNames,
-            List<SimpleMdsValueDto<String>> surnames,
+            List<TransliterableMdsValueDto> surnames,
             Optional<SimpleMdsValueDto<GenderDto>> gender,
             Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth,
             Optional<List<UniversalAddressDto>> addresses) {

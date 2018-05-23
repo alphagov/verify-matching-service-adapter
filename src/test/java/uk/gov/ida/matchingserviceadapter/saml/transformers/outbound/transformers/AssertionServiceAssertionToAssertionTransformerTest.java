@@ -13,6 +13,7 @@ import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.matchingserviceadapter.saml.factories.UserAccountCreationAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
+import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.impl.VerifiedImpl;
 import uk.gov.ida.saml.core.test.OpenSAMLRunner;
@@ -65,7 +66,7 @@ public class AssertionServiceAssertionToAssertionTransformerTest {
     public void shouldTransformAssertionsWithFirstNameAttribute() {
         String personName = "John";
         Attribute attribute = new UserAccountCreationAttributeFactory(openSamlXmlObjectFactory).createUserAccountCreationFirstnameAttribute(
-                ImmutableList.of(new SimpleMdsValue<>(personName, null, null, false)));
+                new TransliterableMdsValue(personName, null));
 
         Assertion assertion = transformAssertionWithAttribute(attribute);
         XMLObject firstAttributeValue = assertAssertionAndGetAttributeValue(FIRST_NAME, assertion);
@@ -87,7 +88,8 @@ public class AssertionServiceAssertionToAssertionTransformerTest {
     @Test
     public void shouldTransformAssertionsWithDateOfBirthAttribute() {
         LocalDate dob = new LocalDate(1980, 10, 30);
-        Attribute attribute = new UserAccountCreationAttributeFactory(openSamlXmlObjectFactory).createUserAccountCreationDateOfBirthAttribute(ImmutableList.of(new SimpleMdsValue<>(dob, null, null, false)));
+        Attribute attribute = new UserAccountCreationAttributeFactory(openSamlXmlObjectFactory).createUserAccountCreationDateOfBirthAttribute(
+                new SimpleMdsValue<>(dob, null, null, false));
 
         Assertion assertion = transformAssertionWithAttribute(attribute);
         XMLObject firstAttributeValue = assertAssertionAndGetAttributeValue(DATE_OF_BIRTH, assertion);

@@ -13,9 +13,9 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class MatchingDatasetDto {
 
-    private Optional<SimpleMdsValueDto<String>> firstName = Optional.empty();
+    private Optional<TransliterableMdsValueDto> firstName = Optional.empty();
     private Optional<SimpleMdsValueDto<String>> middleNames = Optional.empty();
-    private List<SimpleMdsValueDto<String>> surnames = new ArrayList<>();
+    private List<TransliterableMdsValueDto> surnames = new ArrayList<>();
     private Optional<SimpleMdsValueDto<GenderDto>> gender = Optional.empty();
     private Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth = Optional.empty();
 
@@ -24,9 +24,9 @@ public abstract class MatchingDatasetDto {
     }
 
     public MatchingDatasetDto(
-            Optional<SimpleMdsValueDto<String>> firstName,
+            Optional<TransliterableMdsValueDto> firstName,
             Optional<SimpleMdsValueDto<String>> middleNames,
-            List<SimpleMdsValueDto<String>> surnames,
+            List<TransliterableMdsValueDto> surnames,
             Optional<SimpleMdsValueDto<GenderDto>> gender,
             Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth) {
 
@@ -37,7 +37,7 @@ public abstract class MatchingDatasetDto {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Optional<SimpleMdsValueDto<String>> getFirstName() {
+    public Optional<TransliterableMdsValueDto> getFirstName() {
         return firstName;
     }
 
@@ -45,7 +45,7 @@ public abstract class MatchingDatasetDto {
         return middleNames;
     }
 
-    public List<SimpleMdsValueDto<String>> getSurnames() {
+    public List<TransliterableMdsValueDto> getSurnames() {
         return surnames;
     }
 

@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.saml.core.domain.Gender;
@@ -45,11 +46,11 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
 
         // Check that only the current first name is included
-        assertThat(matchingDatasetDto.getFirstName()).contains(new SimpleMdsValueDto<>("Joe", DEFAULT_FROM_DATE, null, true));
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, DEFAULT_FROM_DATE, null, true));
         // Check entire surname history is included
         assertThat(matchingDatasetDto.getSurnames().size()).isEqualTo(2);
-        assertThat(matchingDatasetDto.getSurnames()).contains(new SimpleMdsValueDto<>("Bloggs", DEFAULT_FROM_DATE, null, true));
-        assertThat(matchingDatasetDto.getSurnames()).contains(new SimpleMdsValueDto<>("Smith", DEFAULT_HISTORICAL_FROM_DATE, DEFAULT_HISTORICAL_TO_DATE, false));
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Bloggs", null, DEFAULT_FROM_DATE, null, true));
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Smith", null, DEFAULT_HISTORICAL_FROM_DATE, DEFAULT_HISTORICAL_TO_DATE, false));
         // Check that only the current date of birth is included
         assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, DEFAULT_FROM_DATE, null, false));
         // Check entire address history is included
@@ -79,11 +80,11 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
 
         // Check that only the current first name is included
-        assertThat(matchingDatasetDto.getFirstName()).contains(new SimpleMdsValueDto<>("Joe", DEFAULT_FROM_DATE, null, false));
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, DEFAULT_FROM_DATE, null, false));
         // Check entire surname history is included
         assertThat(matchingDatasetDto.getSurnames().size()).isEqualTo(2);
-        assertThat(matchingDatasetDto.getSurnames()).contains(new SimpleMdsValueDto<>("Bloggs", DEFAULT_FROM_DATE, null, false));
-        assertThat(matchingDatasetDto.getSurnames()).contains(new SimpleMdsValueDto<>("Smith", DEFAULT_HISTORICAL_FROM_DATE, DEFAULT_HISTORICAL_TO_DATE, false));
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Bloggs", null, DEFAULT_FROM_DATE, null, false));
+        assertThat(matchingDatasetDto.getSurnames()).contains(new TransliterableMdsValueDto("Smith", null, DEFAULT_HISTORICAL_FROM_DATE, DEFAULT_HISTORICAL_TO_DATE, false));
         // Check that only the current date of birth is included
         assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, DEFAULT_FROM_DATE, null, false));
         // Check entire address history is included
@@ -107,8 +108,8 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
 
         // eIDAS matching datasets will never have a from or to date and will always be verified
-        assertThat(matchingDatasetDto.getFirstName()).contains(new SimpleMdsValueDto<>("Joe", null, null, true));
-        assertThat(matchingDatasetDto.getSurnames()).containsOnly(new SimpleMdsValueDto<>("Bloggs", null, null, true));
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, null, null, true));
+        assertThat(matchingDatasetDto.getSurnames()).containsOnly(new TransliterableMdsValueDto("Bloggs", null, null, null, true));
         assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, null, null, true));
     }
 }

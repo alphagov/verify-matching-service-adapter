@@ -1,0 +1,24 @@
+{
+  "firstName": {
+    "value": "walker",
+    "from": "2014-02-01T01:02:03.567Z",
+    "to": "2014-02-01T01:02:03.567Z",
+    "verified": true,
+    "nonLatinScriptValue": "περιπατητής"
+  },
+  "surnames": [
+    {
+      "value": "smith",
+      "from": "2014-02-01T01:02:03.567Z",
+      "to": "2014-02-01T01:02:03.567Z",
+      "verified": true,
+      "nonLatinScriptValue": "σιδηρουργός"
+    }
+  ],
+  "dateOfBirth": {
+    "value": "2014-02-01",
+    "from": "2014-02-01T01:02:03.567Z",
+    "to": "2014-02-01T01:02:03.567Z",
+    "verified": true
+  }
+}

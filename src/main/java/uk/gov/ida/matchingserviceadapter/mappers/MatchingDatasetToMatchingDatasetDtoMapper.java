@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.joda.time.LocalDate;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
@@ -14,6 +15,7 @@ import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
+import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -23,40 +25,38 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToMatchingDatasetDtoMapper {
 
     public VerifyMatchingDatasetDto mapToVerifyMatchingDatasetDto(MatchingDataset matchingDataset) {
-        Optional<SimpleMdsValue<String>> firstNameValue = !matchingDataset.getFirstNames().isEmpty() ? Optional.of(matchingDataset.getFirstNames().get(0)) : Optional.empty();
-        Optional<SimpleMdsValue<String>> middleNameValue = !matchingDataset.getMiddleNames().isEmpty() ? Optional.of(matchingDataset.getMiddleNames().get(0)) : Optional.empty();
-        Optional<SimpleMdsValue<LocalDate>> birthDateValue = !matchingDataset.getDateOfBirths().isEmpty() ? Optional.of(matchingDataset.getDateOfBirths().get(0)) : Optional.empty();
+        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().findFirst();
+        Optional<SimpleMdsValue<String>> middleNameValue = matchingDataset.getMiddleNames().stream().findFirst();
+        Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream().findFirst();
+
         return new VerifyMatchingDatasetDto(
-                mapToMatchingDatasetDto(firstNameValue),
-                mapToMatchingDatasetDto(middleNameValue),
-                mapToMatchingDatasetDto(matchingDataset.getSurnames()),
-                mapGender(matchingDataset.getGender()),
-                mapToMatchingDatasetDto(birthDateValue),
+                firstNameValue.map(this::mapToMatchingDatasetTransliterableDto),
+                middleNameValue.map(this::mapToMatchingDatasetDto),
+                matchingDataset.getSurnames().stream().map(this::mapToMatchingDatasetTransliterableDto).collect(Collectors.toList()),
+                matchingDataset.getGender().map(this::mapGender),
+                birthDateValue.map(this::mapToMatchingDatasetDto),
                 mapVerifyAddresses(matchingDataset.getAddresses()));
     }
 
     public UniversalMatchingDatasetDto mapToUniversalMatchingDatasetDto(MatchingDataset matchingDataset) {
-        Optional<SimpleMdsValue<String>> firstNameValue = !matchingDataset.getFirstNames().isEmpty() ? Optional.ofNullable(matchingDataset.getFirstNames().get(0)) : Optional.empty();
-        Optional<SimpleMdsValue<String>> middleNameValue = !matchingDataset.getMiddleNames().isEmpty() ? Optional.ofNullable(matchingDataset.getMiddleNames().get(0)) : Optional.empty();
-        Optional<SimpleMdsValue<LocalDate>> birthDateValue = !matchingDataset.getDateOfBirths().isEmpty() ? Optional.ofNullable(matchingDataset.getDateOfBirths().get(0)) : Optional.empty();
+        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().findFirst();
+        Optional<SimpleMdsValue<String>> middleNameValue = matchingDataset.getMiddleNames().stream().findFirst();
+        Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream().findFirst();
 
         return new UniversalMatchingDatasetDto(
-                mapToMatchingDatasetDto(firstNameValue),
-                mapToMatchingDatasetDto(middleNameValue),
-                mapToMatchingDatasetDto(matchingDataset.getSurnames()),
-                mapGender(matchingDataset.getGender()),
-                mapToMatchingDatasetDto(birthDateValue),
+                firstNameValue.map(this::mapToMatchingDatasetTransliterableDto),
+                middleNameValue.map(this::mapToMatchingDatasetDto),
+                matchingDataset.getSurnames().stream().map(this::mapToMatchingDatasetTransliterableDto).collect(Collectors.toList()),
+                matchingDataset.getGender().map(this::mapGender),
+                birthDateValue.map(this::mapToMatchingDatasetDto),
                 Optional.ofNullable(mapToUniversalAddressDto(matchingDataset.getAddresses())));
     }
 
-    private Optional<SimpleMdsValueDto<GenderDto>> mapGender(Optional<SimpleMdsValue<Gender>> simpleMdsValueOptional) {
-        if (!simpleMdsValueOptional.isPresent()) {
-            return Optional.empty();
-        }
-
-        SimpleMdsValue<Gender> simpleMdsValue = simpleMdsValueOptional.get();
-        GenderDto genderDto = convertToGenderDto(simpleMdsValue.getValue());
-        return Optional.ofNullable(new SimpleMdsValueDto<>(genderDto, simpleMdsValue.getFrom(), simpleMdsValue.getTo(), simpleMdsValue.isVerified()));
+    private SimpleMdsValueDto<GenderDto> mapGender(SimpleMdsValue<Gender> simpleMdsValue) {
+        return new SimpleMdsValueDto<>(convertToGenderDto(simpleMdsValue.getValue()),
+                simpleMdsValue.getFrom(),
+                simpleMdsValue.getTo(),
+                simpleMdsValue.isVerified());
     }
 
     private GenderDto convertToGenderDto(Gender gender) {
@@ -77,23 +77,19 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
         return genderDto;
     }
 
-    private <T> Optional<SimpleMdsValueDto<T>> mapToMatchingDatasetDto(Optional<SimpleMdsValue<T>> simpleMdsValueOptional) {
-        if (!simpleMdsValueOptional.isPresent()) {
-            return Optional.empty();
-        }
-
-        SimpleMdsValue<T> simpleMdsValue = simpleMdsValueOptional.get();
-        return Optional.ofNullable(new SimpleMdsValueDto<>(simpleMdsValue.getValue(), simpleMdsValue.getFrom(), simpleMdsValue.getTo(), simpleMdsValue.isVerified()));
+    private <T> SimpleMdsValueDto<T> mapToMatchingDatasetDto(SimpleMdsValue<T> simpleMdsValueOptional) {
+        return new SimpleMdsValueDto<>(simpleMdsValueOptional.getValue(),
+                simpleMdsValueOptional.getFrom(),
+                simpleMdsValueOptional.getTo(),
+                simpleMdsValueOptional.isVerified());
     }
 
-    private <T> List<SimpleMdsValueDto<T>> mapToMatchingDatasetDto(List<SimpleMdsValue<T>> simpleMdsValues) {
-        return Lists.newArrayList(Collections2.transform(simpleMdsValues, new Function<SimpleMdsValue<T>, SimpleMdsValueDto<T>>() {
-            @Nullable
-            @Override
-            public SimpleMdsValueDto<T> apply(SimpleMdsValue<T> input) {
-                return new SimpleMdsValueDto<>(input.getValue(), input.getFrom(), input.getTo(), input.isVerified());
-            }
-        }));
+    private TransliterableMdsValueDto mapToMatchingDatasetTransliterableDto(TransliterableMdsValue transliterableMdsValue) {
+        return new TransliterableMdsValueDto(transliterableMdsValue.getValue(),
+                transliterableMdsValue.getNonLatinScriptValue(),
+                transliterableMdsValue.getFrom(),
+                transliterableMdsValue.getTo(),
+                transliterableMdsValue.isVerified());
     }
 
     private List<VerifyAddressDto> mapVerifyAddresses(List<Address> addresses) {

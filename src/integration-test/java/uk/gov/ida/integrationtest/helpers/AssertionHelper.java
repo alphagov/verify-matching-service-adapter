@@ -234,7 +234,7 @@ public class AssertionHelper {
         return AttributeQueryBuilder.anAttributeQuery()
                 .withId(requestId)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-                .withSubject(anEidasSubject(requestId, assertionIssuerId, anIdpSignature()))
+                .withSubject(anEidasSubject(requestId, assertionIssuerId, anEidasSignature()))
                 .withSignature(aHubSignature());
     }
 
@@ -245,7 +245,7 @@ public class AssertionHelper {
                 .withSubject(aSubjectWithEncryptedAssertions(
                         asList(
                                 aCycle3Assertion("NI", "123456", requestId),
-                                anEidasEncryptedAssertion(requestId, assertionIssuerId, anIdpSignature())
+                                anEidasEncryptedAssertion(requestId, assertionIssuerId, anEidasSignature())
                         ), requestId, HUB_ENTITY_ID))
                 .withSignature(aHubSignature());
     }

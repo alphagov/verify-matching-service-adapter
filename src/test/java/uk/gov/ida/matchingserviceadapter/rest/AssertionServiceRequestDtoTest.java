@@ -16,6 +16,7 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssuranceDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
+import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
@@ -75,16 +76,16 @@ public class AssertionServiceRequestDtoTest {
 
     private VerifyMatchingDatasetDto getVerifyMatchingDataset(DateTime dateTime) {
         return (VerifyMatchingDatasetDto) aVerifyMatchingDatasetDto()
-                .addSurname(getSimpleMdsValue("walker", dateTime))
+                .addSurname(getTransliterableMdsValue("walker", null, dateTime))
                 .withAddressHistory(ImmutableList.of(getAddressDto("EC2", dateTime), getAddressDto("WC1", dateTime)))
                 .withDateOfBirth(getSimpleMdsValue(LocalDate.fromDateFields(dateTime.toDate()), dateTime))
-                .withFirstname(getSimpleMdsValue("walker", dateTime))
+                .withFirstname(getTransliterableMdsValue("walker", null, dateTime))
                 .withGender(getSimpleMdsValue(GenderDto.FEMALE, dateTime))
                 .withMiddleNames(getSimpleMdsValue("walker", dateTime))
                 .withSurnameHistory(
                         ImmutableList.of(
-                                getSimpleMdsValue("smith", dateTime),
-                                getSimpleMdsValue("walker", dateTime)
+                                getTransliterableMdsValue("smith", null, dateTime),
+                                getTransliterableMdsValue("walker", null, dateTime)
                         ))
                 .build();
     }
@@ -111,5 +112,9 @@ public class AssertionServiceRequestDtoTest {
                 .withValue(value)
                 .withVerifiedStatus(true)
                 .build();
+    }
+
+    private TransliterableMdsValueDto getTransliterableMdsValue(String value, String nonLatinScriptValue, DateTime dateTime) {
+        return new TransliterableMdsValueDto(value, nonLatinScriptValue, dateTime, dateTime, true);
     }
 }

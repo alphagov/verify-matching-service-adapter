@@ -138,7 +138,7 @@ public class UserAccountCreationAttributeExtractorTest {
     }
 
     @Test
-    public void shouldReturnVerifiedIfAllCurrentAttributeValuesAreVerified() throws Exception {
+    public void shouldReturnVerifiedIfAllCurrentAttributeValuesAreVerified() {
         List<Attribute> accountCreationAttributes = Arrays.asList(SURNAME, SURNAME_VERIFIED).stream()
                 .map(attributeQueryAttributeFactory::createAttribute)
                 .collect(toList());
