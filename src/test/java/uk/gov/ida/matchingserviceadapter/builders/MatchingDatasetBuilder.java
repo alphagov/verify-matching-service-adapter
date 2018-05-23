@@ -23,6 +23,7 @@ public class MatchingDatasetBuilder {
     private List<SimpleMdsValue<LocalDate>> dateOfBirths = new ArrayList<>();
     private List<Address> currentAddresses = new ArrayList<>();
     private List<Address> previousAddresses = new ArrayList<>();
+    private String personalId = "a-personal-id";
 
     public static MatchingDatasetBuilder aMatchingDataset() {
         return new MatchingDatasetBuilder();
@@ -43,7 +44,7 @@ public class MatchingDatasetBuilder {
     }
 
     public MatchingDataset build() {
-        return new MatchingDataset(firstnames, middleNames, surnames, gender, dateOfBirths, currentAddresses, previousAddresses);
+        return new MatchingDataset(firstnames, middleNames, surnames, gender, dateOfBirths, currentAddresses, previousAddresses, personalId);
     }
 
     public MatchingDatasetBuilder addFirstname(SimpleMdsValue<String> firstname) {
@@ -78,6 +79,11 @@ public class MatchingDatasetBuilder {
 
     public MatchingDatasetBuilder withPreviousAddresses(List<Address> previousAddresses) {
         this.previousAddresses = previousAddresses;
+        return this;
+    }
+
+    public MatchingDatasetBuilder withPersonalId(String personalId) {
+        this.personalId = personalId;
         return this;
     }
 

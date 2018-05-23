@@ -28,7 +28,7 @@ import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
-import uk.gov.ida.saml.core.transformers.CountryMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAssertionUnmarshaller;
 import uk.gov.ida.saml.core.transformers.IdentityProviderAuthnStatementUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
@@ -184,7 +184,7 @@ public class MsaTransformersFactory {
         AddressFactory addressFactory = new AddressFactory();
         IdentityProviderAssertionUnmarshaller identityProviderAssertionTransformer = new IdentityProviderAssertionUnmarshaller(
                 new VerifyMatchingDatasetUnmarshaller(addressFactory),
-                new CountryMatchingDatasetUnmarshaller(addressFactory),
+                new EidasMatchingDatasetUnmarshaller(),
                 new IdentityProviderAuthnStatementUnmarshaller(new AuthnContextFactory()),
                 hubEntityId
         );

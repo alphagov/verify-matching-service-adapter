@@ -28,7 +28,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP_MS;
 
-public class MatchingServiceAdapterMetadataAppRuleTest {
+public class MetadataIntegrationTest {
 
     private static final String MSA_SIGNING_PRIMARY = "http://matching-service-signing/primary";
     private static final String MSA_SIGNING_SECONDARY = "http://matching-service-signing/secondary";

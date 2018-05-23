@@ -129,6 +129,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     public static ConfigOverride[] withDefaultOverrides(boolean isCountryPresent, ConfigOverride... otherConfigOverrides) {
         List<ConfigOverride> overrides = Stream.of(
             ConfigOverride.config("returnStackTraceInResponse", "true"),
+            ConfigOverride.config("clockSkewInSeconds", "60"),
             ConfigOverride.config("server.applicationConnectors[0].port", "0"),
             ConfigOverride.config("server.adminConnectors[0].port", "0"),
             ConfigOverride.config("encryptionKeys[0].privateKey.key", TEST_RP_MS_PRIVATE_ENCRYPTION_KEY),

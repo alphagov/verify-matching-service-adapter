@@ -5,12 +5,12 @@ import com.google.common.collect.ImmutableList;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.apache.commons.codec.binary.Base64;
 import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.XMLObject;
@@ -31,10 +31,9 @@ import uk.gov.ida.common.shared.security.PublicKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder;
 import uk.gov.ida.integrationtest.helpers.AssertionHelper;
+import uk.gov.ida.integrationtest.helpers.AttributeQueryAttributeFactory;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
-import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.Verified;
@@ -70,6 +69,7 @@ import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
 import static uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder.aUserAccountCreationAttributeValue;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aValidEidasAttributeQueryWithCycle3Attributes;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.ADDRESS_HISTORY;
@@ -96,7 +96,7 @@ import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder
 import static uk.gov.ida.saml.core.test.builders.VerifiedAttributeValueBuilder.aVerifiedValue;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
 
-public class UserAccountCreationAppRuleTest {
+public class UserAccountCreationIntegrationTest {
     private static final String METADATA_PATH = "/uk/gov/ida/saml/metadata/sp";
     private static final String MATCHING_REQUEST_PATH = "/matching-request";
     private static final String UNKNOWN_USER_MATCHING_PATH = "/unknown-user-attribute-query";
@@ -126,7 +126,7 @@ public class UserAccountCreationAppRuleTest {
     }
 
     @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule(
+    public static final MatchingServiceAdapterAppRule applicationRule = new MatchingServiceAdapterAppRule(true,
         ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH),
         ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:" + localMatchingService.getPort() + UNKNOWN_USER_MATCHING_PATH)
     );
@@ -203,21 +203,14 @@ public class UserAccountCreationAppRuleTest {
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
     }
 
+    @Ignore("UAC is not yet enabled for eIDAS")
     @Test
     public void shouldReturnCurrentAttributesWhenPassedEidasFullMatchingDataset() throws Exception {
         List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(toList());
 
-        AttributeQuery attributeQuery = anAttributeQuery()
-                .withId(REQUEST_ID)
-                .withAttributes(requiredAttributes)
-                .withIssuer(anIssuer().withIssuerId(applicationRule.getConfiguration().getHubEntityId()).build())
-                .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion("default-request-id"),
-                        aCompleteMatchingDatasetAssertion(),
-                        AssertionBuilder.aCycle3DatasetAssertion("cycle3Name", "cycle3Value").buildUnencrypted()), REQUEST_ID, HUB_ENTITY_ID))
-                .build();
+        AttributeQuery attributeQuery = aValidEidasAttributeQueryWithCycle3Attributes(REQUEST_ID, applicationRule.getCountryEntityId()).withAttributes(requiredAttributes).build();
 
         Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
         List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
@@ -227,19 +220,11 @@ public class UserAccountCreationAppRuleTest {
         OpenSamlXmlObjectFactory openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
 
         ImmutableList<Attribute> attributes = ImmutableList.of(
-                userAccountCreationAttributeFor(aPersonNameValue().withValue("CurrentSurname").build(), SURNAME),
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("Bloggs").build(), SURNAME),
                 userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), SURNAME_VERIFIED),
-                userAccountCreationAttributeFor(aPersonNameValue().withValue("FirstName").build(), FIRST_NAME),
-                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), FIRST_NAME_VERIFIED),
-                userAccountCreationAttributeFor(anAddressAttributeValue().addLines(ImmutableList.of("address line 1")).withVerified(false).build(), CURRENT_ADDRESS),
-                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), CURRENT_ADDRESS_VERIFIED),
-                userAccountCreationAttributeFor(
-                        Arrays.asList(
-                                anAddressAttributeValue().addLines(ImmutableList.of("address line 1")).withVerified(false).build(),
-                                anAddressAttributeValue().addLines(ImmutableList.of("address line 2")).withVerified(true).build()
-                        ),
-                        ADDRESS_HISTORY),
-                userAccountCreationAttributeFor(openSamlXmlObjectFactory.createSimpleMdsAttributeValue("cycle3Value"), CYCLE_3)
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("Joe").build(), FIRST_NAME),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), FIRST_NAME_VERIFIED),
+                userAccountCreationAttributeFor(openSamlXmlObjectFactory.createSimpleMdsAttributeValue("123456"), CYCLE_3)
         );
 
         assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), attributes);
