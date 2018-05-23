@@ -10,7 +10,7 @@ import org.opensaml.saml.saml2.core.Issuer;
 import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceDtoMapper;
+import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SamlElementType;
@@ -58,7 +58,7 @@ public class AttributeQueryHandlingTests {
                 mock(MatchingResponseGenerator.class),
                 soapMessageManager,
                 unmarshaller,
-                mock(MatchingServiceDtoMapper.class),
+                mock(MatchingServiceRequestDtoMapper.class),
                 mock(MatchingServiceProxy.class),
                 mock(MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper.class),
                 assertionDecrypter

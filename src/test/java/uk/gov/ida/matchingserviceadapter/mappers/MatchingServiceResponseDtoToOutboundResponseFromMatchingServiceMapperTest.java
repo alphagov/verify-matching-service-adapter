@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.common.shared.security.IdGenerator;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
@@ -23,7 +23,7 @@ import static uk.gov.ida.matchingserviceadapter.builders.MatchingServiceResponse
 import static uk.gov.ida.saml.core.domain.MatchingServiceIdaStatus.MatchingServiceMatch;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MatchingServiceResponseDtoToOutboundResponseFromAssertionServiceMapperTest {
+public class MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapperTest {
 
     @Mock
     private MatchingServiceAdapterConfiguration configuration;

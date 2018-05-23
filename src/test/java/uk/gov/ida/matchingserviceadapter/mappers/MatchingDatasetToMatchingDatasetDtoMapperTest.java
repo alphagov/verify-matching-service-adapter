@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
 import org.joda.time.LocalDate;
-import org.junit.Before;
 import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;

@@ -3,7 +3,7 @@ package uk.gov.ida.matchingserviceadapter.mappers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
 import uk.gov.ida.matchingserviceadapter.rest.UniversalMatchingServiceRequestDto;
@@ -22,7 +22,7 @@ import static uk.gov.ida.matchingserviceadapter.rest.matchingservice.LevelOfAssu
 import static uk.gov.ida.saml.core.test.builders.Cycle3DatasetBuilder.aCycle3Dataset;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MatchingDatasetDtoMapperTest {
+public class MatchingServiceRequestDtoMapperTest {
 
     @Mock
     private MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
@@ -39,7 +39,7 @@ public class MatchingDatasetDtoMapperTest {
         VerifyMatchingDatasetDto verifyMatchingDatasetDto = mock(VerifyMatchingDatasetDto.class);
         when(matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset)).thenReturn(verifyMatchingDatasetDto);
 
-        MatchingServiceRequestDto requestDto = new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, false)
+        MatchingServiceRequestDto requestDto = new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, false)
                 .map("a-request-id", "a-hashed-pid", assertionData);
 
         assertThat(requestDto).isInstanceOf(VerifyMatchingServiceRequestDto.class);
@@ -61,7 +61,7 @@ public class MatchingDatasetDtoMapperTest {
         VerifyMatchingDatasetDto verifyMatchingDatasetDto = mock(VerifyMatchingDatasetDto.class);
         when(matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset)).thenReturn(verifyMatchingDatasetDto);
 
-        MatchingServiceRequestDto requestDto = new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, false)
+        MatchingServiceRequestDto requestDto = new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, false)
                 .map("a-request-id", "a-hashed-pid", assertionData);
 
         assertThat(requestDto).isInstanceOf(VerifyMatchingServiceRequestDto.class);
@@ -83,7 +83,7 @@ public class MatchingDatasetDtoMapperTest {
                 matchingDataset);
 
 
-        MatchingServiceRequestDto requestDto = new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, true)
+        MatchingServiceRequestDto requestDto = new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, true)
                 .map("a-request-id", "a-hashed-pid", assertionData);
 
         assertThat(requestDto).isInstanceOf(UniversalMatchingServiceRequestDto.class);
@@ -103,7 +103,7 @@ public class MatchingDatasetDtoMapperTest {
                 matchingDataset);
 
 
-        MatchingServiceRequestDto requestDto = new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, true)
+        MatchingServiceRequestDto requestDto = new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, true)
                 .map("a-request-id", "a-hashed-pid", assertionData);
 
         assertThat(requestDto).isInstanceOf(UniversalMatchingServiceRequestDto.class);

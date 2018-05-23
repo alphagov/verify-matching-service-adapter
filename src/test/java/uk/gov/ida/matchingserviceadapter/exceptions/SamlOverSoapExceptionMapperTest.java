@@ -4,7 +4,7 @@ import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
@@ -35,7 +35,7 @@ public class SamlOverSoapExceptionMapperTest {
     private MatchingServiceAdapterConfiguration configuration;
 
     @Test
-    public void toResponse_shouldReturnValidSamlResponseInSoapEnvelope() throws Exception {
+    public void toResponseShouldReturnValidSamlResponseInSoapEnvelope() throws Exception {
         String requestId = UUID.randomUUID().toString();
         String issuerId = "an-entity-id";
         String errorMessage = "some message";

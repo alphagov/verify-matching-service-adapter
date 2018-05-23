@@ -168,7 +168,7 @@ public class VerifyAssertionServiceTest {
                 .addAttributeStatement(anAttributeStatement().addAttribute(anIPAddress().build()).build());
     }
 
-    private static Subject anAssertionSubject(final String inResponseTo) {
+    public static Subject anAssertionSubject(final String inResponseTo) {
         return aSubject()
                 .withSubjectConfirmation(
                         aSubjectConfirmation()

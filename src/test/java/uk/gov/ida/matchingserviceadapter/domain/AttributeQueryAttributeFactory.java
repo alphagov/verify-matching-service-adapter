@@ -1,4 +1,4 @@
-package uk.gov.ida.matchingserviceadapter.factories;
+package uk.gov.ida.matchingserviceadapter.domain;
 
 import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.Attribute;

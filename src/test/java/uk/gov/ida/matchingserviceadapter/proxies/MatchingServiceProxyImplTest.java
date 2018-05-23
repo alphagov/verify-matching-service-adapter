@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.jerseyclient.JsonClient;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
@@ -22,7 +22,7 @@ import static uk.gov.ida.matchingserviceadapter.builders.UnknownUserCreationRequ
 import static uk.gov.ida.matchingserviceadapter.builders.UnknownUserCreationResponseDtoBuilder.anUnknownUserCreationResponseDto;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AssertionServiceProxyImplTest {
+public class MatchingServiceProxyImplTest {
 
     @Mock
     private JsonClient client;
@@ -38,7 +38,7 @@ public class AssertionServiceProxyImplTest {
     }
 
     @Test
-    public void sendRequestToMatchingService_shouldReturnAMatchingServiceResponseDto() throws Exception {
+    public void makeMatchingServiceRequestShouldReturnAMatchingServiceResponseDto() throws Exception {
         VerifyMatchingServiceRequestDto verifyMatchingServiceRequestDto = aMatchingServiceRequestDto().buildVerifyMatchingServiceRequestDto();
         URI localMatchingServiceUri = URI.create("http://a-uri");
         when(configuration.getLocalMatchingServiceMatchUrl()).thenReturn(localMatchingServiceUri);
@@ -55,7 +55,7 @@ public class AssertionServiceProxyImplTest {
     }
 
     @Test
-    public void makeUnknownUserCreationRequest_shouldReturnAnAppropriateDto() throws Exception {
+    public void makeUnknownUserCreationRequestShouldReturnAnAppropriateDto() throws Exception {
         UnknownUserCreationRequestDto request = anUnknnownUserCreationRequestDto().build();
         UnknownUserCreationResponseDto expectedResponse = anUnknownUserCreationResponseDto().build();
 

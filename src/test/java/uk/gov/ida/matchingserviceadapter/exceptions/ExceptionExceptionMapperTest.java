@@ -5,7 +5,7 @@ import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.common.ExceptionType;
 import uk.gov.ida.exceptions.ApplicationException;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;

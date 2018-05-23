@@ -13,7 +13,7 @@ import uk.gov.ida.matchingserviceadapter.domain.EncryptedAssertionContainer;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.logging.MdcHelper;
-import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceDtoMapper;
+import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceRequestDto;
@@ -47,7 +47,7 @@ public class MatchingServiceResource {
     private final MatchingResponseGenerator responseGenerator;
     private final SoapMessageManager soapMessageManager;
     private final ElementToOpenSamlXMLObjectTransformer<AttributeQuery> attributeQueryUnmarshaller;
-    private final MatchingServiceDtoMapper matchingRequestDtoMapper;
+    private final MatchingServiceRequestDtoMapper matchingRequestDtoMapper;
     private final MatchingServiceProxy matchingServiceProxy;
     private final MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper matchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
     private final AssertionDecrypter assertionDecrypter;
@@ -58,7 +58,7 @@ public class MatchingServiceResource {
             MatchingResponseGenerator responseGenerator,
             SoapMessageManager soapMessageManager,
             ElementToOpenSamlXMLObjectTransformer<AttributeQuery> attributeQueryUnmarshaller,
-            MatchingServiceDtoMapper matchingRequestDtoMapper,
+            MatchingServiceRequestDtoMapper matchingRequestDtoMapper,
             MatchingServiceProxy matchingServiceProxy,
             MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper matchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper, AssertionDecrypter assertionDecrypter) {
         this.attributeQueryService = attributeQueryService;

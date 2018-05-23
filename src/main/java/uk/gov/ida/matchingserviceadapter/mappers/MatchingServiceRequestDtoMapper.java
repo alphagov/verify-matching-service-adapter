@@ -8,12 +8,12 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.Cycle3DatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 
-public class MatchingServiceDtoMapper {
+public class MatchingServiceRequestDtoMapper {
 
     private final MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
     private final Boolean isEidasEnabled;
 
-    public MatchingServiceDtoMapper(
+    public MatchingServiceRequestDtoMapper(
         MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
         Boolean isEidasEnabled) {
         this.matchingDatasetToMatchingDatasetDtoMapper = matchingDatasetToMatchingDatasetDtoMapper;

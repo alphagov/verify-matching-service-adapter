@@ -31,7 +31,7 @@ import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_ENTITY_ID;
 public class ExceptionResponseFactoryTest {
 
     @Test
-    public void createResponse_shouldReturnValidSamlResponse() throws Exception {
+    public void createResponseShouldReturnValidSamlResponse() throws Exception {
         PublicKeyFactory publicKeyFactory = new PublicKeyFactory(new X509CertificateFactory());
         PrivateKey privateKey = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.PRIVATE_SIGNING_KEYS.get(TestEntityIds.STUB_IDP_ONE)));
         PublicKey publicKey = publicKeyFactory.createPublicKey(TestCertificateStrings.getPrimaryPublicEncryptionCert(TestEntityIds.HUB_ENTITY_ID));

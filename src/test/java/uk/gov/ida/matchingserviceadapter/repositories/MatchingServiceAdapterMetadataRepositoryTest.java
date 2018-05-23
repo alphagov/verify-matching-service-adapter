@@ -45,7 +45,7 @@ import static uk.gov.ida.shared.utils.string.StringEncoding.toBase64Encoded;
 import static uk.gov.ida.shared.utils.xml.XmlUtils.writeToString;
 
 @RunWith(OpenSAMLMockitoRunner.class)
-public class AssertionServiceAdapterMetadataRepositoryTest {
+public class MatchingServiceAdapterMetadataRepositoryTest {
 
     @Mock
     private MatchingServiceAdapterConfiguration msaConfiguration;

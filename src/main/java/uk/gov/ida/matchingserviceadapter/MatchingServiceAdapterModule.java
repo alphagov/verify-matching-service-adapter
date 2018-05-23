@@ -33,7 +33,7 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserC
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionResponseFactory;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatasetDtoMapper;
-import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceDtoMapper;
+import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxy;
 import uk.gov.ida.matchingserviceadapter.proxies.MatchingServiceProxyImpl;
@@ -192,11 +192,11 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MatchingServiceDtoMapper getInboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
+    public MatchingServiceRequestDtoMapper getInboundMatchingServiceRequestToMatchingServiceRequestDtoMapper(
             MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
             MatchingServiceAdapterConfiguration configuration
     ) {
-        return new MatchingServiceDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, configuration.isEidasEnabled());
+        return new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, configuration.isEidasEnabled());
     }
 
     @Provides

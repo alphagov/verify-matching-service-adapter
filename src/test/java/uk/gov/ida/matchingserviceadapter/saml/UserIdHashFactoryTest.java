@@ -1,10 +1,10 @@
-package uk.gov.ida.matchingserviceadapter.controllogic;
+package uk.gov.ida.matchingserviceadapter.saml;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.ida.matchingserviceadapter.exceptions.AuthnContextMissingException;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.domain.AuthnContext;

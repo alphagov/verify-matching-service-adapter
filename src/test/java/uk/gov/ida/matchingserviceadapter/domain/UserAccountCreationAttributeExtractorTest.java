@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.opensaml.saml.saml2.core.Attribute;
-import uk.gov.ida.matchingserviceadapter.factories.AttributeQueryAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
