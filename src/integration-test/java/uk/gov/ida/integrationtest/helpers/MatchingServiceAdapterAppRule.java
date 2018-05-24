@@ -35,11 +35,13 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
@@ -187,7 +189,7 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             overrides.addAll(countryOverrides);
         }
 
-        overrides.addAll(Arrays.asList(otherConfigOverrides));
+        overrides.addAll(asList(otherConfigOverrides));
 
         return overrides.toArray(new ConfigOverride[overrides.size()]);
     }
