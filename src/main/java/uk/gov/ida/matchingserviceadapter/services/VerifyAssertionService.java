@@ -24,10 +24,9 @@ import static uk.gov.ida.saml.core.validation.errors.GenericHubProfileValidation
 
 public class VerifyAssertionService extends AssertionService {
 
+    private enum AssertionType {AUTHN_ASSERTION, MDS_ASSERTION, CYCLE_3_ASSERTION}
+
     private String hubEntityId;
-    private static final String AUTHN_ASSERTION = "authn-assertion";
-    private static final String MDS_ASSERTION = "mds-assertion";
-    private static final String CYCLE_3_ASSERTION = "cycle-3-assertion";
     private final VerifyMatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
@@ -43,27 +42,30 @@ public class VerifyAssertionService extends AssertionService {
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
     }
 
+
     @Override
     public void validate(String requestId, List<Assertion> assertions) {
-        Map<String, List<Assertion>> assertionMap = assertions.stream()
+
+        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
                 .collect(Collectors.groupingBy(this::classifyAssertion));
 
-        List<Assertion> authnAssertions = assertionMap.get(AUTHN_ASSERTION);
+        List<Assertion> authnAssertions = assertionMap.get(AssertionType.AUTHN_ASSERTION);
         if (authnAssertions == null || authnAssertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one authn statement is expected.");
         }
 
-        List<Assertion> mdsAssertions = assertionMap.get(MDS_ASSERTION);
+        List<Assertion> mdsAssertions = assertionMap.get(AssertionType.MDS_ASSERTION);
         if (mdsAssertions == null || mdsAssertions.size() != 1) {
             throw new SamlResponseValidationException("Exactly one matching dataset assertion is expected.");
         }
 
-        authnAssertions.forEach(a -> validateHubAssertion(a, requestId, hubEntityId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME));
-        mdsAssertions.forEach(a -> validateHubAssertion(a, requestId, hubEntityId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME));
-        assertionMap.getOrDefault(CYCLE_3_ASSERTION, emptyList()).forEach(a -> validateCycle3Assertion(a, requestId, hubEntityId));
-
-        Assertion mdsAssertion = mdsAssertions.get(0);
         Assertion authnAssertion = authnAssertions.get(0);
+        Assertion mdsAssertion = mdsAssertions.get(0);
+
+        validateHubAssertion(authnAssertion, requestId, hubEntityId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        validateHubAssertion(mdsAssertion, requestId, hubEntityId, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+
+        assertionMap.getOrDefault(AssertionType.CYCLE_3_ASSERTION, emptyList()).forEach(a -> validateCycle3Assertion(a, requestId, hubEntityId));
 
         if (!mdsAssertion.getIssuer().getValue().equals(authnAssertion.getIssuer().getValue())) {
             throw new SamlResponseValidationException(MISMATCHED_ISSUERS);
@@ -76,14 +78,14 @@ public class VerifyAssertionService extends AssertionService {
 
     @Override
     public AssertionData translate(List<Assertion> assertions) {
-        Map<String, List<Assertion>> assertionMap = assertions.stream()
+        Map<AssertionType, List<Assertion>> assertionMap = assertions.stream()
                 .collect(Collectors.groupingBy(this::classifyAssertion));
 
-        AuthnStatement authnStatement = assertionMap.get(AUTHN_ASSERTION).get(0).getAuthnStatements().get(0);
+        AuthnStatement authnStatement = assertionMap.get(AssertionType.AUTHN_ASSERTION).get(0).getAuthnStatements().get(0);
         String levelOfAssurance = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
-        Assertion mdsAssertion = assertionMap.get(MDS_ASSERTION).get(0);
+        Assertion mdsAssertion = assertionMap.get(AssertionType.MDS_ASSERTION).get(0);
 
-        Optional<Assertion> cycle3Assertion = assertionMap.getOrDefault(CYCLE_3_ASSERTION, emptyList())
+        Optional<Assertion> cycle3Assertion = assertionMap.getOrDefault(AssertionType.CYCLE_3_ASSERTION, emptyList())
                 .stream()
                 .findFirst();
 
@@ -93,12 +95,12 @@ public class VerifyAssertionService extends AssertionService {
                 matchingDatasetUnmarshaller.fromAssertion(mdsAssertion));
     }
 
-    private String classifyAssertion(Assertion assertion) {
+    private AssertionType classifyAssertion(Assertion assertion) {
         if (!assertion.getAuthnStatements().isEmpty()) {
-            return AUTHN_ASSERTION;
+            return AssertionType.AUTHN_ASSERTION;
         } else if (assertion.getIssuer().getValue().equals(hubEntityId)) {
-            return CYCLE_3_ASSERTION;
+            return AssertionType.CYCLE_3_ASSERTION;
         }
-        return MDS_ASSERTION;
+        return AssertionType.MDS_ASSERTION;
     }
 }
