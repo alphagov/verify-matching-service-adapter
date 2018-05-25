@@ -11,9 +11,15 @@ import java.util.stream.Stream;
 public class ScenarioFilesLocator implements FilesLocator {
 
     private final static String DEFAULT_EXAMPLES_FOLDER_NAME = "examples";
-    private String customExamplesFolderLocation;
+    private final String datasetType;
+    private final String customExamplesFolderLocation;
 
-    public ScenarioFilesLocator(String customExamplesFolderLocation) {
+    public ScenarioFilesLocator() {
+        this("legacy", null);
+    }
+
+    public ScenarioFilesLocator(String datasetType, String customExamplesFolderLocation) {
+        this.datasetType = datasetType;
         this.customExamplesFolderLocation = customExamplesFolderLocation;
     }
 
@@ -28,10 +34,10 @@ public class ScenarioFilesLocator implements FilesLocator {
     }
 
     private File getScenariosFolder(FolderName folderName) {
-        return new File(getCustomExamplesFolderLocation() + File.separator + folderName.getValue());
+        return Paths.get(getExamplesFolderLocation(), datasetType, folderName.getValue()).toFile();
     }
 
-    private String getCustomExamplesFolderLocation() {
+    private String getExamplesFolderLocation() {
         return customExamplesFolderLocation != null ? customExamplesFolderLocation : getDefaultExamplesFolderLocation();
     }
 

@@ -1,0 +1,32 @@
+{
+  "hashedPid": "f8b5be711023fb45e7a13f323f1667767b0a7ef0584aec9550047655d8ce441b",
+  "levelOfAssurance": "LEVEL_2",
+  "matchId": "default-no-match-id",
+  "matchingDataset": {
+    "addresses": [{
+      "from": "2005-05-14T00:00:00.000Z",
+      "internationalPostCode": "GB1 5PP",
+      "lines": [
+        "2323 George Street"
+      ],
+      "postCode": "GB1 2PP",
+      "uprn": "7D68E096-5510-B3844C0BA3FD",
+      "verified": true
+    }],
+    "dateOfBirth": {
+      "value": "1980-05-24",
+      "verified": true
+    },
+    "firstName": {
+      "value": "Joe",
+      "verified": true
+    },
+    "surnames": [
+      {
+        "from": "2010-01-20T00:00:00.000Z",
+        "value": "Dou",
+        "verified": true
+      }
+    ]
+  }
+}

@@ -30,11 +30,19 @@ public class Application {
     public static void main(String[] args) {
         CommandLineOptionValue commandLineConfig = CommandLineOptionParser.getConfigFileLocation(args);
 
+        ApplicationConfiguration configuration = ConfigurationReader.getConfiguration(commandLineConfig.getConfigFileLocation());
+
+        ScenarioFilesLocator filesLocator = new ScenarioFilesLocator(
+                configuration.getLocalMatchingServiceUsesUniversalDataSet() ? "universal-dataset" : "legacy",
+                commandLineConfig.getExamplesFolderLocation()
+        );
+
         ExitStatus exitStatus = new Application().execute(
             new TestStatusPrintingListener(),
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            ConfigurationReader.getConfiguration(commandLineConfig.getConfigFileLocation()),
-            new ScenarioFilesLocator(commandLineConfig.getExamplesFolderLocation()));
+            configuration,
+            filesLocator
+        );
 
         System.exit(exitStatus.getExitCode());
     }

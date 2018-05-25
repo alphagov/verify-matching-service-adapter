@@ -49,13 +49,13 @@ public class DynamicScenarios extends ScenarioBase {
     }
 
     @TestFactory
-    public Stream<DynamicTest> dynamicMatchTests() throws Exception {
+    public Stream<DynamicTest> dynamicMatchTests() {
         return filesLocator.getFiles(MATCH_FOLDER_NAME)
             .map(file -> dynamicTest(file.getName(), getExecutable(file, true)));
     }
 
     @TestFactory
-    public Stream<DynamicTest> dynamicNoMatchTests() throws Exception {
+    public Stream<DynamicTest> dynamicNoMatchTests() {
         return filesLocator.getFiles(NO_MATCH_FOLDER_NAME)
             .map(file -> dynamicTest(file.getName(), getExecutable(file, false)));
     }

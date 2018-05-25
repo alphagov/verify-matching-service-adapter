@@ -24,8 +24,8 @@ Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you crea
 
 The tool offers scenarios for two JSON schemas:
 
-* legacy matching dataset - you will use this if your service does not support European identities and you have not enabled this functionality in your version of the Matching Service Adapter (MSA)
-* universal matching dataset - you will use this if your service supports European identities and you have enabled this functionality in your version of the MSA
+* **legacy matching dataset**: you will use this if your service does not support European identities and you have not enabled this functionality in your version of the Matching Service Adapter (MSA)
+* **universal matching dataset**: you will use this if your service supports European identities and you have enabled this functionality in your version of the MSA. The universal matching dataset supports assertions from both GOV.UK Verify identity providers (IdP) and identities from other European countries.
 
 If your local matching service supports the universal matching dataset, set `usesUniversalDataset` to true.
 
@@ -48,20 +48,16 @@ NB: the 'examplesFolder' should be the relative path of the folder containing th
 
 ## Test scenarios
 
-The tool will run the following scenarios:
+The tool will run the following scenarios for the legacy matching dataset (if `usesUniversalDataset` is set to false):
 
-For the legacy matching dataset (if `usesUniversalDataset` is set to false)
 * LoA1 - Minimum data set (first name, surname, DOB, a single address) 
 * LoA2 - Minimum data set (first name, surname, DOB, a single address) 
 * LoA1 - Extended data set (historical names, gender, historical addresses, some unverified, with at least one verified address) 
 * LoA2 - Extended data set (historical names, gender, historical addresses, some unverified, with at least one verified address) 
 * User account creation functionality
 
-For universal matching dataset (if `usesUniversalDataset` is set to true)
+The following scenarios using the universal matching dataset will allow you to test your matching service against assertions from a Verify IdP:
 
-The universal matching dataset supports assertions from both GOV.UK Verify identity providers (IdP) and identities from other European countries.
-
-The following scenarios allow you to test your matching service against assertions from GOV.UK Verify IdPs:
 * LoA1 - Minimum data set (first name, surname, DOB, a single address) 
 * LoA2 - Minimum data set (first name, surname, DOB, a single address) 
 * LoA1 - Extended data set (historical names, gender, addresses, some unverified) 
@@ -76,8 +72,8 @@ The following scenarios allow you to test your matching service against assertio
 
 ### Adding additional scenarios
 
-You can add or amend existing test scenarios in the `examples/match` and
-`examples/no-match` folders.
+You can add or amend existing test scenarios in the `examples/legacy/match` and
+`examples/legacy/no-match` folders. For the universal matching dataset, add or amend the test scenarios in `examples/universal-dataset/match` and `examples/universal-dataset/no-match`.
 
 Add any additional test scenarios as new JSON files within these folders.
 
