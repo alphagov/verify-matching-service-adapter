@@ -38,7 +38,7 @@ public class MatchingResponseGenerator {
     }
 
     public Response generateResponse(OutboundResponseFromMatchingService outboundResponseFromMatchingService) {
-        return Response.ok()
+        return ok()
                 .entity(soapMessageManager.wrapWithSoapEnvelope(responseElementTransformer.apply(outboundResponseFromMatchingService)))
                 .build();
     }

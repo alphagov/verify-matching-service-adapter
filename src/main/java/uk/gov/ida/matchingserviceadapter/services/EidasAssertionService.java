@@ -62,7 +62,11 @@ public class EidasAssertionService extends AssertionService {
 
     @Override
     public AssertionData translate(List<Assertion> assertions) {
-        Assertion countryAssertion = assertions.stream().filter(this::isCountryAssertion).findFirst().get();
+        Assertion countryAssertion = assertions
+                .stream()
+                .filter(this::isCountryAssertion)
+                .findFirst()
+                .orElseThrow(() -> new SamlResponseValidationException("No matching dataset assertion present."));
         Optional<Assertion> cycle3Assertion = assertions.stream()
                 .filter(a -> !isCountryAssertion(a))
                 .findFirst();

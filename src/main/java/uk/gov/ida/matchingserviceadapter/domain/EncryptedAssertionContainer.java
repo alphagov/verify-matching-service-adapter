@@ -17,11 +17,12 @@ public class EncryptedAssertionContainer implements ValidatedEncryptedAssertionC
 
     @Override
     public List<EncryptedAssertion> getEncryptedAssertions() {
-        return (List<EncryptedAssertion>) (List<?>)  attributeQuery.getSubject()
+        return attributeQuery.getSubject()
                 .getSubjectConfirmations().stream()
-                .flatMap(
-                        s -> s.getSubjectConfirmationData().getUnknownXMLObjects(EncryptedAssertion.DEFAULT_ELEMENT_NAME).stream()
-                )
+                .flatMap(s -> s.getSubjectConfirmationData()
+                        .getUnknownXMLObjects(EncryptedAssertion.DEFAULT_ELEMENT_NAME)
+                        .stream())
+                .map(ea -> (EncryptedAssertion) ea)
                 .collect(Collectors.toList());
     }
 }

@@ -75,18 +75,19 @@ public class MatchingServiceResource {
     @Path(Urls.MatchingServiceAdapterUrls.MATCHING_SERVICE_MATCH_REQUEST_PATH)
     @Timed(name= Urls.SOAP_TIMED_GROUP)
     public Response receiveSoapRequest(Document attributeQueryDocument) {
-        LOG.debug("AttributeQuery POSTED: {}", attributeQueryDocument);
+        LOG.debug("Matching AttributeQuery POSTED: {}", attributeQueryDocument);
 
         AttributeQuery attributeQuery = unwrapAttributeQuery(attributeQueryDocument);
-        List<Assertion> assertions = assertionDecrypter.decryptAssertions(new EncryptedAssertionContainer(attributeQuery));
-
-        // If no assertions are present, assume this is a Health Check
-        if (assertions.isEmpty()) {
-            return responseGenerator.generateHealthCheckResponse(attributeQuery.getID());
-        }
+        List<Assertion> assertions;
 
         try {
             attributeQueryService.validate(attributeQuery);
+            assertions = assertionDecrypter.decryptAssertions(new EncryptedAssertionContainer(attributeQuery));
+            // If no assertions are present, assume this is a Health Check
+            if (assertions.isEmpty()) {
+                return responseGenerator.generateHealthCheckResponse(attributeQuery.getID());
+            }
+
             attributeQueryService.validateAssertions(attributeQuery.getID(), assertions);
         } catch (SamlResponseValidationException | SamlTransformationErrorException ex) {
             throw new SamlOverSoapException(ex.getMessage(), ex, attributeQuery.getID());

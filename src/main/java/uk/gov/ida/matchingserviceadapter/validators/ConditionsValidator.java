@@ -38,7 +38,7 @@ public class ConditionsValidator {
             timeRestrictionValidator.validateNotOnOrAfter(notOnOrAfter);
         }
 
-        //timeRestrictionValidator.validateNotBefore(conditionsElement.getNotBefore());
+        timeRestrictionValidator.validateNotBefore(conditionsElement.getNotBefore());
         audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), entityId);
     }
 }

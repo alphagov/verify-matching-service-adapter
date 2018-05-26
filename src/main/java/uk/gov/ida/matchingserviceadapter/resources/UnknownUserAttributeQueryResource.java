@@ -73,10 +73,14 @@ public class UnknownUserAttributeQueryResource {
     @POST
     @Timed(name= Urls.SOAP_TIMED_GROUP)
     public Response receiveUnknownUserRequest(Document attributeQueryDocument) {
+        LOG.debug("Unknown User AttributeQuery POSTED: {}", attributeQueryDocument);
+
         AttributeQuery attributeQuery = unwrapAttributeQuery(attributeQueryDocument);
-        List<Assertion> assertions = assertionDecrypter.decryptAssertions(new EncryptedAssertionContainer(attributeQuery));
+        List<Assertion> assertions;
+
         try {
             attributeQueryService.validate(attributeQuery);
+            assertions = assertionDecrypter.decryptAssertions(new EncryptedAssertionContainer(attributeQuery));
             attributeQueryService.validateAssertions(attributeQuery.getID(), assertions);
         } catch (SamlResponseValidationException | SamlTransformationErrorException ex) {
             throw new SamlOverSoapException(ex.getMessage(), ex, attributeQuery.getID());

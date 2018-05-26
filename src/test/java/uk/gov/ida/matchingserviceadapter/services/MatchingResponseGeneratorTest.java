@@ -11,7 +11,6 @@ import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
-import uk.gov.ida.saml.core.test.OpenSAMLRunner;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
 import javax.ws.rs.core.Response;
