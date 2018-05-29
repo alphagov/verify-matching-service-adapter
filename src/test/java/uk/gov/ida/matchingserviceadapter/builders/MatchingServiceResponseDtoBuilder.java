@@ -27,8 +27,8 @@ public class MatchingServiceResponseDtoBuilder {
         return this;
     }
 
-    public MatchingServiceResponseDtoBuilder withCrappyResponse() {
-        result = "crappy";
+    public MatchingServiceResponseDtoBuilder withBadResponse() {
+        result = "bad-response";
         return this;
     }
 }

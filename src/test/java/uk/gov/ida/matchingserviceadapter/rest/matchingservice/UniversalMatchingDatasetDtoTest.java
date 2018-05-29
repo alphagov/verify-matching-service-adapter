@@ -85,6 +85,17 @@ public class UniversalMatchingDatasetDtoTest {
     }
 
     @Test
+    public void shouldSerializeToJson_withNonLatinNames() throws IOException {
+
+        MatchingDatasetDto universalMatchingDatasetDto = createMatchingDatasetDtoWithNonLatinNames(date);
+
+        String serializedJson = objectMapper.writeValueAsString(universalMatchingDatasetDto);
+        String expectedJson = jsonFixture(objectMapper, "universal-matching-dataset_non-latin-names.json");
+
+        assertThat(serializedJson).isEqualTo(expectedJson);
+    }
+
+    @Test
     public void shouldDeserializeFromJson_withNoAddresses() throws Exception {
         UniversalMatchingDatasetDto deserializedValue =
                 objectMapper.readValue(jsonFixture(objectMapper, "universal-matching-dataset_no-addresses-element.json"), UniversalMatchingDatasetDto.class);
@@ -112,16 +123,24 @@ public class UniversalMatchingDatasetDtoTest {
 
     private MatchingDatasetDtoBuilder getMatchingDatasetDtoBuilderWithBasicDetails(DateTime dateTime) {
         return aUniversalMatchingDatasetDto()
-                .addSurname(getSimpleMdsValue("walker", dateTime))
+                .addSurname(getTransliterableMdsValue("walker", null, dateTime))
                 .withDateOfBirth(getSimpleMdsValue(LocalDate.fromDateFields(dateTime.toDate()), dateTime))
-                .withFirstname(getSimpleMdsValue("walker", dateTime))
+                .withFirstname(getTransliterableMdsValue("walker", null, dateTime))
                 .withGender(getSimpleMdsValue(GenderDto.FEMALE, dateTime))
                 .withMiddleNames(getSimpleMdsValue("walker", dateTime))
                 .withSurnameHistory(
                         ImmutableList.of(
-                                getSimpleMdsValue("smith", dateTime),
-                                getSimpleMdsValue("walker", dateTime)
+                                getTransliterableMdsValue("smith", null, dateTime),
+                                getTransliterableMdsValue("walker", null, dateTime)
                         ));
+    }
+
+    private MatchingDatasetDto createMatchingDatasetDtoWithNonLatinNames(DateTime dateTime) {
+        return aUniversalMatchingDatasetDto()
+                .addSurname(getTransliterableMdsValue("smith", "σιδηρουργός", dateTime))
+                .withDateOfBirth(getSimpleMdsValue(LocalDate.fromDateFields(dateTime.toDate()), dateTime))
+                .withFirstname(getTransliterableMdsValue("walker", "περιπατητής", dateTime))
+                .build();
     }
 
     private UniversalAddressDto getAddressDto(String postcode, DateTime dateTime) {
@@ -142,6 +161,10 @@ public class UniversalMatchingDatasetDtoTest {
                 .withValue(value)
                 .withVerifiedStatus(true)
                 .build();
+    }
+
+    private TransliterableMdsValueDto getTransliterableMdsValue(String value, String nonLatinScriptValue, DateTime dateTime) {
+        return new TransliterableMdsValueDto(value, nonLatinScriptValue, dateTime, dateTime, true);
     }
 
 }

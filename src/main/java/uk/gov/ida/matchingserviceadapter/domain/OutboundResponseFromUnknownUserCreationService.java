@@ -1,17 +1,13 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import com.google.common.base.Optional;
 import org.joda.time.DateTime;
 import uk.gov.ida.common.shared.security.IdGenerator;
 import uk.gov.ida.saml.core.domain.IdaMatchingServiceResponse;
 import uk.gov.ida.saml.core.domain.UnknownUserCreationIdaStatus;
 
-import static com.google.common.base.Optional.fromNullable;
+import java.util.Optional;
 
 public class OutboundResponseFromUnknownUserCreationService extends IdaMatchingServiceResponse {
-
-    private static IdGenerator idGenerator = new IdGenerator();
-
     private final UnknownUserCreationIdaStatus status;
     private final Optional<MatchingServiceAssertion> matchingServiceAssertion;
 
@@ -28,40 +24,43 @@ public class OutboundResponseFromUnknownUserCreationService extends IdaMatchingS
     }
 
     public static OutboundResponseFromUnknownUserCreationService createFailure(
+            String responseId,
             String originalRequestId,
             String issuerId) {
         return new OutboundResponseFromUnknownUserCreationService(
-                idGenerator.getId(),
+                responseId,
                 originalRequestId,
                 issuerId,
                 DateTime.now(),
                 UnknownUserCreationIdaStatus.CreateFailure,
-                Optional.<MatchingServiceAssertion>absent());
+                Optional.empty());
     }
 
     public static OutboundResponseFromUnknownUserCreationService createNoAttributeFailure(
+            String responseId,
             String originalRequestId,
             String issuerId) {
         return new OutboundResponseFromUnknownUserCreationService(
-                idGenerator.getId(),
+                responseId,
                 originalRequestId,
                 issuerId,
                 DateTime.now(),
                 UnknownUserCreationIdaStatus.NoAttributeFailure,
-                Optional.<MatchingServiceAssertion>absent());
+                Optional.empty());
     }
 
     public static OutboundResponseFromUnknownUserCreationService createSuccess(
+            String responseId,
             MatchingServiceAssertion assertion,
             String originalRequestId,
             String issuerId) {
         return new OutboundResponseFromUnknownUserCreationService(
-                idGenerator.getId(),
+                responseId,
                 originalRequestId,
                 issuerId,
                 DateTime.now(),
                 UnknownUserCreationIdaStatus.Success,
-                fromNullable(assertion)
+                Optional.ofNullable(assertion)
         );
     }
 

@@ -5,14 +5,26 @@ import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 
 public class SimpleMdsValueBuilder<T> {
 
-    private T value = null;
+    public static final DateTime DEFAULT_FROM_DATE = DateTime.parse("2001-01-01");
+    public static final DateTime DEFAULT_HISTORICAL_TO_DATE = DateTime.parse("2001-01-01");
+    public static final DateTime DEFAULT_HISTORICAL_FROM_DATE = DateTime.parse("2000-01-01");
 
-    private DateTime from = DateTime.now().minusDays(5);
-    private DateTime to = DateTime.now().plusDays(5);
+    private T value;
+
+    private DateTime from;
+    private DateTime to;
     private boolean verified = false;
 
-    public static <T> SimpleMdsValueBuilder<T> aSimpleMdsValue() {
-        return new SimpleMdsValueBuilder<>();
+    public static <T> SimpleMdsValueBuilder<T> aCurrentSimpleMdsValue() {
+        return new SimpleMdsValueBuilder<T>()
+                .withFrom(DEFAULT_FROM_DATE)
+                .withTo(null);
+    }
+
+    public static <T> SimpleMdsValueBuilder<T> aHistoricalSimpleMdsValue() {
+        return new SimpleMdsValueBuilder<T>()
+                .withTo(DEFAULT_HISTORICAL_TO_DATE)
+                .withFrom(DEFAULT_HISTORICAL_FROM_DATE);
     }
 
     public SimpleMdsValue<T> build() {

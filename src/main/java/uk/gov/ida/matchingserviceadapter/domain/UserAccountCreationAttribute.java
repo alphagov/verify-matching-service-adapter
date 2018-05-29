@@ -7,9 +7,9 @@ import uk.gov.ida.matchingserviceadapter.saml.factories.UserAccountCreationAttri
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
-import uk.gov.ida.saml.core.domain.HubAssertion;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
+import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,46 +17,40 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
 public enum UserAccountCreationAttribute implements Serializable, AttributeExtractor {
-    FIRST_NAME("firstname"){
+    FIRST_NAME("firstname") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            List<SimpleMdsValue<String>> firstNameAttributeValues =
-                    getAttributeValuesWithoutMdsDetails(matchingDataset.getFirstNames());
-            return optionalOfList(
-                    firstNameAttributeValues,
-                    userAccountCreationAttributeFactory.createUserAccountCreationFirstnameAttribute(firstNameAttributeValues)
-            );
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return getTransliterableCurrentValue(matchingDataset.getFirstNames())
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationFirstnameAttribute);
         }
     },
-    FIRST_NAME_VERIFIED("firstname_verified"){
+    FIRST_NAME_VERIFIED("firstname_verified") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            return getCurrentValue(matchingDataset.getFirstNames())
-                    .map((SimpleMdsValue<String> stringSimpleMdsValue) ->
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return getTransliterableCurrentValue(matchingDataset.getFirstNames())
+                    .map(firstname ->
                             userAccountCreationAttributeFactory.createUserAccountCreationVerifiedAttribute(
                                     UserAccountCreationAttribute.FIRST_NAME_VERIFIED,
-                                    stringSimpleMdsValue.isVerified()
+                                    firstname.isVerified()
                             )
                     );
         }
     },
-    MIDDLE_NAME("middlename"){
+    MIDDLE_NAME("middlename") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            List<SimpleMdsValue<String>> middleNameAttributeValues = getAttributeValuesWithoutMdsDetails(matchingDataset.getMiddleNames());
-            return optionalOfList(
-                    middleNameAttributeValues,
-                    userAccountCreationAttributeFactory.createUserAccountCreationMiddlenameAttribute(middleNameAttributeValues)
-            );
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return getCurrentValue(matchingDataset.getMiddleNames())
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationMiddlenameAttribute);
         }
     },
-    MIDDLE_NAME_VERIFIED("middlename_verified"){
+    MIDDLE_NAME_VERIFIED("middlename_verified") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             return getCurrentValue(matchingDataset.getMiddleNames())
                     .map((SimpleMdsValue<String> stringSimpleMdsValue) ->
                             userAccountCreationAttributeFactory.createUserAccountCreationVerifiedAttribute(
@@ -66,20 +60,17 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
                     );
         }
     },
-    SURNAME("surname"){
+    SURNAME("surname") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            List<SimpleMdsValue<String>> surnameAttributeValues = getAttributeValuesWithoutMdsDetails(matchingDataset.getSurnames());
-            return optionalOfList(
-                    surnameAttributeValues,
-                    userAccountCreationAttributeFactory.createUserAccountCreationSurnameAttribute(surnameAttributeValues)
-            );
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return getTransliterableCurrentValue(matchingDataset.getSurnames())
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationSurnameAttribute);
         }
     },
-    SURNAME_VERIFIED("surname_verified"){
+    SURNAME_VERIFIED("surname_verified") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            return getCurrentValue(matchingDataset.getSurnames())
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return getTransliterableCurrentValue(matchingDataset.getSurnames())
                     .map((SimpleMdsValue<String> stringSimpleMdsValue) ->
                             userAccountCreationAttributeFactory.createUserAccountCreationVerifiedAttribute(
                                     UserAccountCreationAttribute.SURNAME_VERIFIED,
@@ -88,18 +79,16 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
                     );
         }
     },
-    DATE_OF_BIRTH("dateofbirth"){
+    DATE_OF_BIRTH("dateofbirth") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            List<SimpleMdsValue<LocalDate>> dateOfBirthAttributeValues = getAttributeValuesWithoutMdsDetails(matchingDataset.getDateOfBirths());
-            return optionalOfList(
-                    dateOfBirthAttributeValues,
-                    userAccountCreationAttributeFactory.createUserAccountCreationDateOfBirthAttribute(dateOfBirthAttributeValues));
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return getCurrentValue(matchingDataset.getDateOfBirths())
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationDateOfBirthAttribute);
         }
     },
-    DATE_OF_BIRTH_VERIFIED("dateofbirth_verified"){
+    DATE_OF_BIRTH_VERIFIED("dateofbirth_verified") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             return getCurrentValue(matchingDataset.getDateOfBirths())
                     .map((SimpleMdsValue<LocalDate> localDateSimpleMdsValue) ->
                             userAccountCreationAttributeFactory.createUserAccountCreationVerifiedAttribute(
@@ -109,16 +98,16 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
                     );
         }
     },
-    CURRENT_ADDRESS("currentaddress"){
+    CURRENT_ADDRESS("currentaddress") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             return extractCurrentAddress(matchingDataset.getCurrentAddresses()).
-                    map((Address address) -> userAccountCreationAttributeFactory.createUserAccountCreationCurrentAddressAttribute(ImmutableList.of(address)));
+                    map(userAccountCreationAttributeFactory::createUserAccountCreationCurrentAddressAttribute);
         }
     },
-    CURRENT_ADDRESS_VERIFIED("currentaddress_verified"){
+    CURRENT_ADDRESS_VERIFIED("currentaddress_verified") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             return extractCurrentAddress(matchingDataset.getCurrentAddresses())
                     .map((Address address) ->
                             userAccountCreationAttributeFactory.createUserAccountCreationVerifiedAttribute(
@@ -128,21 +117,20 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
                     );
         }
     },
-    ADDRESS_HISTORY("addresshistory"){
+    ADDRESS_HISTORY("addresshistory") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             List<Address> allAddresses = matchingDataset.getAddresses();
-            return optionalOfList(
-                    allAddresses,
-                    userAccountCreationAttributeFactory.createUserAccountCreationAddressHistoryAttribute(ImmutableList.copyOf(allAddresses)));
+            return allAddresses.isEmpty() ? Optional.empty()
+                    : Optional.of(userAccountCreationAttributeFactory.createUserAccountCreationAddressHistoryAttribute(ImmutableList.copyOf(allAddresses)));
         }
     },
-    CYCLE_3("cycle_3"){
+    CYCLE_3("cycle_3") {
         @Override
-        public Optional<Attribute> transform(MatchingDataset matchingDataset, HubAssertion cycle3Assertion) {
-            return cycle3Assertion != null ? cycle3Assertion.getCycle3Data()
-                    .map((Cycle3Dataset cycle3Dataset) -> cycle3Dataset.getAttributes().values())
-                    .map(userAccountCreationAttributeFactory::createUserAccountCreationCycle3DataAttributes) : Optional.empty();
+        public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
+            return cycle3Dataset
+                    .map(c3 -> c3.getAttributes().values())
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationCycle3DataAttributes);
         }
     };
 
@@ -154,26 +142,15 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
         this.attributeName = attributeName;
     }
 
-    public String getAttributeName(){
+    public String getAttributeName() {
         return attributeName;
     }
 
-    public static UserAccountCreationAttribute getUserAccountCreationAttribute(final String name){
+    public static UserAccountCreationAttribute getUserAccountCreationAttribute(final String name) {
         return Arrays.stream(values())
                 .filter(value -> value.getAttributeName().equals(name))
                 .findFirst()
                 .get();
-    }
-
-    private static <T> Optional<Attribute> optionalOfList(List<T> firstNameAttributeValues, Attribute userAccountCreationFirstnameAttribute) {
-        return !firstNameAttributeValues.isEmpty() ? Optional.of(userAccountCreationFirstnameAttribute) : Optional.empty();
-    }
-
-    private static <T> List<SimpleMdsValue<T>> getAttributeValuesWithoutMdsDetails(final List<SimpleMdsValue<T>> simpleMdsValues) {
-        List<SimpleMdsValue<T>> attributesWithoutMdsDetails = new ArrayList<>();
-        getCurrentValue(simpleMdsValues).ifPresent((SimpleMdsValue<T> tSimpleMdsValue) ->
-                attributesWithoutMdsDetails.add(new SimpleMdsValue<>(tSimpleMdsValue.getValue(), null, null, false)));
-        return attributesWithoutMdsDetails;
     }
 
     private static Optional<Address> extractCurrentAddress(List<Address> addresses) {
@@ -203,6 +180,10 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
             return Optional.empty();
         }
         return Optional.of(currentValues.get(0));
+    }
+
+    private static Optional<SimpleMdsValue<String>> getTransliterableCurrentValue(final List<TransliterableMdsValue> simpleMdsValues) {
+        return getCurrentValue(simpleMdsValues.stream().map(t -> (SimpleMdsValue<String>) t).collect(Collectors.toList()));
     }
 }
 

@@ -41,8 +41,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singletonList;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT;
+import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_IDP_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
@@ -201,20 +203,20 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         return Base64.encodeBase64String(certificate.getBytes());
     }
 
-    private String buildTrustAnchorString() throws ParseException, JOSEException, CertificateEncodingException {
+    private String buildTrustAnchorString() throws JOSEException, CertificateEncodingException {
         X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
         PrivateKey trustAnchorKey = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY));
         X509Certificate trustAnchorCert = x509CertificateFactory.createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);
         Generator generator = new Generator(trustAnchorKey, trustAnchorCert);
-        HashMap<String, X509Certificate> trustAnchorMap = new HashMap<>();
+        HashMap<String, List<X509Certificate>> trustAnchorMap = new HashMap<>();
         X509Certificate metadataCACert = x509CertificateFactory.createCertificate(CACertificates.TEST_METADATA_CA.replace(BEGIN_CERT, "").replace(END_CERT, "").replace("\n", ""));
-        trustAnchorMap.put(countryEntityId, metadataCACert);
+        trustAnchorMap.put(countryEntityId, singletonList(metadataCACert));
         return generator.generateFromMap(trustAnchorMap).serialize();
     }
 
     private EntityDescriptor buildTestCountryEntityDescriptor() throws Exception {
         KeyDescriptor signingKeyDescriptor = KeyDescriptorBuilder.aKeyDescriptor()
-                .withX509ForSigning(STUB_IDP_PUBLIC_PRIMARY_CERT)
+                .withX509ForSigning(STUB_COUNTRY_PUBLIC_PRIMARY_CERT)
                 .build();
 
         IDPSSODescriptor idpSsoDescriptor = IdpSsoDescriptorBuilder.anIdpSsoDescriptor()

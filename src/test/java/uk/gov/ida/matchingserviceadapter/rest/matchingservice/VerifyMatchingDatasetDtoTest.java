@@ -50,16 +50,16 @@ public class VerifyMatchingDatasetDtoTest {
 
     private MatchingDatasetDto createVerifyMatchingDatasetDto(DateTime dateTime) {
         return aVerifyMatchingDatasetDto()
-                .addSurname(getSimpleMdsValue("walker", dateTime))
+                .addSurname(getTransliterableMdsValue("walker", null, dateTime))
                 .withAddressHistory(ImmutableList.of(getAddressDto("EC2", dateTime), getAddressDto("WC1", dateTime)))
                 .withDateOfBirth(getSimpleMdsValue(LocalDate.fromDateFields(dateTime.toDate()), dateTime))
-                .withFirstname(getSimpleMdsValue("walker", dateTime))
+                .withFirstname(getTransliterableMdsValue("walker", null, dateTime))
                 .withGender(getSimpleMdsValue(GenderDto.FEMALE, dateTime))
                 .withMiddleNames(getSimpleMdsValue("walker", dateTime))
                 .withSurnameHistory(
                         ImmutableList.of(
-                                getSimpleMdsValue("smith", dateTime),
-                                getSimpleMdsValue("walker", dateTime)
+                                getTransliterableMdsValue("smith", null, dateTime),
+                                getTransliterableMdsValue("walker", null, dateTime)
                         ))
                 .build();
     }
@@ -82,6 +82,10 @@ public class VerifyMatchingDatasetDtoTest {
                 .withValue(value)
                 .withVerifiedStatus(true)
                 .build();
+    }
+
+    private TransliterableMdsValueDto getTransliterableMdsValue(String value, String nonLatinScriptValue, DateTime dateTime) {
+        return new TransliterableMdsValueDto(value, nonLatinScriptValue, dateTime, dateTime, true);
     }
 
 }

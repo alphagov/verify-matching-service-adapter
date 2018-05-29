@@ -9,13 +9,13 @@ import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
-import uk.gov.ida.saml.core.extensions.Date;
 import uk.gov.ida.saml.core.extensions.Line;
-import uk.gov.ida.saml.core.extensions.PersonName;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 
 public class UserAccountCreationAttributeFactory {
@@ -26,37 +26,29 @@ public class UserAccountCreationAttributeFactory {
         this.openSamlXmlObjectFactory = openSamlXmlObjectFactory;
     }
 
-    public Attribute createUserAccountCreationFirstnameAttribute(List<SimpleMdsValue<String>> firstnames) {
-        return createPersonNameAttribute(firstnames, UserAccountCreationAttribute.FIRST_NAME);
+    public Attribute createUserAccountCreationFirstnameAttribute(SimpleMdsValue<String> firstname) {
+        return createPersonNameAttribute(firstname, UserAccountCreationAttribute.FIRST_NAME);
     }
 
-    public Attribute createUserAccountCreationMiddlenameAttribute(List<SimpleMdsValue<String>> middlenames) {
-        return createPersonNameAttribute(middlenames, UserAccountCreationAttribute.MIDDLE_NAME);
+    public Attribute createUserAccountCreationMiddlenameAttribute(SimpleMdsValue<String> middlename) {
+        return createPersonNameAttribute(middlename, UserAccountCreationAttribute.MIDDLE_NAME);
     }
 
-    public Attribute createUserAccountCreationSurnameAttribute(List<SimpleMdsValue<String>> surnames) {
-        return createPersonNameAttribute(surnames, UserAccountCreationAttribute.SURNAME);
+    public Attribute createUserAccountCreationSurnameAttribute(SimpleMdsValue<String> surname) {
+        return createPersonNameAttribute(surname, UserAccountCreationAttribute.SURNAME);
     }
 
-    public Attribute createUserAccountCreationDateOfBirthAttribute(List<SimpleMdsValue<LocalDate>> dateOfBirths) {
-        List<AttributeValue> dateOfBirthAttributeValues = new ArrayList<>();
-        for (SimpleMdsValue<LocalDate> dateOfBirth : dateOfBirths) {
-            dateOfBirthAttributeValues.add(createAttributeValuesForDate(dateOfBirth));
-        }
+    public Attribute createUserAccountCreationDateOfBirthAttribute(SimpleMdsValue<LocalDate> dateOfBirth) {
         return createAttribute(
                 UserAccountCreationAttribute.DATE_OF_BIRTH,
-                dateOfBirthAttributeValues
+                singletonList(openSamlXmlObjectFactory.createDateAttributeValue(dateOfBirth.getValue().toString("yyyy-MM-dd")))
         );
     }
 
-    public Attribute createUserAccountCreationCurrentAddressAttribute(List<Address> addresses) {
-        List<AttributeValue> addressValues = new ArrayList<>();
-        for (Address address: addresses) {
-            addressValues.add(createAddressAttributeValue(address));
-        }
+    public Attribute createUserAccountCreationCurrentAddressAttribute(Address address) {
         return createAttribute(
                 UserAccountCreationAttribute.CURRENT_ADDRESS,
-                addressValues);
+                singletonList(createAddressAttributeValue(address)));
     }
 
     public Attribute createUserAccountCreationAddressHistoryAttribute(List<Address> addresses) {
@@ -83,14 +75,10 @@ public class UserAccountCreationAttributeFactory {
         return createAttribute(UserAccountCreationAttribute.CYCLE_3, cycle3AttributeValues);
     }
 
-    private Attribute createPersonNameAttribute(List<SimpleMdsValue<String>> names, final UserAccountCreationAttribute userAccountCreationAttribute) {
-        List<AttributeValue> nameValues = new ArrayList<>();
-        for (SimpleMdsValue<String> name : names) {
-            nameValues.add(createAttributeValueForPersonName(name));
-        }
+    private Attribute createPersonNameAttribute(SimpleMdsValue<String> name, final UserAccountCreationAttribute userAccountCreationAttribute) {
         return createAttribute(
                 userAccountCreationAttribute,
-                nameValues
+                singletonList(openSamlXmlObjectFactory.createPersonNameAttributeValue(name.getValue()))
         );
     }
 
@@ -129,21 +117,5 @@ public class UserAccountCreationAttributeFactory {
         attribute.getAttributeValues().addAll(attributeValues);
 
         return attribute;
-    }
-
-    private AttributeValue createAttributeValueForPersonName(SimpleMdsValue<String> nameValue) {
-        final PersonName personNameAttributeValue = openSamlXmlObjectFactory.createPersonNameAttributeValue(nameValue.getValue());
-        personNameAttributeValue.setFrom(nameValue.getFrom());
-        personNameAttributeValue.setTo(nameValue.getTo());
-        personNameAttributeValue.setVerified(nameValue.isVerified());
-        return personNameAttributeValue;
-    }
-
-    private AttributeValue createAttributeValuesForDate(SimpleMdsValue<LocalDate> dateValue) {
-        final Date dateOfBirthAttributeValue = openSamlXmlObjectFactory.createDateAttributeValue(dateValue.getValue().toString("yyyy-MM-dd"));
-        dateOfBirthAttributeValue.setFrom(dateValue.getFrom());
-        dateOfBirthAttributeValue.setTo(dateValue.getTo());
-        dateOfBirthAttributeValue.setVerified(dateValue.isVerified());
-        return dateOfBirthAttributeValue;
     }
 }

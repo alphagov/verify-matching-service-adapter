@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.rest.matchingservice;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.joda.time.LocalDate;
@@ -21,9 +20,9 @@ public class UniversalMatchingDatasetDto extends MatchingDatasetDto {
     }
 
     public UniversalMatchingDatasetDto(
-            Optional<SimpleMdsValueDto<String>> firstName,
+            Optional<TransliterableMdsValueDto> firstName,
             Optional<SimpleMdsValueDto<String>> middleNames,
-            List<SimpleMdsValueDto<String>> surnames,
+            List<TransliterableMdsValueDto> surnames,
             Optional<SimpleMdsValueDto<GenderDto>> gender,
             Optional<SimpleMdsValueDto<LocalDate>> dateOfBirth,
             Optional<List<UniversalAddressDto>> addresses) {

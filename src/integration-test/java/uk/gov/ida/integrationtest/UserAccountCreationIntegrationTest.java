@@ -203,7 +203,6 @@ public class UserAccountCreationIntegrationTest {
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
     }
 
-    @Ignore("UAC is not yet enabled for eIDAS")
     @Test
     public void shouldReturnCurrentAttributesWhenPassedEidasFullMatchingDataset() throws Exception {
         List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
