@@ -34,12 +34,12 @@ project.version = "$gradle.ext.version_number-$build_number"
 def dependencyVersions = [
         opensaml:"$opensaml",
         dropwizard: '1.3.2',
-        ida_utils: '326',
-        ida_test_utils: '35',
-        hub_saml: "$opensaml-15551",
-        dev_pki: '1.1.0-22',
-        trust_anchor: '1.0-21',
-        saml_libs_version: "$opensaml-142"
+        ida_utils: '333',
+        ida_test_utils: '38',
+        hub_saml: "$opensaml-15564",
+        dev_pki: '1.1.0-28',
+        trust_anchor: '1.0-31',
+        saml_libs_version: "$opensaml-143"
 ]
 
 apply plugin: "idaJar"
