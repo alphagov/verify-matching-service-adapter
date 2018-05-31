@@ -91,8 +91,7 @@ dependencies {
         "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:saml-utils:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:hub-saml:$dependencyVersions.hub_saml",
-        "uk.gov.ida.eidas:trust-anchor:$dependencyVersions.trust_anchor",
-        "uk.gov.ida:validation:1.0.9-40"
+        "uk.gov.ida.eidas:trust-anchor:$dependencyVersions.trust_anchor"
 
     compile configurations.dropwizard,
         configurations.ida,
