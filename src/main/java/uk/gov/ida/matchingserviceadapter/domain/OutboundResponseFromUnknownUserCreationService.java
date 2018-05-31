@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
 import org.joda.time.DateTime;
-import uk.gov.ida.common.shared.security.IdGenerator;
 import uk.gov.ida.saml.core.domain.IdaMatchingServiceResponse;
 import uk.gov.ida.saml.core.domain.UnknownUserCreationIdaStatus;
 

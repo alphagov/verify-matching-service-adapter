@@ -14,7 +14,7 @@ import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public abstract class AssertionService {
     protected final InstantValidator instantValidator;
@@ -43,7 +43,7 @@ public abstract class AssertionService {
                                         String expectedInResponseTo,
                                         String hubEntityId,
                                         QName role) {
-        hubSignatureValidator.validate(asList(assertion), role);
+        hubSignatureValidator.validate(singletonList(assertion), role);
         instantValidator.validate(assertion.getIssueInstant(), "Hub Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         if (assertion.getConditions() != null) {

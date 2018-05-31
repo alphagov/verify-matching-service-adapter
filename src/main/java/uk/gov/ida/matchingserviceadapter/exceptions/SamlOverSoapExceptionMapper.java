@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.exceptions;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
@@ -42,7 +41,7 @@ public class SamlOverSoapExceptionMapper implements ExceptionMapper<SamlOverSoap
             return Response.serverError().entity(soapMessage).type(MediaType.TEXT_XML_TYPE).build();
         } catch (MarshallingException | SignatureException e) {
             LOG.error("Failed to create error response.");
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

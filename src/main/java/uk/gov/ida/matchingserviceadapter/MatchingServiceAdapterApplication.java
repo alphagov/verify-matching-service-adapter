@@ -1,8 +1,7 @@
 package uk.gov.ida.matchingserviceadapter;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
@@ -38,7 +37,11 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
         // - it's the same fix that was required in the tests...
         JerseyGuiceUtils.reset();
 
-        new MatchingServiceAdapterApplication().runRuntimeException(args);
+        try {
+            new MatchingServiceAdapterApplication().run(args);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -89,7 +92,7 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
     public final void run(MatchingServiceAdapterConfiguration configuration, Environment environment) {
         IdaSamlBootstrap.bootstrap();
 
-        environment.getObjectMapper().setDateFormat(new ISO8601DateFormat());
+        environment.getObjectMapper().setDateFormat(StdDateFormat.getDateInstance());
 
         environment.jersey().register(LocalMetadataResource.class);
         environment.jersey().register(MatchingServiceResource.class);
@@ -105,11 +108,4 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
         environment.healthChecks().register(healthCheck.getName(), healthCheck);
     }
 
-    private void runRuntimeException(String[] arguments) {
-        try {
-            run(arguments);
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
-    }
 }
