@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public class EidasAssertionService extends AssertionService {
 
@@ -87,7 +87,7 @@ public class EidasAssertionService extends AssertionService {
                 .map(SamlMessageSignatureValidator::new)
                 .map(SamlAssertionsSignatureValidator::new)
                 .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
-                .validate(asList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+                .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         conditionsValidator.validate(assertion.getConditions(), hubConnectorEntityId);

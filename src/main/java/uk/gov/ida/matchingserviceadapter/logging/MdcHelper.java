@@ -8,13 +8,12 @@ public class MdcHelper {
     private MdcHelper() {}
 
     public static void addContextToMdc(AttributeQuery attributeQuery) {
-        addContextToMdc("AttributeQuery", attributeQuery.getID(), attributeQuery.getIssuer().getValue());
-    }
+        String messageId = attributeQuery.getID();
+        String entityID = attributeQuery.getIssuer().getValue();
 
-    private static void addContextToMdc(String messageType, String messageId, String entityID) {
         MDC.put("messageId", messageId);
         MDC.put("entityId", entityID);
-        MDC.put("logPrefix", "[" + messageType + " " + messageId + " from " + entityID + "] ");
+        MDC.put("logPrefix", "[AttributeQuery " + messageId + " from " + entityID + "] ");
+        
     }
-
 }

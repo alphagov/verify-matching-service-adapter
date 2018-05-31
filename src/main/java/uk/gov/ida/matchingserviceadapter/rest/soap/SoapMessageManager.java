@@ -15,7 +15,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import static com.google.common.base.Throwables.propagate;
 import static java.text.MessageFormat.format;
 import static uk.gov.ida.shared.utils.xml.XmlUtils.newDocumentBuilder;
 
@@ -29,7 +28,7 @@ public class SoapMessageManager {
             documentBuilder = newDocumentBuilder();
         } catch (ParserConfigurationException e) {
             LOG.error("*** ALERT: Failed to create a document builder when trying to construct the the soap message. ***", e);
-            throw propagate(e);
+            throw new RuntimeException(e);
         }
         Document document = documentBuilder.newDocument();
         document.adoptNode(element);
@@ -67,7 +66,7 @@ public class SoapMessageManager {
 
             return element;
         } catch (XPathExpressionException e) {
-            throw propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
