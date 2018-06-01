@@ -4,6 +4,7 @@ MSA Release Notes
 ### Next
 
 * Added configuration option to Verify Matching Service Test Tool config to allow testing using the new universal dataset
+* Update Test CA certificate
 
 
 ### 2.2.0
