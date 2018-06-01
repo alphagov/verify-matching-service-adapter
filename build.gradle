@@ -35,8 +35,8 @@ def dependencyVersions = [
         opensaml:"$opensaml",
         dropwizard: '1.3.2',
         ida_utils: '333',
-        ida_test_utils: '38',
-        hub_saml: "$opensaml-15564",
+        ida_test_utils: '39',
+        hub_saml: "$opensaml-15565",
         dev_pki: '1.1.0-28',
         trust_anchor: '1.0-31',
         saml_libs_version: "$opensaml-143"
