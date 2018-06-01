@@ -65,7 +65,7 @@ public class AssertionServiceAssertionToAssertionTransformerTest {
     @Test
     public void shouldTransformAssertionsWithFirstNameAttribute() {
         String personName = "John";
-        Attribute attribute = new UserAccountCreationAttributeFactory(openSamlXmlObjectFactory).createUserAccountCreationFirstnameAttribute(
+        Attribute attribute = new UserAccountCreationAttributeFactory(openSamlXmlObjectFactory).createUserAccountCreationFirstNameAttribute(
                 new TransliterableMdsValue(personName, null));
 
         Assertion assertion = transformAssertionWithAttribute(attribute);
