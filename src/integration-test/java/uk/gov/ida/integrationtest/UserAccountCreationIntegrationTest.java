@@ -10,7 +10,6 @@ import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.XMLObject;
@@ -38,6 +37,7 @@ import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.extensions.StringValueSamlObject;
 import uk.gov.ida.saml.core.extensions.Verified;
 import uk.gov.ida.saml.core.extensions.impl.AddressImpl;
+import uk.gov.ida.saml.core.extensions.impl.StringBasedMdsAttributeValueImpl;
 import uk.gov.ida.saml.core.extensions.impl.VerifiedImpl;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.core.test.builders.AddressAttributeBuilder_1_1;
@@ -76,6 +76,8 @@ import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttrib
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.CURRENT_ADDRESS;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.CURRENT_ADDRESS_VERIFIED;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.CYCLE_3;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.DATE_OF_BIRTH;
+import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.DATE_OF_BIRTH_VERIFIED;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.FIRST_NAME;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.FIRST_NAME_VERIFIED;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.MIDDLE_NAME;
@@ -90,6 +92,7 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP_MS;
 import static uk.gov.ida.saml.core.test.builders.AddressAttributeValueBuilder_1_1.anAddressAttributeValue;
 import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
+import static uk.gov.ida.saml.core.test.builders.DateAttributeValueBuilder.aDateValue;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.aPersonName_1_1;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
@@ -101,6 +104,8 @@ public class UserAccountCreationIntegrationTest {
     private static final String MATCHING_REQUEST_PATH = "/matching-request";
     private static final String UNKNOWN_USER_MATCHING_PATH = "/unknown-user-attribute-query";
     private static final String REQUEST_ID = "default-request-id";
+
+    private static final DateTime FROM_DATE = new DateTime(1990, 1, 30, 0, 0);
 
     @ClassRule
     public static final HttpStubRule localMatchingService = new HttpStubRule();
@@ -127,8 +132,8 @@ public class UserAccountCreationIntegrationTest {
 
     @ClassRule
     public static final MatchingServiceAdapterAppRule applicationRule = new MatchingServiceAdapterAppRule(true,
-        ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH),
-        ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:" + localMatchingService.getPort() + UNKNOWN_USER_MATCHING_PATH)
+            ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH),
+            ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:" + localMatchingService.getPort() + UNKNOWN_USER_MATCHING_PATH)
     );
 
     private final String UNKNOWN_USER_URI = "http://localhost:" + applicationRule.getLocalPort() + "/unknown-user-attribute-query";
@@ -161,8 +166,8 @@ public class UserAccountCreationIntegrationTest {
     }
 
     @Test
-    public void shouldReturnCurrentAttributesWhenPassedFullMatchingDataset() throws Exception {
-        List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
+    public void shouldReturnCurrentAttributesWhenPassedFullMatchingDataset() {
+        List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, DATE_OF_BIRTH, DATE_OF_BIRTH_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(toList());
 
@@ -186,8 +191,12 @@ public class UserAccountCreationIntegrationTest {
         assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), ImmutableList.of(
                 userAccountCreationAttributeFor(aPersonNameValue().withValue("CurrentSurname").build(), SURNAME),
                 userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), SURNAME_VERIFIED),
-                userAccountCreationAttributeFor(aPersonNameValue().withValue("FirstName").build(), FIRST_NAME),
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("FirstName").withFrom(FROM_DATE).build(), FIRST_NAME),
                 userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), FIRST_NAME_VERIFIED),
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("MiddleName").build(), MIDDLE_NAME),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), MIDDLE_NAME_VERIFIED),
+                userAccountCreationAttributeFor(aDateValue().withValue("1991-11-11").build(), DATE_OF_BIRTH),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), DATE_OF_BIRTH_VERIFIED),
                 userAccountCreationAttributeFor(anAddressAttributeValue().addLines(ImmutableList.of("address line 1")).withVerified(false).build(), CURRENT_ADDRESS),
                 userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), CURRENT_ADDRESS_VERIFIED),
                 userAccountCreationAttributeFor(
@@ -201,10 +210,11 @@ public class UserAccountCreationIntegrationTest {
         Assertions.assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
         Assertions.assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+
     }
 
     @Test
-    public void shouldReturnCurrentAttributesWhenPassedEidasFullMatchingDataset() throws Exception {
+    public void shouldReturnCurrentAttributesWhenPassedEidasFullMatchingDataset() {
         List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(toList());
@@ -233,8 +243,8 @@ public class UserAccountCreationIntegrationTest {
     }
 
     @Test
-    public void shouldReturnFailureResponseWhenAttributesRequestedDoNotExist(){
-        List<Attribute> requiredAttributes = asList(FIRST_NAME, MIDDLE_NAME).stream()
+    public void shouldReturnFailureResponseWhenAttributesRequestedDoNotExist() {
+        List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, MIDDLE_NAME)
                 .map(userAccountCreationAttribute -> new AttributeQueryAttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
                 .collect(toList());
 
@@ -271,9 +281,8 @@ public class UserAccountCreationIntegrationTest {
                 .withSubject(aSubjectWithAssertions(asList(
                         anAuthnStatementAssertion("default-request-id"),
                         assertionWithOnlyFirstName()
-                        ), REQUEST_ID, HUB_ENTITY_ID))
+                ), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
-
 
         Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
 
@@ -291,13 +300,13 @@ public class UserAccountCreationIntegrationTest {
 
     private Attribute userAccountCreationAttributeFor(List<AttributeValue> attributeValues, UserAccountCreationAttribute userAccountCreationAttribute) {
         UserAccountCreationValueAttributeBuilder attributeBuilder = aUserAccountCreationAttributeValue();
-        for(AttributeValue attributeValue : attributeValues) {
+        for (AttributeValue attributeValue : attributeValues) {
             attributeBuilder.addValue(attributeValue);
         }
         return attributeBuilder.buildAsAttribute(userAccountCreationAttribute);
     }
 
-    private void assertThatResponseContainsExpectedUserCreationAttributes(List<AttributeStatement>  attributeStatements, final List<Attribute> expectedUserCreationAttributes) {
+    private void assertThatResponseContainsExpectedUserCreationAttributes(List<AttributeStatement> attributeStatements, final List<Attribute> expectedUserCreationAttributes) {
         assertThat(attributeStatements).hasSize(1);
         AttributeStatement attributeStatement = attributeStatements.get(0);
         assertThat(attributeStatement.getAttributes()).hasSameSizeAs(expectedUserCreationAttributes);
@@ -341,17 +350,36 @@ public class UserAccountCreationIntegrationTest {
             StringValueSamlObject expectedAttributeValue = (StringValueSamlObject) expectedValue;
             assertThat(actualAttributeValue.getValue()).isEqualTo(expectedAttributeValue.getValue());
         }
+
+        assertThatToAndFromDatesAreEqual(actualValue, expectedValue);
+    }
+
+    private void assertThatToAndFromDatesAreEqual(XMLObject actualValue, XMLObject expectedValue) {
+        if (actualValue instanceof StringBasedMdsAttributeValueImpl) {
+            StringBasedMdsAttributeValueImpl actualAttributeValue = (StringBasedMdsAttributeValueImpl) actualValue;
+            StringBasedMdsAttributeValueImpl expectedAttributeValue = (StringBasedMdsAttributeValueImpl) expectedValue;
+
+            assertThat(actualAttributeValue.getTo()).isNull();
+
+            if (expectedAttributeValue.getFrom() == null) {
+                assertThat(actualAttributeValue.getFrom()).isNull();
+            } else {
+                assertThat(actualAttributeValue.getFrom()).isNotNull();
+                assertThat(actualAttributeValue.getFrom().toDate()).isInSameDayAs(expectedAttributeValue.getFrom().toDate());
+            }
+        }
     }
 
     private Assertion aCompleteMatchingDatasetAssertion() {
         return aMatchingDatasetAssertion(asList(
-                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldSurname").withFrom(new DateTime(1990, 1, 30, 0, 0)).withTo(new DateTime(2000, 1, 29, 0, 0)).withVerified(true).build()).buildAsSurname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldSurname").withFrom(FROM_DATE).withTo(new DateTime(2000, 1, 29, 0, 0)).withVerified(true).build()).buildAsSurname(),
                 aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentSurname").withVerified(true).build()).buildAsSurname(),
-                aPersonName_1_1().addValue(aPersonNameValue().withValue("FirstName").withVerified(false).build()).buildAsFirstname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("FirstName").withVerified(false).withFrom(FROM_DATE).build()).buildAsFirstname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("MiddleName").withVerified(false).build()).buildAsMiddlename(),
                 AddressAttributeBuilder_1_1.anAddressAttribute().addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("address line 1")).withVerified(false).build()).buildCurrentAddress(),
                 AddressAttributeBuilder_1_1.anAddressAttribute().addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("address line 2")).withVerified(true).build()).buildPreviousAddress(),
                 GenderAttributeBuilder_1_1.aGender_1_1().build(),
-                DateAttributeBuilder_1_1.aDate_1_1().buildAsDateOfBirth()));
+                DateAttributeBuilder_1_1.aDate_1_1().addValue(aDateValue().withValue("1991-11-11").withVerified(true).build()).buildAsDateOfBirth()));
     }
 
     private Assertion assertionWithOnlyFirstName() {
@@ -363,5 +391,4 @@ public class UserAccountCreationIntegrationTest {
     private Assertion aMatchingDatasetAssertion(List<Attribute> attributes) {
         return AssertionHelper.aMatchingDatasetAssertion(attributes, false, REQUEST_ID);
     }
-
 }
