@@ -10,13 +10,13 @@ server:
       - type: console
 
 logging:
-  level: INFO
+  level: ${LOG_LEVEL:-INFO}
   appenders:
     - type: console
       logFormat: '%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'
 
 matchingServiceAdapter:
-  entityId: http://dev-rp-ms.local/SAML2/MD
+  entityId: ${MSA_ENTITY_ID}
   externalUrl: ${ASSERTION_CONSUMER_SERVICE_URL}
 
 localMatchingService:
@@ -26,16 +26,22 @@ localMatchingService:
 hub:
   ssoUrl: ${HUB_SSO_URL}
   republishHubCertificatesInLocalMetadata: true
-  hubEntityId: https://dev-hub.local
+  hubEntityId: ${METADATA_ENTITY_ID}
 
 metadata:
   url: ${METADATA_URL}
   trustStore:
     path: data/pki/metadata.ts
     password: marshmallow
+  hubTrustStore:
+      path: data/pki/hub_federation.ts
+      password: marshmallow
+  idpTrustStore:
+      path: data/pki/idp_federation.ts
+      password: marshmallow
   minRefreshDelay: 60000
   maxRefreshDelay: 600000
-  expectedEntityId: https://dev-hub.local
+  expectedEntityId: ${METADATA_ENTITY_ID}
   hubFederationId: VERIFY-FEDERATION
 
 signingKeys:
@@ -58,15 +64,15 @@ returnStackTraceInResponse: true
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
   hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
-  metadata:
-    uri: ${COUNTRY_METADATA_URI}
+  aggregatedMetadata:
+    trustAnchorUri: ${TRUST_ANCHOR_URL}
+    metadataSourceUri: ${METADATA_SOURCE_URI}
     trustStore:
-      path: truststores/country_metadata_truststore.ts
-      password: Password
-    minRefreshDelay: 60000
+      path: data/pki/metadata.ts
+      password: marshmallow
+    minRefreshDelay: 5000
     maxRefreshDelay: 600000
-    expectedEntityId: ${COUNTRY_EXPECTED_ENTITY_ID}
-    jerseyClientName: country-metadata-client
+    jerseyClientName: trust-anchor-client
     client:
       timeout: 2s
       timeToLive: 10m
