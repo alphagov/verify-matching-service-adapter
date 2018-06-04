@@ -72,8 +72,13 @@ The following scenarios allow you to test your matching service against assertio
 
 ### Adding additional scenarios
 
-You can add or amend existing test scenarios in the `examples/legacy/match` and
-`examples/legacy/no-match` folders. For the universal matching dataset, add or amend the test scenarios in `examples/universal-dataset/match` and `examples/universal-dataset/no-match`.
+You can add or amend existing example test datasets.
+If you are running in legacy mode, these can be found in `examples/legacy/match` and`examples/legacy/no-match` folders.
+If you are running in universal matching dataset mode, these can be found in `examples/universal-dataset/match` and `examples/universal-dataset/no-match`.
+
+For scenarios under the corresponding `no-match` folder, the testing tool will expect a no match response from your local matching service.
+
+For scenarios under the corresponding `match` folder, the testing tool will expect a match response from your local matching service.
 
 Add any additional test scenarios as new JSON files within these folders.
 
