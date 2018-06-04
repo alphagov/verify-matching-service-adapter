@@ -25,7 +25,7 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
         @Override
         public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             return getTransliterableCurrentValue(matchingDataset.getFirstNames())
-                    .map(userAccountCreationAttributeFactory::createUserAccountCreationFirstnameAttribute);
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationFirstNameAttribute);
         }
     },
     FIRST_NAME_VERIFIED("firstname_verified") {
@@ -44,7 +44,7 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
         @Override
         public Optional<Attribute> transform(MatchingDataset matchingDataset, Optional<Cycle3Dataset> cycle3Dataset) {
             return getCurrentValue(matchingDataset.getMiddleNames())
-                    .map(userAccountCreationAttributeFactory::createUserAccountCreationMiddlenameAttribute);
+                    .map(userAccountCreationAttributeFactory::createUserAccountCreationMiddleNameAttribute);
         }
     },
     MIDDLE_NAME_VERIFIED("middlename_verified") {
@@ -185,4 +185,3 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
         return getCurrentValue(simpleMdsValues.stream().map(t -> (SimpleMdsValue<String>) t).collect(Collectors.toList()));
     }
 }
-

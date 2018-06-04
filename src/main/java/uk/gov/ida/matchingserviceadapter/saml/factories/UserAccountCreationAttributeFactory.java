@@ -10,6 +10,7 @@ import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.extensions.Line;
+import uk.gov.ida.saml.core.extensions.StringBasedMdsAttributeValue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,12 +27,12 @@ public class UserAccountCreationAttributeFactory {
         this.openSamlXmlObjectFactory = openSamlXmlObjectFactory;
     }
 
-    public Attribute createUserAccountCreationFirstnameAttribute(SimpleMdsValue<String> firstname) {
-        return createPersonNameAttribute(firstname, UserAccountCreationAttribute.FIRST_NAME);
+    public Attribute createUserAccountCreationFirstNameAttribute(SimpleMdsValue<String> firstName) {
+        return createPersonNameAttribute(firstName, UserAccountCreationAttribute.FIRST_NAME);
     }
 
-    public Attribute createUserAccountCreationMiddlenameAttribute(SimpleMdsValue<String> middlename) {
-        return createPersonNameAttribute(middlename, UserAccountCreationAttribute.MIDDLE_NAME);
+    public Attribute createUserAccountCreationMiddleNameAttribute(SimpleMdsValue<String> middleName) {
+        return createPersonNameAttribute(middleName, UserAccountCreationAttribute.MIDDLE_NAME);
     }
 
     public Attribute createUserAccountCreationSurnameAttribute(SimpleMdsValue<String> surname) {
@@ -41,7 +42,9 @@ public class UserAccountCreationAttributeFactory {
     public Attribute createUserAccountCreationDateOfBirthAttribute(SimpleMdsValue<LocalDate> dateOfBirth) {
         return createAttribute(
                 UserAccountCreationAttribute.DATE_OF_BIRTH,
-                singletonList(openSamlXmlObjectFactory.createDateAttributeValue(dateOfBirth.getValue().toString("yyyy-MM-dd")))
+                singletonList(createAttributeValueWithDates(
+                        openSamlXmlObjectFactory.createDateAttributeValue(dateOfBirth.getValue().toString("yyyy-MM-dd")),
+                        dateOfBirth))
         );
     }
 
@@ -53,7 +56,7 @@ public class UserAccountCreationAttributeFactory {
 
     public Attribute createUserAccountCreationAddressHistoryAttribute(List<Address> addresses) {
         List<AttributeValue> addressValues = new ArrayList<>();
-        for (Address address: addresses) {
+        for (Address address : addresses) {
             addressValues.add(createAddressAttributeValue(address));
         }
         return createAttribute(
@@ -78,7 +81,7 @@ public class UserAccountCreationAttributeFactory {
     private Attribute createPersonNameAttribute(SimpleMdsValue<String> name, final UserAccountCreationAttribute userAccountCreationAttribute) {
         return createAttribute(
                 userAccountCreationAttribute,
-                singletonList(openSamlXmlObjectFactory.createPersonNameAttributeValue(name.getValue()))
+                singletonList(createAttributeValueWithDates(openSamlXmlObjectFactory.createPersonNameAttributeValue(name.getValue()), name))
         );
     }
 
@@ -105,6 +108,12 @@ public class UserAccountCreationAttributeFactory {
         addressAttributeValue.setVerified(address.isVerified());
 
         return addressAttributeValue;
+    }
+
+    private AttributeValue createAttributeValueWithDates(StringBasedMdsAttributeValue attributeValue, SimpleMdsValue value) {
+        attributeValue.setFrom(value.getFrom());
+        attributeValue.setTo(value.getTo());
+        return attributeValue;
     }
 
     private Attribute createAttribute(UserAccountCreationAttribute userAccountCreationAttribute, List<? extends XMLObject> attributeValues) {
