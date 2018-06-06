@@ -84,6 +84,7 @@ europeanIdentity:
 
   # Details about eIDAS metadata can be configured here
   aggregatedMetadata:
+    jerseyClientName: trust-anchor-client
     trustAnchorUri: https://www.integration.signin.service.gov.uk/SAML2/metadata/trust-anchor
     metadataSourceUri: https://www.integration.signin.service.gov.uk/SAML2/metadata/aggregator
     trustStore:
