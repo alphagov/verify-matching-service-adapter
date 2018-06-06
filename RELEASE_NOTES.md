@@ -10,6 +10,21 @@ MSA Release Notes
 * Included the Hub and IDP truststore files in the JAR archive to simplify the MSA deployment process.
 * Upgraded to using Dropwizard version 1.3.2.
 
+#### Required configuration changes
+* Remove the the `hub.trustStore` section and instead set `environment` in the `metadata` section:
+```diff
+ hub:
+   ssoUrl: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/SSO
+-  trustStore:
+-    path: test_ida_hub.ts
+-    password: puppet
+
+ metadata:
++  # Choices are (INTEGRATION|PRODUCTION)
++  environment: INTEGRATION
+```
+
+
 ### 2.2.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.1.0...2.2.0)
 
