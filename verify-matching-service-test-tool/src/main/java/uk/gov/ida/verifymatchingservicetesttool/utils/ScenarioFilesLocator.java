@@ -34,7 +34,7 @@ public class ScenarioFilesLocator implements FilesLocator {
     }
 
     private File getScenariosFolder(FolderName folderName) {
-        return Paths.get(getExamplesFolderLocation(), datasetType, folderName.getValue()).toFile();
+        return Paths.get(getExamplesFolderLocation(), folderName.getValue()).toFile();
     }
 
     private String getExamplesFolderLocation() {
@@ -46,6 +46,6 @@ public class ScenarioFilesLocator implements FilesLocator {
         return new File(path)
                 .getParentFile()
                 .getParentFile()
-                .getAbsolutePath() + File.separator + DEFAULT_EXAMPLES_FOLDER_NAME;
+                .getAbsolutePath() + File.separator + DEFAULT_EXAMPLES_FOLDER_NAME + File.separator + datasetType;
     }
 }
