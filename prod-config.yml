@@ -77,6 +77,21 @@ metadata:
     path: prod_ida_metadata.ts
     password: puppet
 
+# Including this section will enable European identities and the universal dataset for matching
+# European identities are NOT enabled for production yet so this should remain false
+europeanIdentity:
+  enabled: false
+  hubConnectorEntityId: https://www.signin.service.gov.uk/SAML2/metadata/connector
+
+  # Details about eIDAS metadata can be configured here
+  aggregatedMetadata:
+    jerseyClientName: trust-anchor-client
+    trustAnchorUri: https://www.signin.service.gov.uk/SAML2/metadata/trust-anchor
+    metadataSourceUri: https://www.signin.service.gov.uk/SAML2/metadata/aggregator
+    trustStore:
+      path: prod_ida_metadata.ts
+      password: puppet
+
 ## Options to add additional logging. By default, logs will be output to console.
 ## See http://www.dropwizard.io/1.0.5/docs/manual/configuration.html#logging
 ## for more information.

@@ -67,15 +67,29 @@ encryptionKeys:
 # Settings for connecting with the hub can be configured here
 # if necessary.
 hub:
-  ssoUrl: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/SSO
+  ssoUrl: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/SSO
 
 # Settings for obtaining Verify's metadata can be configured here.
 metadata:
   environment: INTEGRATION
-  url: https://compliance-tool-reference.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation
+  url: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation
   trustStore:
     path: test_ida_metadata.ts
     password: puppet
+
+# Including this section will enable European identities and the universal dataset for matching
+europeanIdentity:
+  enabled: true
+  hubConnectorEntityId: https://www.integration.signin.service.gov.uk/SAML2/metadata/connector # replace with the URL for the production environment when your service goes live
+
+  # Details about eIDAS metadata can be configured here
+  aggregatedMetadata:
+    jerseyClientName: trust-anchor-client
+    trustAnchorUri: https://www.integration.signin.service.gov.uk/SAML2/metadata/trust-anchor
+    metadataSourceUri: https://www.integration.signin.service.gov.uk/SAML2/metadata/aggregator
+    trustStore:
+      path: test_ida_metadata.ts
+      password: puppet
 
 ## Options to add additional logging. By default, logs will be output to console.
 ## See http://www.dropwizard.io/1.0.5/docs/manual/configuration.html#logging
