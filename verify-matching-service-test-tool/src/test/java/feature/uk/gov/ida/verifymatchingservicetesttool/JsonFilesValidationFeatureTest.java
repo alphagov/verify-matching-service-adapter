@@ -1,9 +1,7 @@
 package feature.uk.gov.ida.verifymatchingservicetesttool;
 
 import common.uk.gov.ida.verifymatchingservicetesttool.utils.TestsFilesLocator;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.scenarios.DynamicScenarios;
@@ -24,22 +22,22 @@ import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.MATCH_FO
 public class JsonFilesValidationFeatureTest extends FeatureTestBase {
 
     @Test
-    public void givenNonWellFormedJsonThenShowRelevantError() {
+    public void givenBadlyFormedJsonThenShowRelevantError() {
         localMatchingService.ensureDefaultMatchScenariosExist();
+
+        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{
+            put(MATCH_FOLDER_NAME, Arrays.asList("badly-formed.json"));
+        }};
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+            .withFilesLocator(new TestsFilesLocator(testFiles))
             .build();
-
-        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{
-            put(MATCH_FOLDER_NAME, Arrays.asList("not-well-formed.json"));
-        }};
 
         application.execute(
             listener,
             selectClass(DynamicScenarios.class),
-            applicationConfiguration,
-            new TestsFilesLocator(testFiles)
+            applicationConfiguration
         );
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
@@ -47,42 +45,110 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
         assertThat(
             firstFailure.getException().getMessage(),
             allOf(
-                containsString(String.format("Invalid JSON in file '%s'. Reason: ", "not-well-formed.json")),
+                containsString(String.format("Invalid JSON in file '%s'. Reason: ", "badly-formed.json")),
                 containsString("Unrecognized token")
             )
         );
     }
 
     @Test
-    public void givenWellFormedJsonWithWrongSchemaThenShowRelevantError(){
+    public void givenWellFormedLegacyJsonWithWrongSchemaThenShowRelevantError() {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
-        ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
-            .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
-            .build();
-
-        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{
+        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>() {{
             put(MATCH_FOLDER_NAME, Arrays.asList("well-formed-wrong-schema.json"));
         }};
 
+        ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
+                .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+                .withFilesLocator(new TestsFilesLocator(testFiles))
+                .build();
+
         application.execute(
-            listener,
-            selectClass(DynamicScenarios.class),
-            applicationConfiguration,
-            new TestsFilesLocator(testFiles)
+                listener,
+                selectClass(DynamicScenarios.class),
+                applicationConfiguration
         );
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
 
         assertThat(
-            firstFailure.getException().getMessage(),
-            allOf(
-                containsString(String.format("Invalid JSON in file '%s'. JSON schema validation failed. Reason: ", "well-formed-wrong-schema.json")),
-                containsString("required key [matchId] not found"),
-                containsString("required key [levelOfAssurance] not found"),
-                containsString("required key [hashedPid] not found"),
-                containsString("required key [matchingDataset] not found")
-            )
+                firstFailure.getException().getMessage(),
+                allOf(
+                        containsString(String.format("Invalid JSON in file '%s'. JSON schema validation failed. Reason: ", "well-formed-wrong-schema.json")),
+                        containsString("required key [matchId] not found"),
+                        containsString("required key [levelOfAssurance] not found"),
+                        containsString("required key [hashedPid] not found"),
+                        containsString("required key [matchingDataset] not found")
+                )
+        );
+    }
+
+    @Test
+    public void givenWellFormedUniversalJsonWithWrongSchemaThenShowRelevantError() {
+        localMatchingService.ensureDefaultMatchScenariosExist();
+
+        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{
+            put(MATCH_FOLDER_NAME, Arrays.asList("well-formed-wrong-schema.json"));
+        }};
+
+        ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
+                .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+                .withUsesUniversalDataSet(true)
+                .withFilesLocator(new TestsFilesLocator(testFiles))
+                .build();
+
+        application.execute(
+                listener,
+                selectClass(DynamicScenarios.class),
+                applicationConfiguration
+        );
+
+        Failure firstFailure = listener.getSummary().getFailures().get(0);
+
+        assertThat(
+                firstFailure.getException().getMessage(),
+                allOf(
+                        containsString(String.format("Invalid JSON in file '%s'. JSON schema validation failed. Reason: ", "well-formed-wrong-schema.json")),
+                        containsString("required key [matchId] not found"),
+                        containsString("required key [levelOfAssurance] not found"),
+                        containsString("required key [hashedPid] not found"),
+                        containsString("required key [matchingDataset] not found")
+                )
+        );
+    }
+
+    @Test
+    public void givenWellFormedUniversalJsonWithWrongWithMissingSchemaElementsThenShowRelevantError() {
+        localMatchingService.ensureDefaultMatchScenariosExist();
+
+        Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{
+            put(MATCH_FOLDER_NAME, Arrays.asList("well-formed-wrong-universal-schema.json"));
+        }};
+
+        ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
+                .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
+                .withUsesUniversalDataSet(true)
+                .withFilesLocator(new TestsFilesLocator(testFiles))
+                .build();
+
+        application.execute(
+                listener,
+                selectClass(DynamicScenarios.class),
+                applicationConfiguration
+        );
+
+        Failure firstFailure = listener.getSummary().getFailures().get(0);
+
+        assertThat(
+                firstFailure.getException().getMessage(),
+                allOf(
+                        containsString(String.format("Invalid JSON in file '%s'. JSON schema validation failed. Reason: ",
+                                "well-formed-wrong-universal-schema.json")),
+                        containsString("required key [firstName] not found"),
+                        containsString("required key [surnames] not found"),
+                        containsString("required key [dateOfBirth] not found")
+                )
         );
     }
 }

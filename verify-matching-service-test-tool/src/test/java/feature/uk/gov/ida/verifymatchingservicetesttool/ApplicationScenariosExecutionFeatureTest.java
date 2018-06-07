@@ -15,8 +15,6 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 
 public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
-    private static final long NUMBER_OF_SCENARIOS = 10;
-
     @Test
     public void shouldRunAllTestsForLegacyDataSchemaWhenUniversalDatasetFlagMissing() {
         localMatchingService.ensureDefaultMatchScenariosExist();
@@ -30,13 +28,12 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         assertThat(
-            listener.getTotalTests(),
-            is(NUMBER_OF_SCENARIOS)
+            listener.getSummary().getTestsSucceededCount(),
+            is(7L)
         );
     }
 
@@ -54,13 +51,12 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         application.execute(
                 listener,
                 selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-                applicationConfiguration,
-                fileLocator
+                applicationConfiguration
         );
 
         assertThat(
-                listener.getTotalTests(),
-                is(NUMBER_OF_SCENARIOS)
+                listener.getSummary().getTestsSucceededCount(),
+                is(10L)
         );
     }
 
@@ -81,8 +77,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         ExitStatus exitStatus = application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         assertThat(exitStatus, is(ExitStatus.FAILURE));
@@ -101,8 +96,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         ExitStatus exitStatus = application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         assertThat(exitStatus, is(ExitStatus.SUCCESS));

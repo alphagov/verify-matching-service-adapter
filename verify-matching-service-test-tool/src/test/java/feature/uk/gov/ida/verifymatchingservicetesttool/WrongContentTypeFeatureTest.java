@@ -27,8 +27,7 @@ public class WrongContentTypeFeatureTest extends FeatureTestBase {
         application.execute(
             listener,
             selectClass(LevelOfAssuranceOneScenario.class),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);

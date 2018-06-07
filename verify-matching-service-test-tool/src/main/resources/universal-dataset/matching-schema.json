@@ -20,8 +20,7 @@
         "LEVEL_2",
         "LEVEL_3",
         "LEVEL_4"
-      ],
-      "type": "string"
+      ]
     },
     "matchId": {
       "type": "string"
@@ -32,8 +31,7 @@
           "items": {
             "properties": {
               "from": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "internationalPostCode": {
                 "type": "string"
@@ -48,8 +46,7 @@
                 "type": "string"
               },
               "to": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "uprn": {
                 "type": "string"
@@ -65,16 +62,13 @@
         "dateOfBirth": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date"
             },
             "verified": {
               "type": "boolean"
@@ -85,14 +79,15 @@
         "firstName": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
+              "type": "string"
+            },
+            "nonLatinScriptValue": {
               "type": "string"
             },
             "verified": {
@@ -104,20 +99,17 @@
         "gender": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
               "enum": [
                 "FEMALE",
                 "MALE",
                 "NOT_SPECIFIED"
-              ],
-              "type": "string"
+              ]
             },
             "verified": {
               "type": "boolean"
@@ -128,12 +120,10 @@
         "middleNames": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
               "type": "string"
@@ -148,14 +138,15 @@
           "items": {
             "properties": {
               "from": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "to": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "value": {
+                "type": "string"
+              },
+              "nonLatinScriptValue": {
                 "type": "string"
               },
               "verified": {
@@ -167,7 +158,8 @@
           "type": "array"
         }
       },
-      "type": "object"
+      "type": "object",
+      "required": ["dateOfBirth", "firstName", "surnames"]
     }
   },
   "type": "object",

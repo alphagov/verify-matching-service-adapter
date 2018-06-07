@@ -4,8 +4,8 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import uk.gov.ida.verifymatchingservicetesttool.utils.ScenarioFilesLocator;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
+import uk.gov.ida.verifymatchingservicetesttool.utils.ScenarioFilesLocator;
 
 public class FilesLocatorResolver implements ParameterResolver {
 

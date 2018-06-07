@@ -14,12 +14,12 @@ import javax.ws.rs.core.Response;
 import java.util.HashSet;
 import java.util.Map;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.StringContains.containsString;
 
 @ExtendWith(ApplicationConfigurationResolver.class)
 public abstract class ScenarioBase {

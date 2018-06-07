@@ -1,7 +1,5 @@
 package uk.gov.ida.verifymatchingservicetesttool.utils;
 
-import uk.gov.ida.verifymatchingservicetesttool.Application;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +8,6 @@ import java.util.stream.Stream;
 
 public class ScenarioFilesLocator implements FilesLocator {
 
-    private final static String DEFAULT_EXAMPLES_FOLDER_NAME = "examples";
     private final String datasetType;
     private final String customExamplesFolderLocation;
 
@@ -38,14 +35,6 @@ public class ScenarioFilesLocator implements FilesLocator {
     }
 
     private String getExamplesFolderLocation() {
-        return customExamplesFolderLocation != null ? customExamplesFolderLocation : getDefaultExamplesFolderLocation();
-    }
-
-    private String getDefaultExamplesFolderLocation() {
-        String path = Application.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        return new File(path)
-                .getParentFile()
-                .getParentFile()
-                .getAbsolutePath() + File.separator + DEFAULT_EXAMPLES_FOLDER_NAME + File.separator + datasetType;
+        return customExamplesFolderLocation;
     }
 }

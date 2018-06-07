@@ -29,7 +29,7 @@ public class MatchingFeatureTest extends FeatureTestBase {
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
             .build();
 
-        application.execute(listener, selectClass(DynamicScenarios.class), applicationConfiguration, fileLocator);
+        application.execute(listener, selectClass(DynamicScenarios.class), applicationConfiguration);
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
 
@@ -54,7 +54,7 @@ public class MatchingFeatureTest extends FeatureTestBase {
             .withLocalMatchingServiceMatchUrl(localMatchingService.getMatchingUrl())
             .build();
 
-        application.execute(listener, selectClass(DynamicScenarios.class), applicationConfiguration, fileLocator);
+        application.execute(listener, selectClass(DynamicScenarios.class), applicationConfiguration);
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
 

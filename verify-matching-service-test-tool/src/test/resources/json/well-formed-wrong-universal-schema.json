@@ -1,0 +1,17 @@
+{
+  "hashedPid": "8fbfdd035a92daf890673d9ff8f50def3aad66ea42026c581bd73735250ba706",
+  "levelOfAssurance": "LEVEL_1",
+  "matchId": "default-match-id",
+  "matchingDataset": {
+    "addresses": [{
+      "from": "%yesterdayDate%",
+      "internationalPostCode": "GB1 5PP",
+      "lines": [
+        "2323 George Street"
+      ],
+      "postCode": "GB1 2PP",
+      "uprn": "7D68E096-5510-B3844C0BA3FD",
+      "verified": true
+    }]
+  }
+}

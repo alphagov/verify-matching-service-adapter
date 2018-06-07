@@ -8,16 +8,12 @@ import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
-import uk.gov.ida.verifymatchingservicetesttool.configurations.CommandLineOptionValue;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.ApplicationConfigurationResolver;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.FileUtilsResolver;
 import uk.gov.ida.verifymatchingservicetesttool.resolvers.FilesLocatorResolver;
-import uk.gov.ida.verifymatchingservicetesttool.utils.CommandLineOptionParser;
+import uk.gov.ida.verifymatchingservicetesttool.resolvers.JsonValidatorResolver;
 import uk.gov.ida.verifymatchingservicetesttool.utils.ExitStatus;
-import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
-import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
-import uk.gov.ida.verifymatchingservicetesttool.utils.ScenarioFilesLocator;
 import uk.gov.ida.verifymatchingservicetesttool.utils.TestStatusPrintingListener;
 
 import java.util.Collection;
@@ -28,20 +24,12 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 public class Application {
 
     public static void main(String[] args) {
-        CommandLineOptionValue commandLineConfig = CommandLineOptionParser.getConfigFileLocation(args);
-
-        ApplicationConfiguration configuration = ConfigurationReader.getConfiguration(commandLineConfig.getConfigFileLocation());
-
-        ScenarioFilesLocator filesLocator = new ScenarioFilesLocator(
-                configuration.getLocalMatchingServiceUsesUniversalDataSet() ? "universal-dataset" : "legacy",
-                commandLineConfig.getExamplesFolderLocation()
-        );
+        ApplicationConfiguration configuration = ConfigurationReader.getConfiguration(args);
 
         ExitStatus exitStatus = new Application().execute(
             new TestStatusPrintingListener(),
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            configuration,
-            filesLocator
+            configuration
         );
 
         System.exit(exitStatus.getExitCode());
@@ -49,10 +37,10 @@ public class Application {
 
     public ExitStatus execute(SummaryGeneratingListener listener,
                               DiscoverySelector selector,
-                              ApplicationConfiguration applicationConfiguration,
-                              FilesLocator filesLocator) {
+                              ApplicationConfiguration applicationConfiguration) {
         ApplicationConfigurationResolver.setConfiguration(applicationConfiguration);
-        FilesLocatorResolver.setFilesLocator(filesLocator);
+        FilesLocatorResolver.setFilesLocator(applicationConfiguration.getFilesLocator());
+        JsonValidatorResolver.setJsonValidator(applicationConfiguration.getJsonValidator());
 
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selector)
@@ -60,13 +48,8 @@ public class Application {
 
         Collection<TestExecutionSummary> testSummaries = new HashSet<>();
 
-        if (applicationConfiguration.getLocalMatchingServiceUsesUniversalDataSet()) {
-            FileUtilsResolver.setFileUtils(new FileUtils("universal-dataset"));
-            testSummaries.add(executeTestRun(listener, request));
-        } else {
-            FileUtilsResolver.setFileUtils(new FileUtils("legacy"));
-            testSummaries.add(executeTestRun(listener, request));
-        }
+        FileUtilsResolver.setFileUtils(applicationConfiguration.getFileUtils());
+        testSummaries.add(executeTestRun(listener, request));
 
         return testSummaries.stream().anyMatch(summary -> !summary.getFailures().isEmpty())
                 ? ExitStatus.FAILURE : ExitStatus.SUCCESS;
