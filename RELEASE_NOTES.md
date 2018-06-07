@@ -2,9 +2,27 @@ MSA Release Notes
 =================
 
 ### Next
+* [Enabled support for accepting identities from other European countries](https://github.com/alphagov/verify-matching-service-adapter/blob/releaseNotes3.0.0/doc/release-details/3.0.0.md#support-for-european-identities) as part of eIDAS compliance.
+* [Added a configuration option to the Matching Service Test Tool](https://github.com/alphagov/verify-matching-service-adapter/blob/master/verify-matching-service-test-tool/README.md#configuration) to allow testing using the new [universal JSON matching schema](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/buildmatchingservice.html#jsonschema).
+* [Upgraded to SHA-256 as the default secure hashing algorithm](https://github.com/alphagov/verify-matching-service-adapter/blob/releaseNotes3.0.0/doc/release-details/3.0.0.md#upgrade-to-sha-256) for signing and encrypting SAML messages.
+* Updated the test IDAP root Certificate Authority.
+* Separated the GOV.UK Verify Hub and IDP truststores to improve security.
+* Included the Hub and IDP truststore files in the JAR archive to simplify the MSA deployment process.
+* Upgraded to using Dropwizard version 1.3.2.
 
-* Added configuration option to Verify Matching Service Test Tool config to allow testing using the new universal dataset
-* Update Test CA certificate
+#### Required configuration changes
+* Remove the the `hub.trustStore` section and instead set `environment` in the `metadata` section:
+```diff
+ hub:
+   ssoUrl: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/SSO
+-  trustStore:
+-    path: test_ida_hub.ts
+-    password: puppet
+
+ metadata:
++  # Choices are (INTEGRATION|PRODUCTION)
++  environment: INTEGRATION
+```
 
 
 ### 2.2.0
@@ -27,7 +45,7 @@ MSA Release Notes
 * Add address history as a user account creation attribute
  - Add ADDRESS_HISTORY to the UserAccountCreationAttribute enum and support for it in UserAccountCreationAttributeExtractor
  - If a transaction is configured with ADDRESS_HISTORY in its list of user account creation attributes, then the MSA will extract the user's full address history and return it to the hub as an "addresshistory" SAML attribute.
- - Address history will be added to the onboarding form at a later date for Relying Parties to request it. 
+ - Address history will be added to the onboarding form at a later date for Relying Parties to request it.
 
 ### 2.0.0
 
@@ -145,7 +163,7 @@ Jul 28, 2015 -- v. 411
 ~~~ Missing notes from wiki
 
 Jun 25,2014 -- v. 247
-* Removing type from NameID to support Shibboleth 
+* Removing type from NameID to support Shibboleth
 
 
 Feb 28, 2014 -- v. 153
@@ -153,13 +171,13 @@ Feb 28, 2014 -- v. 153
 * Upgraded to Dropwizard 0.7rc1
 * Jetty configuration has changed
 * Graphite configuration has changed
-* Breaking changes for configuration - see instructions 
+* Breaking changes for configuration - see instructions
 
 -- Upcoming Changes --
 
 * Re-enable configurable syslog logging
 * Add configurable logstash format for files or console logging
-* Allow dropwizard configuration for log levels 
+* Allow dropwizard configuration for log levels
 
 Feb 3, 2014 -- v. 151
 
