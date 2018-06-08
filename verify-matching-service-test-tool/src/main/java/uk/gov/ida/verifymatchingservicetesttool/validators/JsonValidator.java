@@ -6,6 +6,7 @@ import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,6 +14,12 @@ import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
 
 public class JsonValidator {
+
+    private final String datasetType;
+
+    public JsonValidator(String datasetType) {
+        this.datasetType = datasetType;
+    }
 
     public void validate(String validationErrorMessage, String jsonString) {
         wellFormedValidation(validationErrorMessage, jsonString);
@@ -28,7 +35,7 @@ public class JsonValidator {
     }
 
     private void schemaValidation(String validationErrorMessage, String jsonString) {
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("legacy/matching-schema.json")) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(datasetType + File.separator + "matching-schema.json")) {
             JSONObject rawSchema = new JSONObject(new JSONTokener(inputStream));
             SchemaLoader.load(rawSchema).validate(new JSONObject(jsonString));
         } catch (ValidationException e) {

@@ -23,13 +23,13 @@ public class LocalMatchingServiceConfiguration {
 
     @Valid
     @JsonProperty
-    private Boolean usesUniversalDataset;
+    private boolean usesUniversalDataset;
 
     @JsonCreator
     public LocalMatchingServiceConfiguration(
         @JsonProperty("matchUrl") URI matchUrl,
         @JsonProperty("accountCreationUrl") URI accountCreationUrl,
-        @JsonProperty("usesUniversalDataset") Boolean usesUniversalDataset
+        @JsonProperty("usesUniversalDataset") boolean usesUniversalDataset
     ) {
         this.matchUrl = matchUrl;
         this.accountCreationUrl = accountCreationUrl;
@@ -44,7 +44,7 @@ public class LocalMatchingServiceConfiguration {
         return accountCreationUrl;
     }
 
-    public Boolean getUsesUniversalDataset() {
-        return (usesUniversalDataset == null) ? false : usesUniversalDataset;
+    public Boolean usesUniversalDataset() {
+        return usesUniversalDataset;
     }
 }

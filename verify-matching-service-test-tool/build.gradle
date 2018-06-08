@@ -31,6 +31,7 @@ ext {
     jUnitPlatformLauncherVersion = '1.0.1'
     apiguardianVersion = '1.0.0'
     wiremockVersion = '2.10.1'
+    mockitoVersion = '2.12.0'
 }
 
 dependencies {
@@ -52,7 +53,8 @@ dependencies {
 
     runtime("org.junit.jupiter:junit-jupiter-engine:$jUnitJupiterVersion")
 
-    testCompile("com.github.tomakehurst:wiremock:$wiremockVersion")
+    testCompile("com.github.tomakehurst:wiremock:$wiremockVersion",
+            "org.mockito:mockito-core:$mockitoVersion")
 }
 
 applicationDistribution.from("examples") {

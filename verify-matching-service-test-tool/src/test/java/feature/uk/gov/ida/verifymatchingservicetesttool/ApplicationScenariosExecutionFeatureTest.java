@@ -2,6 +2,7 @@ package feature.uk.gov.ida.verifymatchingservicetesttool;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.exceptions.MsaTestingToolConfigException;
 import uk.gov.ida.verifymatchingservicetesttool.utils.ExitStatus;
 import uk.gov.ida.verifymatchingservicetesttool.utils.TestStatusPrintingListener;
 
@@ -15,10 +16,8 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 
 public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
 
-    private static final long NUMBER_OF_SCENARIOS = 10;
-
     @Test
-    public void shouldRunAllTestsForLegacyDataSchemaWhenUniversalDatasetFlagMissing() {
+    public void shouldRunAllTestsForLegacyDataSchemaWhenUniversalDatasetFlagMissing() throws MsaTestingToolConfigException {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -30,18 +29,17 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         assertThat(
-            listener.getTotalTests(),
-            is(NUMBER_OF_SCENARIOS)
+            listener.getSummary().getTestsSucceededCount(),
+            is(7L)
         );
     }
 
     @Test
-    public void shouldRunAllTestsForUniversalDatasetWhenUniversalDatasetFlagIsTrue() {
+    public void shouldRunAllTestsForUniversalDatasetWhenUniversalDatasetFlagIsTrue() throws MsaTestingToolConfigException {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -54,18 +52,17 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         application.execute(
                 listener,
                 selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-                applicationConfiguration,
-                fileLocator
+                applicationConfiguration
         );
 
         assertThat(
-                listener.getTotalTests(),
-                is(NUMBER_OF_SCENARIOS)
+                listener.getSummary().getTestsSucceededCount(),
+                is(10L)
         );
     }
 
     @Test
-    public void shouldReturnFailureExitCodeIfAnyScenariosFail() {
+    public void shouldReturnFailureExitCodeIfAnyScenariosFail() throws MsaTestingToolConfigException {
 
         localMatchingService.ensureResponseFor(
             RELATIVE_MATCH_URL,
@@ -81,15 +78,14 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         ExitStatus exitStatus = application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         assertThat(exitStatus, is(ExitStatus.FAILURE));
     }
 
     @Test
-    public void shouldReturnSuccessExitCodeIfAllScenariosPass() {
+    public void shouldReturnSuccessExitCodeIfAllScenariosPass() throws MsaTestingToolConfigException {
 
         localMatchingService.ensureDefaultMatchScenariosExist();
 
@@ -101,8 +97,7 @@ public class ApplicationScenariosExecutionFeatureTest extends FeatureTestBase {
         ExitStatus exitStatus = application.execute(
             listener,
             selectPackage("uk.gov.ida.verifymatchingservicetesttool.scenarios"),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         assertThat(exitStatus, is(ExitStatus.SUCCESS));

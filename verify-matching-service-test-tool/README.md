@@ -16,35 +16,21 @@ You can use the test tool while [building your local matching service](http://al
 
 Unzip Test Tool zip file
 
-## Configuration
+## Configure the Matching Service Test Tool
 
-Open the `verify-matching-service-test-tool.yml` file.
-
-Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you created for your local matching service. Refer to the [guidance on matching requests for more information about matching and account creation URLs](http://alphagov.github.io/rp-onboarding-tech-docs/pages/ms/msBuild.html#respond-to-json-matching-requests).
-
-The tool offers scenarios for two JSON schemas:
-
-* **legacy matching dataset**: you will use this if your service does not support European identities and you have not enabled this functionality in your version of the Matching Service Adapter (MSA)
-* **universal matching dataset**: you will use this if your service supports European identities and you have enabled this functionality in your version of the MSA. The universal matching dataset supports assertions from both GOV.UK Verify identity providers (IdP) and identities from other European countries.
-
-If your local matching service supports the universal matching dataset, set `usesUniversalDataset` to true.
-
+1. Open the `verify-matching-service-test-tool.yml` file.
+2. Replace the `matchUrl` and `accountCreationUrl` URLs with the same URLs you created for your local matching service. Refer to the [guidance on matching requests for more information about matching and account creation URLs](http://alphagov.github.io/rp-onboarding-tech-docs/pages/ms/msBuild.html#respond-to-json-matching-requests).
+3. Set `usesUniversalDataset` to `true` or `false` depending on which matching dataset schema [your MSA is configured to use](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#in-the-field-europeanidentity).
+4. Set `examplesFolderLocation` to the path for the examples directory. If this is not set, the test tool defaults to the `examples/legacy` or `examples/universal-dataset` directory in the application ZIP file, depending on the setting in step 3. If you are using a custom examples directory, it should contain `match` and `no-match` directories with JSON files that you expect to either match or not match.
 
 ## Run
 
-Run `bin/verify-matching-service-test-tool` to start the test tool.
+To start the test tool, run:
+```
+bin/verify-matching-service-test-tool verify-matching-service-test-tool.yml
+```
 
-This command will run a series of test scenarios.
-
-## Optional Command Line Arguments
-
-You can also use command line arguments to specify the relative location of the configuration file and/or the relative location of the directory containing the additional scenario files described below.
-
-e.g. `bin/verify-matching-service-test-tool -c <../config-file.yml> -e <../examplesFolder>`
-
-NB: the 'examplesFolder' should be the relative path of the folder containing the 'match' and 'no-match' sub-folders.
-
-`bin/verify-matching-service-test-tool --help` will display the available command line arguments.
+This command will run a series of test scenarios as described in [Test scenarios](README.md#Test_scenarios).
 
 ## Test scenarios
 
@@ -72,13 +58,13 @@ The following scenarios allow you to test your matching service against assertio
 
 ### Adding additional scenarios
 
-You can add or amend existing example test datasets.
-If you are running in legacy mode, these can be found in `examples/legacy/match` and`examples/legacy/no-match` folders.
-If you are running in universal matching dataset mode, these can be found in `examples/universal-dataset/match` and `examples/universal-dataset/no-match`.
+You can add or amend existing example test datasets or provide a folder containing custom scenarios as described in [Configuration](README.md#configuration).
+If you are using the legacy schema, the default scenarios can be found in `examples/legacy` folders.
+If you are using the universal schema, these can be found in `examples/universal-dataset`.
 
-For scenarios under the corresponding `no-match` folder, the testing tool will expect a no match response from your local matching service.
+For scenarios under the `no-match` folder, the testing tool will expect a no match response from your local matching service.
 
-For scenarios under the corresponding `match` folder, the testing tool will expect a match response from your local matching service.
+For scenarios under the `match` folder, the testing tool will expect a match response from your local matching service.
 
 Add any additional test scenarios as new JSON files within these folders.
 

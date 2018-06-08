@@ -3,6 +3,7 @@ package feature.uk.gov.ida.verifymatchingservicetesttool;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.exceptions.MsaTestingToolConfigException;
 import uk.gov.ida.verifymatchingservicetesttool.scenarios.LevelOfAssuranceOneScenario;
 
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
@@ -16,7 +17,7 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 public class WrongContentTypeFeatureTest extends FeatureTestBase {
 
     @Test
-    public void shouldFailWhenWrongContentTypeIsPassed() {
+    public void shouldFailWhenWrongContentTypeIsPassed() throws MsaTestingToolConfigException {
         localMatchingService.ensureResponseHeaderFor(RELATIVE_MATCH_URL, APPLICATION_XHTML_XML_TYPE);
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -27,8 +28,7 @@ public class WrongContentTypeFeatureTest extends FeatureTestBase {
         application.execute(
             listener,
             selectClass(LevelOfAssuranceOneScenario.class),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);

@@ -5,8 +5,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import uk.gov.ida.verifymatchingservicetesttool.Application;
-import uk.gov.ida.verifymatchingservicetesttool.utils.ScenarioFilesLocator;
-import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
 
 public abstract class FeatureTestBase {
 
@@ -14,7 +12,6 @@ public abstract class FeatureTestBase {
 
     protected LocalMatchingServiceStub localMatchingService = new LocalMatchingServiceStub();
     protected SummaryGeneratingListener listener = new SummaryGeneratingListener();
-    protected FilesLocator fileLocator = new ScenarioFilesLocator();
 
     @BeforeEach
     public void setUp() {

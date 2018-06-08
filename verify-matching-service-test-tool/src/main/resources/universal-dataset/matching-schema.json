@@ -9,6 +9,7 @@
           "type": "object"
         }
       },
+      "additionalProperties": false,
       "type": "object"
     },
     "hashedPid": {
@@ -20,8 +21,7 @@
         "LEVEL_2",
         "LEVEL_3",
         "LEVEL_4"
-      ],
-      "type": "string"
+      ]
     },
     "matchId": {
       "type": "string"
@@ -32,8 +32,7 @@
           "items": {
             "properties": {
               "from": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "internationalPostCode": {
                 "type": "string"
@@ -48,8 +47,7 @@
                 "type": "string"
               },
               "to": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "uprn": {
                 "type": "string"
@@ -58,6 +56,7 @@
                 "type": "boolean"
               }
             },
+            "additionalProperties": false,
             "type": "object"
           },
           "type": "array"
@@ -65,59 +64,56 @@
         "dateOfBirth": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date"
             },
             "verified": {
               "type": "boolean"
             }
           },
+          "additionalProperties": false,
           "type": "object"
         },
         "firstName": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
+              "type": "string"
+            },
+            "nonLatinScriptValue": {
               "type": "string"
             },
             "verified": {
               "type": "boolean"
             }
           },
+          "additionalProperties": false,
           "type": "object"
         },
         "gender": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
               "enum": [
                 "FEMALE",
                 "MALE",
                 "NOT_SPECIFIED"
-              ],
-              "type": "string"
+              ]
             },
             "verified": {
               "type": "boolean"
@@ -128,12 +124,10 @@
         "middleNames": {
           "properties": {
             "from": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "to": {
-              "format": "DATE_TIME",
-              "type": "string"
+              "format": "date-time"
             },
             "value": {
               "type": "string"
@@ -148,28 +142,33 @@
           "items": {
             "properties": {
               "from": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "to": {
-                "format": "DATE_TIME",
-                "type": "string"
+                "format": "date-time"
               },
               "value": {
+                "type": "string"
+              },
+              "nonLatinScriptValue": {
                 "type": "string"
               },
               "verified": {
                 "type": "boolean"
               }
             },
+            "additionalProperties": false,
             "type": "object"
           },
           "type": "array"
         }
       },
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dateOfBirth", "firstName", "surnames"]
     }
   },
   "type": "object",
+  "additionalProperties": false,
   "required": [ "matchId", "levelOfAssurance", "hashedPid", "matchingDataset" ]
 }

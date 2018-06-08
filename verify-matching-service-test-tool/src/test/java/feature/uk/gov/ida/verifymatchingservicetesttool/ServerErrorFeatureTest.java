@@ -3,6 +3,7 @@ package feature.uk.gov.ida.verifymatchingservicetesttool;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.exceptions.MsaTestingToolConfigException;
 import uk.gov.ida.verifymatchingservicetesttool.scenarios.LevelOfAssuranceOneScenario;
 
 import static common.uk.gov.ida.verifymatchingservicetesttool.builders.ApplicationConfigurationBuilder.aApplicationConfiguration;
@@ -16,7 +17,7 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 public class ServerErrorFeatureTest extends FeatureTestBase {
 
     @Test
-    public void shouldFailWhenInternalServerError() {
+    public void shouldFailWhenInternalServerError() throws MsaTestingToolConfigException {
         localMatchingService.ensureResponseFor(RELATIVE_MATCH_URL, INTERNAL_SERVER_ERROR, null);
 
         ApplicationConfiguration applicationConfiguration = aApplicationConfiguration()
@@ -27,8 +28,7 @@ public class ServerErrorFeatureTest extends FeatureTestBase {
         application.execute(
             listener,
             selectClass(LevelOfAssuranceOneScenario.class),
-            applicationConfiguration,
-            fileLocator
+            applicationConfiguration
         );
 
         Failure firstFailure = listener.getSummary().getFailures().get(0);
