@@ -3,6 +3,9 @@ MSA Release Notes
 
 ### Next
 
+### 3.0.0
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.2.0...3.0.0)
+
 * [Enabled support for accepting identities from other European countries](doc/release-details/3.0.0.md#support-for-european-identities) as part of eIDAS compliance.
 * [Added a configuration option to the Matching Service Test Tool](README.md#configuration) to allow testing using the new [universal JSON matching schema](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/buildmatchingservice.html#jsonschema).
 * Simplified Matching Service Test Tool to use only a YAML configuration file.
