@@ -1,0 +1,23 @@
+{
+  "hashedPid": "8fbfdd035a92daf890673d9ff8f50def3aad66ea42026c581bd73735250ba706",
+  "levelOfAssurance": "LEVEL_1",
+  "matchId": "default-match-id",
+  "matchingDataset": {
+    "dateOfBirth": {
+      "value": "1980-05-24",
+      "verified": true
+    },
+    "firstName": {
+      "value": "Joe",
+      "verified": true,
+      "fromDate": "1980-05-24T00:00:00.000Z"
+    },
+    "surnames": [
+      {
+        "from": "1980-05-24T00:00:00.000Z",
+        "to": "1987-01-20T00:00:00.000Z",
+        "value": "Fred"
+      }
+    ]
+  }
+}

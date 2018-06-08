@@ -9,6 +9,7 @@
           "type": "object"
         }
       },
+      "additionalProperties": false,
       "type": "object"
     },
     "hashedPid": {
@@ -55,6 +56,7 @@
                 "type": "boolean"
               }
             },
+            "additionalProperties": false,
             "type": "object"
           },
           "type": "array"
@@ -74,6 +76,7 @@
               "type": "boolean"
             }
           },
+          "additionalProperties": false,
           "type": "object"
         },
         "firstName": {
@@ -94,6 +97,7 @@
               "type": "boolean"
             }
           },
+          "additionalProperties": false,
           "type": "object"
         },
         "gender": {
@@ -153,15 +157,18 @@
                 "type": "boolean"
               }
             },
+            "additionalProperties": false,
             "type": "object"
           },
           "type": "array"
         }
       },
       "type": "object",
+      "additionalProperties": false,
       "required": ["dateOfBirth", "firstName", "surnames"]
     }
   },
   "type": "object",
+  "additionalProperties": false,
   "required": [ "matchId", "levelOfAssurance", "hashedPid", "matchingDataset" ]
 }
