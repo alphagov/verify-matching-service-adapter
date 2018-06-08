@@ -2,6 +2,7 @@ package common.uk.gov.ida.verifymatchingservicetesttool.builders;
 
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.LocalMatchingServiceConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.exceptions.MsaTestingToolConfigException;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
 
 import java.net.URI;
@@ -19,7 +20,7 @@ public class ApplicationConfigurationBuilder {
         return new ApplicationConfigurationBuilder();
     }
 
-    public ApplicationConfiguration build() {
+    public ApplicationConfiguration build() throws MsaTestingToolConfigException {
         LocalMatchingServiceConfiguration localMatchingServiceConfiguration = new LocalMatchingServiceConfiguration(
             localMatchingServiceMatchUrl,
             localMatchingServiceAccountCreationUrl,
@@ -54,7 +55,7 @@ public class ApplicationConfigurationBuilder {
 
         public TestApplicationConfiguration(LocalMatchingServiceConfiguration localMatchingService,
                                             String examplesFolderLocation,
-                                            FilesLocator filesLocator) {
+                                            FilesLocator filesLocator) throws MsaTestingToolConfigException {
             super(localMatchingService, examplesFolderLocation);
             this.filesLocator = filesLocator;
         }

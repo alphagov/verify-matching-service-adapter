@@ -4,11 +4,10 @@ import common.uk.gov.ida.verifymatchingservicetesttool.utils.TestsFilesLocator;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.launcher.listeners.TestExecutionSummary.Failure;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
+import uk.gov.ida.verifymatchingservicetesttool.exceptions.MsaTestingToolConfigException;
 import uk.gov.ida.verifymatchingservicetesttool.scenarios.DynamicScenarios;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FolderName;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +23,9 @@ import static uk.gov.ida.verifymatchingservicetesttool.utils.FolderName.MATCH_FO
 public class JsonFilesValidationFeatureTest extends FeatureTestBase {
 
     @Test
-    public void givenBadlyFormedJsonThenShowRelevantError() {
+    public void givenBadlyFormedJsonThenShowRelevantError() throws MsaTestingToolConfigException {
         ApplicationConfiguration applicationConfiguration = setupApplication("malformed.json",
                 false);
-
         application.execute(
             listener,
             selectClass(DynamicScenarios.class),
@@ -46,7 +44,7 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void givenWellFormedLegacyJsonWithWrongSchemaThenShowRelevantError() {
+    public void givenWellFormedLegacyJsonWithWrongSchemaThenShowRelevantError() throws MsaTestingToolConfigException {
         ApplicationConfiguration applicationConfiguration = setupApplication("invalid-schema.json",
                 false);
 
@@ -71,7 +69,7 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void givenWellFormedJsonWithWrongUniversalSchemaThenShowRelevantError() {
+    public void givenWellFormedJsonWithWrongUniversalSchemaThenShowRelevantError() throws MsaTestingToolConfigException {
         ApplicationConfiguration applicationConfiguration = setupApplication("invalid-schema.json",
                 true);
 
@@ -96,7 +94,7 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void givenWellFormedUniversalJsonWithInvalidValuesThenShowRelevantError() {
+    public void givenWellFormedUniversalJsonWithInvalidValuesThenShowRelevantError() throws MsaTestingToolConfigException {
         ApplicationConfiguration applicationConfiguration = setupApplication("universal-invalid-values.json",
                 true);
 
@@ -120,7 +118,7 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void givenWellFormedUniversalJsonWithWrongWithMissingSchemaElementsThenShowRelevantError() {
+    public void givenWellFormedUniversalJsonWithWrongWithMissingSchemaElementsThenShowRelevantError() throws MsaTestingToolConfigException {
         ApplicationConfiguration applicationConfiguration = setupApplication("universal-missing-keys.json",
                 true);
 
@@ -145,7 +143,7 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
     }
 
     @Test
-    public void givenWellFormedUniversalJsonWithWrongKeysThenShowRelevantError() {
+    public void givenWellFormedUniversalJsonWithWrongKeysThenShowRelevantError() throws MsaTestingToolConfigException {
         ApplicationConfiguration applicationConfiguration = setupApplication("universal-invalid-keys.json",
                 true);
 
@@ -167,7 +165,7 @@ public class JsonFilesValidationFeatureTest extends FeatureTestBase {
         );
     }
 
-    private ApplicationConfiguration setupApplication(String jsonFile, boolean usesUniversalDataset) {
+    private ApplicationConfiguration setupApplication(String jsonFile, boolean usesUniversalDataset) throws MsaTestingToolConfigException {
         localMatchingService.ensureDefaultMatchScenariosExist();
 
         Map<FolderName, List<String>> testFiles = new HashMap<FolderName, List<String>>(){{

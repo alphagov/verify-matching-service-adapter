@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import uk.gov.ida.verifymatchingservicetesttool.configurations.ApplicationConfiguration;
-import uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader;
 
 public class ApplicationConfigurationResolver implements ParameterResolver {
 
@@ -18,15 +17,11 @@ public class ApplicationConfigurationResolver implements ParameterResolver {
 
     @Override
     public ApplicationConfiguration resolveParameter(
-        ParameterContext parameterContext,
-        ExtensionContext extensionContext
+            ParameterContext parameterContext,
+            ExtensionContext extensionContext
     ) throws ParameterResolutionException {
-        return getConfiguration();
-    }
-
-    private ApplicationConfiguration getConfiguration() {
         if (configuration == null) {
-            configuration = ConfigurationReader.getConfiguration(null);
+            throw new RuntimeException("No configuration defined.");
         }
 
         return configuration;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import uk.gov.ida.verifymatchingservicetesttool.Application;
+import uk.gov.ida.verifymatchingservicetesttool.exceptions.MsaTestingToolConfigException;
 import uk.gov.ida.verifymatchingservicetesttool.utils.Color;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FileUtils;
 import uk.gov.ida.verifymatchingservicetesttool.utils.FilesLocator;
@@ -13,10 +14,6 @@ import uk.gov.ida.verifymatchingservicetesttool.validators.JsonValidator;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static uk.gov.ida.verifymatchingservicetesttool.configurations.ConfigurationReader.getAbsoluteFilePath;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplicationConfiguration {
@@ -29,9 +26,9 @@ public class ApplicationConfiguration {
 
     @JsonCreator
     public ApplicationConfiguration(
-        @JsonProperty("localMatchingService") LocalMatchingServiceConfiguration localMatchingService,
-        @JsonProperty("examplesFolderLocation") String examplesFolderLocation
-    ) {
+            @JsonProperty("localMatchingService") LocalMatchingServiceConfiguration localMatchingService,
+            @JsonProperty("examplesFolderLocation") String examplesFolderLocation
+    ) throws MsaTestingToolConfigException {
         this.localMatchingService = localMatchingService;
 
         this.filesLocator = new ScenarioFilesLocator(getDatasetType(), getExamplesFolder(examplesFolderLocation));
@@ -67,18 +64,20 @@ public class ApplicationConfiguration {
         return localMatchingService.usesUniversalDataset() ? "universal-dataset" : "legacy";
     }
 
-    private String getExamplesFolder(String examplesFolderLocation) {
+    private String getExamplesFolder(String examplesFolderLocation) throws MsaTestingToolConfigException {
         if (examplesFolderLocation != null) {
-            String exampleScenariosFolderLocation = getAbsoluteFilePath(examplesFolderLocation);
-            if (exampleScenariosFolderLocation != null &&
-                    checkIfFileDoesNotExist(exampleScenariosFolderLocation, FolderName.MATCH_FOLDER_NAME) &&
-                    checkIfFileDoesNotExist(exampleScenariosFolderLocation, FolderName.NO_MATCH_FOLDER_NAME)) {
-                System.out.println(String.format("%sTest Run Failed%s", Color.RED, Color.NONE));
-                System.out.println(String.format("%sEnsure the specified example scenarios folder '%s' " +
-                        "has 'match' and 'no-match' sub-folders%s", Color.YELLOW, exampleScenariosFolderLocation, Color.NONE));
-                System.exit(2);
+            File exampleScenariosFolderLocation = new ConfigurationReader().getAbsoluteFilePath(examplesFolderLocation);
+            if (ifFileDoesNotExist(exampleScenariosFolderLocation, FolderName.MATCH_FOLDER_NAME) ||
+                    ifFileDoesNotExist(exampleScenariosFolderLocation, FolderName.NO_MATCH_FOLDER_NAME)) {
+
+                throw new MsaTestingToolConfigException(String.format(
+                        "%sEnsure the specified example scenarios folder '%s' has 'match' and 'no-match' sub-folders%s",
+                        Color.YELLOW,
+                        exampleScenariosFolderLocation,
+                        Color.NONE)
+                );
             }
-            return exampleScenariosFolderLocation;
+            return exampleScenariosFolderLocation.getAbsolutePath();
         }
         return getDefaultExamplesFolderLocation();
     }
@@ -92,7 +91,7 @@ public class ApplicationConfiguration {
                 + File.separator + getDatasetType();
     }
 
-    private static boolean checkIfFileDoesNotExist(String fileName, FolderName folderName) {
-        return !Files.exists(Paths.get(fileName, folderName.getValue()));
+    private static boolean ifFileDoesNotExist(File fileName, FolderName folderName) {
+        return !(new File(fileName, folderName.getValue()).exists());
     }
 }
