@@ -1,11 +1,17 @@
 buildscript {
     repositories {
-        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+        if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
+            logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
+            maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+            jcenter()
+        }
+        else {
+            maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+        }
     }
     dependencies {
-        classpath 'uk.gov.ida:ida-gradle:1.1.0-15',
-	        'com.github.ben-manes:gradle-versions-plugin:0.11.3'
-
+        classpath 'uk.gov.ida:ida-gradle:1.1.0-23',
+            'com.github.ben-manes:gradle-versions-plugin:0.11.3'
     }
 }
 
@@ -45,7 +51,14 @@ def dependencyVersions = [
 apply plugin: "idaJar"
 
 repositories {
-    maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+    if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
+        logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
+        maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+        jcenter()
+    }
+    else {
+        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+    }
 }
 
 configurations {
