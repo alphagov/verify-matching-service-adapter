@@ -2,6 +2,9 @@ MSA Release Notes
 =================
 
 ### Next
+
+### 3.0.1
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.0...3.0.1)
 * Minor update of documentation
 
 ### 3.0.0
