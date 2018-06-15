@@ -85,7 +85,7 @@ distZip {
 
 task copyExamples(dependsOn: assemble) {
     doLast {
-        ['build', 'out'].each { dest ->
+        ['build/classes', 'out'].each { dest ->
             copy {
                 from 'examples'
                 into "${dest}/examples"
@@ -96,7 +96,7 @@ task copyExamples(dependsOn: assemble) {
 
 task copyConfiguration(dependsOn: assemble) {
     doLast {
-        ['build', 'out'].each { dest ->
+        ['build/classes', 'out'].each { dest ->
             copy {
                 from 'verify-matching-service-test-tool.yml'
                 into dest
