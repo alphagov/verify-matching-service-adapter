@@ -48,8 +48,6 @@ def dependencyVersions = [
         saml_libs_version: "$opensaml-147"
 ]
 
-apply plugin: "idaJar"
-
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
@@ -199,3 +197,22 @@ task(outputDependencies) doLast {
 }
 
 task sonar(dependsOn: [':clean', ':test', intTest, 'sonarqube'])
+
+jar {
+    def manifestClasspath = configurations.runtime.collect { 'lib/' + it.getName() }.join(' ')
+    def buildNumber = System.getenv('BUILD_NUMBER')
+    def gitCommit = System.getenv('GIT_COMMIT')
+
+    manifest {
+        attributes(
+                'Main-Class': mainClassName,
+                'Class-Path': manifestClasspath,
+                'Build-Number': buildNumber != null ? buildNumber : '',
+                'Version-Number': project.version,
+                'Git-Commit': gitCommit != null ? gitCommit : '',
+                'Build-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm'Z'"))
+    }
+
+    archiveName = project.name + '.jar'
+    destinationDir = file("$buildDir/output")
+}
