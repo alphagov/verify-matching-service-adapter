@@ -1,5 +1,7 @@
 # Verify Matching Service Adapter
 
+[![Build Status](https://travis-ci.org/alphagov/verify-matching-service-adapter.svg?branch=master)](https://travis-ci.org/alphagov/verify-matching-service-adapter)
+
 The Verify Matching Service Adapter (MSA) is component you can use to handle communication with the Verify hub. The MSA converts the SAML message received from the Hub into JSON data that is then passed onto a Local Matching Service and vice versa. It also handles the encryption, decryption, and signing of the SAML messages. It is a stateless Web Service that runs on Java 8 and was built using the Dropwizard framework and Gradle build tool.
 
 ## How does it work?

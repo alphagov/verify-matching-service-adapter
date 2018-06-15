@@ -8,12 +8,26 @@ apply plugin: 'org.junit.platform.gradle.plugin'
 sourceCompatibility = 1.8
 
 repositories {
-    maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+    if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
+        logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
+        maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+        jcenter()
+    }
+    else {
+        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+    }
 }
 
 buildscript {
     repositories {
-        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+        if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
+            logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
+            maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+            jcenter()
+        }
+        else {
+            maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
+        }
     }
     dependencies {
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
@@ -71,7 +85,7 @@ distZip {
 
 task copyExamples(dependsOn: assemble) {
     doLast {
-        ['build', 'out'].each { dest ->
+        ['build/classes', 'out'].each { dest ->
             copy {
                 from 'examples'
                 into "${dest}/examples"
@@ -82,7 +96,7 @@ task copyExamples(dependsOn: assemble) {
 
 task copyConfiguration(dependsOn: assemble) {
     doLast {
-        ['build', 'out'].each { dest ->
+        ['build/classes', 'out'].each { dest ->
             copy {
                 from 'verify-matching-service-test-tool.yml'
                 into dest
