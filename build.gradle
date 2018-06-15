@@ -40,12 +40,12 @@ project.version = "$gradle.ext.version_number-$build_number"
 def dependencyVersions = [
         opensaml:"$opensaml",
         dropwizard: '1.3.2',
-        ida_utils: '333',
-        ida_test_utils: '39',
-        hub_saml: "$opensaml-15565",
-        dev_pki: '1.1.0-28',
-        trust_anchor: '1.0-31',
-        saml_libs_version: "$opensaml-143"
+        ida_utils: '336',
+        ida_test_utils: '43',
+        hub_saml: "$opensaml-15572",
+        dev_pki: '1.1.0-34',
+        trust_anchor: '1.0-34',
+        saml_libs_version: "$opensaml-147"
 ]
 
 apply plugin: "idaJar"
@@ -53,7 +53,8 @@ apply plugin: "idaJar"
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
-        maven { url 'https://dl.bintray.com/alphagov/maven-test' }
+        maven { url 'https://dl.bintray.com/alphagov/maven' } // For dropwizard-logstash
+        maven { url 'https://dl.bintray.com/alphagov/maven-test' } // For other public verify binaries
         jcenter()
     }
     else {
