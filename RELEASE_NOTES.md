@@ -19,7 +19,7 @@ MSA Release Notes
 * Remove the the `hub.trustStore` section and instead set `environment` in the `metadata` section:
 ```diff
  hub:
-   ssoUrl: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/SSO
+   ssoUrl: https://www.integration.signin.service.gov.uk/SAML2/SSO
 -  trustStore:
 -    path: test_ida_hub.ts
 -    password: puppet

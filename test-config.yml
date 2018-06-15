@@ -67,12 +67,12 @@ encryptionKeys:
 # Settings for connecting with the hub can be configured here
 # if necessary.
 hub:
-  ssoUrl: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/SSO
+  ssoUrl: https://www.integration.signin.service.gov.uk/SAML2/SSO
 
 # Settings for obtaining Verify's metadata can be configured here.
 metadata:
   environment: INTEGRATION
-  url: https://integration.ida.digital.cabinet-office.gov.uk/SAML2/metadata/federation
+  url: https://www.integration.signin.service.gov.uk/SAML2/metadata/federation 
   trustStore:
     path: test_ida_metadata.ts
     password: puppet
