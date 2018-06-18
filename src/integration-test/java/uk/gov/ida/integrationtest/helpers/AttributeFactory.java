@@ -5,12 +5,12 @@ import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 
-public class AttributeQueryAttributeFactory {
+public class AttributeFactory {
 
     private final OpenSamlXmlObjectFactory openSamlXmlObjectFactory;
 
     @Inject
-    public AttributeQueryAttributeFactory(OpenSamlXmlObjectFactory openSamlXmlObjectFactory) {
+    public AttributeFactory(OpenSamlXmlObjectFactory openSamlXmlObjectFactory) {
         this.openSamlXmlObjectFactory = openSamlXmlObjectFactory;
     }
 
