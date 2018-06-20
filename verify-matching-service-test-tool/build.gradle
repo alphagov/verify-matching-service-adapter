@@ -3,7 +3,6 @@ version = "$version"
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 sourceCompatibility = 1.8
 
@@ -29,9 +28,6 @@ buildscript {
             maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos' }
         }
     }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
-    }
 }
 
 ext {
@@ -46,6 +42,7 @@ ext {
     apiguardianVersion = '1.0.0'
     wiremockVersion = '2.10.1'
     mockitoVersion = '2.12.0'
+    jaxbapiVersion = '2.2.9'
 }
 
 dependencies {
@@ -68,7 +65,8 @@ dependencies {
     runtime("org.junit.jupiter:junit-jupiter-engine:$jUnitJupiterVersion")
 
     testCompile("com.github.tomakehurst:wiremock:$wiremockVersion",
-            "org.mockito:mockito-core:$mockitoVersion")
+            "org.mockito:mockito-core:$mockitoVersion",
+            "javax.xml.bind:jaxb-api:$jaxbapiVersion")
 }
 
 applicationDistribution.from("examples") {
@@ -105,7 +103,10 @@ task copyConfiguration(dependsOn: assemble) {
     }
 }
 
-test { dependsOn copyExamples, copyConfiguration }
+test {
+    dependsOn copyExamples, copyConfiguration
+    useJUnitPlatform()
+}
 run { dependsOn copyExamples, copyConfiguration }
 
 run {
