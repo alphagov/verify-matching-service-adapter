@@ -186,6 +186,8 @@ task(outputDependencies) doLast {
     println "ida_utils=$dependencyVersions.ida_utils"
 }
 
+tasks.check.dependsOn(intTest)
+
 jar {
     def manifestClasspath = configurations.runtime.collect { 'lib/' + it.getName() }.join(' ')
     def buildNumber = System.getenv('BUILD_NUMBER')
