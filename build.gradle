@@ -134,6 +134,20 @@ dependencies {
 }
 
 sourceSets {
+    java9 {
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            java {
+                srcDir 'src/main/java9'
+            }
+        }
+    }
+    java10 {
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+            java {
+                srcDir 'src/main/java10'
+            }
+        }
+    }
     intTest {
         java {
             srcDir 'src/integration-test/java'
@@ -145,6 +159,24 @@ sourceSets {
         compileClasspath += sourceSets.main.runtimeClasspath
         compileClasspath += sourceSets.test.runtimeClasspath
         compileClasspath += sourceSets.test.output
+    }
+}
+
+compileJava {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '8'])
+    }
+}
+
+compileJava9Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '9'])
+    }
+}
+
+compileJava10Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+        options.compilerArgs.addAll(['--release', '10'])
     }
 }
 
@@ -193,6 +225,12 @@ jar {
     def buildNumber = System.getenv('BUILD_NUMBER')
     def gitCommit = System.getenv('GIT_COMMIT')
 
+    into('META-INF/versions/9') {
+        from sourceSets.java9.output
+    }
+    into('META-INF/versions/10') {
+        from sourceSets.java10.output
+    }
     manifest {
         attributes(
                 'Main-Class': mainClassName,
@@ -200,7 +238,11 @@ jar {
                 'Build-Number': buildNumber != null ? buildNumber : '',
                 'Version-Number': project.version,
                 'Git-Commit': gitCommit != null ? gitCommit : '',
-                'Build-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm'Z'"))
+                'Build-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
+        )
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            attributes.put("Multi-Release", "true")
+        }
     }
 
     archiveName = project.name + '.jar'
