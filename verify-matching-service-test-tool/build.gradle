@@ -4,8 +4,6 @@ version = "$version"
 apply plugin: 'java'
 apply plugin: 'application'
 
-sourceCompatibility = 1.8
-
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
@@ -45,6 +43,23 @@ ext {
     jaxbapiVersion = '2.2.9'
 }
 
+sourceSets {
+    java9 {
+        if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            java {
+                srcDir 'src/main/java9'
+            }
+        }
+    }
+    java10 {
+        if (JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+            java {
+                srcDir 'src/main/java10'
+            }
+        }
+    }
+}
+
 dependencies {
     compile(
             "org.glassfish.jersey.core:jersey-client:$jerseyVersion",
@@ -67,6 +82,38 @@ dependencies {
     testCompile("com.github.tomakehurst:wiremock:$wiremockVersion",
             "org.mockito:mockito-core:$mockitoVersion",
             "javax.xml.bind:jaxb-api:$jaxbapiVersion")
+}
+
+compileJava {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '8'])
+    }
+}
+
+compileJava9Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+        options.compilerArgs.addAll(['--release', '9'])
+    }
+}
+
+compileJava10Java {
+    if(JavaVersion.current() >= JavaVersion.VERSION_1_10) {
+        options.compilerArgs.addAll(['--release', '10'])
+    }
+}
+
+jar {
+    into('META-INF/versions/9') {
+        from sourceSets.java9.output
+    }
+    into('META-INF/versions/10') {
+        from sourceSets.java10.output
+    }
+    manifest {
+        if(JavaVersion.current() >= JavaVersion.VERSION_1_9) {
+            attributes.put("Multi-Release", "true")
+        }
+    }
 }
 
 applicationDistribution.from("examples") {
