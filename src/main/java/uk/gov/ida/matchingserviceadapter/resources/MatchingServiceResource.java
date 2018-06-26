@@ -100,6 +100,8 @@ public class MatchingServiceResource {
                 attributeQueryService.hashPid(assertionData),
                 assertionData);
         MatchingServiceResponseDto matchingServiceResponse = matchingServiceProxy.makeMatchingServiceRequest(matchingServiceRequest);
+        LOG.info("Result from matching service for id " + attributeQuery.getID() + " is " + matchingServiceResponse.getResult());
+
         OutboundResponseFromMatchingService outboundResponseFromMatchingService = matchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper.map(matchingServiceResponse,
                 matchingServiceRequest.getHashedPid(),
                 attributeQuery.getID(),
