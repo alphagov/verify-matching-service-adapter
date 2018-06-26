@@ -1,5 +1,8 @@
 package uk.gov.ida.integrationtest;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.core.Appender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import helpers.JerseyClientConfigurationBuilder;
 import httpstub.HttpStubRule;
@@ -8,18 +11,25 @@ import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.util.Duration;
 import org.apache.http.HttpStatus;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.xmlsec.algorithm.DigestAlgorithm;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
 import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
 import org.opensaml.xmlsec.signature.Signature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
+import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResource;
+import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
@@ -33,8 +43,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aHubSignature;
@@ -71,20 +85,36 @@ public class EidasMatchingIntegrationTest {
 
     @ClassRule
     public static final MatchingServiceAdapterAppRule msaApplicationRule = new MatchingServiceAdapterAppRule(true,
-        ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH));
+            ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH));
+
+    @SuppressWarnings("unchecked")
+    @Mock
+    private Appender<ILoggingEvent> appender = mock(Appender.class);
+
+    private ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+
+    @Mock
+    private ArgumentCaptor<LoggingEvent> argumentCaptor = ArgumentCaptor.forClass(LoggingEvent.class);
 
     @BeforeClass
     public static void beforeClass() {
         JerseyClientConfiguration jerseyClientConfiguration = JerseyClientConfigurationBuilder.aJerseyClientConfiguration().withTimeout(Duration.seconds(10)).build();
         client = new JerseyClientBuilder(msaApplicationRule.getEnvironment()).using(jerseyClientConfiguration).build(EidasMatchingIntegrationTest.class.getSimpleName());
         msaMatchingUrl = "http://localhost:" + msaApplicationRule.getLocalPort() + Urls.MatchingServiceAdapterUrls.MATCHING_SERVICE_ROOT
-            + Urls.MatchingServiceAdapterUrls.MATCHING_SERVICE_MATCH_REQUEST_PATH;
+                + Urls.MatchingServiceAdapterUrls.MATCHING_SERVICE_MATCH_REQUEST_PATH;
     }
 
     @Before
     public void setup() throws Exception {
         localMatchingService.reset();
         localMatchingService.register(MATCHING_REQUEST_PATH, 200, "application/json", "{\"result\": \"match\"}");
+
+        logger.addAppender(appender);
+    }
+
+    @After
+    public void tearDown() {
+        logger.detachAppender(appender);
     }
 
     @Test
@@ -105,6 +135,8 @@ public class EidasMatchingIntegrationTest {
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(RESPONDER);
         assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(NO_MATCH);
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+
+        assertMatchStatusLogMessage(REQUEST_ID, MatchingServiceResponseDto.NO_MATCH);
     }
 
     @Test
@@ -116,25 +148,26 @@ public class EidasMatchingIntegrationTest {
         assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(RESPONDER);
         assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(NO_MATCH);
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+
+        assertMatchStatusLogMessage(REQUEST_ID, MatchingServiceResponseDto.NO_MATCH);
     }
 
     @Test
     public void shouldNotProcessEidasAttributeQueryRequestContainingItsInvalidSignature() {
-        String issuerId = HUB_ENTITY_ID;
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
-            .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anEidasSignature()))
-            .withSignature(
-                aSignature()
-                    .withSigningCredential(
-                        new TestCredentialFactory(
-                            HEADLESS_RP_PUBLIC_SIGNING_CERT,
-                            HEADLESS_RP_PRIVATE_SIGNING_KEY
-                        ).getSigningCredential()
-                    ).build()
-            )
-            .build();
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+                .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), anEidasSignature()))
+                .withSignature(
+                        aSignature()
+                                .withSigningCredential(
+                                        new TestCredentialFactory(
+                                                HEADLESS_RP_PUBLIC_SIGNING_CERT,
+                                                HEADLESS_RP_PRIVATE_SIGNING_KEY
+                                        ).getSigningCredential()
+                                ).build()
+                )
+                .build();
 
         Response response = postResponse(msaMatchingUrl, attributeQuery);
 
@@ -144,14 +177,13 @@ public class EidasMatchingIntegrationTest {
 
     @Test
     public void shouldNotProcessEidasAttributeQueryRequestContainingItsAssertionInvalidSignature() {
-        String issuerId = HUB_ENTITY_ID;
         Signature invalidSignature = aSignature().withSigningCredential(new TestCredentialFactory(HEADLESS_RP_PUBLIC_SIGNING_CERT, HEADLESS_RP_PRIVATE_SIGNING_KEY).getSigningCredential()).build();
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-            .withId(REQUEST_ID)
-            .withIssuer(anIssuer().withIssuerId(issuerId).build())
-            .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), invalidSignature))
-            .withSignature(aHubSignature())
-            .build();
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+                .withSubject(anEidasSubject(REQUEST_ID, msaApplicationRule.getCountryEntityId(), invalidSignature))
+                .withSignature(aHubSignature())
+                .build();
 
         Response response = postResponse(msaMatchingUrl, attributeQuery);
 
@@ -161,10 +193,9 @@ public class EidasMatchingIntegrationTest {
 
     @Test
     public void shouldNotProcessEidasAttributeQueryRequestContainingAValidSignatureFromCountryNotInTrustAnchor() {
-        String issuerId = HUB_ENTITY_ID;
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
                 .withId(REQUEST_ID)
-                .withIssuer(anIssuer().withIssuerId(issuerId).build())
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
                 .withSubject(anEidasSubject(REQUEST_ID, "not-in-trust-anchor-id", anEidasSignature()))
                 .withSignature(
                         aSignature()
@@ -189,9 +220,21 @@ public class EidasMatchingIntegrationTest {
 
         URI uri = UriBuilder.fromPath(url).build();
         return client
-            .target(uri.toASCIIString())
-            .request()
-            .post(Entity.entity(xmlString, MediaType.TEXT_XML));
+                .target(uri.toASCIIString())
+                .request()
+                .post(Entity.entity(xmlString, MediaType.TEXT_XML));
+    }
+
+    private void assertMatchStatusLogMessage(String requestId, String matchStatus) {
+        verify(appender, atLeastOnce()).doAppend(argumentCaptor.capture());
+
+        Optional<LoggingEvent> event = argumentCaptor.getAllValues()
+                .stream()
+                .filter(loggingEvent -> loggingEvent.getLoggerName().equals(MatchingServiceResource.class.getName()))
+                .filter(loggingEvent -> loggingEvent.getFormattedMessage().equals("Result from matching service for id " + requestId + " is " + matchStatus))
+                .findFirst();
+
+        assertThat(event.isPresent()).isTrue();
     }
 
 }
