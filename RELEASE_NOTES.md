@@ -3,6 +3,8 @@ MSA Release Notes
 
 ### Next
 
+* Put back post-matching logging status which had been removed in [release 3.0.0](RELEASE_NOTES.md#300)
+
 ### 3.0.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.0...3.0.1)
 * Minor update of documentation
@@ -31,6 +33,9 @@ MSA Release Notes
  metadata:
 +  # Choices are (INTEGRATION|PRODUCTION)
 +  environment: INTEGRATION
+  trustStore:
+    path: test_ida_metadata.ts
+    password: puppet
 ```
 
 
