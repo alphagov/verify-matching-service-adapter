@@ -4,7 +4,7 @@ MSA Release Notes
 ### Next
 
 * Put back post-matching logging status which had been removed in [release 3.0.0](RELEASE_NOTES.md#300)
-* Included support for compilation on Java 9 and 10, and creation of multi-release jars.
+* Included support for compilation on Java 9 and 10, and creation of multi-release JAR files.
 
 ### 3.0.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.0...3.0.1)
