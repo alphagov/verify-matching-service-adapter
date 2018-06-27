@@ -1,10 +1,14 @@
 package uk.gov.ida.matchingserviceadapter;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
+import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Environment;
 import org.joda.time.Duration;
+import org.opensaml.saml.metadata.resolver.MetadataResolver;
+import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
@@ -89,13 +93,18 @@ import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.client.Client;
+import java.io.PrintWriter;
 import java.security.KeyPair;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Encryption;
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Signing;
 
@@ -489,8 +498,24 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 new MetadataResolverConfigBuilder(),
                 client
         );
-
+        registerMetadataRefreshTask(environment, ofNullable(resolverRepository), Collections.unmodifiableCollection(resolverRepository.getMetadataResolvers().values()), "eidas-metadata");
         environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));
         return resolverRepository;
+    }
+
+    public static void registerMetadataRefreshTask(Environment environment, Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository, Collection<MetadataResolver> metadataResolvers, String name) {
+        environment.admin().addTask(new Task(name + "-refresh") {
+            @Override
+            public void execute(ImmutableMultimap<String, String> parameters, PrintWriter output) throws Exception {
+                for(MetadataResolver metadataResolver : metadataResolvers) {
+                    if(metadataResolver instanceof AbstractReloadingMetadataResolver) {
+                        ((AbstractReloadingMetadataResolver) metadataResolver).refresh();
+                    }
+                }
+                if(eidasMetadataResolverRepository.isPresent()) {
+                    eidasMetadataResolverRepository.get().refresh();
+                }
+            }
+        });
     }
 }
