@@ -51,13 +51,13 @@ public class EidasAssertionService extends AssertionService {
 
     @Override
     void validate(String expectedInResponseTo, List<Assertion> assertions) {
-        for (Assertion assertion : assertions){
-            if(isCountryAssertion(assertion)){
+        for (Assertion assertion : assertions) {
+            if (isCountryAssertion(assertion)) {
                 validateCountryAssertion(assertion, expectedInResponseTo);
-            }else if(isHubAssertion(assertion)){
+            } else if (isHubAssertion(assertion)) {
                 validateCycle3Assertion(assertion, expectedInResponseTo, hubEntityId);
-            }else{
-                throw new SamlResponseValidationException("Unknown Issuer for eIDAS Assertion: "+assertion.getIssuer().getValue());
+            } else {
+                throw new SamlResponseValidationException("Unknown Issuer for eIDAS Assertion: " + assertion.getIssuer().getValue());
             }
         }
     }
