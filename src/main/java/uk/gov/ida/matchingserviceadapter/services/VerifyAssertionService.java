@@ -42,7 +42,6 @@ public class VerifyAssertionService extends AssertionService {
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
     }
 
-
     @Override
     public void validate(String requestId, List<Assertion> assertions) {
 

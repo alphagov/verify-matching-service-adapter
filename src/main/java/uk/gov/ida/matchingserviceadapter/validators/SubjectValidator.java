@@ -2,12 +2,11 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
+import org.opensaml.saml.saml2.core.NameIDType;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-
-import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 
 public class SubjectValidator {
     TimeRestrictionValidator timeRestrictionValidator;
@@ -22,21 +21,17 @@ public class SubjectValidator {
             throw new SamlResponseValidationException("Subject is missing from the assertion.");
         }
 
-        if (subject.getSubjectConfirmations().size() != 1) {
-            throw new SamlResponseValidationException("Exactly one subject confirmation is expected.");
+        if (subject.getSubjectConfirmations().size() == 0) {
+            throw new SamlResponseValidationException("A subject confirmation is expected.");
         }
 
         SubjectConfirmation subjectConfirmation = subject.getSubjectConfirmations().get(0);
-        if (!METHOD_BEARER.equals(subjectConfirmation.getMethod())) {
-            throw new SamlResponseValidationException("Subject confirmation method must be 'bearer'.");
-        }
+
 
         SubjectConfirmationData subjectConfirmationData = subjectConfirmation.getSubjectConfirmationData();
         if (subjectConfirmationData == null) {
             throw new SamlResponseValidationException("Subject confirmation data is missing from the assertion.");
         }
-
-        timeRestrictionValidator.validateNotBefore(subjectConfirmationData.getNotBefore());
 
         DateTime notOnOrAfter = subjectConfirmationData.getNotOnOrAfter();
         if (notOnOrAfter == null) {
@@ -50,12 +45,16 @@ public class SubjectValidator {
             throw new SamlResponseValidationException("Subject confirmation data must contain 'InResponseTo'.");
         }
 
-        if (!expectedInResponseTo.equals(actualInResponseTo)) {
-            throw new SamlResponseValidationException(String.format("'InResponseTo' must match requestId. Expected %s but was %s", expectedInResponseTo, actualInResponseTo));
-        }
-
         if (subject.getNameID() == null) {
             throw new SamlResponseValidationException("NameID is missing from the subject of the assertion.");
+        }
+
+        if (subject.getNameID().getFormat() == null || subject.getNameID().getFormat().length() == 0) {
+            throw new SamlResponseValidationException("NameID format is missing or empty in the subject of the assertion.");
+        }
+
+        if (!subject.getNameID().getFormat().equals(NameIDType.PERSISTENT)) {
+            throw new SamlResponseValidationException("NameID format is invalid in the subject of the assertion.");
         }
     }
 }

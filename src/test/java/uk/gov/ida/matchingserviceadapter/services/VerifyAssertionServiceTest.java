@@ -3,13 +3,18 @@ package uk.gov.ida.matchingserviceadapter.services;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
+import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
@@ -76,6 +81,9 @@ public class VerifyAssertionServiceTest {
     @Mock
     private Cycle3DatasetFactory cycle3DatasetFactory;
 
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
@@ -101,6 +109,87 @@ public class VerifyAssertionServiceTest {
     public void tearDown() {
         DateTimeFreezer.unfreezeTime();
     }
+    
+    @Test
+    public void shouldThrowExceptionIfIssueInstantMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssueInstant(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion IssueInstant is missing.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfAssertionIdIsMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setID(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Id is missing or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfAssertionIdIsBlankWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setID("");
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Id is missing or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIssuerMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssuer(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIssuerValueMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssuer(anIssuer().withIssuerId(null).build());
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIssuerValueIsBlankWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssuer(anIssuer().withIssuerId("").build());
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfMissingAssertionVersionWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setVersion(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion has missing Version.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+
+    @Test
+    public void shouldThrowExceptionIfAssertionVersionInvalidWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setVersion(SAMLVersion.VERSION_10);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion declared an illegal Version attribute value.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
 
     @Test
     public void shouldCallValidatorsCorrectly() {
@@ -109,9 +198,7 @@ public class VerifyAssertionServiceTest {
                 anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted());
 
         verifyAssertionService.validate("requestId", assertions);
-        verify(instantValidator, times(2)).validate(any(), any());
         verify(subjectValidator, times(2)).validate(any(), any());
-        verify(conditionsValidator, times(2)).validate(any(), any());
         verify(hubSignatureValidator, times(2)).validate(any(), any());
     }
 
