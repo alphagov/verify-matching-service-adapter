@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Subject;
@@ -115,8 +116,8 @@ public class VerifyAssertionServiceTest {
         assertion.setIssueInstant(null);
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion IssueInstant cannot be null.");
-        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        exception.expectMessage("Assertion IssueInstant is missing.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
@@ -125,8 +126,8 @@ public class VerifyAssertionServiceTest {
         assertion.setID(null);
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion Id cannot be null or blank.");
-        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        exception.expectMessage("Assertion Id is missing or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
@@ -135,8 +136,8 @@ public class VerifyAssertionServiceTest {
         assertion.setID("");
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion Id cannot be null or blank.");
-        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        exception.expectMessage("Assertion Id is missing or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
@@ -145,8 +146,8 @@ public class VerifyAssertionServiceTest {
         assertion.setIssuer(null);
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion Issuer cannot be null or blank.");
-        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
@@ -155,8 +156,8 @@ public class VerifyAssertionServiceTest {
         assertion.setIssuer(anIssuer().withIssuerId(null).build());
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion Issuer cannot be null or blank.");
-        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
@@ -165,8 +166,29 @@ public class VerifyAssertionServiceTest {
         assertion.setIssuer(anIssuer().withIssuerId("").build());
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion Issuer cannot be null or blank.");
-        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        exception.expectMessage("Assertion with id mds-assertion has missing or blank Issuer.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfMissingAssertionVersionWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setVersion(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion has Version missing Version.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+
+    @Test
+    public void shouldThrowExceptionIfAssertionVersionInvalidWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setVersion(SAMLVersion.VERSION_10);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion with id mds-assertion declared an illegal Version attribute value.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test

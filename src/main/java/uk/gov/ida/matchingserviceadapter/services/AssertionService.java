@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
+import org.opensaml.saml.common.SAMLVersion;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
@@ -44,14 +45,25 @@ public abstract class AssertionService {
                                         String expectedInResponseTo,
                                         String hubEntityId,
                                         QName role) {
-        if (assertion.getIssueInstant() == null){
-            throw new SamlResponseValidationException("Assertion IssueInstant cannot be null.");
+
+        if (assertion.getIssueInstant() == null) {
+            throw new SamlResponseValidationException("Assertion IssueInstant is missing.");
         }
-        if (assertion.getID() == null || assertion.getID().length() == 0){
-            throw new SamlResponseValidationException("Assertion Id cannot be null or blank.");
+
+        if (assertion.getID() == null || assertion.getID().length() == 0) {
+            throw new SamlResponseValidationException("Assertion Id is missing or blank.");
         }
-        if (assertion.getIssuer() == null || assertion.getIssuer().getValue() == null || assertion.getIssuer().getValue().length() == 0){
-            throw new SamlResponseValidationException("Assertion Issuer cannot be null or blank.");
+
+        if (assertion.getIssuer() == null || assertion.getIssuer().getValue() == null || assertion.getIssuer().getValue().length() == 0) {
+            throw new SamlResponseValidationException("Assertion with id " + assertion.getID() + " has missing or blank Issuer.");
+        }
+
+        if (assertion.getVersion() == null) {
+            throw new SamlResponseValidationException("Assertion with id " + assertion.getID() + " has Version missing Version.");
+        }
+
+        if (!assertion.getVersion().equals(SAMLVersion.VERSION_20)) {
+            throw new SamlResponseValidationException("Assertion with id " + assertion.getID() + " declared an illegal Version attribute value.");
         }
 
         hubSignatureValidator.validate(singletonList(assertion), role);
