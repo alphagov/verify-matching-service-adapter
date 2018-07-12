@@ -10,6 +10,7 @@ import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 
 import javax.xml.namespace.QName;
@@ -24,6 +25,7 @@ public abstract class AssertionService {
     protected final ConditionsValidator conditionsValidator;
     private final SamlAssertionsSignatureValidator hubSignatureValidator;
     private final Cycle3DatasetFactory cycle3DatasetFactory;
+    private final AssertionAttributeStatementValidator attributeStatementValidator;
 
     protected AssertionService(InstantValidator instantValidator,
                                SubjectValidator subjectValidator,
@@ -35,6 +37,7 @@ public abstract class AssertionService {
         this.conditionsValidator = conditionsValidator;
         this.hubSignatureValidator = hubSignatureValidator;
         this.cycle3DatasetFactory = cycle3DatasetFactory;
+        this.attributeStatementValidator = new AssertionAttributeStatementValidator();
     }
 
     abstract void validate(String requestId, List<Assertion> assertions);
@@ -59,7 +62,7 @@ public abstract class AssertionService {
         }
 
         if (assertion.getVersion() == null) {
-            throw new SamlResponseValidationException("Assertion with id " + assertion.getID() + " has Version missing Version.");
+            throw new SamlResponseValidationException("Assertion with id " + assertion.getID() + " has missing Version.");
         }
 
         if (!assertion.getVersion().equals(SAMLVersion.VERSION_20)) {
@@ -68,7 +71,7 @@ public abstract class AssertionService {
 
         hubSignatureValidator.validate(singletonList(assertion), role);
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-
+        attributeStatementValidator.validate(assertion);
     }
 
     protected void validateCycle3Assertion(Assertion assertion, String requestId, String hubEntityId) {

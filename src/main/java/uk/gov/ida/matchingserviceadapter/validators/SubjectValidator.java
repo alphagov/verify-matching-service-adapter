@@ -2,12 +2,11 @@ package uk.gov.ida.matchingserviceadapter.validators;
 
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
+import org.opensaml.saml.saml2.core.NameIDType;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-
-import static org.opensaml.saml.saml2.core.SubjectConfirmation.METHOD_BEARER;
 
 public class SubjectValidator {
     TimeRestrictionValidator timeRestrictionValidator;
@@ -48,6 +47,14 @@ public class SubjectValidator {
 
         if (subject.getNameID() == null) {
             throw new SamlResponseValidationException("NameID is missing from the subject of the assertion.");
+        }
+
+        if (subject.getNameID().getFormat() == null || subject.getNameID().getFormat().length() == 0) {
+            throw new SamlResponseValidationException("NameID format is missing or empty in the subject of the assertion.");
+        }
+
+        if (!subject.getNameID().getFormat().equals(NameIDType.PERSISTENT)) {
+            throw new SamlResponseValidationException("NameID format is invalid in the subject of the assertion.");
         }
     }
 }

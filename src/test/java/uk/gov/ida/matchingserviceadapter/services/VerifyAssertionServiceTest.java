@@ -176,7 +176,7 @@ public class VerifyAssertionServiceTest {
         assertion.setVersion(null);
 
         exception.expect(SamlResponseValidationException.class);
-        exception.expectMessage("Assertion with id mds-assertion has Version missing Version.");
+        exception.expectMessage("Assertion with id mds-assertion has missing Version.");
         verifyAssertionService.validateHubAssertion(assertion, "not-used", "not-used", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
