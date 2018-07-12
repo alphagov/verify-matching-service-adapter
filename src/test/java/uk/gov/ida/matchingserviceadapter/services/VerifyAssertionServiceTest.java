@@ -108,15 +108,64 @@ public class VerifyAssertionServiceTest {
     public void tearDown() {
         DateTimeFreezer.unfreezeTime();
     }
-
-
+    
     @Test
-    public void shouldThrowExceptionIfIssuerInstanceMissing() {
+    public void shouldThrowExceptionIfIssueInstantMissingWhenValidatingHubAssertion() {
         Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
         assertion.setIssueInstant(null);
 
         exception.expect(SamlResponseValidationException.class);
         exception.expectMessage("Assertion IssueInstant cannot be null.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfAssertionIdIsMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setID(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Id cannot be null or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfAssertionIdIsBlankWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setID("");
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Id cannot be null or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIssuerMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssuer(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Issuer cannot be null or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIssuerValueMissingWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssuer(anIssuer().withIssuerId(null).build());
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Issuer cannot be null or blank.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfIssuerValueIsBlankWhenValidatingHubAssertion() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssuer(anIssuer().withIssuerId("").build());
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion Issuer cannot be null or blank.");
         verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 

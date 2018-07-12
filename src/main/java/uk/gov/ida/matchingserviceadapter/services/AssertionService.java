@@ -50,7 +50,7 @@ public abstract class AssertionService {
         if (assertion.getID() == null || assertion.getID().length() == 0){
             throw new SamlResponseValidationException("Assertion Id cannot be null or blank.");
         }
-        if(assertion.getIssuer() == null || assertion.getIssuer() == null || assertion.getIssuer().getValue().length() == 0){
+        if (assertion.getIssuer() == null || assertion.getIssuer().getValue() == null || assertion.getIssuer().getValue().length() == 0){
             throw new SamlResponseValidationException("Assertion Issuer cannot be null or blank.");
         }
 
