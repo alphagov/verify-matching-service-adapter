@@ -322,37 +322,6 @@ public class VerifyMatchingIntegrationTest {
         assertThat(response.getStatus().getStatusMessage().getMessage()).contains("IDP matching dataset and authn statement assertions do not contain matching issuers");
     }
 
-    @Test
-    public void shouldReturnErrorResponseWhenAnAttributeQueryRequestContainsIdpMatchingDatasetAssertionWithInResponseToNotMatchingRequestId() {
-        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-                .withId(REQUEST_ID)
-                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-                .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion("default-request-id"),
-                        aMatchingDatasetAssertion(Collections.emptyList(), false, "wrong-request-id")), REQUEST_ID, HUB_ENTITY_ID))
-                .build();
-
-        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
-
-        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("'InResponseTo' must match requestId. Expected default-request-id but was wrong-request-id");
-    }
-
-    @Test
-    public void shouldReturnErrorResponseWhenAnAttributeQueryRequestContainsIdpAuthnAssertionWithInResponseToNotMatchingRequestId() {
-        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
-                .withId(REQUEST_ID)
-                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
-                .withSubject(aSubjectWithAssertions(asList(
-                        anAuthnStatementAssertion("wrong-request-id"),
-                        aMatchingDatasetAssertion(Collections.emptyList(), false, REQUEST_ID)), REQUEST_ID, HUB_ENTITY_ID))
-                .build();
-
-        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
-
-        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(REQUESTER);
-        assertThat(response.getStatus().getStatusMessage().getMessage()).contains("'InResponseTo' must match requestId. Expected default-request-id but was wrong-request-id");
-    }
 
     @Test
     public void shouldReturnAHealthyResponseToAValidHealthcheckGivenValidMetadata() {

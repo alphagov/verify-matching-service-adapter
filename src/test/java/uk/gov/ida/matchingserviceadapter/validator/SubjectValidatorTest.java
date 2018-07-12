@@ -44,29 +44,6 @@ public class SubjectValidatorTest {
         subjectValidator.validate(null, IN_RESPONSE_TO);
     }
 
-    @Test
-    public void shouldThrowExceptionWhenMultipleSubjectConfirmation() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Exactly one subject confirmation is expected.");
-
-        Subject subject = aSubject().build();
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().build();
-        subject.getSubjectConfirmations().addAll(ImmutableList.of(subjectConfirmation, subjectConfirmation));
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenSubjectConfirmationMethodIsNotBearer() throws Exception {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Subject confirmation method must be 'bearer'.");
-
-        Subject subject = aSubject()
-                .withSubjectConfirmation(aSubjectConfirmation().withMethod("anything-but-not-bearer").build())
-                .build();
-
-        subjectValidator.validate(subject, IN_RESPONSE_TO);
-    }
 
     @Test
     public void shouldThrowExceptionWhenSubjectConfirmationDataMissing() throws Exception {
@@ -110,22 +87,7 @@ public class SubjectValidatorTest {
         subjectValidator.validate(subject, IN_RESPONSE_TO);
     }
 
-    @Test
-    public void shouldThrowExceptionWhenInResponseToRequestIdDoesNotMatchTheRequestId() throws Exception {
-        String expectedInResponseTo = "some-non-matching-request-id";
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("'InResponseTo' must match requestId. Expected " + expectedInResponseTo + " but was " + IN_RESPONSE_TO);
 
-        SubjectConfirmation subjectConfirmation = aSubjectConfirmation().withSubjectConfirmationData(
-                aSubjectConfirmationData()
-                        .withInResponseTo(IN_RESPONSE_TO)
-                        .build()).build();
-        Subject subject = aSubject()
-                .withSubjectConfirmation(subjectConfirmation)
-                .build();
-
-        subjectValidator.validate(subject, expectedInResponseTo);
-    }
 
     @Test
     public void shouldThrowExceptionWhenNameIdIsMissing() throws Exception {

@@ -109,9 +109,7 @@ public class VerifyAssertionServiceTest {
                 anAuthnStatementAssertion(IdaAuthnContext.LEVEL_2_AUTHN_CTX, "requestId").buildUnencrypted());
 
         verifyAssertionService.validate("requestId", assertions);
-        verify(instantValidator, times(2)).validate(any(), any());
         verify(subjectValidator, times(2)).validate(any(), any());
-        verify(conditionsValidator, times(2)).validate(any(), any());
         verify(hubSignatureValidator, times(2)).validate(any(), any());
     }
 

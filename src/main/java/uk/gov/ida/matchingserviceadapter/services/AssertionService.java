@@ -44,9 +44,8 @@ public abstract class AssertionService {
                                         String hubEntityId,
                                         QName role) {
         hubSignatureValidator.validate(singletonList(assertion), role);
-        instantValidator.validate(assertion.getIssueInstant(), "Hub Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        
+
     }
 
     protected void validateCycle3Assertion(Assertion assertion, String requestId, String hubEntityId) {
