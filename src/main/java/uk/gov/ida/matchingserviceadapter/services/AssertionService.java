@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.services;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
+import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
@@ -43,6 +44,16 @@ public abstract class AssertionService {
                                         String expectedInResponseTo,
                                         String hubEntityId,
                                         QName role) {
+        if (assertion.getIssueInstant() == null){
+            throw new SamlResponseValidationException("Assertion IssueInstant cannot be null.");
+        }
+        if (assertion.getID() == null || assertion.getID().length() == 0){
+            throw new SamlResponseValidationException("Assertion Id cannot be null or blank.");
+        }
+        if(assertion.getIssuer() == null || assertion.getIssuer() == null || assertion.getIssuer().getValue().length() == 0){
+            throw new SamlResponseValidationException("Assertion Issuer cannot be null or blank.");
+        }
+
         hubSignatureValidator.validate(singletonList(assertion), role);
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
 

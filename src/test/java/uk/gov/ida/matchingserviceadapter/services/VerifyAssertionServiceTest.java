@@ -3,13 +3,17 @@ package uk.gov.ida.matchingserviceadapter.services;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.Subject;
+import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
+import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
@@ -76,6 +80,9 @@ public class VerifyAssertionServiceTest {
     @Mock
     private Cycle3DatasetFactory cycle3DatasetFactory;
 
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
@@ -100,6 +107,17 @@ public class VerifyAssertionServiceTest {
     @After
     public void tearDown() {
         DateTimeFreezer.unfreezeTime();
+    }
+
+
+    @Test
+    public void shouldThrowExceptionIfIssuerInstanceMissing() {
+        Assertion assertion = aMatchingDatasetAssertionWithSignature(emptyList(), anIdpSignature(), "requestId").buildUnencrypted();
+        assertion.setIssueInstant(null);
+
+        exception.expect(SamlResponseValidationException.class);
+        exception.expectMessage("Assertion IssueInstant cannot be null.");
+        verifyAssertionService.validateHubAssertion(assertion, "not-used", "", IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     @Test
