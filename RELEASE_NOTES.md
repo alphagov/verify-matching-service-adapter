@@ -3,6 +3,8 @@ MSA Release Notes
 
 ### Next
 
+* Changed back to the set of IDP assertion validations used before [release 3.0.0](RELEASE_NOTES.md#300).
+
 ### 3.0.2
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.1...3.0.2)
 
