@@ -2,6 +2,7 @@ package uk.gov.ida.matchingserviceadapter;
 
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
 import com.squarespace.jersey2.guice.JerseyGuiceUtils;
@@ -26,7 +27,10 @@ import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.metadata.MetadataHealthCheck;
 import uk.gov.ida.saml.metadata.bundle.MetadataResolverBundle;
 
+import java.util.Optional;
+
 import static com.hubspot.dropwizard.guicier.GuiceBundle.defaultBuilder;
+import static uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterModule.registerMetadataRefreshTask;
 
 public class MatchingServiceAdapterApplication extends Application<MatchingServiceAdapterConfiguration> {
 
@@ -103,6 +107,7 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
 
 
         environment.healthChecks().register("VerifyMetadataHealthCheck", new MetadataHealthCheck(metadataResolverBundle.getMetadataResolver(), configuration.getMetadataConfiguration().getExpectedEntityId()));
+        registerMetadataRefreshTask(environment, Optional.empty(), ImmutableList.of(metadataResolverBundle.getMetadataResolver()), "metadata");
 
         MatchingServiceAdapterHealthCheck healthCheck = new MatchingServiceAdapterHealthCheck();
         environment.healthChecks().register(healthCheck.getName(), healthCheck);
