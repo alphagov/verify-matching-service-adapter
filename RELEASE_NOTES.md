@@ -8,17 +8,17 @@ MSA Release Notes
 
 * Changed back to the set of IDP assertion validations used before [release 3.0.0](RELEASE_NOTES.md#300).
 
-### 3.0.2
+### 3.0.2 [DEPRECATED: Please use release 3.0.3 or higher]
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.1...3.0.2)
 
 * Re-introduced post-matching logging status which had been removed in [release 3.0.0](RELEASE_NOTES.md#300)
 * Included support for compilation on Java 9 and 10. Compilation on Java 9 or 10 will produce a multi-release JAR that will run on Java 8, 9, and 10. This release was compiled on Java 8 and does not contain a multi-release JAR.
 
-### 3.0.1
+### 3.0.1 [DEPRECATED: Please use release 3.0.3 or higher]
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.0...3.0.1)
 * Minor update of documentation
 
-### 3.0.0
+### 3.0.0 [DEPRECATED: Please use release 3.0.3 or higher]
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.2.0...3.0.0)
 
 * [Enabled support for accepting identities from other European countries](doc/release-details/3.0.0.md#support-for-european-identities) as part of eIDAS compliance.
