@@ -6,21 +6,28 @@ MSA Release Notes
 ### 3.0.3
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.0.3)
 
-* Changed back to the set of IDP assertion validations used before [release 3.0.0](RELEASE_NOTES.md#300).
+* Revoked SAML message changes introduced in [release 3.0.3](RELEASE_NOTES.md#303). The set of IDP assertion validations is now the same as before release 3.0.0.
 
-### 3.0.2 [DEPRECATED: Please use release 3.0.3 or higher]
+
+### 3.0.2
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.1...3.0.2)
 
+* **Contains the change revoked in release 3.0.3. Please use release 3.0.3 or the latest release available.**
 * Re-introduced post-matching logging status which had been removed in [release 3.0.0](RELEASE_NOTES.md#300)
 * Included support for compilation on Java 9 and 10. Compilation on Java 9 or 10 will produce a multi-release JAR that will run on Java 8, 9, and 10. This release was compiled on Java 8 and does not contain a multi-release JAR.
 
-### 3.0.1 [DEPRECATED: Please use release 3.0.3 or higher]
+
+### 3.0.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.0...3.0.1)
+
+* **Contains the change revoked in release 3.0.3. Please use release 3.0.3 or the latest release available.**
 * Minor update of documentation
 
-### 3.0.0 [DEPRECATED: Please use release 3.0.3 or higher]
+
+### 3.0.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/2.2.0...3.0.0)
 
+* Added validations to `Conditions` within the `Assertion` element of the SAML message. **This change was revoked in [release 3.0.3](RELEASE_NOTES.md#303). Please use release 3.0.3 or the latest release available.**
 * [Enabled support for accepting identities from other European countries](doc/release-details/3.0.0.md#support-for-european-identities) as part of eIDAS compliance.
 * [Added a configuration option to the Matching Service Test Tool](README.md#configuration) to allow testing using the new [universal JSON matching schema](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/buildmatchingservice.html#jsonschema).
 * Simplified Matching Service Test Tool to use only a YAML configuration file.
