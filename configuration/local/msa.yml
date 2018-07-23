@@ -31,13 +31,13 @@ hub:
 metadata:
   url: ${METADATA_URL}
   trustStore:
-    path: data/pki/metadata.ts
+    path: /data/pki/metadata.ts
     password: marshmallow
   hubTrustStore:
-      path: data/pki/hub_federation.ts
+      path: /data/pki/hub_federation.ts
       password: marshmallow
   idpTrustStore:
-      path: data/pki/idp_federation.ts
+      path: /data/pki/idp_federation.ts
       password: marshmallow
   minRefreshDelay: 60000
   maxRefreshDelay: 600000
@@ -47,17 +47,17 @@ metadata:
 signingKeys:
   primary:
     publicKey:
-      certFile: data/pki/sample_rp_msa_signing_primary.crt
+      certFile: /data/pki/sample_rp_msa_signing_primary.crt
       name: http://www.test-rp-ms.gov.uk/SAML2/MD
     privateKey:
-      keyFile: data/pki/sample_rp_msa_signing_primary.pk8
+      keyFile: /data/pki/sample_rp_msa_signing_primary.pk8
 
 encryptionKeys:
   - publicKey:
-      certFile: data/pki/sample_rp_msa_encryption_primary.crt
+      certFile: /data/pki/sample_rp_msa_encryption_primary.crt
       name: http://www.test-rp-ms.gov.uk/SAML2/MD
     privateKey:
-      keyFile: data/pki/sample_rp_msa_encryption_primary.pk8
+      keyFile: /data/pki/sample_rp_msa_encryption_primary.pk8
 
 returnStackTraceInResponse: true
 
@@ -68,7 +68,7 @@ europeanIdentity:
     trustAnchorUri: ${TRUST_ANCHOR_URL}
     metadataSourceUri: ${METADATA_SOURCE_URI}
     trustStore:
-      path: data/pki/metadata.ts
+      path: /data/pki/metadata.ts
       password: marshmallow
     minRefreshDelay: 5000
     maxRefreshDelay: 600000
