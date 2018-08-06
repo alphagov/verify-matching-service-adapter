@@ -3,6 +3,8 @@ MSA Release Notes
 
 ### Next
 
+* Upgrade to Dropwizard 1.3.5 plus updated various other libs, specifically: ida_utils, ida_test_utils, hub_saml, saml_libs_version.
+
 ### 3.0.3
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.0.3)
 
