@@ -8,6 +8,8 @@ import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 
+import java.util.stream.Stream;
+
 public class SubjectValidator {
     TimeRestrictionValidator timeRestrictionValidator;
 
@@ -53,7 +55,11 @@ public class SubjectValidator {
             throw new SamlResponseValidationException("NameID format is missing or empty in the subject of the assertion.");
         }
 
-        if (!subject.getNameID().getFormat().equals(NameIDType.PERSISTENT)) {
+        boolean correctNameIdType = Stream
+                .of(NameIDType.PERSISTENT, NameIDType.TRANSIENT)
+                .anyMatch(type -> type.equals(subject.getNameID().getFormat()));
+
+        if (!correctNameIdType) {
             throw new SamlResponseValidationException("NameID format is invalid in the subject of the assertion.");
         }
     }
