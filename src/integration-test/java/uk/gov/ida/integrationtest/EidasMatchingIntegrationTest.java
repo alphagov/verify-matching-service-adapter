@@ -22,7 +22,6 @@ import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.xmlsec.algorithm.DigestAlgorithm;
 import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
-import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
 import org.opensaml.xmlsec.signature.Signature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import uk.gov.ida.matchingserviceadapter.rest.Urls;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.saml.core.test.TestCredentialFactory;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
+import uk.gov.ida.saml.security.signature.SignatureRSASSAPSS;
 import uk.gov.ida.saml.serializers.XmlObjectToElementTransformer;
 import uk.gov.ida.shared.utils.xml.XmlUtils;
 
@@ -74,7 +74,7 @@ public class EidasMatchingIntegrationTest {
 
     private static final String REQUEST_ID = "a-request-id";
     private static final String MATCHING_REQUEST_PATH = "/matching-request";
-    private static final SignatureAlgorithm SIGNATURE_ALGORITHM = new SignatureRSASHA1();
+    private static final SignatureAlgorithm SIGNATURE_ALGORITHM = new SignatureRSASSAPSS();
     private static final DigestAlgorithm DIGEST_ALGORITHM = new DigestSHA256();
 
     private static Client client;
