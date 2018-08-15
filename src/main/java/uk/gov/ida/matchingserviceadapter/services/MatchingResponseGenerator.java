@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterApplication;
-import uk.gov.ida.matchingserviceadapter.domain.HealthCheckMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
@@ -54,18 +53,18 @@ public class MatchingResponseGenerator {
             LOG.error("Failed to read version number from manifest", e);
         }
 
-        HealthCheckMatchingServiceResponse response = new HealthCheckMatchingServiceResponse(new HealthCheckResponseFromMatchingService(
-                matchingServiceAdapterConfiguration.getEntityId(),
-                requestId,
-                manifestVersionNumber,
-                matchingServiceAdapterConfiguration.isEidasEnabled(),
-                matchingServiceAdapterConfiguration.shouldSignWithSHA1()));
+        HealthCheckResponseFromMatchingService healthCheckResponseFromMatchingService =
+            new HealthCheckResponseFromMatchingService(
+                    matchingServiceAdapterConfiguration.getEntityId(),
+                    requestId,
+                    manifestVersionNumber,
+                    matchingServiceAdapterConfiguration.isEidasEnabled(),
+                    matchingServiceAdapterConfiguration.shouldSignWithSHA1());
 
         return ok()
                 .header("ida-msa-version", manifestVersionNumber)
                 .entity(soapMessageManager.wrapWithSoapEnvelope(
-                                healthCheckResponseTransformer.apply(
-                                        response.getHealthCheckResponseFromMatchingService())))
+                                healthCheckResponseTransformer.apply(healthCheckResponseFromMatchingService)))
                 .build();
     }
 }
