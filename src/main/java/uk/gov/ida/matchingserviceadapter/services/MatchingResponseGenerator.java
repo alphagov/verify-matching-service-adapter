@@ -8,6 +8,7 @@ import uk.gov.ida.matchingserviceadapter.domain.HealthCheckMatchingServiceRespon
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
+import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
 import javax.ws.rs.core.Response;
@@ -23,18 +24,18 @@ public class MatchingResponseGenerator {
     private final Function<OutboundResponseFromMatchingService, Element> responseElementTransformer;
     private final Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
     private final ManifestReader manifestReader;
-    private final String matchingServiceEntityId;
+    private final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
 
     public MatchingResponseGenerator(
             SoapMessageManager soapMessageManager,
             Function<OutboundResponseFromMatchingService, Element> responseElementTransformer,
             Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader,
-            String matchingServiceEntityId) {
+            MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration) {
         this.soapMessageManager = soapMessageManager;
         this.responseElementTransformer = responseElementTransformer;
         this.healthCheckResponseTransformer = healthCheckResponseTransformer;
         this.manifestReader = manifestReader;
-        this.matchingServiceEntityId = matchingServiceEntityId;
+        this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
     }
 
     public Response generateResponse(OutboundResponseFromMatchingService outboundResponseFromMatchingService) {
@@ -54,10 +55,11 @@ public class MatchingResponseGenerator {
         }
 
         HealthCheckMatchingServiceResponse response = new HealthCheckMatchingServiceResponse(new HealthCheckResponseFromMatchingService(
-                matchingServiceEntityId,
+                matchingServiceAdapterConfiguration.getEntityId(),
                 requestId,
-                manifestVersionNumber
-        ));
+                manifestVersionNumber,
+                matchingServiceAdapterConfiguration.isEidasEnabled(),
+                matchingServiceAdapterConfiguration.shouldSignWithSHA1()));
 
         return ok()
                 .header("ida-msa-version", manifestVersionNumber)
