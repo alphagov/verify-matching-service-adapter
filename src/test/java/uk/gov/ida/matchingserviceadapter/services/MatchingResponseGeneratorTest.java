@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.w3c.dom.Element;
+import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
@@ -41,6 +42,9 @@ public class MatchingResponseGeneratorTest {
     @Mock
     private ManifestReader manifestReader;
 
+    @Mock
+    private MatchingServiceAdapterConfiguration matchingServiceConfiguration;
+
     @Before
     public void setUp() {
         JerseyGuiceUtils.reset();
@@ -50,7 +54,7 @@ public class MatchingResponseGeneratorTest {
                 responseElementTransformer,
                 healthCheckResponseTransformer,
                 manifestReader,
-                ENTITY_ID
+                matchingServiceConfiguration
         );
     }
 
@@ -58,12 +62,18 @@ public class MatchingResponseGeneratorTest {
     public void shouldGenerateCorrectHealthCheckResponse() throws IOException {
         Element responseValue = mock(Element.class);
         when(manifestReader.getAttributeValueFor(any(), any())).thenReturn("VERSION");
+        when(matchingServiceConfiguration.isEidasEnabled()).thenReturn(true);
+        when(matchingServiceConfiguration.shouldSignWithSHA1()).thenReturn(true);
+        when(matchingServiceConfiguration.getEntityId()).thenReturn(ENTITY_ID);
+
         ArgumentCaptor<HealthCheckResponseFromMatchingService> healthCheckCaptor = ArgumentCaptor.forClass(HealthCheckResponseFromMatchingService.class);
         when(healthCheckResponseTransformer.apply(healthCheckCaptor.capture())).thenReturn(responseValue);
         Response response = matchingResponseGenerator.generateHealthCheckResponse("requestId");
 
         assertThat(response.getHeaders().getFirst("ida-msa-version")).isEqualTo("VERSION");
-        assertThat(healthCheckCaptor.getValue().getId()).contains("VERSION");
+
+        String expectedRequestIdPhrase = "-version-VERSION-eidasenabled-true-shouldsignwithsha1-true";
+        assertThat(healthCheckCaptor.getValue().getId()).endsWith(expectedRequestIdPhrase);
         assertThat(healthCheckCaptor.getValue().getInResponseTo()).isEqualTo("requestId");
         assertThat(healthCheckCaptor.getValue().getIssuer()).isEqualTo(ENTITY_ID);
     }

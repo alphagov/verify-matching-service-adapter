@@ -272,7 +272,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 responseElementTransformer,
                 healthCheckResponseTransformer,
                 manifestReader,
-                configuration.getEntityId());
+                configuration);
     }
 
     @Provides

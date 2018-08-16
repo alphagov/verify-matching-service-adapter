@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterApplication;
-import uk.gov.ida.matchingserviceadapter.domain.HealthCheckMatchingServiceResponse;
 import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
+import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
 import javax.ws.rs.core.Response;
@@ -23,18 +23,18 @@ public class MatchingResponseGenerator {
     private final Function<OutboundResponseFromMatchingService, Element> responseElementTransformer;
     private final Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer;
     private final ManifestReader manifestReader;
-    private final String matchingServiceEntityId;
+    private final MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration;
 
     public MatchingResponseGenerator(
             SoapMessageManager soapMessageManager,
             Function<OutboundResponseFromMatchingService, Element> responseElementTransformer,
             Function<HealthCheckResponseFromMatchingService, Element> healthCheckResponseTransformer, ManifestReader manifestReader,
-            String matchingServiceEntityId) {
+            MatchingServiceAdapterConfiguration matchingServiceAdapterConfiguration) {
         this.soapMessageManager = soapMessageManager;
         this.responseElementTransformer = responseElementTransformer;
         this.healthCheckResponseTransformer = healthCheckResponseTransformer;
         this.manifestReader = manifestReader;
-        this.matchingServiceEntityId = matchingServiceEntityId;
+        this.matchingServiceAdapterConfiguration = matchingServiceAdapterConfiguration;
     }
 
     public Response generateResponse(OutboundResponseFromMatchingService outboundResponseFromMatchingService) {
@@ -53,17 +53,18 @@ public class MatchingResponseGenerator {
             LOG.error("Failed to read version number from manifest", e);
         }
 
-        HealthCheckMatchingServiceResponse response = new HealthCheckMatchingServiceResponse(new HealthCheckResponseFromMatchingService(
-                matchingServiceEntityId,
-                requestId,
-                manifestVersionNumber
-        ));
+        HealthCheckResponseFromMatchingService healthCheckResponseFromMatchingService =
+            new HealthCheckResponseFromMatchingService(
+                    matchingServiceAdapterConfiguration.getEntityId(),
+                    requestId,
+                    manifestVersionNumber,
+                    matchingServiceAdapterConfiguration.isEidasEnabled(),
+                    matchingServiceAdapterConfiguration.shouldSignWithSHA1());
 
         return ok()
                 .header("ida-msa-version", manifestVersionNumber)
                 .entity(soapMessageManager.wrapWithSoapEnvelope(
-                                healthCheckResponseTransformer.apply(
-                                        response.getHealthCheckResponseFromMatchingService())))
+                                healthCheckResponseTransformer.apply(healthCheckResponseFromMatchingService)))
                 .build();
     }
 }
