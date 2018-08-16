@@ -6,6 +6,10 @@ MSA Release Notes
 * Upgrade SAML libs version so that the MSA can support the ECDSA and RSASSA-PSS signing algorithms to fulfil the eIDAS cryptographic requirements
 as laid out in the "eIDAS - Cryptographic requirements for the Interoperability Framework". 
 * Upgrade to Dropwizard 1.3.5 plus updated various other libs, specifically: ida_utils, ida_test_utils, hub_saml, saml_libs_version.
+* Enhance the MatchingResponseGenerator so that it creates a Response with a request id containing
+      two new flags: eidasEnabled & shouldSignWithSha1. The request id follows the following format:
+  
+      healthcheck-response-id-{0}-version-{1}-eidasenabled-{2}-shouldsignwithsha1-{3}
 
 ### 3.0.3
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.0.3)
