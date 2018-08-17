@@ -3,8 +3,7 @@ MSA Release Notes
 
 ### Next
 
-* Upgraded SAML libs version so that the MSA can support the ECDSA and RSASSA-PSS signing algorithms to fulfil the eIDAS cryptographic requirements
-as laid out in the "eIDAS - Cryptographic requirements for the Interoperability Framework". 
+* Upgraded SAML libs version so that the MSA can support the ECDSA and RSASSA-PSS signing algorithms to fulfil the eIDAS cryptographic requirements as laid out in the ["eIDAS - Cryptographic requirements for the Interoperability Framework"](https://ec.europa.eu/cefdigital/wiki/download/attachments/46992719/eidas_-_crypto_requirements_for_the_eidas_interoperability_framework_v1.0.pdf?version=1&modificationDate=1497252920224&api=v2). 
 * Upgraded to Dropwizard 1.3.5.
 * Extend the existing incoming health-check capability from Verify Hub to return the following MSA configurations in the response:
 
