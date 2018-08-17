@@ -11,10 +11,6 @@ as laid out in the "eIDAS - Cryptographic requirements for the Interoperability 
     * eIDAS is enabled
     * SHA1 signature is disabled
  
-    The request id follows the following format:
-  
-      healthcheck-response-id-{0}-version-{1}-eidasenabled-{2}-shouldsignwithsha1-{3}
-
 ### 3.0.3
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.0.3)
 
