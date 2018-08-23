@@ -351,7 +351,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 publicSigningCertificates);
     }
 
-    private Certificate cert(String keyName, String cert, Certificate.KeyUse keyUse) {
+    public Certificate cert(String keyName, String cert, Certificate.KeyUse keyUse) {
         String certBody = cert
                 .replace("-----BEGIN CERTIFICATE-----", "")
                 .replace("-----END CERTIFICATE-----", "")
