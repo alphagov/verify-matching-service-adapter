@@ -208,9 +208,6 @@ task intTest(type: Test) {
 }
 
 run {
-    int debug_port = System.getenv("TEST_RP_MSA_PORT") != null ? Integer.parseInt(System.getenv("TEST_RP_MSA_PORT")) + 2 : 50212
-    String debug = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$debug_port"
-    applicationDefaultJvmArgs = [debug]
     args = ["server", "configuration/verify-matching-service-adapter.yml"]
 }
 
