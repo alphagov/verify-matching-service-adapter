@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Environment;
+import org.apache.commons.codec.binary.Base64;
 import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
@@ -36,6 +37,7 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingServ
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionResponseFactory;
+import uk.gov.ida.matchingserviceadapter.exceptions.InvalidCertificateException;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatasetDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
@@ -92,6 +94,8 @@ import uk.gov.ida.truststore.KeyStoreLoader;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.security.cert.CertificateException;
+import javax.security.cert.X509Certificate;
 import javax.ws.rs.client.Client;
 import java.io.PrintWriter;
 import java.security.KeyPair;
@@ -351,12 +355,14 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 publicSigningCertificates);
     }
 
-    private Certificate cert(String keyName, String cert, Certificate.KeyUse keyUse) {
-        String certBody = cert
-                .replace("-----BEGIN CERTIFICATE-----", "")
-                .replace("-----END CERTIFICATE-----", "")
-                .replace(" ", "");
-        return new Certificate(keyName, certBody, keyUse);
+    public Certificate cert(String keyName, String cert, Certificate.KeyUse keyUse) {
+        try {
+            X509Certificate x509cert = X509Certificate.getInstance(cert.getBytes());
+            String certBody = Base64.encodeBase64String(x509cert.getEncoded());
+            return new Certificate(keyName, certBody, keyUse);
+        } catch (CertificateException e) {
+            throw new InvalidCertificateException(e);
+        }
     }
 
     @Provides
