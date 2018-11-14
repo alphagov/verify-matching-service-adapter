@@ -170,12 +170,11 @@ public class UnknownUserResponseGeneratorTest {
         assertThat(response.getMatchingServiceAssertion().get().getAssertionRestrictions().getNotOnOrAfter()).isEqualTo(DateTime.now().plus(assertionLifetimeConfiguration.getAssertionLifetime().toMilliseconds()));
         assertThat(response.getMatchingServiceAssertion().get().getAssertionRestrictions().getRecipient()).isEqualTo(ASSERTION_CONSUMER_SERVICE_URL);
 
-        Map<String, String> expectedValues = new HashMap<String, String>() {{
-            put(FIRST_NAME.getAttributeName(), "Joe");
-            put(SURNAME.getAttributeName(), "Bloggs");
-            put(DATE_OF_BIRTH.getAttributeName(), dob.toString());
-            put(CYCLE_3.getAttributeName(), "123456");
-        }};
+        Map<String, String> expectedValues = new HashMap<String, String>();
+        expectedValues.put(FIRST_NAME.getAttributeName(), "Joe");
+        expectedValues.put(SURNAME.getAttributeName(), "Bloggs");
+        expectedValues.put(DATE_OF_BIRTH.getAttributeName(), dob.toString());
+        expectedValues.put(CYCLE_3.getAttributeName(), "123456");
 
         // Check Assertion contains expected number/type of User Account Creation attributes
         List<Attribute> userAttributesForAccountCreation = response.getMatchingServiceAssertion().get().getUserAttributesForAccountCreation();
