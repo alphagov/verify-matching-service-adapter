@@ -1,0 +1,28 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: 8-jdk-slim
+
+inputs:
+  - name: msa
+  - name: msa-version
+
+outputs:
+  - name: msa-artifact
+
+caches:
+  - path: ../../../root/.gradle/caches
+  - path: ../../../root/.gradle/wrapper
+
+run:
+  path: /bin/sh
+  args:
+    - -c
+    - |
+      cd msa
+      ./gradlew distZip -Pversion=$(cat ../msa-version/number) --no-daemon
+      cp build/distributions/msa-*.zip ../msa-artifact/

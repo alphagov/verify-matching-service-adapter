@@ -42,7 +42,17 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
         JerseyGuiceUtils.reset();
 
         try {
-            new MatchingServiceAdapterApplication().run(args);
+            if (args == null || args.length == 0) {
+                String configFile = System.getenv("CONFIG_FILE");
+
+                if (configFile == null) {
+                    throw new RuntimeException("CONFIG_FILE environment variable should be set with path to configuration file");
+                }
+
+                new MatchingServiceAdapterApplication().run("server", configFile);
+            } else {
+                new MatchingServiceAdapterApplication().run(args);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
