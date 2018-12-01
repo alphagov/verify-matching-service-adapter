@@ -1,39 +1,18 @@
 server:
   applicationConnectors:
     - type: http
-      port: 50210
+      port: ${PORT:-50210}
   adminConnectors:
     - type: http
       port: 50211
   requestLog:
     appenders:
-      - type: file
-        currentLogFilename: ${LOG_PATH}/debug/test-rp-msa_access.log
-        archivedLogFilenamePattern: ${LOG_PATH}/debug/test-rp-msa_access.log.%d.gz
-        archivedFileCount: 7
-      - type: logstash-file
-        currentLogFilename: ${LOG_PATH}/test-rp-msa_access.log
-        archivedLogFilenamePattern: ${LOG_PATH}/test-rp-msa_access.log.%d.gz
-        archivedFileCount: 7
-      - type: logstash-syslog
-        facility: local2
-        tag: test-rp-msa
+      - type: console
 
 logging:
-  level: INFO
+  level: ${LOG_LEVEL}
   appenders:
-    - type: file
-      currentLogFilename: ${LOG_PATH}/debug/test-rp-msa.log
-      archivedLogFilenamePattern: ${LOG_PATH}/debug/test-rp-msa.log.%d.gz
-      archivedFileCount: 7
-      logFormat: '%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'
-    - type: logstash-file
-      currentLogFilename: ${LOG_PATH}/test-rp-msa.log
-      archivedLogFilenamePattern: ${LOG_PATH}/test-rp-msa.log.%d.gz
-      archivedFileCount: 7
-    - type: logstash-syslog
-      facility: local2
-      tag: test-rp-msa
+    - type: console
 
 metrics:
   reporters:
@@ -45,18 +24,11 @@ metrics:
 
 matchingServiceAdapter:
   entityId: http://www.test-rp-ms.gov.uk/SAML2/MD
-  externalUrl: https://${TEST_RP_MSA_HOST}:443/matching-service/POST
+  externalUrl: ${TEST_RP_MSA_URL}
 
 localMatchingService:
-  matchUrl: https://${TEST_RP_HOST}:443/test-rp/matching-service/POST
-  accountCreationUrl: https://${TEST_RP_HOST}:443/test-rp/unknown-user/POST
-  client:
-    timeout: 60s
-    timeToLive: 10m
-    connectionTimeout: 4s
-    tls:
-      verifyHostname: false
-      trustSelfSignedCertificates: true
+  matchUrl: ${TEST_RP_ROUTE}/test-rp/matching-service/POST
+  accountCreationUrl: ${TEST_RP_ROUTE}/test-rp/unknown-user/POST
 
 hub:
   ssoUrl: https://${SIGNIN_DOMAIN}/SAML2/SSO
@@ -64,46 +36,33 @@ hub:
   hubEntityId: ${METADATA_ENTITY_ID}
 
 metadata:
-  url: https://${SIGNIN_DOMAIN}/SAML2/metadata/federation
+  url: ${METADATA_URL}
+  environment: ${ENVIRONMENT:-INTEGRATION}
   trustStore:
-    path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
+    path: ${TRUSTSTORE_PATH}
     password: ${TRUSTSTORE_PASSWORD}
-  hubTrustStore:
-      path: ${TRUSTSTORE_PATH}/ida_hub_truststore.ts
-      password: ${TRUSTSTORE_PASSWORD}
-  idpTrustStore:
-      path: ${TRUSTSTORE_PATH}/ida_idp_truststore.ts
-      password: ${TRUSTSTORE_PASSWORD}
   minRefreshDelay: 30000
   maxRefreshDelay: 1800000
   expectedEntityId: ${METADATA_ENTITY_ID}
-  client:
-    timeout: 60s
-    timeToLive: 10m
-    connectionTimeout: 4s
-    retries: 3
-    keepAlive: 60s
-    chunkedEncodingEnabled: false
-    validateAfterInactivityPeriod: 5s
-    tls:
-      protocol: TLSv1.2
-      verifyHostname: false
-      trustSelfSignedCertificates: true
 
 signingKeys:
   primary:
     publicKey:
-      certFile: ${TEST_RP_MSA_PUBLIC_SIGNING_KEY}
+      type: encoded
+      cert: ${SIGNING_CERT}
       name: http://www.test-rp-ms.gov.uk/SAML2/MD
     privateKey:
-      keyFile: ${TEST_RP_MSA_PRIVATE_SIGNING_KEY}
+      type: encoded
+      key: ${SIGNING_KEY}
 
 encryptionKeys:
   - publicKey:
-      certFile: ${TEST_RP_MSA_PUBLIC_ENCRYPTION_KEY}
+      type: encoded
+      cert: ${ENCRYPTION_CERT}
       name: http://www.test-rp-ms.gov.uk/SAML2/MD
     privateKey:
-      keyFile: ${TEST_RP_MSA_PRIVATE_ENCRYPTION_KEY}
+      type: encoded
+      key: ${ENCRYPTION_KEY}
 
 returnStackTraceInErrorResponse: true
 
@@ -114,7 +73,7 @@ europeanIdentity:
     trustAnchorUri: ${TRUST_ANCHOR_URI}
     metadataSourceUri: ${METADATA_SOURCE_URI}
     trustStore:
-      path: ${TRUSTSTORE_PATH}/ida_metadata_truststore.ts
+      path: ${TRUSTSTORE_PATH}
       password: ${TRUSTSTORE_PASSWORD}
     minRefreshDelay: 5000
     maxRefreshDelay: 600000
