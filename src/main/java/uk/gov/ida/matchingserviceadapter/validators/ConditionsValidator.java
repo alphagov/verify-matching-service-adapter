@@ -8,12 +8,12 @@ import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationExcept
 
 public class ConditionsValidator {
 
-    private final TimeRestrictionValidator timeRestrictionValidator;
+    private final AssertionTimeRestrictionValidator timeRestrictionValidator;
     private final AudienceRestrictionValidator audienceRestrictionValidator;
 
     @Inject
     public ConditionsValidator(
-            TimeRestrictionValidator timeRestrictionValidator,
+            AssertionTimeRestrictionValidator timeRestrictionValidator,
             AudienceRestrictionValidator audienceRestrictionValidator
     ) {
         this.timeRestrictionValidator = timeRestrictionValidator;

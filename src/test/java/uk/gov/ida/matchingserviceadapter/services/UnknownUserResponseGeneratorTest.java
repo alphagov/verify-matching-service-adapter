@@ -18,7 +18,6 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserC
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.rest.UnknownUserCreationResponseDto;
-import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
@@ -76,15 +75,8 @@ public class UnknownUserResponseGeneratorTest {
     @Mock
     private AssertionLifetimeConfiguration assertionLifetimeConfiguration;
 
-    @Mock
-    private UserIdHashFactory userIdHashFactory;
-
     private UnknownUserResponseGenerator unknownUserResponseGenerator;
 
-    private String hashedPid = "hashedPid";
-    private String issuerId = "some-idp";
-    private String nameId = "nameId";
-    private AuthnContext authnContext = AuthnContext.LEVEL_2;
     private OpenSamlXmlObjectFactory openSamlXmlObjectFactory = new OpenSamlXmlObjectFactory();
 
     @Before

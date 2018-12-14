@@ -58,7 +58,7 @@ import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
-import uk.gov.ida.matchingserviceadapter.validators.TimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
@@ -130,11 +130,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
         bind(AttributeQuerySignatureValidator.class);
         bind(InstantValidator.class);
-        bind(TimeRestrictionValidator.class);
+        bind(AssertionTimeRestrictionValidator.class);
         bind(SubjectValidator.class);
         bind(AudienceRestrictionValidator.class);
         bind(ConditionsValidator.class);
-        //bind(AttributeQueryService.class);
 
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);

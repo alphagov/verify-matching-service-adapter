@@ -13,7 +13,7 @@ import org.opensaml.saml.saml2.core.ProxyRestriction;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
 import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
-import uk.gov.ida.matchingserviceadapter.validators.TimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAu
 
 public class ConditionsValidatorTest {
 
-    private TimeRestrictionValidator timeRestrictionValidator;
+    private AssertionTimeRestrictionValidator timeRestrictionValidator;
     private AudienceRestrictionValidator audienceRestrictionValidator;
     private Conditions conditions;
 
@@ -34,7 +34,7 @@ public class ConditionsValidatorTest {
 
     @Before
     public void setUp() {
-        timeRestrictionValidator = mock(TimeRestrictionValidator.class);
+        timeRestrictionValidator = mock(AssertionTimeRestrictionValidator.class);
         audienceRestrictionValidator = mock(AudienceRestrictionValidator.class);
         conditions = mock(Conditions.class);
 

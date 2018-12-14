@@ -11,7 +11,7 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
-import uk.gov.ida.matchingserviceadapter.validators.TimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
@@ -28,7 +28,7 @@ public class SubjectValidatorTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private TimeRestrictionValidator timeRestrictionValidator;
+    private AssertionTimeRestrictionValidator timeRestrictionValidator;
 
     @Before
     public void setUp() {
