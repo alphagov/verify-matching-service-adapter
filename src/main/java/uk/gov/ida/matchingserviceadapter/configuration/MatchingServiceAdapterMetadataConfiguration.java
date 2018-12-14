@@ -38,6 +38,14 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
         @JsonProperty("environment") MatchingServiceAdapterEnvironment environment) {
 
         super(uri, minRefreshDelay, maxRefreshDelay, expectedEntityId, client, jerseyClientName, hubFederationId, trustStore);
+
+        if ((hubTrustStore == null || idpTrustStore == null) && environment == null) {
+            throw new IllegalArgumentException(
+                    "Missing property 'environment' in the 'metadata' section of the config: set environment to either PRODUCTION or INTEGRATION to use the default 'hub' and 'idp' metadata truststores, " +
+                            "or override both by providing configuration for 'hubTrustStore' and 'idpTrustStore'");
+        }
+
+
         this.hubTrustStore = hubTrustStore;
         this.idpTrustStore = idpTrustStore;
         this.environment = Optional.ofNullable(environment).orElse(MatchingServiceAdapterEnvironment.INTEGRATION);
