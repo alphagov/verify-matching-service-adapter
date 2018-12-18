@@ -59,15 +59,9 @@ public class MsaTransformersFactory {
             EntityToEncryptForLocator entityToEnryptForLocator,
             MatchingServiceAdapterConfiguration configuration
     ) {
-        SignatureAlgorithm signatureAlgorithm = configuration.shouldSignWithSHA1() ?
-                new SignatureRSASHA1() :
-                new SignatureRSASHA256();
+        SignatureAlgorithm signatureAlgorithm = getSignatureAlgorithm(configuration);
+        SignatureFactory signatureFactory = getSignatureFactory(keyStore, signatureAlgorithm);
 
-        SignatureFactory signatureFactory = new SignatureFactory(
-            new IdaKeyStoreCredentialRetriever(keyStore),
-                signatureAlgorithm,
-            new DigestSHA256()
-        );
         SamlResponseAssertionEncrypter assertionEncrypter = new SamlResponseAssertionEncrypter(
                 encryptionCredentialResolver,
                 new EncrypterFactory(),
@@ -79,6 +73,25 @@ public class MsaTransformersFactory {
                 new ResponseAssertionSigner(signatureFactory),
                 new ResponseSignatureCreator(signatureFactory)
         );
+    }
+
+    public SignatureFactory getSignatureFactory(boolean includeKeyInfo, IdaKeyStore keyStore, SignatureAlgorithm signatureAlgorithm) {
+        return new SignatureFactory(
+                includeKeyInfo,
+                new IdaKeyStoreCredentialRetriever(keyStore),
+                signatureAlgorithm,
+                new DigestSHA256()
+        );
+    }
+
+    public SignatureFactory getSignatureFactory(IdaKeyStore keyStore, SignatureAlgorithm signatureAlgorithm) {
+        return getSignatureFactory(false, keyStore, signatureAlgorithm);
+    }
+
+    public SignatureAlgorithm getSignatureAlgorithm(MatchingServiceAdapterConfiguration configuration) {
+        return configuration.shouldSignWithSHA1() ?
+                new SignatureRSASHA1() :
+                new SignatureRSASHA256();
     }
 
     public HealthCheckResponseFromMatchingServiceTransformer getHealthCheckResponseFromMatchingServiceToResponseTransformer() {

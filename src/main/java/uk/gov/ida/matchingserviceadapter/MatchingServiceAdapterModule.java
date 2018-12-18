@@ -456,7 +456,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 configuration.getSigningKeys().get(0).getPrivateKey().getPrivateKey()
         );
 
-        return new IdaKeyStore(signingKeyPair, encryptionKeyPairs);
+        X509CertificateFactory x509CertificateFactory = new X509CertificateFactory();
+        return new IdaKeyStore(x509CertificateFactory.createCertificate(configuration.getSigningKeys().get(0).getPublicKey().getCert()), signingKeyPair, encryptionKeyPairs);
     }
 
     @Provides

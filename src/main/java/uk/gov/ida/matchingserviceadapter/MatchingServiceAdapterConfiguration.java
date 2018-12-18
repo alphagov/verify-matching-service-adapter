@@ -73,6 +73,11 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
     @JsonProperty
     private boolean shouldSignWithSHA1 = false;
 
+    @NotNull
+    @Valid
+    @JsonProperty
+    private boolean signMetadataEnabled = true;
+
     protected MatchingServiceAdapterConfiguration() {
     }
 
@@ -171,5 +176,9 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     public boolean isEidasEnabled() {
         return getEuropeanIdentity() != null && getEuropeanIdentity().isEnabled();
+    }
+
+    public boolean isSignMetadataEnabled() {
+        return signMetadataEnabled;
     }
 }
