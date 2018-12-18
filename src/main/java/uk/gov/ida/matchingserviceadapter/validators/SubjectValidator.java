@@ -11,10 +11,10 @@ import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationExcept
 import java.util.stream.Stream;
 
 public class SubjectValidator {
-    TimeRestrictionValidator timeRestrictionValidator;
+    AssertionTimeRestrictionValidator timeRestrictionValidator;
 
     @Inject
-    public SubjectValidator(TimeRestrictionValidator timeRestrictionValidator) {
+    public SubjectValidator(AssertionTimeRestrictionValidator timeRestrictionValidator) {
         this.timeRestrictionValidator = timeRestrictionValidator;
     }
 

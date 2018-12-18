@@ -8,12 +8,12 @@ import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationExcept
 import static org.joda.time.DateTimeZone.UTC;
 import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
 
-public class TimeRestrictionValidator {
+public class AssertionTimeRestrictionValidator {
 
     private final DateTimeComparator dateTimeComparator;
 
     @Inject
-    public TimeRestrictionValidator(DateTimeComparator dateTimeComparator) {
+    public AssertionTimeRestrictionValidator(DateTimeComparator dateTimeComparator) {
         this.dateTimeComparator = dateTimeComparator;
     }
 

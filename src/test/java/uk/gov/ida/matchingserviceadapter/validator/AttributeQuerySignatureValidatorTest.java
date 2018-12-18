@@ -3,16 +3,13 @@ package uk.gov.ida.matchingserviceadapter.validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
-import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
-import org.slf4j.event.Level;
 import uk.gov.ida.matchingserviceadapter.validators.AttributeQuerySignatureValidator;
 import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.core.validation.SamlValidationResponse;
 import uk.gov.ida.saml.core.validation.SamlValidationSpecificationFailure;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,15 +18,10 @@ public class AttributeQuerySignatureValidatorTest {
     private AttributeQuerySignatureValidator validator;
     private SamlMessageSignatureValidator samlMessageSignatureValidator;
 
-//    @Rule
-//    public ExpectedException expectedException = ExpectedException.none();
-
-
     @Before
     public void setUp() {
 
         samlMessageSignatureValidator = mock(SamlMessageSignatureValidator.class);
-        //IdaSamlBootstrap.bootstrap();
     }
 
     @Test

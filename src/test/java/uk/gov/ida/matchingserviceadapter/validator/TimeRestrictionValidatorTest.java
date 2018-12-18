@@ -8,18 +8,17 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
-import uk.gov.ida.matchingserviceadapter.validators.TimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 
 import static org.joda.time.DateTimeZone.UTC;
 import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TimeRestrictionValidatorTest {
 
     private DateTimeComparator dateTimeComparator;
 
-    private TimeRestrictionValidator validator;
+    private AssertionTimeRestrictionValidator validator;
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -28,7 +27,7 @@ public class TimeRestrictionValidatorTest {
     public void setUp() {
         dateTimeComparator = new DateTimeComparator(new Duration(5000)  );
 
-        validator = new TimeRestrictionValidator(dateTimeComparator);
+        validator = new AssertionTimeRestrictionValidator(dateTimeComparator);
     }
 
     @Test

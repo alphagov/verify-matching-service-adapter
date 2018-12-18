@@ -65,29 +65,29 @@ public class EidasAssertionService extends AssertionService {
     @Override
     public AssertionData translate(List<Assertion> assertions) {
         Assertion countryAssertion = assertions
-                .stream()
-                .filter(this::isCountryAssertion)
-                .findFirst()
-                .orElseThrow(() -> new SamlResponseValidationException("No matching dataset assertion present."));
+            .stream()
+            .filter(this::isCountryAssertion)
+            .findFirst()
+            .orElseThrow(() -> new SamlResponseValidationException("No matching dataset assertion present."));
         Optional<Assertion> cycle3Assertion = assertions.stream()
-                .filter(a -> !isCountryAssertion(a))
-                .findFirst();
+            .filter(a -> !isCountryAssertion(a))
+            .findFirst();
 
         AuthnStatement authnStatement = countryAssertion.getAuthnStatements().get(0);
         String levelOfAssurance = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
         return new AssertionData(countryAssertion.getIssuer().getValue(),
-                authnContextFactory.mapFromEidasToLoA(levelOfAssurance),
-                getCycle3Data(cycle3Assertion),
-                matchingDatasetUnmarshaller.fromAssertion(countryAssertion));
+            authnContextFactory.mapFromEidasToLoA(levelOfAssurance),
+            getCycle3Data(cycle3Assertion),
+            matchingDatasetUnmarshaller.fromAssertion(countryAssertion));
     }
 
     private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
         metadataResolverRepository.getSignatureTrustEngine(assertion.getIssuer().getValue())
-                .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
-                .map(SamlMessageSignatureValidator::new)
-                .map(SamlAssertionsSignatureValidator::new)
-                .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
-                .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+            .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
+            .map(SamlMessageSignatureValidator::new)
+            .map(SamlAssertionsSignatureValidator::new)
+            .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
+            .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         conditionsValidator.validate(assertion.getConditions(), hubConnectorEntityId);
