@@ -2,16 +2,15 @@ package uk.gov.ida.integrationtest;
 
 import certificates.values.CACertificates;
 import com.google.common.collect.ImmutableList;
-import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import keystore.CertificateEntry;
 import keystore.KeyStoreResource;
 import keystore.builders.KeyStoreResourceBuilder;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
+import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.core.xml.schema.XSString;
@@ -28,7 +27,6 @@ import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -84,12 +82,14 @@ public class MetadataIntegrationTest {
 
     @Test
     public void shouldGenerateValidMetadataFromLocalConfiguration() throws Exception {
-        MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(applicationRule.getEnvironment(), TestMetadataResolverConfigurationBuilder.aConfig()
+        MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolverWithClient(TestMetadataResolverConfigurationBuilder.aConfig()
                 .withMsaEntityId(TEST_RP_MS)
                 .withUri("http://localhost:" + applicationRule.getLocalPort() + "/matching-service/SAML2/metadata")
                 .withTrustStore(rpTrustStore.getKeyStore())
                 .withHubFederationId("")//"this is not set in the generated metadata
-                .build());
+                .build(),
+                true,
+                JerseyClientBuilder.createClient());
 
         EntityDescriptor descriptor = metadataResolver.resolveSingle(new CriteriaSet(new EntityIdCriterion(TEST_RP_MS)));
         AttributeAuthorityDescriptor attributeAuthorityDescriptor = descriptor.getAttributeAuthorityDescriptor(SAMLConstants.SAML20P_NS);
@@ -112,14 +112,15 @@ public class MetadataIntegrationTest {
     }
 
     @Test
-    @Ignore("having issues with metrics, but this works ok on its own")
     public void shouldGenerateInvalidMetadataFromLocalConfiguration() throws Exception {
-        MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolver(applicationRule.getEnvironment(), TestMetadataResolverConfigurationBuilder.aConfig()
+        MetadataResolver metadataResolver = new DropwizardMetadataResolverFactory().createMetadataResolverWithClient(TestMetadataResolverConfigurationBuilder.aConfig()
                 .withMsaEntityId(TEST_RP_MS)
                 .withUri("http://localhost:" + applicationRuleWithUnexpectedSigningKeyInTheBaggingArea.getLocalPort() + "/matching-service/SAML2/metadata")
                 .withTrustStore(rpTrustStore.getKeyStore())
                 .withHubFederationId("")//"this is not set in the generated metadata
-                .build());
+                .build(),
+                true,
+                JerseyClientBuilder.createClient());
 
         EntityDescriptor descriptor = metadataResolver.resolveSingle(new CriteriaSet(new EntityIdCriterion(TEST_RP_MS)));
         assertThat(descriptor).isNull();
