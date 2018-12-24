@@ -210,7 +210,7 @@ task intTest(type: Test) {
     String maxParallelForksEnvVarValue = 1
     println "Overriding maxParallelForks value (value: \'${maxParallelForksEnvVarValue}\')"
     maxParallelForks = Integer.parseInt("${maxParallelForksEnvVarValue}")
-    testClassesDir = sourceSets.intTest.output.classesDir
+    testClassesDirs = sourceSets.intTest.output.classesDirs
     classpath += sourceSets.intTest.runtimeClasspath
 }
 
