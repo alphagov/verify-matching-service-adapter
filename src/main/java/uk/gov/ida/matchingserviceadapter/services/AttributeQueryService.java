@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.services;
 import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import uk.gov.ida.matchingserviceadapter.domain.AssertionClassifier;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.validators.AttributeQuerySignatureValidator;
@@ -11,18 +12,16 @@ import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import java.util.List;
 import java.util.Optional;
 
-public class AttributeQueryService {
+import static uk.gov.ida.matchingserviceadapter.domain.AssertionClassification.MDS_ASSERTION;
 
-    private static final String AUTHN_ASSERTION = "authn-assertion";
-    private static final String MDS_ASSERTION = "mds-assertion";
-    private static final String CYCLE_3_ASSERTION = "cycle-3-assertion";
+public class AttributeQueryService {
 
     private final AttributeQuerySignatureValidator attributeQuerySignatureValidator;
     private final InstantValidator instantValidator;
     private final VerifyAssertionService verifyAssertionService;
     private final EidasAssertionService eidasAssertionService;
     private final UserIdHashFactory userIdHashFactory;
-    private final String hubEntityId;
+    private final AssertionClassifier assertionClassifier;
 
     @Inject
     public AttributeQueryService(AttributeQuerySignatureValidator attributeQuerySignatureValidator,
@@ -36,7 +35,7 @@ public class AttributeQueryService {
         this.verifyAssertionService = verifyAssertionService;
         this.eidasAssertionService = eidasAssertionService;
         this.userIdHashFactory = userIdHashFactory;
-        this.hubEntityId = hubEntityId;
+        this.assertionClassifier = new AssertionClassifier(hubEntityId);
     }
 
     public void validate(AttributeQuery attributeQuery) {
@@ -56,8 +55,8 @@ public class AttributeQueryService {
 
     private boolean hasMdsAssertion(List<Assertion> assertions) {
         return assertions.stream()
-                    .map(this::classifyAssertion)
-                    .anyMatch(type -> type.equals(MDS_ASSERTION));
+                    .map(assertionClassifier::getClassification)
+                    .anyMatch(MDS_ASSERTION::equals);
     }
 
     public AssertionData getAssertionData(List<Assertion> decryptedAssertions) {
@@ -69,15 +68,6 @@ public class AttributeQueryService {
 
     private boolean isCountryAttributeQuery(List<Assertion> assertions) {
         return assertions.stream().anyMatch(eidasAssertionService::isCountryAssertion);
-    }
-
-    private String classifyAssertion(Assertion assertion) {
-        if (!assertion.getAuthnStatements().isEmpty()) {
-            return AUTHN_ASSERTION;
-        } else if (assertion.getIssuer().getValue().equals(hubEntityId)) {
-            return CYCLE_3_ASSERTION;
-        }
-        return MDS_ASSERTION;
     }
 
     public String hashPid(AssertionData assertionData) {
