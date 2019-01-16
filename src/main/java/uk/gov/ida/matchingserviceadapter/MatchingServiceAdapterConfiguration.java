@@ -14,13 +14,14 @@ import uk.gov.ida.matchingserviceadapter.configuration.LocalMatchingServiceConfi
 import uk.gov.ida.matchingserviceadapter.configuration.MatchingServiceAdapterMetadataConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.ServiceInfo;
 import uk.gov.ida.matchingserviceadapter.configuration.SigningKeysConfiguration;
-import uk.gov.ida.saml.metadata.MetadataConfiguration;
+import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class MatchingServiceAdapterConfiguration extends Configuration implements AssertionLifetimeConfiguration, ServiceNameConfiguration {
@@ -122,8 +123,8 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         return localMatchingService.getClient();
     }
 
-    public MetadataConfiguration getMetadataConfiguration() {
-        return metadata;
+    public Optional<MetadataResolverConfiguration> getMetadataConfiguration() {
+        return Optional.of(metadata);
     }
 
     public List<KeyPairConfiguration> getSigningKeys() {

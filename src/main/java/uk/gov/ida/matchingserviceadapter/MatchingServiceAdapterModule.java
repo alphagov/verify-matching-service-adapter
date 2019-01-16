@@ -38,6 +38,7 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserC
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttributeExtractor;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionResponseFactory;
 import uk.gov.ida.matchingserviceadapter.exceptions.InvalidCertificateException;
+import uk.gov.ida.matchingserviceadapter.exceptions.MissingMetadataException;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingDatasetToMatchingDatasetDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceRequestDtoMapper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper;
@@ -72,8 +73,8 @@ import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
 import uk.gov.ida.saml.metadata.EidasTrustAnchorHealthCheck;
 import uk.gov.ida.saml.metadata.EidasTrustAnchorResolver;
 import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
-import uk.gov.ida.saml.metadata.MetadataConfiguration;
 import uk.gov.ida.saml.metadata.MetadataResolverConfigBuilder;
+import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
 import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
@@ -302,7 +303,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named("HubFederationId")
     public String getHubFederationId(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.getMetadataConfiguration().getHubFederationId();
+        return configuration.getMetadataConfiguration().orElseThrow(() -> new MissingMetadataException()).getHubFederationId();
     }
 
     @Provides
@@ -460,7 +461,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MetadataConfiguration metadataConfiguration(MatchingServiceAdapterConfiguration msaConfiguration) {
+    public Optional<MetadataResolverConfiguration> metadataConfiguration(MatchingServiceAdapterConfiguration msaConfiguration) {
         return msaConfiguration.getMetadataConfiguration();
     }
 

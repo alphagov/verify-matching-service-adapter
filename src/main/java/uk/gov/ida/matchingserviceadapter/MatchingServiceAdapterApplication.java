@@ -18,6 +18,7 @@ import uk.gov.ida.bundles.LoggingBundle;
 import uk.gov.ida.bundles.MonitoringBundle;
 import uk.gov.ida.bundles.ServiceStatusBundle;
 import uk.gov.ida.matchingserviceadapter.exceptions.ExceptionExceptionMapper;
+import uk.gov.ida.matchingserviceadapter.exceptions.MissingMetadataException;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlOverSoapExceptionMapper;
 import uk.gov.ida.matchingserviceadapter.healthcheck.MatchingServiceAdapterHealthCheck;
 import uk.gov.ida.matchingserviceadapter.resources.LocalMetadataResource;
@@ -105,8 +106,6 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
         environment.jersey().register(SamlOverSoapExceptionMapper.class);
         environment.jersey().register(ExceptionExceptionMapper.class);
 
-
-        environment.healthChecks().register("VerifyMetadataHealthCheck", new MetadataHealthCheck(metadataResolverBundle.getMetadataResolver(), configuration.getMetadataConfiguration().getExpectedEntityId()));
         registerMetadataRefreshTask(environment, Optional.empty(), ImmutableList.of(metadataResolverBundle.getMetadataResolver()), "metadata");
 
         MatchingServiceAdapterHealthCheck healthCheck = new MatchingServiceAdapterHealthCheck();
