@@ -1,0 +1,18 @@
+---
+applications:
+  - name: ((name))
+    command:  (cd ((dist))-* && bin/((dist)) server example-lms-msa.yml)
+    routes:
+      - route: ((name)).apps.internal
+      - route: ((name)).cloudapps.digital
+    memory: 1G
+    buildpack: java_buildpack
+    env:
+      JAVA_HOME: "../.java-buildpack/open_jdk_jre"
+      LOG_LEVEL: INFO
+      LMS_URI: http://((lms_app)).apps.internal:8080
+      SIGNIN_DOMAIN: www.((hub_env)).signin.service.gov.uk
+      METADATA_ENTITY_ID: https://signin.service.gov.uk
+      METADATA_TRUSTSTORE_PATH: ((truststore_path))
+      METADATA_TRUSTSTORE_PASSWORD: puppet
+      EUROPEAN_IDENTITY_ENABLED: false

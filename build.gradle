@@ -222,6 +222,18 @@ task(outputDependencies) doLast {
     println "ida_utils=$dependencyVersions.ida_utils"
 }
 
+distributions {
+    paas {
+        contents {
+            from 'configuration/example-lms-msa.yml',
+                 'src/main/resources/test_metadata_truststore.ts'
+
+            with distributions.main.contents
+        }
+    }
+}
+
+
 tasks.check.dependsOn(intTest)
 
 jar {
