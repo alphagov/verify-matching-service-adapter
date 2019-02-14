@@ -1,0 +1,59 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: ${PORT:-50210}
+  adminConnectors:
+    - type: http
+      port: 50211
+  requestLog:
+    appenders:
+      - type: console
+
+logging:
+  level: ${LOG_LEVEL}
+  appenders:
+    - type: console
+
+matchingServiceAdapter:
+  entityId: ${MSA_ENTITY_ID}
+  externalUrl: ${EXTERNAL_URL}
+
+localMatchingService:
+  matchUrl: ${LMS_URI}/match-user
+  accountCreationUrl: ${LMS_URI}/create-user
+
+hub:
+  ssoUrl: https://${SIGNIN_DOMAIN}/SAML2/SSO
+  republishHubCertificatesInLocalMetadata: true
+  hubEntityId: ${METADATA_ENTITY_ID}
+
+metadata:
+  url: https://${SIGNIN_DOMAIN}/SAML2/metadata/federation
+  environment: ${ENVIRONMENT:-INTEGRATION}
+  minRefreshDelay: 30000
+  maxRefreshDelay: 1800000
+  trustStore:
+    path: ${METADATA_TRUSTSTORE_PATH}
+    password: ${METADATA_TRUSTSTORE_PASSWORD}
+  expectedEntityId: ${METADATA_ENTITY_ID}
+
+signingKeys:
+  primary:
+    publicKey:
+      type: x509
+      cert: ${SIGNING_CERT}
+      name: http://www.vsp-ms.gov.uk
+    privateKey:
+      type: encoded
+      key: ${SIGNING_KEY}
+
+encryptionKeys:
+  - publicKey:
+      type: encoded
+      cert: ${ENCRYPTION_CERT}
+      name: http://www.vsp-ms.gov.uk
+    privateKey:
+      type: encoded
+      key: ${ENCRYPTION_KEY}
+
+returnStackTraceInResponse: true
