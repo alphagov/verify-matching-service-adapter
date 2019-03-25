@@ -11,6 +11,8 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalAddressDt
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyAddressDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.validators.FirstNameToComparator;
+import uk.gov.ida.matchingserviceadapter.validators.FirstNameVerifiedComparator;
 import uk.gov.ida.saml.core.domain.Address;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
@@ -25,7 +27,8 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToMatchingDatasetDtoMapper {
 
     public VerifyMatchingDatasetDto mapToVerifyMatchingDatasetDto(MatchingDataset matchingDataset) {
-        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().findFirst();
+        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream()
+                .sorted(new FirstNameToComparator()).min(new FirstNameVerifiedComparator());
         Optional<SimpleMdsValue<String>> middleNameValue = matchingDataset.getMiddleNames().stream().findFirst();
         Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream().findFirst();
 
