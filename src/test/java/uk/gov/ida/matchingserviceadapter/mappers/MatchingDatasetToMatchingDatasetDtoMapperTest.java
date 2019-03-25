@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
@@ -8,13 +9,20 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingDatasetDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
+import uk.gov.ida.matchingserviceadapter.validators.FirstNameToComparator;
+import uk.gov.ida.matchingserviceadapter.validators.FirstNameVerifiedComparator;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
+import uk.gov.ida.saml.core.domain.SimpleMdsValue;
+import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.aCurrentAddress;
 import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.aHistoricalAddress;
 import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_FROM_DATE;
@@ -63,14 +71,61 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
     @Test
     public void shouldMapCurrentFirstName() {
         MatchingDataset matchingDataset = aMatchingDataset()
-                .addFirstname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("Bob").build())
-                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Joe").withVerifiedStatus(true).build())
+                .addFirstname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("historical unverified: expected fourth").build())
+                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("current unverified: expected second").build())
+                .addFirstname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("historical verified: expected third").withVerifiedStatus(true).build())
+                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("current verified: expected first").withVerifiedStatus(true).build())
                 .build();
 
         VerifyMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToVerifyMatchingDatasetDto(matchingDataset);
 
         // Check that only the current first name is included
-        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, DEFAULT_FROM_DATE, null, true));
+        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("current verified: expected first", null, DEFAULT_FROM_DATE, null, true));
+    }
+
+    @Test
+    public void comparatorPrioritisesVerifiedThenCurrent() {
+        List<TransliterableMdsValue> firstNames = new ArrayList<>();
+        firstNames.add(buildFirstName("historical unverified: expected seventh", DateTime.now(), false));
+        firstNames.add(buildFirstName("current unverified: expected fifth", null, false));
+        firstNames.add(buildFirstName("historical verified: expected third", DateTime.now(), true));
+        firstNames.add(buildFirstName("current verified: expected first", null, true));
+        firstNames.add(buildFirstName("historical unverified: expected eighth", DateTime.now(), false));
+        firstNames.add(buildFirstName("current unverified: expected sixth", null, false));
+        firstNames.add(buildFirstName("historical verified: expected fourth", DateTime.now(), true));
+        firstNames.add(buildFirstName("current verified: expected second", null, true));
+        firstNames.sort(MatchingDatasetToMatchingDatasetDtoMapper.getFirstNameComparator());
+        assertEquals("current verified: expected first", firstNames.get(0).getValue());
+        assertEquals("current verified: expected second", firstNames.get(1).getValue());
+        assertEquals("historical verified: expected third", firstNames.get(2).getValue());
+        assertEquals("historical verified: expected fourth", firstNames.get(3).getValue());
+        assertEquals("current unverified: expected fifth", firstNames.get(4).getValue());
+        assertEquals("current unverified: expected sixth", firstNames.get(5).getValue());
+        assertEquals("historical unverified: expected seventh", firstNames.get(6).getValue());
+        assertEquals("historical unverified: expected eighth", firstNames.get(7).getValue());
+    }
+
+    @Test
+    public void comparatorMatchesExistingBehaviour() {
+        List<TransliterableMdsValue> firstNames = new ArrayList<>();
+        firstNames.add(buildFirstName("historical unverified: expected seventh", DateTime.now(), false));
+        firstNames.add(buildFirstName("current unverified: expected fifth", null, false));
+        firstNames.add(buildFirstName("historical verified: expected third", DateTime.now(), true));
+        firstNames.add(buildFirstName("current verified: expected first", null, true));
+        firstNames.add(buildFirstName("historical unverified: expected eighth", DateTime.now(), false));
+        firstNames.add(buildFirstName("current unverified: expected sixth", null, false));
+        firstNames.add(buildFirstName("historical verified: expected fourth", DateTime.now(), true));
+        firstNames.add(buildFirstName("current verified: expected second", null, true));
+        firstNames.sort(new FirstNameToComparator());
+        firstNames.sort(new FirstNameVerifiedComparator());
+        assertEquals("current verified: expected first", firstNames.get(0).getValue());
+        assertEquals("current verified: expected second", firstNames.get(1).getValue());
+        assertEquals("historical verified: expected third", firstNames.get(2).getValue());
+        assertEquals("historical verified: expected fourth", firstNames.get(3).getValue());
+        assertEquals("current unverified: expected fifth", firstNames.get(4).getValue());
+        assertEquals("current unverified: expected sixth", firstNames.get(5).getValue());
+        assertEquals("historical unverified: expected seventh", firstNames.get(6).getValue());
+        assertEquals("historical unverified: expected eighth", firstNames.get(7).getValue());
     }
 
     @Test
@@ -123,5 +178,10 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, null, null, true));
         assertThat(matchingDatasetDto.getSurnames()).containsOnly(new TransliterableMdsValueDto("Bloggs", null, null, null, true));
         assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, null, null, true));
+    }
+
+    private TransliterableMdsValue buildFirstName(String name, DateTime to, boolean verified) {
+        SimpleMdsValue<String> simpleValue = new SimpleMdsValue<>(name, null, to, verified);
+        return new TransliterableMdsValue(simpleValue);
     }
 }
