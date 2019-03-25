@@ -62,8 +62,6 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
 
     @Test
     public void shouldMapCurrentFirstName() {
-        LocalDate dob = new LocalDate(1970, 1, 2);
-        LocalDate oldDob = new LocalDate(1970, 2, 1);
         MatchingDataset matchingDataset = aMatchingDataset()
                 .addFirstname(SimpleMdsValueBuilder.<String>aHistoricalSimpleMdsValue().withValue("Bob").build())
                 .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Joe").withVerifiedStatus(true).build())

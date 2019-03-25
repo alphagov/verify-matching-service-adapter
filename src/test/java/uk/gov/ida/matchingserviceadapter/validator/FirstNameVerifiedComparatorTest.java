@@ -1,8 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.validator;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
-import uk.gov.ida.matchingserviceadapter.validators.FirstNameToComparator;
 import uk.gov.ida.matchingserviceadapter.validators.FirstNameVerifiedComparator;
 import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
