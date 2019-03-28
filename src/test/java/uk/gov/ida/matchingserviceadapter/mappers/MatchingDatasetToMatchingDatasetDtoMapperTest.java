@@ -92,7 +92,7 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         firstNames.add(buildFirstName("current unverified: expected sixth", null, false));
         firstNames.add(buildFirstName("historical verified: expected fourth", DateTime.now(), true));
         firstNames.add(buildFirstName("current verified: expected second", null, true));
-        firstNames.sort(MatchingDatasetToMatchingDatasetDtoMapper.getFirstNameComparator());
+        firstNames.sort(MatchingDatasetToMatchingDatasetDtoMapper.comparatorByVerifiedThenCurrent());
         assertEquals("current verified: expected first", firstNames.get(0).getValue());
         assertEquals("current verified: expected second", firstNames.get(1).getValue());
         assertEquals("historical verified: expected third", firstNames.get(2).getValue());
