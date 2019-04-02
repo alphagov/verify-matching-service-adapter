@@ -158,7 +158,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         jerseyClientConfiguration.setCookiesEnabled(false);
         jerseyClientConfiguration.setConnectionTimeout(Duration.seconds(4));
         jerseyClientConfiguration.setRetries(3);
-        jerseyClientConfiguration.setKeepAlive(Duration.seconds(60));
+        jerseyClientConfiguration.setKeepAlive(Duration.seconds(10));
         jerseyClientConfiguration.setChunkedEncodingEnabled(false);
         jerseyClientConfiguration.setValidateAfterInactivityPeriod(Duration.seconds(5));
         TlsConfiguration tlsConfiguration = new TlsConfiguration();
