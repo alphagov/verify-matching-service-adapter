@@ -25,12 +25,12 @@ import uk.gov.ida.saml.core.transformers.outbound.decorators.ResponseAssertionSi
 import uk.gov.ida.saml.core.transformers.outbound.decorators.ResponseSignatureCreator;
 import uk.gov.ida.saml.core.transformers.outbound.decorators.SamlResponseAssertionEncrypter;
 import uk.gov.ida.saml.core.transformers.outbound.decorators.SamlSignatureSigner;
-import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
-import uk.gov.ida.saml.core.validators.assertion.AssertionValidator;
-import uk.gov.ida.saml.core.validators.assertion.IdentityProviderAssertionValidator;
+import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
+import uk.gov.ida.saml.core.validation.assertion.AssertionValidator;
+import uk.gov.ida.saml.core.validation.assertion.IdentityProviderAssertionValidator;
+import uk.gov.ida.saml.core.validation.subjectconfirmation.AssertionSubjectConfirmationValidator;
+import uk.gov.ida.saml.core.validation.subjectconfirmation.BasicAssertionSubjectConfirmationValidator;
 import uk.gov.ida.saml.core.validators.subject.AssertionSubjectValidator;
-import uk.gov.ida.saml.core.validators.subjectconfirmation.AssertionSubjectConfirmationValidator;
-import uk.gov.ida.saml.core.validators.subjectconfirmation.BasicAssertionSubjectConfirmationValidator;
 import uk.gov.ida.saml.hub.transformers.outbound.MatchingServiceIdaStatusMarshaller;
 import uk.gov.ida.saml.hub.transformers.outbound.UnknownUserCreationIdaStatusMarshaller;
 import uk.gov.ida.saml.security.EncrypterFactory;

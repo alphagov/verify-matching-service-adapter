@@ -10,7 +10,7 @@ import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
-import uk.gov.ida.saml.core.validators.assertion.AssertionAttributeStatementValidator;
+import uk.gov.ida.saml.core.validation.assertion.AssertionAttributeStatementValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 
 import javax.xml.namespace.QName;
