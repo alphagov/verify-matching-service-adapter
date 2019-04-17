@@ -18,6 +18,7 @@ import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToMatchingDatasetDtoMapper {
 
     public VerifyMatchingDatasetDto mapToVerifyMatchingDatasetDto(MatchingDataset matchingDataset) {
-        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().findFirst();
+        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().min(comparatorByVerifiedThenCurrent());
         Optional<SimpleMdsValue<String>> middleNameValue = matchingDataset.getMiddleNames().stream().findFirst();
         Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream().findFirst();
 
@@ -113,5 +114,10 @@ public class MatchingDatasetToMatchingDatasetDtoMapper {
                         input.getTo(),
                         input.isVerified()))
                 .collect(Collectors.toList());
+    }
+
+    public static Comparator<TransliterableMdsValue> comparatorByVerifiedThenCurrent() {
+        return Comparator.comparing(TransliterableMdsValue::isVerified, Comparator.reverseOrder())
+                .thenComparing(TransliterableMdsValue::getTo, Comparator.nullsFirst(null));
     }
 }

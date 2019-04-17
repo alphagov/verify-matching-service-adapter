@@ -177,6 +177,44 @@ public class VerifyMatchingIntegrationTest {
     }
 
     @Test
+    public void shouldReturnSuccessResponseWhenMultipleCurrentFirstNamesAreProvided() {
+        AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion(REQUEST_ID),
+                        aMatchingDatasetAssertion(asList(
+                                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldUnverifiedFirstName1")
+                                        .withFrom(new DateTime(1990, 1, 30, 0, 0))
+                                        .withTo(new DateTime(2000, 1, 29, 0, 0))
+                                        .withVerified(false).build()).buildAsFirstname(),
+                                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentUnverifiedFirstName1")
+                                        .withFrom(new DateTime(1995, 1, 30, 0, 0))
+                                        .withVerified(false).build()).buildAsFirstname(),
+                                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentVerifiedFirstName1")
+                                        .withFrom(new DateTime(2000, 1, 30, 0, 0))
+                                        .withVerified(true).build()).buildAsFirstname(),
+                                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldVerifiedFirstName2")
+                                        .withFrom(new DateTime(2005, 1, 30, 0, 0))
+                                        .withTo(new DateTime(2010, 1, 30, 0, 0))
+                                        .withVerified(true).build()).buildAsFirstname(),
+                                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentUnverifiedFirstName2")
+                                        .withFrom(new DateTime(2010, 1, 30, 0, 0))
+                                        .withVerified(false).build()).buildAsFirstname(),
+                                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentVerifiedFirstName2")
+                                        .withFrom(new DateTime(2015, 1, 30, 0, 0))
+                                        .withVerified(true).build()).buildAsFirstname()
+                        ),false, REQUEST_ID)
+                ), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+        Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(MATCH);
+        assertMatchStatusLogMessage(REQUEST_ID, MatchingServiceResponseDto.MATCH);
+    }
+
+    @Test
     public void shouldReturnErrorResponseWhenIncorrectlySignedAssertionProvided() {
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
                 .withId(REQUEST_ID)
