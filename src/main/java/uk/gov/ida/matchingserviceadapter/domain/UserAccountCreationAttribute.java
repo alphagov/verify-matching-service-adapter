@@ -155,17 +155,7 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
 
     private static Optional<Address> extractCurrentAddress(List<Address> addresses) {
         Predicate<Address> addressPredicate = (Address candidateValue) -> candidateValue.getTo() == null || !candidateValue.getTo().isPresent();
-        List<Address> currentValues = ImmutableList.copyOf(addresses.stream()
-                .filter(addressPredicate)
-                .collect(toList()));
-
-        if (currentValues.size() > 1) {
-            throw new IllegalStateException("There cannot be multiple current values for attribute.");
-        }
-        if (currentValues.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(currentValues.get(0));
+        return addresses.stream().filter(addressPredicate).min(Comparators.attributeComparatorByVerified());
     }
 
     private static <T> Optional<SimpleMdsValue<T>> getCurrentValue(final List<SimpleMdsValue<T>> simpleMdsValues) {
