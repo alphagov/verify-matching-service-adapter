@@ -3,6 +3,7 @@ package uk.gov.ida.integrationtest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import httpstub.HttpStubRule;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -20,6 +21,8 @@ import uk.gov.ida.integrationtest.helpers.AttributeFactory;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
+import uk.gov.ida.saml.core.test.builders.AddressAttributeBuilder_1_1;
+import uk.gov.ida.saml.core.test.builders.AddressAttributeValueBuilder_1_1;
 import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 
@@ -33,10 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
 import static uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder.aUserAccountCreationAttributeValue;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCompleteMatchingDatasetAssertion;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.assertionWithOnlyFirstName;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.*;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.integrationtest.helpers.UserAccountCreationTestAssertionHelper.assertThatResponseContainsExpectedUserCreationAttributes;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.*;
@@ -49,6 +49,7 @@ import static uk.gov.ida.saml.core.test.TestEntityIds.TEST_RP_MS;
 import static uk.gov.ida.saml.core.test.builders.AddressAttributeValueBuilder_1_1.anAddressAttributeValue;
 import static uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder.anAttributeQuery;
 import static uk.gov.ida.saml.core.test.builders.IssuerBuilder.anIssuer;
+import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeBuilder_1_1.aPersonName_1_1;
 import static uk.gov.ida.saml.core.test.builders.PersonNameAttributeValueBuilder.aPersonNameValue;
 import static uk.gov.ida.saml.core.test.builders.VerifiedAttributeValueBuilder.aVerifiedValue;
 import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.signedBy;
@@ -112,6 +113,154 @@ public abstract class UserAccountCreationBaseTest {
                 ),
                 ADDRESS_HISTORY),
             userAccountCreationAttributeFor(openSamlXmlObjectFactory.createSimpleMdsAttributeValue("cycle3Value"), CYCLE_3)
+        ));
+        assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
+        assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
+        assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    @Test
+    public void shouldReturnCurrentVerifiedWhenPassedMultipleCurrentAttributes() {
+        List<Attribute> requiredAttributes = attributesFromUacAttributes(Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED));
+        Assertion datasetAssertion = aMatchingDatasetAssertion(asList(
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldUnverifiedFirstName").withFrom(new DateTime(1980, 1, 30, 0, 0)).withTo(new DateTime(1990, 1, 29, 0, 0)).withVerified(false).build()).buildAsFirstname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldVerifiedFirstName").withFrom(new DateTime(1990, 1, 30, 0, 0)).withTo(new DateTime(2000, 1, 29, 0, 0)).withVerified(true).build()).buildAsFirstname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentUnverifiedFirstName").withFrom(new DateTime(2000, 1, 30, 0, 0)).withVerified(false).build()).buildAsFirstname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentVerifiedFirstName").withFrom(new DateTime(2010, 1, 30, 0, 0)).withVerified(true).build()).buildAsFirstname()
+        ), false, REQUEST_ID);
+        AttributeQuery attributeQuery = anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withAttributes(requiredAttributes)
+                .withIssuer(anIssuer().withIssuerId(matchingServiceAdapterAppRule.getConfiguration().getHubEntityId()).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion("default-request-id"),
+                        datasetAssertion), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(CREATED);
+        assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), ImmutableList.of(
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("CurrentVerifiedFirstName").build(), FIRST_NAME),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), FIRST_NAME_VERIFIED)
+        ));
+        assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
+        assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
+        assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    @Test
+    public void shouldNotCareAboutDateWhenPassedMultipleCurrentAttributes() {
+        List<Attribute> requiredAttributes = attributesFromUacAttributes(Stream.of(SURNAME, SURNAME_VERIFIED));
+        Assertion datasetAssertion = aMatchingDatasetAssertion(asList(
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldUnverifiedSurname").withFrom(new DateTime(1980, 1, 30, 0, 0)).withTo(new DateTime(1990, 1, 29, 0, 0)).withVerified(false).build()).buildAsSurname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldVerifiedSurname").withFrom(new DateTime(1990, 1, 30, 0, 0)).withTo(new DateTime(2000, 1, 29, 0, 0)).withVerified(true).build()).buildAsSurname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("FirstOlderCurrentUnverifiedSurname").withFrom(new DateTime(2000, 1, 30, 0, 0)).withVerified(false).build()).buildAsSurname(),
+                aPersonName_1_1().addValue(aPersonNameValue().withValue("SecondNewerCurrentUnverifiedSurname").withFrom(new DateTime(2010, 1, 30, 0, 0)).withVerified(false).build()).buildAsSurname()
+        ), false, REQUEST_ID);
+        AttributeQuery attributeQuery = anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withAttributes(requiredAttributes)
+                .withIssuer(anIssuer().withIssuerId(matchingServiceAdapterAppRule.getConfiguration().getHubEntityId()).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion("default-request-id"),
+                        datasetAssertion), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(CREATED);
+        assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), ImmutableList.of(
+                userAccountCreationAttributeFor(aPersonNameValue().withValue("FirstOlderCurrentUnverifiedSurname").build(), SURNAME),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), SURNAME_VERIFIED)
+        ));
+        assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
+        assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
+        assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    @Test
+    public void shouldReturnVerifiedAddressWhenPassedMultipleCurrentAddresses() {
+        List<Attribute> requiredAttributes = attributesFromUacAttributes(Stream.of(CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY));
+        Assertion datasetAssertion = aMatchingDatasetAssertion(asList(
+                AddressAttributeBuilder_1_1.anAddressAttribute()
+                        .addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("first current, unverified address")).withVerified(false).build())
+                        .addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("second current, verified address")).withVerified(true).build())
+                        .buildCurrentAddress(),
+                AddressAttributeBuilder_1_1.anAddressAttribute()
+                        .addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("old verified address")).withVerified(true).build())
+                        .buildPreviousAddress()
+            ), false, REQUEST_ID);
+        AttributeQuery attributeQuery = anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withAttributes(requiredAttributes)
+                .withIssuer(anIssuer().withIssuerId(matchingServiceAdapterAppRule.getConfiguration().getHubEntityId()).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion("default-request-id"),
+                        datasetAssertion), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(CREATED);
+        assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), ImmutableList.of(
+                userAccountCreationAttributeFor(anAddressAttributeValue().addLines(ImmutableList.of("second current, verified address")).withVerified(true).build(), CURRENT_ADDRESS),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(true).build(), CURRENT_ADDRESS_VERIFIED),
+                userAccountCreationAttributeFor(
+                        asList(
+                                anAddressAttributeValue().addLines(ImmutableList.of("first current, unverified address")).withVerified(false).build(),
+                                anAddressAttributeValue().addLines(ImmutableList.of("second current, verified address")).withVerified(true).build(),
+                                anAddressAttributeValue().addLines(ImmutableList.of("old verified address")).withVerified(true).build()
+                        ),
+                        ADDRESS_HISTORY)
+        ));
+        assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
+        assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
+        assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    @Test
+    public void shouldPreserveOrderWhenPassedMultipleCurrentAddressAttributes() {
+        List<Attribute> requiredAttributes = attributesFromUacAttributes(Stream.of(CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY));
+        Assertion datasetAssertion = aMatchingDatasetAssertion(asList(
+                AddressAttributeBuilder_1_1.anAddressAttribute()
+                        .addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("first current, unverified address")).withVerified(false).build())
+                        .addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("second current, unverified address")).withVerified(false).build())
+                        .buildCurrentAddress(),
+                AddressAttributeBuilder_1_1.anAddressAttribute()
+                        .addAddress(new AddressAttributeValueBuilder_1_1().addLines(ImmutableList.of("old, verified address")).withVerified(true).build())
+                        .buildPreviousAddress()
+            ), false, REQUEST_ID);
+        AttributeQuery attributeQuery = anAttributeQuery()
+                .withId(REQUEST_ID)
+                .withAttributes(requiredAttributes)
+                .withIssuer(anIssuer().withIssuerId(matchingServiceAdapterAppRule.getConfiguration().getHubEntityId()).build())
+                .withSubject(aSubjectWithAssertions(asList(
+                        anAuthnStatementAssertion("default-request-id"),
+                        datasetAssertion), REQUEST_ID, HUB_ENTITY_ID))
+                .build();
+
+        Response response = makeAttributeQueryRequest(UNKNOWN_USER_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
+        List<Assertion> decryptedAssertions = assertionDecrypter.decryptAssertions(response::getEncryptedAssertions);
+
+        assertThat(response.getStatus().getStatusCode().getValue()).isEqualTo(SUCCESS);
+        assertThat(response.getStatus().getStatusCode().getStatusCode().getValue()).isEqualTo(CREATED);
+        assertThatResponseContainsExpectedUserCreationAttributes(decryptedAssertions.get(0).getAttributeStatements(), ImmutableList.of(
+                userAccountCreationAttributeFor(anAddressAttributeValue().addLines(ImmutableList.of("first current, unverified address")).withVerified(false).build(), CURRENT_ADDRESS),
+                userAccountCreationAttributeFor(aVerifiedValue().withValue(false).build(), CURRENT_ADDRESS_VERIFIED),
+                userAccountCreationAttributeFor(
+                        asList(
+                                anAddressAttributeValue().addLines(ImmutableList.of("first current, unverified address")).withVerified(false).build(),
+                                anAddressAttributeValue().addLines(ImmutableList.of("second current, unverified address")).withVerified(true).build(),
+                                anAddressAttributeValue().addLines(ImmutableList.of("old, verified address")).withVerified(true).build()
+                        ),
+                        ADDRESS_HISTORY)
         ));
         assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
         assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
