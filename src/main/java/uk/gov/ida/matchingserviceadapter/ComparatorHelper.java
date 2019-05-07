@@ -5,7 +5,7 @@ import uk.gov.ida.saml.core.domain.SimpleMdsValue;
 
 import java.util.Comparator;
 
-public class Comparators {
+public class ComparatorHelper {
     public static <T> Comparator<SimpleMdsValue<T>> comparatorByVerified() {
         return Comparator.comparing(SimpleMdsValue::isVerified, Comparator.reverseOrder());
     }

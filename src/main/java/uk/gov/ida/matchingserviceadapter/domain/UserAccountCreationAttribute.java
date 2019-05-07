@@ -3,7 +3,7 @@ package uk.gov.ida.matchingserviceadapter.domain;
 import com.google.common.collect.ImmutableList;
 import org.joda.time.LocalDate;
 import org.opensaml.saml.saml2.core.Attribute;
-import uk.gov.ida.matchingserviceadapter.Comparators;
+import uk.gov.ida.matchingserviceadapter.ComparatorHelper;
 import uk.gov.ida.matchingserviceadapter.saml.factories.UserAccountCreationAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
@@ -153,12 +153,12 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
 
     private static Optional<Address> extractCurrentAddress(List<Address> addresses) {
         Predicate<Address> addressPredicate = (Address candidateValue) -> candidateValue.getTo() == null || !candidateValue.getTo().isPresent();
-        return addresses.stream().filter(addressPredicate).min(Comparators.attributeComparatorByVerified());
+        return addresses.stream().filter(addressPredicate).min(ComparatorHelper.attributeComparatorByVerified());
     }
 
     private static <T> Optional<SimpleMdsValue<T>> getCurrentValue(final List<SimpleMdsValue<T>> simpleMdsValues) {
         Predicate<SimpleMdsValue<T>> simpleMdsValuePredicate = (SimpleMdsValue<T> simpleMdsValue) -> simpleMdsValue.getTo() == null;
-        return simpleMdsValues.stream().filter(simpleMdsValuePredicate).min(Comparators.comparatorByVerified());
+        return simpleMdsValues.stream().filter(simpleMdsValuePredicate).min(ComparatorHelper.comparatorByVerified());
     }
 
     private static Optional<SimpleMdsValue<String>> getTransliterableCurrentValue(final List<TransliterableMdsValue> simpleMdsValues) {

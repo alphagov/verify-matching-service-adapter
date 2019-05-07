@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import org.joda.time.LocalDate;
-import uk.gov.ida.matchingserviceadapter.Comparators;
+import uk.gov.ida.matchingserviceadapter.ComparatorHelper;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.GenderDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.SimpleMdsValueDto;
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.TransliterableMdsValueDto;
@@ -26,7 +26,8 @@ import java.util.stream.Collectors;
 public class MatchingDatasetToMatchingDatasetDtoMapper {
 
     public VerifyMatchingDatasetDto mapToVerifyMatchingDatasetDto(MatchingDataset matchingDataset) {
-        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream().min(Comparators.comparatorByVerifiedThenCurrent());
+        Optional<TransliterableMdsValue> firstNameValue = matchingDataset.getFirstNames().stream()
+                .min(ComparatorHelper.comparatorByVerifiedThenCurrent());
         Optional<SimpleMdsValue<String>> middleNameValue = matchingDataset.getMiddleNames().stream().findFirst();
         Optional<SimpleMdsValue<LocalDate>> birthDateValue = matchingDataset.getDateOfBirths().stream().findFirst();
 

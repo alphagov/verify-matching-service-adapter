@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-class ComparatorsTest {
+class ComparatorHelperTest {
 
     @Test
     public void comparatorByVerifiedThenCurrent() {
@@ -25,7 +25,7 @@ class ComparatorsTest {
         firstNames.add(buildFirstName("current unverified: expected sixth", null, false));
         firstNames.add(buildFirstName("historical verified: expected fourth", DateTime.now(), true));
         firstNames.add(buildFirstName("current verified: expected second", null, true));
-        firstNames.sort(Comparators.comparatorByVerifiedThenCurrent());
+        firstNames.sort(ComparatorHelper.comparatorByVerifiedThenCurrent());
         assertEquals("current verified: expected first", firstNames.get(0).getValue());
         assertEquals("current verified: expected second", firstNames.get(1).getValue());
         assertEquals("historical verified: expected third", firstNames.get(2).getValue());
@@ -47,7 +47,7 @@ class ComparatorsTest {
         addresses.add(buildAddress("current unverified: expected eighth", null, false));
         addresses.add(buildAddress("historical verified: expected third", DateTime.now(), true));
         addresses.add(buildAddress("current verified: expected fourth", null, true));
-        addresses.sort(Comparators.attributeComparatorByVerified());
+        addresses.sort(ComparatorHelper.attributeComparatorByVerified());
         assertEquals("historical verified: expected first", addresses.get(0).getLines().get(0));
         assertEquals("current verified: expected second", addresses.get(1).getLines().get(0));
         assertEquals("historical verified: expected third", addresses.get(2).getLines().get(0));
