@@ -79,10 +79,8 @@ public abstract class UserAccountCreationBaseTest {
 
     @Test
     public void shouldReturnCurrentAttributesWhenPassedFullMatchingDataset() {
-        List<Attribute> requiredAttributes = Stream.of(FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3)
-            .map(userAccountCreationAttribute -> new AttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
-            .collect(toList());
-
+        List<Attribute> requiredAttributes = attributesFromUacAttributes(Stream.of(
+                FIRST_NAME, FIRST_NAME_VERIFIED, MIDDLE_NAME, MIDDLE_NAME_VERIFIED, SURNAME, SURNAME_VERIFIED, CURRENT_ADDRESS, CURRENT_ADDRESS_VERIFIED, ADDRESS_HISTORY, CYCLE_3));
         AttributeQuery attributeQuery = anAttributeQuery()
             .withId(REQUEST_ID)
             .withAttributes(requiredAttributes)
@@ -123,10 +121,7 @@ public abstract class UserAccountCreationBaseTest {
 
     @Test
     public void shouldReturnFailureResponseWhenAttributesRequestedDoNotExist(){
-        List<Attribute> requiredAttributes = asList(FIRST_NAME, MIDDLE_NAME).stream()
-            .map(userAccountCreationAttribute -> new AttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
-            .collect(toList());
-
+        List<Attribute> requiredAttributes = attributesFromUacAttributes(Stream.of(FIRST_NAME, MIDDLE_NAME));
         AttributeQuery attributeQuery = anAttributeQuery()
             .withId(REQUEST_ID)
             .withAttributes(requiredAttributes)
@@ -171,6 +166,12 @@ public abstract class UserAccountCreationBaseTest {
         assertThat(response.getInResponseTo()).isEqualTo(REQUEST_ID);
         assertThat(response.getIssuer().getValue()).isEqualTo(TEST_RP_MS);
         assertThat(response).is(signedBy(TEST_RP_MS_PUBLIC_SIGNING_CERT, TEST_RP_MS_PRIVATE_SIGNING_KEY));
+    }
+
+    private List<Attribute> attributesFromUacAttributes(Stream<UserAccountCreationAttribute> uacAttributes) {
+        return uacAttributes
+                .map(userAccountCreationAttribute -> new AttributeFactory(new OpenSamlXmlObjectFactory()).createAttribute(userAccountCreationAttribute))
+                .collect(toList());
     }
 
     protected Attribute userAccountCreationAttributeFor(AttributeValue attributeValue, UserAccountCreationAttribute userAccountCreationAttribute) {
