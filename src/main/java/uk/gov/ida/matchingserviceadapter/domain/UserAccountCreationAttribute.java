@@ -19,8 +19,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 public enum UserAccountCreationAttribute implements Serializable, AttributeExtractor {
     FIRST_NAME("firstname") {
         @Override

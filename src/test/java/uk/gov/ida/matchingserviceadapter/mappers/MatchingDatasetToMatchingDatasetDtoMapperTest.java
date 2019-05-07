@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder;
@@ -11,16 +10,11 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.UniversalMatchingD
 import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingDatasetDto;
 import uk.gov.ida.saml.core.domain.Gender;
 import uk.gov.ida.saml.core.domain.MatchingDataset;
-import uk.gov.ida.saml.core.domain.SimpleMdsValue;
-import uk.gov.ida.saml.core.domain.TransliterableMdsValue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.aCurrentAddress;
 import static uk.gov.ida.matchingserviceadapter.builders.AddressBuilder.aHistoricalAddress;
 import static uk.gov.ida.matchingserviceadapter.builders.SimpleMdsValueBuilder.DEFAULT_FROM_DATE;

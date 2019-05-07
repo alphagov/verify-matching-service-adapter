@@ -16,7 +16,6 @@ import org.opensaml.xmlsec.algorithm.SignatureAlgorithm;
 import org.opensaml.xmlsec.algorithm.descriptors.DigestSHA256;
 import org.opensaml.xmlsec.algorithm.descriptors.SignatureRSASHA1;
 import uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder;
-import uk.gov.ida.integrationtest.helpers.AssertionHelper;
 import uk.gov.ida.integrationtest.helpers.AttributeFactory;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
@@ -36,7 +35,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.opensaml.saml.saml2.core.StatusCode.RESPONDER;
 import static org.opensaml.saml.saml2.core.StatusCode.SUCCESS;
 import static uk.gov.ida.integrationtest.builders.UserAccountCreationValueAttributeBuilder.aUserAccountCreationAttributeValue;
-import static uk.gov.ida.integrationtest.helpers.AssertionHelper.*;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aCompleteMatchingDatasetAssertion;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aMatchingDatasetAssertion;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithAssertions;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAssertionDecrypter;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anAuthnStatementAssertion;
+import static uk.gov.ida.integrationtest.helpers.AssertionHelper.assertionWithOnlyFirstName;
 import static uk.gov.ida.integrationtest.helpers.RequestHelper.makeAttributeQueryRequest;
 import static uk.gov.ida.integrationtest.helpers.UserAccountCreationTestAssertionHelper.assertThatResponseContainsExpectedUserCreationAttributes;
 import static uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute.*;
@@ -69,7 +73,7 @@ public abstract class UserAccountCreationBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        assertionDecrypter = AssertionHelper.anAssertionDecrypter();
+        assertionDecrypter = anAssertionDecrypter();
         localMatchingService = setUpMatchingService();
         matchingServiceAdapterAppRule = getAppRule();
         UNKNOWN_USER_URI = "http://localhost:" + matchingServiceAdapterAppRule.getLocalPort() + "/unknown-user-attribute-query";
