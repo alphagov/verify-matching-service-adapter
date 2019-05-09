@@ -3,6 +3,7 @@ package uk.gov.ida.matchingserviceadapter.domain;
 import com.google.common.collect.ImmutableList;
 import org.joda.time.LocalDate;
 import org.opensaml.saml.saml2.core.Attribute;
+import uk.gov.ida.matchingserviceadapter.ComparatorHelper;
 import uk.gov.ida.matchingserviceadapter.saml.factories.UserAccountCreationAttributeFactory;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.Address;
@@ -17,8 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 public enum UserAccountCreationAttribute implements Serializable, AttributeExtractor {
     FIRST_NAME("firstname") {
@@ -154,31 +153,12 @@ public enum UserAccountCreationAttribute implements Serializable, AttributeExtra
 
     private static Optional<Address> extractCurrentAddress(List<Address> addresses) {
         Predicate<Address> addressPredicate = (Address candidateValue) -> candidateValue.getTo() == null || !candidateValue.getTo().isPresent();
-        List<Address> currentValues = ImmutableList.copyOf(addresses.stream()
-                .filter(addressPredicate)
-                .collect(toList()));
-
-        if (currentValues.size() > 1) {
-            throw new IllegalStateException("There cannot be multiple current values for attribute.");
-        }
-        if (currentValues.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(currentValues.get(0));
+        return addresses.stream().filter(addressPredicate).min(ComparatorHelper.attributeComparatorByVerified());
     }
 
     private static <T> Optional<SimpleMdsValue<T>> getCurrentValue(final List<SimpleMdsValue<T>> simpleMdsValues) {
         Predicate<SimpleMdsValue<T>> simpleMdsValuePredicate = (SimpleMdsValue<T> simpleMdsValue) -> simpleMdsValue.getTo() == null;
-        List<SimpleMdsValue<T>> currentValues = ImmutableList.copyOf(simpleMdsValues.stream()
-                .filter(simpleMdsValuePredicate)
-                .collect(toList()));
-        if (currentValues.size() > 1) {
-            throw new IllegalStateException("There cannot be multiple current values for attribute.");
-        }
-        if (currentValues.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(currentValues.get(0));
+        return simpleMdsValues.stream().filter(simpleMdsValuePredicate).min(ComparatorHelper.comparatorByVerified());
     }
 
     private static Optional<SimpleMdsValue<String>> getTransliterableCurrentValue(final List<TransliterableMdsValue> simpleMdsValues) {
