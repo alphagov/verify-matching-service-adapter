@@ -6,6 +6,7 @@ import org.opensaml.saml.saml2.metadata.SPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.VerifyConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.domain.Cycle3Dataset;
