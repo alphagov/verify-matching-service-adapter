@@ -5,7 +5,7 @@ import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.EidasConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
@@ -24,7 +24,7 @@ import static java.util.Collections.singletonList;
 
 public class EidasAssertionService extends AssertionService {
 
-    private final ConditionsValidator conditionsValidator;
+    private final EidasConditionsValidator conditionsValidator;
     private final MetadataResolverRepository metadataResolverRepository;
     private final String hubConnectorEntityId;
     private final String hubEntityId;
@@ -34,7 +34,7 @@ public class EidasAssertionService extends AssertionService {
     @Inject
     public EidasAssertionService(InstantValidator instantValidator,
                                  SubjectValidator subjectValidator,
-                                 ConditionsValidator conditionsValidator,
+                                 EidasConditionsValidator conditionsValidator,
                                  SamlAssertionsSignatureValidator hubSignatureValidator,
                                  Cycle3DatasetFactory cycle3DatasetFactory,
                                  MetadataResolverRepository metadataResolverRepository,

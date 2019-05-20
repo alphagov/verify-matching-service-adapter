@@ -12,7 +12,7 @@ import org.opensaml.saml.saml2.core.OneTimeUse;
 import org.opensaml.saml.saml2.core.ProxyRestriction;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.VerifyConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 
@@ -21,13 +21,13 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
 
-public class ConditionsValidatorTest {
+public class VerifyConditionsValidatorTest {
 
     private AssertionTimeRestrictionValidator timeRestrictionValidator;
     private AudienceRestrictionValidator audienceRestrictionValidator;
     private Conditions conditions;
 
-    private ConditionsValidator validator;
+    private VerifyConditionsValidator validator;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -38,7 +38,7 @@ public class ConditionsValidatorTest {
         audienceRestrictionValidator = mock(AudienceRestrictionValidator.class);
         conditions = mock(Conditions.class);
 
-        validator = new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator);
+        validator = new VerifyConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator);
 
         IdaSamlBootstrap.bootstrap();
     }
