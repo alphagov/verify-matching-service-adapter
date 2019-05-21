@@ -6,7 +6,7 @@ import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationExcept
 public class ConditionsElementMustNotBeNull extends ValidationRule<Conditions> {
 
     public ConditionsElementMustNotBeNull() {
-        super((e) -> e != null);
+        super((conditions) -> conditions != null);
     }
 
     public static void validate(Conditions conditions) {

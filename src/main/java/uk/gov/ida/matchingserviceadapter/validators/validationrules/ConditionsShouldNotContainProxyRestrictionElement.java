@@ -1,15 +1,15 @@
 package uk.gov.ida.matchingserviceadapter.validators.validationrules;
 
-import org.opensaml.saml.saml2.core.ProxyRestriction;
+import org.opensaml.saml.saml2.core.Conditions;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 
-public class ConditionsShouldNotContainProxyRestrictionElement extends ValidationRule<ProxyRestriction> {
+public class ConditionsShouldNotContainProxyRestrictionElement extends ValidationRule<Conditions> {
     public ConditionsShouldNotContainProxyRestrictionElement() {
-        super((e) -> e == null);
+        super((conditions) -> conditions.getProxyRestriction() == null);
     }
 
-    public static void validate(ProxyRestriction proxyRestriction) {
-        new ConditionsShouldNotContainProxyRestrictionElement().apply(proxyRestriction);
+    public static void validate(Conditions conditions) {
+        new ConditionsShouldNotContainProxyRestrictionElement().apply(conditions);
     }
 
     @Override

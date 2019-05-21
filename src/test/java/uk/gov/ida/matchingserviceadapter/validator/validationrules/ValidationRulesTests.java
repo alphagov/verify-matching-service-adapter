@@ -44,12 +44,12 @@ public class ValidationRulesTests {
         expectedException.expectMessage("Conditions should not contain one time use element.");
         when(conditions.getOneTimeUse()).thenReturn(mock(OneTimeUse.class));
 
-        ConditionsShouldNotContainOneTimeUseElement.validate(conditions.getOneTimeUse());
+        ConditionsShouldNotContainOneTimeUseElement.validate(conditions);
     }
 
     @Test
     public void shouldNotThrowExceptionWhenConditionsDoNotContainOneTimeUseElement() {
-        ConditionsShouldNotContainOneTimeUseElement.validate(conditions.getOneTimeUse());
+        ConditionsShouldNotContainOneTimeUseElement.validate(conditions);
     }
 
     @Test
@@ -58,11 +58,11 @@ public class ValidationRulesTests {
         expectedException.expectMessage("Conditions should not contain proxy restriction element.");
         when(conditions.getProxyRestriction()).thenReturn(mock(ProxyRestriction.class));
 
-        ConditionsShouldNotContainProxyRestrictionElement.validate(conditions.getProxyRestriction());
+        ConditionsShouldNotContainProxyRestrictionElement.validate(conditions);
     }
 
     @Test
     public void shouldNotThrowExceptionWhenConditionsDoNotContainProxyRestrictionElement() {
-        ConditionsShouldNotContainProxyRestrictionElement.validate(conditions.getProxyRestriction());
+        ConditionsShouldNotContainProxyRestrictionElement.validate(conditions);
     }
 }

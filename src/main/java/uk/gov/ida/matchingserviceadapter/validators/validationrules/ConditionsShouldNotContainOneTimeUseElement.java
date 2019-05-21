@@ -1,15 +1,15 @@
 package uk.gov.ida.matchingserviceadapter.validators.validationrules;
 
-import org.opensaml.saml.saml2.core.OneTimeUse;
+import org.opensaml.saml.saml2.core.Conditions;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 
-public class ConditionsShouldNotContainOneTimeUseElement extends ValidationRule<OneTimeUse> {
+public class ConditionsShouldNotContainOneTimeUseElement extends ValidationRule<Conditions> {
     public ConditionsShouldNotContainOneTimeUseElement() {
-        super((e) -> e == null);
+        super((conditions) -> conditions.getOneTimeUse() == null);
     }
 
-    public static void validate(OneTimeUse oneTimeUse) {
-        new ConditionsShouldNotContainOneTimeUseElement().apply(oneTimeUse);
+    public static void validate(Conditions conditions) {
+        new ConditionsShouldNotContainOneTimeUseElement().apply(conditions);
     }
 
     public void throwException() {

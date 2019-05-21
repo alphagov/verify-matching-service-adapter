@@ -26,9 +26,9 @@ public class VerifyConditionsValidator implements ConditionsValidator {
 
         ConditionsElementMustNotBeNull.validate(conditionsElement);
 
-        ConditionsShouldNotContainProxyRestrictionElement.validate(conditionsElement.getProxyRestriction());
+        ConditionsShouldNotContainProxyRestrictionElement.validate(conditionsElement);
 
-        ConditionsShouldNotContainOneTimeUseElement.validate(conditionsElement.getOneTimeUse());
+        ConditionsShouldNotContainOneTimeUseElement.validate(conditionsElement);
 
         DateTime notOnOrAfter = conditionsElement.getNotOnOrAfter();
         if (notOnOrAfter != null) {

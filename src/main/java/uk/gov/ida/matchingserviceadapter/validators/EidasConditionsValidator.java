@@ -25,7 +25,7 @@ public class EidasConditionsValidator implements ConditionsValidator {
 
         ConditionsElementMustNotBeNull.validate(conditionsElement);
 
-        ConditionsShouldNotContainProxyRestrictionElement.validate(conditionsElement.getProxyRestriction());
+        ConditionsShouldNotContainProxyRestrictionElement.validate(conditionsElement);
 
         DateTime notOnOrAfter = conditionsElement.getNotOnOrAfter();
         if (notOnOrAfter != null) {
