@@ -62,7 +62,6 @@ public class MatchingResponseGenerator {
                     matchingServiceAdapterConfiguration.shouldSignWithSHA1());
 
         return ok()
-                .header("ida-msa-version", manifestVersionNumber)
                 .entity(soapMessageManager.wrapWithSoapEnvelope(
                                 healthCheckResponseTransformer.apply(healthCheckResponseFromMatchingService)))
                 .build();

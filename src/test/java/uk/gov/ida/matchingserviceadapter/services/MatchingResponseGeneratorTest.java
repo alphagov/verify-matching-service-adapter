@@ -68,9 +68,7 @@ public class MatchingResponseGeneratorTest {
 
         ArgumentCaptor<HealthCheckResponseFromMatchingService> healthCheckCaptor = ArgumentCaptor.forClass(HealthCheckResponseFromMatchingService.class);
         when(healthCheckResponseTransformer.apply(healthCheckCaptor.capture())).thenReturn(responseValue);
-        Response response = matchingResponseGenerator.generateHealthCheckResponse("requestId");
-
-        assertThat(response.getHeaders().getFirst("ida-msa-version")).isEqualTo("VERSION");
+        matchingResponseGenerator.generateHealthCheckResponse("requestId");
 
         String expectedRequestIdPhrase = "-version-VERSION-eidasenabled-true-shouldsignwithsha1-true";
         assertThat(healthCheckCaptor.getValue().getId()).endsWith(expectedRequestIdPhrase);
