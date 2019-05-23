@@ -7,13 +7,13 @@ import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsEl
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainProxyRestrictionElement;
 
 
-public class EidasConditionsValidator implements ConditionsValidator {
+public class CountryConditionsValidator implements ConditionsValidator {
 
     private final AssertionTimeRestrictionValidator timeRestrictionValidator;
     private final AudienceRestrictionValidator audienceRestrictionValidator;
 
     @Inject
-    public EidasConditionsValidator(
+    public CountryConditionsValidator(
             AssertionTimeRestrictionValidator timeRestrictionValidator,
             AudienceRestrictionValidator audienceRestrictionValidator
     ) {

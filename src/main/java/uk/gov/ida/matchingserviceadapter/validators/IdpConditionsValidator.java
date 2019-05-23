@@ -8,13 +8,13 @@ import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsSh
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainProxyRestrictionElement;
 
 
-public class VerifyConditionsValidator implements ConditionsValidator {
+public class IdpConditionsValidator implements ConditionsValidator {
 
     private final AssertionTimeRestrictionValidator timeRestrictionValidator;
     private final AudienceRestrictionValidator audienceRestrictionValidator;
 
     @Inject
-    public VerifyConditionsValidator(
+    public IdpConditionsValidator(
             AssertionTimeRestrictionValidator timeRestrictionValidator,
             AudienceRestrictionValidator audienceRestrictionValidator
     ) {
