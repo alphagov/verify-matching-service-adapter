@@ -39,7 +39,7 @@ def dependencyVersions = [
         ida_test_utils: '44',
         dev_pki: '1.1.0-34',
         trust_anchor: '1.0-34',
-        saml_libs_version: "$opensaml-192"
+        saml_libs_version: "$opensaml-193"
 ]
 
 repositories {
