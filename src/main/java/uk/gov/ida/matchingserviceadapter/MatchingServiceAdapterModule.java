@@ -55,7 +55,8 @@ import uk.gov.ida.matchingserviceadapter.services.UnknownUserResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.services.VerifyAssertionService;
 import uk.gov.ida.matchingserviceadapter.validators.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
@@ -134,7 +135,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(AssertionTimeRestrictionValidator.class);
         bind(SubjectValidator.class);
         bind(AudienceRestrictionValidator.class);
-        bind(ConditionsValidator.class);
+        bind(IdpConditionsValidator.class);
+        bind(CountryConditionsValidator.class);
 
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
@@ -217,7 +219,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     public VerifyAssertionService getVerifyAssertionService(
             InstantValidator instantValidator,
             SubjectValidator subjectValidator,
-            ConditionsValidator conditionsValidator,
+            IdpConditionsValidator conditionsValidator,
             SamlAssertionsSignatureValidator signatureValidator,
             Cycle3DatasetFactory cycle3DatasetFactory,
             VerifyMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
@@ -244,7 +246,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     public EidasAssertionService getCountryAssertionService(
             InstantValidator instantValidator,
             SubjectValidator subjectValidator,
-            ConditionsValidator conditionsValidator,
+            CountryConditionsValidator conditionsValidator,
             SamlAssertionsSignatureValidator hubSignatureValidator,
             Cycle3DatasetFactory cycle3DatasetFactory,
             MetadataResolverRepository eidasMetadataRepository,

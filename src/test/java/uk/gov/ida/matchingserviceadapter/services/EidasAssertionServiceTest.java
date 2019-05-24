@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -49,7 +49,7 @@ public class EidasAssertionServiceTest {
     private SubjectValidator subjectValidator;
 
     @Mock
-    private ConditionsValidator conditionsValidator;
+    private CountryConditionsValidator conditionsValidator;
 
     @Mock
     private SamlAssertionsSignatureValidator hubSignatureValidator;

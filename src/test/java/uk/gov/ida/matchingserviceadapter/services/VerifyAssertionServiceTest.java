@@ -15,7 +15,7 @@ import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
@@ -70,7 +70,7 @@ public class VerifyAssertionServiceTest {
     private SubjectValidator subjectValidator;
 
     @Mock
-    private ConditionsValidator conditionsValidator;
+    private IdpConditionsValidator conditionsValidator;
 
     @Mock
     private SamlAssertionsSignatureValidator hubSignatureValidator;

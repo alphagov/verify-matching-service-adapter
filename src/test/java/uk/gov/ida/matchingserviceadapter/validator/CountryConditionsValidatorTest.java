@@ -11,23 +11,25 @@ import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.OneTimeUse;
 import org.opensaml.saml.saml2.core.ProxyRestriction;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
 
-public class ConditionsValidatorTest {
+public class CountryConditionsValidatorTest {
 
     private AssertionTimeRestrictionValidator timeRestrictionValidator;
     private AudienceRestrictionValidator audienceRestrictionValidator;
     private Conditions conditions;
 
-    private ConditionsValidator validator;
+    private CountryConditionsValidator validator;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -38,7 +40,7 @@ public class ConditionsValidatorTest {
         audienceRestrictionValidator = mock(AudienceRestrictionValidator.class);
         conditions = mock(Conditions.class);
 
-        validator = new ConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator);
+        validator = new CountryConditionsValidator(timeRestrictionValidator, audienceRestrictionValidator);
 
         IdaSamlBootstrap.bootstrap();
     }
@@ -62,12 +64,8 @@ public class ConditionsValidatorTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenOneTimeUseElementExists() {
-        expectedException.expect(SamlResponseValidationException.class);
-        expectedException.expectMessage("Conditions should not contain one time use element.");
-
+    public void shouldNotThrowExceptionWhenOneTimeUseElementExists() {
         when(conditions.getOneTimeUse()).thenReturn(mock(OneTimeUse.class));
-
         validator.validate(conditions, "any-entity-id");
     }
 

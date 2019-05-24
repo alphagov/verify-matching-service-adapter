@@ -7,7 +7,7 @@ import uk.gov.ida.matchingserviceadapter.domain.AssertionClassification;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionClassifier;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-import uk.gov.ida.matchingserviceadapter.validators.ConditionsValidator;
+import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
@@ -36,7 +36,7 @@ public class VerifyAssertionService extends AssertionService {
 
     public VerifyAssertionService(InstantValidator instantValidator,
                                   SubjectValidator subjectValidator,
-                                  ConditionsValidator conditionsValidator,
+                                  IdpConditionsValidator conditionsValidator,
                                   SamlAssertionsSignatureValidator hubSignatureValidator,
                                   Cycle3DatasetFactory cycle3DatasetFactory,
                                   String hubEntityId,
