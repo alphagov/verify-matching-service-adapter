@@ -264,6 +264,7 @@ public class VerifyMatchingIntegrationTest {
     public void shouldReturnErrorResponseWhenLocalMatchingServiceRespondsWithError() throws Exception {
         localMatchingService.reset();
         localMatchingService.register(MATCHING_REQUEST_PATH, 500, "application/json", "foo");
+
         AttributeQuery attributeQuery = AttributeQueryBuilder.anAttributeQuery()
                 .withId(REQUEST_ID)
                 .withIssuer(anIssuer().withIssuerId(HUB_ENTITY_ID).build())
@@ -277,6 +278,7 @@ public class VerifyMatchingIntegrationTest {
                 .post(Entity.entity(attributeQueryDocument, TEXT_XML_TYPE));
 
         assertThat(response.getStatus()).isEqualTo(500);
+        assertThat(response.readEntity(String.class)).startsWith("uk.gov.ida.matchingserviceadapter.exceptions.LocalMatchingServiceException");
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.domain.EncryptedAssertionContainer;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
+import uk.gov.ida.matchingserviceadapter.exceptions.LocalMatchingServiceException;
 import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.logging.MdcHelper;
 import uk.gov.ida.matchingserviceadapter.mappers.MatchingServiceRequestDtoMapper;
@@ -99,9 +100,15 @@ public class MatchingServiceResource {
                 attributeQuery.getID(),
                 attributeQueryService.hashPid(assertionData),
                 assertionData);
-        MatchingServiceResponseDto matchingServiceResponse = matchingServiceProxy.makeMatchingServiceRequest(matchingServiceRequest);
-        LOG.info("Result from matching service for id " + attributeQuery.getID() + " is " + matchingServiceResponse.getResult());
 
+        MatchingServiceResponseDto matchingServiceResponse;
+        try {
+            matchingServiceResponse = matchingServiceProxy.makeMatchingServiceRequest(matchingServiceRequest);
+        } catch(Exception ex) {
+            throw new LocalMatchingServiceException("Error calling local matching service: " + ex.getMessage(), ex);
+        }
+
+        LOG.info("Result from matching service for id " + attributeQuery.getID() + " is " + matchingServiceResponse.getResult());
         OutboundResponseFromMatchingService outboundResponseFromMatchingService = matchingServiceResponseDtoToOutboundResponseFromMatchingServiceMapper.map(matchingServiceResponse,
                 matchingServiceRequest.getHashedPid(),
                 attributeQuery.getID(),

@@ -34,7 +34,7 @@ public class ExceptionExceptionMapperTest {
         Response response = exceptionExceptionMapper.toResponse(unauditedException);
 
         String responseBody = (String) response.getEntity();
-        assertThat(responseBody).contains("uk.gov.ida.exceptions.ApplicationException");
+        assertThat(responseBody).contains("uk.gov.ida.exceptions.ApplicationException - Cause: java.lang.Exception");
         assertThat(responseBody).doesNotContain(causeMessage);
     }
 
@@ -48,7 +48,7 @@ public class ExceptionExceptionMapperTest {
         Response response = exceptionExceptionMapper.toResponse(unauditedException);
 
         String responseBody = (String) response.getEntity();
-        assertThat(responseBody).contains("uk.gov.ida.exceptions.ApplicationException");
+        assertThat(responseBody).contains("uk.gov.ida.exceptions.ApplicationException - Cause: java.lang.Exception");
         assertThat(responseBody).contains(causeMessage);
     }
 }

@@ -31,6 +31,12 @@ public class ExceptionExceptionMapper implements ExceptionMapper<Exception> {
         StringBuilder sb = new StringBuilder();
         sb.append(exception.getClass().getName());
 
+        if (exception.getCause() != null) {
+            sb.append(" - Cause: ").append(exception.getCause().getClass().getName());
+        } else {
+            sb.append("No cause specified.");
+        }
+
         if (configuration.getReturnStackTraceInResponse()) {
             sb.append(" : ");
             sb.append(exception.getMessage());
