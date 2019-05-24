@@ -184,8 +184,4 @@ public class DateTimeComparatorTest {
 
         assertThat(comparator.isBeforeSkewedNow(pastDateTime)).isFalse();
     }
-
-
-
-
 }
