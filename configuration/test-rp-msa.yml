@@ -105,7 +105,7 @@ encryptionKeys:
     privateKey:
       keyFile: ${TEST_RP_MSA_PRIVATE_ENCRYPTION_KEY}
 
-returnStackTraceInResponse: true
+returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}

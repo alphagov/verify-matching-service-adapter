@@ -59,7 +59,7 @@ encryptionKeys:
     privateKey:
       keyFile: /data/pki/sample_rp_msa_encryption_primary.pk8
 
-returnStackTraceInResponse: true
+returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
