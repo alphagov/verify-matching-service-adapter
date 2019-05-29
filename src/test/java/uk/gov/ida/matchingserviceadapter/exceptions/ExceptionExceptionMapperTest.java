@@ -27,6 +27,7 @@ public class ExceptionExceptionMapperTest {
 
     @Test
     public void shouldNotRespondWithTheBodyOfTheUpstreamError() {
+        when(configuration.getReturnStackTraceInErrorResponse()).thenReturn(false);
         ExceptionExceptionMapper exceptionExceptionMapper = new ExceptionExceptionMapper(configuration);
 
         String causeMessage = "my message";
@@ -40,7 +41,7 @@ public class ExceptionExceptionMapperTest {
 
     @Test
     public void shouldRespondWithTheBodyOfTheUpstreamErrorWhenReturningCauseStackTrace() {
-        when(configuration.getReturnStackTraceInResponse()).thenReturn(true);
+        when(configuration.getReturnStackTraceInErrorResponse()).thenReturn(true);
         ExceptionExceptionMapper exceptionExceptionMapper = new ExceptionExceptionMapper(configuration);
 
         String causeMessage = "my message";
