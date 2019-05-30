@@ -28,7 +28,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
     @NotNull
     @Valid
     @JsonProperty
-    private Boolean returnStackTraceInResponse = false;
+    private Boolean returnStackTraceInErrorResponse = true;
 
     @NotNull
     @Valid
@@ -106,8 +106,8 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         return matchingServiceAdapter.getExternalUrl();
     }
 
-    public boolean getReturnStackTraceInResponse() {
-        return returnStackTraceInResponse;
+    public boolean getReturnStackTraceInErrorResponse() {
+        return returnStackTraceInErrorResponse;
     }
 
     public ServiceInfo getServiceInfo() {

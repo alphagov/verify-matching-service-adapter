@@ -31,7 +31,7 @@ public class ExceptionExceptionMapper implements ExceptionMapper<Exception> {
         StringBuilder sb = new StringBuilder();
         sb.append(exception.getClass().getName());
 
-        if (configuration.getReturnStackTraceInResponse()) {
+        if (configuration.getReturnStackTraceInErrorResponse()) {
             sb.append(" : ");
             sb.append(exception.getMessage());
             sb.append("\n");
