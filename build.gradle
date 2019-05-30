@@ -24,6 +24,12 @@ jacoco {
     toolVersion = "0.8.2"
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
 ext {
     opensaml = '3.4.2'
     build_number="$version"
@@ -109,7 +115,7 @@ dependencies {
         'commons-lang:commons-lang:2.6',
         'org.apache.ws.commons:ws-commons-util:1.0.1',
         'com.google.code.findbugs:annotations:3.0.0',
-        'xml-apis:xml-apis:1.0.b2', 
+        'xml-apis:xml-apis:1.0.b2',
         'javax.xml.bind:jaxb-api:2.2.3',
         configurations.saml   {
             exclude group: 'uk.gov.ida', module: 'dropwizard-saml'
