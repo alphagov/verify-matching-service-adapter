@@ -5,11 +5,11 @@ MSA Release Notes
 
 * Added additional detail and stack trace to error responses. This is enabled by default but can be
 disabled by setting `returnStackTraceInErrorResponse: false` in configuration file.
-* If multiple firstnames are provided by IDP, the MSA will select which to pass to local matching service based
-in the following order:
+* If multiple firstnames are provided by IDP, the MSA will select which one to pass to local matching service based
+on the following rules:
     1. the verified current firstname
     1. if no verified firstname, then the first current is selected
-    1. if no verified or current then the first provided by IDP
+    1. if no verified or current then the first provided by the IDP
 * When calling user account creation, if multiple current values exist for any attribute, the first verified value will be preferred over non-verified values.
 * Removed redundant header `ida-msa-version` from matching response.
 * Upgraded `verify-saml-libs` to build 192
