@@ -11,6 +11,10 @@ in the following order:
     1. if no verified firstname, then the first current is selected
     1. if no verified or current then the first provided by IDP
 * When calling user account creation, if multiple current values exist for any attribute, the first verified value will be preferred over non-verified values.
+* Removed redundant header `ida-msa-version` from matching response.
+* Upgraded `verify-saml-libs` to build 192
+* Upgraded Jackson databind libs to 2.9.7 to address security vulnerabilities.
+* Upgraded OpenSAML to 3.4.0
 
 ### 3.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.1.0)
