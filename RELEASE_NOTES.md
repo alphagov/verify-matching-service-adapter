@@ -4,7 +4,7 @@ MSA Release Notes
 ### Next
 
 * Allow `OneTimeUse` validation with eIDAS assertions. The MSA doesn't allow the use of the `OneTimeUse` attribute with assertions from IDPs, however there are some eIDAS countries that use it. The MSA will now accept eIDAS assertions with zero or one `OneTimeUse` elements.
-* Allow unsigned eIDAS assertions. The eIDAS specification does not required signed assertions, whereas the Verify specification does. Signed eIDAS assertions are still verified.
+* Allow unsigned eIDAS assertions. The eIDAS specification does not require signed assertions, whereas the Verify specification does. Signed eIDAS assertions are still verified.
 * Added additional detail and stack trace to error responses. This is enabled by default but can be
 disabled by setting `returnStackTraceInErrorResponse: false` in configuration file.
 * If multiple firstnames are provided by IDP, the MSA will select which one to pass to local matching service based
