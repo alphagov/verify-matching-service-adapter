@@ -3,6 +3,9 @@ MSA Release Notes
 
 ### Next
 
+### 4.0.0
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.1.0...4.0.0)
+
 * Allow `OneTimeUse` validation with eIDAS assertions. The MSA doesn't allow the use of the `OneTimeUse` attribute with assertions from IDPs, however there are some eIDAS countries that use it. The MSA will now accept eIDAS assertions with zero or one `OneTimeUse` elements.
 * Allow unsigned eIDAS assertions. The eIDAS specification does not require signed assertions, whereas the Verify specification does. Signed eIDAS assertions are still verified.
 * Added additional detail and stack trace to error responses. This is enabled by default but can be
