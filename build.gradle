@@ -44,7 +44,7 @@ def dependencyVersions = [
         ida_utils: '337',
         ida_test_utils: '44',
         dev_pki: '1.1.0-34',
-        trust_anchor: '1.0-34',
+        trust_anchor: '1.0-72',
         saml_libs_version: "$opensaml-193"
 ]
 
@@ -98,7 +98,7 @@ dependencies {
     ida "uk.gov.ida:saml-lib:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
         "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
-        "uk.gov.ida.eidas:trust-anchor:$dependencyVersions.trust_anchor"
+        "uk.gov.ida.eidas:trust-anchor-cli:$dependencyVersions.trust_anchor"
 
     compile configurations.dropwizard,
         configurations.ida,
