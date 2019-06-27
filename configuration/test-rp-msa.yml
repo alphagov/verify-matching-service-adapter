@@ -14,14 +14,6 @@ logging:
   appenders:
     - type: console
 
-metrics:
-  reporters:
-    - type: graphite
-      host: graphite
-      port: 2003
-      prefix: ${GRAPHITE_PREFIX}
-      frequency: 10s
-
 matchingServiceAdapter:
   entityId: http://www.test-rp-ms.gov.uk/SAML2/MD
   externalUrl: ${TEST_RP_MSA_URL}
