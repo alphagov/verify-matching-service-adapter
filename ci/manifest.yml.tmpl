@@ -1,16 +1,17 @@
 ---
 applications:
-  - name: $ENV-test-rp-msa
+  - name: test-rp-msa-$ENV
     routes:
-      - route: $ENV-test-rp-msa.apps.internal
+      - route: test-rp-msa-$ENV.cloudapps.digital
+      - route: test-rp-msa-$ENV.apps.internal
     memory: 1G
     buildpack: java_buildpack
     env:
       JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+ } }'
       CONFIG_FILE: /app/msa/test-rp-msa.yml
       LOG_LEVEL: INFO
-      TEST_RP_MSA_URL: https://$ENV-test-rp.cloudapps.digital/matching-service/POST
-      TEST_RP_ROUTE: $ENV-test-rp.apps.internal:8080
+      TEST_RP_MSA_URL: https://test-rp-msa-$ENV.cloudapps.digital/matching-service/POST
+      TEST_RP_ROUTE: http://test-rp-$ENV.apps.internal:8080
       METADATA_URL: https://verify-$ENV-metadata.cloudapps.digital/metadata.xml
       SIGNIN_DOMAIN: www.$ENV.signin.service.gov.uk
       METADATA_ENTITY_ID: https://signin.service.gov.uk
