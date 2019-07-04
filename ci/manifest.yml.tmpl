@@ -12,7 +12,7 @@ applications:
       LOG_LEVEL: INFO
       TEST_RP_MSA_URL: https://test-rp-msa-$ENV.cloudapps.digital/matching-service/POST
       TEST_RP_ROUTE: http://test-rp-$ENV.apps.internal:8080
-      METADATA_URL: https://verify-$ENV-metadata.cloudapps.digital/metadata.xml
+      METADATA_URL: $METADATA_URL
       SIGNIN_DOMAIN: www.$ENV.signin.service.gov.uk
       METADATA_ENTITY_ID: https://signin.service.gov.uk
       TRUSTSTORE_PATH: /app/msa/truststores/$TRUSTSTORE_NAME
