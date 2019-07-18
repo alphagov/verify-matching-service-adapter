@@ -41,11 +41,10 @@ project.version = "$gradle.ext.version_number-$build_number"
 def dependencyVersions = [
         opensaml:"$opensaml",
         dropwizard: '1.3.5',
-        ida_utils: '337',
+        ida_utils: '370',
         ida_test_utils: '44',
         dev_pki: '1.1.0-34',
-        trust_anchor: '1.0-72',
-        saml_libs_version: "$opensaml-193"
+        saml_libs_version: "$opensaml-206"
 ]
 
 repositories {
@@ -68,15 +67,6 @@ configurations {
     ida_test
 }
 
-configurations.all {
-    resolutionStrategy {
-        // Need to enforce use of AssertJ 3.9.1 to override the dependency on 3.8.0 from saml-extensions
-        // TODO - Remove compile-time dependency on configurations.test_deps for saml-extensions
-        force 'org.assertj:assertj-core:3.9.1'
-    }
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 dependencies {
     dropwizard "io.dropwizard:dropwizard-core:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-util:$dependencyVersions.dropwizard",
@@ -97,8 +87,7 @@ dependencies {
 
     ida "uk.gov.ida:saml-lib:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
-        "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
-        "uk.gov.ida.eidas:trust-anchor-cli:$dependencyVersions.trust_anchor"
+        "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils"
 
     compile configurations.dropwizard,
         configurations.ida,
