@@ -6,6 +6,9 @@ MSA Release Notes
 ### 4.0.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.0.0...4.0.1)
 
+### 4.0.1
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.0.0...4.0.1)
+
 * Upgraded `verify-saml-libs` to build 206
 * Upgraded `ida_utils` to build 370
 * Removed dependency on `trust-anchor-cli` which brought in a security vulnerability through the `wiremock-standalone-2.16.0.jar` library. This library contains a jar file `handlebars-v4.0.4.js` which has a known security vulnerability.
