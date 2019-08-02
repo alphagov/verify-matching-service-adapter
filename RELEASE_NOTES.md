@@ -3,6 +3,10 @@ MSA Release Notes
 
 ### Next
 
+* Revert changes to allow unsigned eIDAS assertions. An issue was identified and a new approach will be released in a future version.
+* Upgraded `verify-saml-libs` to build 209
+* Upgraded `opensaml` to version 3.4.3
+
 ### 4.0.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.0.0...4.0.1)
 
