@@ -87,7 +87,7 @@ public class EidasAssertionService extends AssertionService {
             .map(SamlMessageSignatureValidator::new)
             .map(SamlAssertionsSignatureValidator::new)
             .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
-            .validateEidas(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+            .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         conditionsValidator.validate(assertion.getConditions(), hubConnectorEntityId);
