@@ -36,7 +36,6 @@ ext {
 }
 
 group = "uk.gov.ida"
-project.version = "$gradle.ext.version_number-$build_number"
 
 def dependencyVersions = [
         opensaml:"$opensaml",
@@ -183,7 +182,7 @@ task copyToLib(dependsOn: jar, type: Copy) {
 }
 
 task copyTestToolZip(dependsOn: 'verify-matching-service-test-tool:distZip', type: Copy) {
-    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-" + "$build_number" + ".zip")
+    from("verify-matching-service-test-tool/build/distributions/verify-matching-service-test-tool-*.zip")
     into(distsDir)
 }
 
@@ -222,6 +221,23 @@ distributions {
 
 
 tasks.check.dependsOn(intTest)
+
+distZip {
+    into(project.name + '/truststores') {
+        from 'src/main/resources'
+        include '*_metadata_truststore.ts'
+    }
+    into(project.name) {
+        from 'configuration'
+        include 'test-rp-msa.yml'
+    }
+
+    def versionedPath = archivePath
+    version = null
+    doLast {
+        archivePath.renameTo(versionedPath)
+    }
+}
 
 jar {
     def manifestClasspath = configurations.runtime.collect { 'lib/' + it.getName() }.join(' ')
