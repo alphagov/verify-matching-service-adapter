@@ -9,7 +9,7 @@ publishing {
             version "$build_number"
             groupId = "uk.gov.verify"
 
-            artifact file('../build/distributions/verify-matching-service-test-tool-' + "$build_number" + '.zip')
+            artifact file('build/distributions/verify-matching-service-test-tool-' + "$build_number" + '.zip')
         }
     }
     repositories {
