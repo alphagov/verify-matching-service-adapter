@@ -1,7 +1,7 @@
 package uk.gov.ida.matchingserviceadapter.validators.validationrules;
 
 import org.opensaml.saml.saml2.core.Conditions;
-import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 
 import java.util.function.Predicate;
 

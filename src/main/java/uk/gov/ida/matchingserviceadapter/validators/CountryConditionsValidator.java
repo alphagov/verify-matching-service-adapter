@@ -5,7 +5,7 @@ import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Conditions;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsElementMustNotBeNull;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainProxyRestrictionElement;
-
+import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 
 public class CountryConditionsValidator implements ConditionsValidator {
 
@@ -14,17 +14,15 @@ public class CountryConditionsValidator implements ConditionsValidator {
 
     @Inject
     public CountryConditionsValidator(
-            AssertionTimeRestrictionValidator timeRestrictionValidator,
-            AudienceRestrictionValidator audienceRestrictionValidator
+        AssertionTimeRestrictionValidator timeRestrictionValidator,
+        AudienceRestrictionValidator audienceRestrictionValidator
     ) {
         this.timeRestrictionValidator = timeRestrictionValidator;
         this.audienceRestrictionValidator = audienceRestrictionValidator;
     }
 
-    public void validate(Conditions conditionsElement, String entityId) {
-
+    public void validate(Conditions conditionsElement, String... acceptableEntityIds) {
         ConditionsElementMustNotBeNull.validate(conditionsElement);
-
         ConditionsShouldNotContainProxyRestrictionElement.validate(conditionsElement);
 
         DateTime notOnOrAfter = conditionsElement.getNotOnOrAfter();
@@ -33,6 +31,6 @@ public class CountryConditionsValidator implements ConditionsValidator {
         }
 
         timeRestrictionValidator.validateNotBefore(conditionsElement.getNotBefore());
-        audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), entityId);
+        audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), acceptableEntityIds);
     }
 }

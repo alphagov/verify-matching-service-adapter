@@ -68,7 +68,7 @@ public class EidasAssertionServiceTest {
                 hubSignatureValidator,
                 new Cycle3DatasetFactory(),
                 metadataResolverRepository,
-                HUB_CONNECTOR_ENTITY_ID,
+                new String[] { HUB_CONNECTOR_ENTITY_ID },
                 HUB_ENTITY_ID,
                 new EidasMatchingDatasetUnmarshaller()
         );
@@ -77,7 +77,6 @@ public class EidasAssertionServiceTest {
         doNothing().when(conditionsValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
         when(metadataResolverRepository.getResolverEntityIds()).thenReturn(Arrays.asList(STUB_COUNTRY_ONE));
-
 
         DateTimeFreezer.freezeTime();
     }

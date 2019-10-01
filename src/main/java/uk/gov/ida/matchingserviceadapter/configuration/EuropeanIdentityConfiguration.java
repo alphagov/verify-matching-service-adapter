@@ -13,6 +13,10 @@ public class EuropeanIdentityConfiguration {
     @JsonProperty
     private String hubConnectorEntityId;
 
+    @Valid
+    @JsonProperty
+    private String[] acceptableHubConnectorEntityIds;
+
     @NotNull
     @Valid
     @JsonProperty
@@ -24,6 +28,12 @@ public class EuropeanIdentityConfiguration {
 
     public String getHubConnectorEntityId() {
         return hubConnectorEntityId;
+    }
+
+    public String[] getAcceptableHubConnectorEntityIds() {
+        return acceptableHubConnectorEntityIds != null && acceptableHubConnectorEntityIds.length > 0
+            ? acceptableHubConnectorEntityIds
+            : new String[] { hubConnectorEntityId };
     }
 
     public EidasMetadataConfiguration getAggregatedMetadata() {
