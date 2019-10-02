@@ -5,8 +5,8 @@ MSA Release Notes
 
 * Add a capability to validate audience restrictions in SAML against more than one _acceptable_ entity id.
   You may optionally provide an `acceptableHubConnectorEntityIds` (string array) parameter in your [MSA configuration](https://www.docs.verify.service.gov.uk/legacy/build-ms/msa/configure-your-msa/#configure-your-msa).
-  We recommend you add it alongside the existing `hubConnectorEntityId` parameter.
-  If _not_ provided, default behaviour is unaffected.
+  Do not remove the existing `hubConnectorEntityId` parameter.
+  If `acceptableHubConnectorEntityIds` is _not_ provided, default behaviour is unaffected.
 
 ### 4.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.0.0...4.1.0)
