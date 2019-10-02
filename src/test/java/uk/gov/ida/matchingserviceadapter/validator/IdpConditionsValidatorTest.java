@@ -10,15 +10,17 @@ import org.opensaml.saml.saml2.core.AudienceRestriction;
 import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.OneTimeUse;
 import org.opensaml.saml.saml2.core.ProxyRestriction;
-import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
-import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
+import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.ida.saml.core.test.builders.AudienceRestrictionBuilder.anAudienceRestriction;
 
 public class IdpConditionsValidatorTest {

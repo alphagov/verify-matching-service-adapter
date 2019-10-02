@@ -7,10 +7,10 @@ import org.junit.rules.ExpectedException;
 import org.opensaml.saml.saml2.core.Conditions;
 import org.opensaml.saml.saml2.core.OneTimeUse;
 import org.opensaml.saml.saml2.core.ProxyRestriction;
-import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsElementMustNotBeNull;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainOneTimeUseElement;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainProxyRestrictionElement;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -1,16 +1,17 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
+import com.google.inject.name.Named;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnStatement;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
-import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
@@ -26,7 +27,7 @@ public class EidasAssertionService extends AssertionService {
 
     private final CountryConditionsValidator conditionsValidator;
     private final MetadataResolverRepository metadataResolverRepository;
-    private final String hubConnectorEntityId;
+    private final String[] acceptableHubConnectorEntityIds;
     private final String hubEntityId;
     private final EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
@@ -38,13 +39,13 @@ public class EidasAssertionService extends AssertionService {
                                  SamlAssertionsSignatureValidator hubSignatureValidator,
                                  Cycle3DatasetFactory cycle3DatasetFactory,
                                  MetadataResolverRepository metadataResolverRepository,
-                                 String hubConnectorEntityId,
+                                 @Named("AcceptableHubConnectorEntityIds") String[] acceptableHubConnectorEntityIds,
                                  String hubEntityId,
                                  EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller) {
         super(instantValidator, subjectValidator, conditionsValidator, hubSignatureValidator, cycle3DatasetFactory);
         this.conditionsValidator = conditionsValidator;
         this.metadataResolverRepository = metadataResolverRepository;
-        this.hubConnectorEntityId = hubConnectorEntityId;
+        this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;
         this.hubEntityId = hubEntityId;
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
     }
@@ -90,7 +91,7 @@ public class EidasAssertionService extends AssertionService {
             .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        conditionsValidator.validate(assertion.getConditions(), hubConnectorEntityId);
+        conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds);
     }
 
     public Boolean isCountryAssertion(Assertion assertion) {

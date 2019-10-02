@@ -53,20 +53,20 @@ import uk.gov.ida.matchingserviceadapter.services.EidasAssertionService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.services.UnknownUserResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.services.VerifyAssertionService;
+import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AttributeQuerySignatureValidator;
-import uk.gov.ida.matchingserviceadapter.validators.AudienceRestrictionValidator;
 import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
-import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
+import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
-import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.metadata.DisabledMetadataResolverRepository;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
@@ -251,7 +251,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             Cycle3DatasetFactory cycle3DatasetFactory,
             MetadataResolverRepository eidasMetadataRepository,
             EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            @Named("HubConnectorEntityId") String hubConnectorEntityId,
+            @Named("AcceptableHubConnectorEntityIds") String[] hubConnectorEntityIds,
             @Named("HubEntityId") String hubEntityId
     ) {
         return new EidasAssertionService(instantValidator,
@@ -260,7 +260,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 hubSignatureValidator,
                 cycle3DatasetFactory,
                 eidasMetadataRepository,
-                hubConnectorEntityId,
+                hubConnectorEntityIds,
                 hubEntityId,
                 matchingDatasetUnmarshaller);
     }
@@ -299,6 +299,13 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Named("HubConnectorEntityId")
     public String getHubConnectorEntityId(MatchingServiceAdapterConfiguration configuration) {
         return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getHubConnectorEntityId() : "";
+    }
+
+    @Provides
+    @Singleton
+    @Named("AcceptableHubConnectorEntityIds")
+    public String[] getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
+        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds() : new String[0];
     }
 
     @Provides

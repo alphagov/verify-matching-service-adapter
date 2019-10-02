@@ -6,7 +6,7 @@ import org.opensaml.saml.saml2.core.Conditions;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsElementMustNotBeNull;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainOneTimeUseElement;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainProxyRestrictionElement;
-
+import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 
 public class IdpConditionsValidator implements ConditionsValidator {
 
@@ -22,7 +22,7 @@ public class IdpConditionsValidator implements ConditionsValidator {
         this.audienceRestrictionValidator = audienceRestrictionValidator;
     }
 
-    public void validate(Conditions conditionsElement, String entityId) {
+    public void validate(Conditions conditionsElement, String... acceptableEntityIds) {
 
         ConditionsElementMustNotBeNull.validate(conditionsElement);
 
@@ -36,6 +36,6 @@ public class IdpConditionsValidator implements ConditionsValidator {
         }
 
         timeRestrictionValidator.validateNotBefore(conditionsElement.getNotBefore());
-        audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), entityId);
+        audienceRestrictionValidator.validate(conditionsElement.getAudienceRestrictions(), acceptableEntityIds);
     }
 }

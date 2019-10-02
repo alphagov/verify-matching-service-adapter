@@ -9,10 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
-import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
-import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
+import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 
 import static uk.gov.ida.saml.core.test.builders.NameIdBuilder.aNameId;
 import static uk.gov.ida.saml.core.test.builders.SubjectBuilder.aSubject;

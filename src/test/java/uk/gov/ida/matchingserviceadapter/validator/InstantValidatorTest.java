@@ -5,9 +5,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import uk.gov.ida.matchingserviceadapter.exceptions.SamlResponseValidationException;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 
 import static org.joda.time.DateTimeZone.UTC;
 import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;
