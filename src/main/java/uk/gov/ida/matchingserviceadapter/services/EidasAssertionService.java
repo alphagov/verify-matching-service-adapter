@@ -27,7 +27,7 @@ public class EidasAssertionService extends AssertionService {
 
     private final CountryConditionsValidator conditionsValidator;
     private final MetadataResolverRepository metadataResolverRepository;
-    private final String[] acceptableHubConnectorEntityIds;
+    private final List<String> acceptableHubConnectorEntityIds;
     private final String hubEntityId;
     private final EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
@@ -39,7 +39,7 @@ public class EidasAssertionService extends AssertionService {
                                  SamlAssertionsSignatureValidator hubSignatureValidator,
                                  Cycle3DatasetFactory cycle3DatasetFactory,
                                  MetadataResolverRepository metadataResolverRepository,
-                                 @Named("AcceptableHubConnectorEntityIds") String[] acceptableHubConnectorEntityIds,
+                                 @Named("AcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
                                  String hubEntityId,
                                  EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller) {
         super(instantValidator, subjectValidator, conditionsValidator, hubSignatureValidator, cycle3DatasetFactory);
@@ -91,7 +91,7 @@ public class EidasAssertionService extends AssertionService {
             .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds);
+        conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
     }
 
     public Boolean isCountryAssertion(Assertion assertion) {

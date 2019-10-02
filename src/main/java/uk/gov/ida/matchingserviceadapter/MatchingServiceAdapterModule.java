@@ -103,6 +103,7 @@ import java.io.PrintWriter;
 import java.security.KeyPair;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
@@ -251,7 +252,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             Cycle3DatasetFactory cycle3DatasetFactory,
             MetadataResolverRepository eidasMetadataRepository,
             EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            @Named("AcceptableHubConnectorEntityIds") String[] hubConnectorEntityIds,
+            @Named("AcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
             @Named("HubEntityId") String hubEntityId
     ) {
         return new EidasAssertionService(instantValidator,
@@ -260,7 +261,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 hubSignatureValidator,
                 cycle3DatasetFactory,
                 eidasMetadataRepository,
-                hubConnectorEntityIds,
+                acceptableHubConnectorEntityIds,
                 hubEntityId,
                 matchingDatasetUnmarshaller);
     }
@@ -304,8 +305,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Provides
     @Singleton
     @Named("AcceptableHubConnectorEntityIds")
-    public String[] getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds() : new String[0];
+    public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
+        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds() : new LinkedList<>();
     }
 
     @Provides
