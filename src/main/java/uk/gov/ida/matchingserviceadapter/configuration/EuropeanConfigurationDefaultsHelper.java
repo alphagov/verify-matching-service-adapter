@@ -17,7 +17,11 @@ public class EuropeanConfigurationDefaultsHelper {
     };
 
     private static final String[] ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS_INTEGRATION = new String[]{
-        // TODO
+        "https://www.integration.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)
+        "https://connector-node-integration.london.verify.govsvc.uk/ConnectorMetadata",         // (GSP)
+        "https://integration.eidas.signin.service.gov.uk/ConnectorMetadata",                    // (potential new #1)
+        "https://connector.integration.eidas.signin.service.gov.uk/ConnectorMetadata",          // (potential new #2)
+        "https://connector-node.integration.eidas.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
     };
 
     public static Map<MatchingServiceAdapterEnvironment, List<String>> DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS;
