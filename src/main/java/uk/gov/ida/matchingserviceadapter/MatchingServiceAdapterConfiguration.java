@@ -176,8 +176,9 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
     }
 
     public MatchingServiceAdapterEnvironment getMetadataEnvironment() {
-        return getMetadataConfiguration().isPresent()
-            ? ((MatchingServiceAdapterMetadataConfiguration)getMetadataConfiguration().get()).getEnvironment()
-            : MatchingServiceAdapterEnvironment.INTEGRATION;
+        return getMetadataConfiguration()
+            .map(c -> (MatchingServiceAdapterMetadataConfiguration)c)
+            .map(MatchingServiceAdapterMetadataConfiguration::getEnvironment)
+            .orElse(MatchingServiceAdapterEnvironment.INTEGRATION);
     }
 }
