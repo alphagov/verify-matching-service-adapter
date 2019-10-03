@@ -306,7 +306,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named("AcceptableHubConnectorEntityIds")
     public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds() : new LinkedList<>();
+        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds(configuration.getMetadataEnvironment()) : new LinkedList<>();
     }
 
     @Provides

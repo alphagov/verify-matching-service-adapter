@@ -11,6 +11,7 @@ import uk.gov.ida.matchingserviceadapter.configuration.EuropeanIdentityConfigura
 import uk.gov.ida.matchingserviceadapter.configuration.HubConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.KeyPairConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.LocalMatchingServiceConfiguration;
+import uk.gov.ida.matchingserviceadapter.configuration.MatchingServiceAdapterEnvironment;
 import uk.gov.ida.matchingserviceadapter.configuration.MatchingServiceAdapterMetadataConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.ServiceInfo;
 import uk.gov.ida.matchingserviceadapter.configuration.SigningKeysConfiguration;
@@ -172,5 +173,11 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     public boolean isEidasEnabled() {
         return getEuropeanIdentity() != null && getEuropeanIdentity().isEnabled();
+    }
+
+    public MatchingServiceAdapterEnvironment getMetadataEnvironment() {
+        return getMetadataConfiguration().isPresent()
+            ? ((MatchingServiceAdapterMetadataConfiguration)getMetadataConfiguration().get()).getEnvironment()
+            : MatchingServiceAdapterEnvironment.INTEGRATION;
     }
 }
