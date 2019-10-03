@@ -101,9 +101,9 @@ import javax.security.cert.X509Certificate;
 import javax.ws.rs.client.Client;
 import java.io.PrintWriter;
 import java.security.KeyPair;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Timer;
@@ -306,7 +306,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named("AcceptableHubConnectorEntityIds")
     public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds(configuration.getMetadataEnvironment()) : new LinkedList<>();
+        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds(configuration.getMetadataEnvironment()) : new ArrayList<>();
     }
 
     @Provides
