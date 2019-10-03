@@ -6,7 +6,7 @@ import java.util.Map;
 
 import static org.eclipse.jetty.util.TypeUtil.asList;
 
-public class EuropeanConfigurationConstants {
+public class EuropeanConfigurationDefaultsHelper {
 
     private static final String[] ACCEPTABLE_HUB_CONNECTOR_IDS_PRODUCTION = new String[] {
         "https://www.signin.service.gov.uk/SAML2/metadata/connector",               // (AWS)

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static uk.gov.ida.matchingserviceadapter.configuration.EuropeanConfigurationConstants.DEFAULT_ACCEPTABLE_HUB_CONNECTOR_IDS;
+import static uk.gov.ida.matchingserviceadapter.configuration.EuropeanConfigurationDefaultsHelper.DEFAULT_ACCEPTABLE_HUB_CONNECTOR_IDS;
 
 public class EuropeanIdentityConfiguration {
 
