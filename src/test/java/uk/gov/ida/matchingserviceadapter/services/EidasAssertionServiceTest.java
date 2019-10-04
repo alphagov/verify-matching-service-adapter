@@ -19,7 +19,7 @@ import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -68,7 +68,7 @@ public class EidasAssertionServiceTest {
                 hubSignatureValidator,
                 new Cycle3DatasetFactory(),
                 metadataResolverRepository,
-                new String[] { HUB_CONNECTOR_ENTITY_ID },
+                Collections.singletonList(HUB_CONNECTOR_ENTITY_ID),
                 HUB_ENTITY_ID,
                 new EidasMatchingDatasetUnmarshaller()
         );
@@ -76,7 +76,7 @@ public class EidasAssertionServiceTest {
         doNothing().when(subjectValidator).validate(any(), any());
         doNothing().when(conditionsValidator).validate(any(), any());
         when(hubSignatureValidator.validate(any(), any())).thenReturn(mock(ValidatedAssertions.class));
-        when(metadataResolverRepository.getResolverEntityIds()).thenReturn(Arrays.asList(STUB_COUNTRY_ONE));
+        when(metadataResolverRepository.getResolverEntityIds()).thenReturn(Collections.singletonList(STUB_COUNTRY_ONE));
 
         DateTimeFreezer.freezeTime();
     }

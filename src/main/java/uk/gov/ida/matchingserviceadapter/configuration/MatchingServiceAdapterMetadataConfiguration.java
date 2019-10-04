@@ -51,6 +51,10 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
         this.environment = Optional.ofNullable(environment).orElse(MatchingServiceAdapterEnvironment.INTEGRATION);
     }
 
+    public MatchingServiceAdapterEnvironment getEnvironment() {
+        return environment;
+    }
+
     @Override
     public Optional<KeyStore> getHubTrustStore() {
         return Optional.of(

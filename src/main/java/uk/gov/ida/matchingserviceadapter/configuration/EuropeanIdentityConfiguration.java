@@ -5,6 +5,13 @@ import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static uk.gov.ida.matchingserviceadapter.configuration.EuropeanConfigurationDefaultsHelper.DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS;
 
 public class EuropeanIdentityConfiguration {
 
@@ -15,7 +22,7 @@ public class EuropeanIdentityConfiguration {
 
     @Valid
     @JsonProperty
-    private String[] acceptableHubConnectorEntityIds;
+    private List<String> acceptableHubConnectorEntityIds;
 
     @NotNull
     @Valid
@@ -30,10 +37,11 @@ public class EuropeanIdentityConfiguration {
         return hubConnectorEntityId;
     }
 
-    public String[] getAcceptableHubConnectorEntityIds() {
-        return acceptableHubConnectorEntityIds != null && acceptableHubConnectorEntityIds.length > 0
-            ? acceptableHubConnectorEntityIds
-            : new String[] { hubConnectorEntityId };
+    public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
+        Set<String> entityIds = new HashSet<>(DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS.getOrDefault(environment, new ArrayList<>()));
+        Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
+        Optional.ofNullable(hubConnectorEntityId).ifPresent(entityIds::add);
+        return new ArrayList<>(entityIds);
     }
 
     public EidasMetadataConfiguration getAggregatedMetadata() {
