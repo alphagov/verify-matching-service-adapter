@@ -82,26 +82,33 @@ public class EidasAssertionService extends AssertionService {
 
         AuthnStatement authnStatement = countryAssertion.getAuthnStatements().get(0);
         String levelOfAssurance = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
-        boolean markedUnsigned = isMarkedUnsigned(countryAssertion);
-        MatchingDatasetUnmarshaller unmarshaller  = markedUnsigned ? matchingUnsignedDatasetUnmarshaller : matchingDatasetUnmarshaller;
         return new AssertionData(countryAssertion.getIssuer().getValue(),
             authnContextFactory.mapFromEidasToLoA(levelOfAssurance),
             getCycle3Data(cycle3Assertion),
-                unmarshaller.fromAssertion(countryAssertion));
+            getUnmarshaller(countryAssertion).fromAssertion(countryAssertion));
+    }
+
+    private MatchingDatasetUnmarshaller getUnmarshaller(Assertion countryAssertion) {
+        return isUnsigned(countryAssertion) ? matchingUnsignedDatasetUnmarshaller : matchingDatasetUnmarshaller;
     }
 
     protected void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
-        boolean markedUnsigned = isMarkedUnsigned(assertion);
         conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
-        if (!markedUnsigned) {
+        if (isSigned(assertion)) {
             validateAssertionSignature(assertion);
         }
     }
 
-    private boolean isMarkedUnsigned(Assertion assertion) {
-        return assertion.getAttributeStatements().stream().flatMap(as -> as.getAttributes().stream()).anyMatch(attribute -> IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME.equals(attribute.getName()));
+    private boolean isUnsigned(Assertion assertion) {
+        return assertion.getAttributeStatements().stream()
+                .flatMap(as -> as.getAttributes().stream())
+                .anyMatch(attribute -> IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME.equals(attribute.getName()));
+    }
+
+    private boolean isSigned(Assertion assertion) {
+        return !isUnsigned(assertion);
     }
 
     private void validateAssertionSignature(Assertion assertion) {
