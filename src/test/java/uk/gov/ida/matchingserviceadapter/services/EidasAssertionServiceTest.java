@@ -13,6 +13,7 @@ import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
@@ -70,7 +71,8 @@ public class EidasAssertionServiceTest {
                 metadataResolverRepository,
                 Collections.singletonList(HUB_CONNECTOR_ENTITY_ID),
                 HUB_ENTITY_ID,
-                new EidasMatchingDatasetUnmarshaller()
+                new EidasMatchingDatasetUnmarshaller(),
+                new EidasUnsignedMatchingDatasetUnmarshaller(null, null)
         );
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
