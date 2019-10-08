@@ -1,5 +1,6 @@
 package uk.gov.ida.integrationtest.interfacetests;
 
+import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import org.junit.ClassRule;
@@ -7,8 +8,6 @@ import org.junit.Test;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.security.credential.Credential;
-
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 import uk.gov.ida.saml.core.test.builders.AttributeQueryBuilder;
@@ -20,10 +19,11 @@ import java.nio.file.Paths;
 import static java.util.Arrays.asList;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.aSubjectWithEncryptedAssertions;
 import static uk.gov.ida.integrationtest.helpers.AssertionHelper.anEidasSignature;
-import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentGivenNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentFamilyNameAttribute;
+import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aCurrentGivenNameAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aDateOfBirthAttribute;
 import static uk.gov.ida.matchingserviceadapter.builders.AttributeStatementBuilder.aPersonIdentifierAttribute;
+import static uk.gov.ida.matchingserviceadapter.configuration.MatchingServiceAdapterEnvironment.INTEGRATION;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_PRIVATE_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_ENCRYPTION_CERT;
@@ -69,7 +69,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                     .withConditions(
                         aConditions()
                         .validFor(Duration.standardMinutes(10))
-                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId(INTEGRATION))
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
                     .withSignature(anEidasSignature())
@@ -100,7 +100,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                     .withConditions(
                         aConditions()
                         .validFor(Duration.standardMinutes(10))
-                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId(INTEGRATION))
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
                     .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
@@ -131,7 +131,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                     .withConditions(
                         aConditions()
                         .validFor(Duration.standardMinutes(10))
-                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId())
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId(INTEGRATION))
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
                     .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())

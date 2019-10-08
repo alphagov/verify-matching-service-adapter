@@ -15,7 +15,6 @@ import static uk.gov.ida.matchingserviceadapter.configuration.EuropeanConfigurat
 
 public class EuropeanIdentityConfiguration {
 
-    @NotNull
     @Valid
     @JsonProperty
     private String hubConnectorEntityId;
@@ -33,8 +32,8 @@ public class EuropeanIdentityConfiguration {
     @JsonProperty
     private EidasMetadataConfiguration aggregatedMetadata;
 
-    public String getHubConnectorEntityId() {
-        return hubConnectorEntityId;
+    public String getHubConnectorEntityId(MatchingServiceAdapterEnvironment environment) {
+        return Optional.ofNullable(hubConnectorEntityId).orElse(getAcceptableHubConnectorEntityIds(environment).stream().findFirst().orElse(null));
     }
 
     public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {

@@ -299,7 +299,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     @Named("HubConnectorEntityId")
     public String getHubConnectorEntityId(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getHubConnectorEntityId() : "";
+        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getHubConnectorEntityId(configuration.getMetadataEnvironment()) : "";
     }
 
     @Provides
