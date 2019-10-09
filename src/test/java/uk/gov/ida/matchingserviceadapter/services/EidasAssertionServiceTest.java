@@ -20,6 +20,7 @@ import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.OpenSamlXmlObjectFactory;
+import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
@@ -74,6 +75,11 @@ public class EidasAssertionServiceTest {
     @Mock
     private MetadataResolverRepository metadataResolverRepository;
 
+    @Mock
+    private EidasMatchingDatasetUnmarshaller eidasMatchingDatasetUnmarshaller;
+    @Mock
+    private EidasUnsignedMatchingDatasetUnmarshaller eidasUnsignedMatchingDatasetUnmarshaller;
+
     @Before
     public void setUp() {
         IdaSamlBootstrap.bootstrap();
@@ -87,8 +93,8 @@ public class EidasAssertionServiceTest {
                 metadataResolverRepository,
                 Collections.singletonList(HUB_CONNECTOR_ENTITY_ID),
                 HUB_ENTITY_ID,
-                new EidasMatchingDatasetUnmarshaller(),
-                new EidasUnsignedMatchingDatasetUnmarshaller(null, null)
+                eidasMatchingDatasetUnmarshaller,
+                eidasUnsignedMatchingDatasetUnmarshaller
         );
         doNothing().when(instantValidator).validate(any(), any());
         doNothing().when(subjectValidator).validate(any(), any());
@@ -151,30 +157,44 @@ public class EidasAssertionServiceTest {
     }
 
     @Test
-    public void shouldAttemptToValidateSignatureOnUnsignedAssertion() {
-        Assertion eidasUnisgnedAssertion = anEidasAssertion().buildUnencrypted();
-        ExplicitKeySignatureTrustEngine trustEngine = mock(ExplicitKeySignatureTrustEngine.class);
+    public void shouldUseMatchingUnsignedDatasetUnmarshallerForUnsignedAssertions() {
+        Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
+        unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
 
-        Optional<ExplicitKeySignatureTrustEngine> mockOptionalTrustEngine = mock(Optional.class);
-        when(metadataResolverRepository.getSignatureTrustEngine(any(String.class))).thenReturn(mockOptionalTrustEngine);
+       when(eidasUnsignedMatchingDatasetUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(null);
 
-        Optional<MetadataBackedSignatureValidator> mockOptionalSignatureValidator = mock(Optional.class);
-        when(mockOptionalTrustEngine.map(MetadataBackedSignatureValidator::withoutCertificateChainValidation))
-                .thenReturn(mockOptionalSignatureValidator);
+        List<Assertion> assertions = List.of(anEidasAssertion().addAttributeStatement(
+                new AttributeStatementBuilder()
+                .addAttribute(unsignedAssertions)
+                        .build())
+                .buildUnencrypted());
+        eidasAssertionService.translate(assertions);
+        verify(eidasUnsignedMatchingDatasetUnmarshaller).fromAssertion(any(Assertion.class));
+    }
 
-        Optional<SamlMessageSignatureValidator> mockOptionalSamlMessageSignatureValidator = mock(Optional.class);
-        when(mockOptionalSignatureValidator.map(SamlMessageSignatureValidator::new))
-                .thenReturn(mockOptionalSamlMessageSignatureValidator);
+    @Test
+    public void shouldUseMatchingDatasetUnmarshallerForUnsignedAssertions() {
+        Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
+        unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
 
-        Optional<SamlAssertionsSignatureValidator> mockOptionalSamlAssertionsSignatureValidator = mock(Optional.class);
-        when(mockOptionalSamlMessageSignatureValidator.map(SamlAssertionsSignatureValidator::new))
-                .thenReturn(mockOptionalSamlAssertionsSignatureValidator);
+        when(eidasUnsignedMatchingDatasetUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(null);
 
+        List<Assertion> assertions = List.of(anEidasAssertion().addAttributeStatement(
+                new AttributeStatementBuilder()
+                        .addAttribute(unsignedAssertions)
+                        .build())
+                .buildUnencrypted());
+        eidasAssertionService.translate(assertions);
+    }
 
+    @Test
+    public void shouldUseEidasMatchingDatasetUnmarshallerForSignedAssertions() {
 
+        when(eidasMatchingDatasetUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(null);
 
-
-        eidasAssertionService.validate("bob", List.of(eidasUnisgnedAssertion));
-        verify(mockOptionalSamlAssertionsSignatureValidator).get().validate(anyList(), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        List<Assertion> assertions = List.of(anEidasAssertion().buildUnencrypted());
+        eidasAssertionService.translate(assertions);
+        verify(eidasMatchingDatasetUnmarshaller).fromAssertion(any(Assertion.class));
     }
 }
+
