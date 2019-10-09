@@ -3,6 +3,8 @@ MSA Release Notes
 
 ### Next
 
+* Configuration option `hubConnectorEntityId` is now optional.
+
 ### 4.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.0.0...4.1.0)
 
