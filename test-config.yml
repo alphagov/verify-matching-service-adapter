@@ -86,7 +86,6 @@ metadata:
 # Including this section will enable European identities and the universal dataset for matching
 europeanIdentity:
   enabled: true
-  hubConnectorEntityId: https://www.integration.signin.service.gov.uk/SAML2/metadata/connector # replace with the URL for the production environment when your service goes live
 
   # Details about eIDAS metadata can be configured here
   aggregatedMetadata:

@@ -87,7 +87,6 @@ metadata:
 # European identities are NOT enabled for production yet so this should remain false
 europeanIdentity:
   enabled: false
-  hubConnectorEntityId: https://www.signin.service.gov.uk/SAML2/metadata/connector
 
   # Details about eIDAS metadata can be configured here
   aggregatedMetadata:

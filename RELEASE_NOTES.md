@@ -3,6 +3,9 @@ MSA Release Notes
 
 ### Next
 
+* Handle unsigned eIDAS assertions in a secure manner. At the moment, unsigned assertions are not allowed. The eIDAS specification does not require signed assertions, whereas the Verify specification does. This release adds logic to accept unsigned eIDAS assertions. Signed eIDAS and Verify assertions are still verified as previously. This change will allow the MSA to accept eIDs from more European countries.
+* Configuration parameter `hubConnectorEntityId` in the `europeanIdentity` section is now optional and can be removed from the configuration file.
+
 ### 4.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.0.0...4.1.0)
 
