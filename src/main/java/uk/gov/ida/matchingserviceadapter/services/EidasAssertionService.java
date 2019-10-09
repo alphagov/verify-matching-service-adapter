@@ -39,7 +39,7 @@ public class EidasAssertionService extends AssertionService {
                                  SamlAssertionsSignatureValidator hubSignatureValidator,
                                  Cycle3DatasetFactory cycle3DatasetFactory,
                                  MetadataResolverRepository metadataResolverRepository,
-                                 @Named("AcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
+                                 @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
                                  String hubEntityId,
                                  EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller) {
         super(instantValidator, subjectValidator, conditionsValidator, hubSignatureValidator, cycle3DatasetFactory);

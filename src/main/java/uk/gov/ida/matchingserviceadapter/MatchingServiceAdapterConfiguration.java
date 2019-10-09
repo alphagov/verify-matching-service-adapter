@@ -177,7 +177,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     public MatchingServiceAdapterEnvironment getMetadataEnvironment() {
         return getMetadataConfiguration()
-            .map(c -> (MatchingServiceAdapterMetadataConfiguration)c)
+            .map(config -> (MatchingServiceAdapterMetadataConfiguration)config)
             .map(MatchingServiceAdapterMetadataConfiguration::getEnvironment)
             .orElse(MatchingServiceAdapterEnvironment.INTEGRATION);
     }
