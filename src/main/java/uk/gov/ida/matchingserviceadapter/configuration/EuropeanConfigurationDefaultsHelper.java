@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,15 @@ public class EuropeanConfigurationDefaultsHelper {
         "https://connector-node.eidas.integration.signin.service.gov.uk/ConnectorMetadata",     // (potential new #3)
     };
 
-    public static Map<MatchingServiceAdapterEnvironment, List<String>> DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS;
-
-    static {
-        DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS = new HashMap<>();
-        DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS.put(MatchingServiceAdapterEnvironment.INTEGRATION, asList(ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS_INTEGRATION));
-        DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS.put(MatchingServiceAdapterEnvironment.PRODUCTION, asList(ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS_PRODUCTION));
+    public static List<String> getDefaultAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
+        switch (environment) {
+            case INTEGRATION:
+                return asList(ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS_INTEGRATION);
+            case PRODUCTION:
+                return asList(ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS_PRODUCTION);
+            default:
+                throw new IllegalArgumentException(environment.name());
+        }
     }
 
 }

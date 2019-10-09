@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static uk.gov.ida.matchingserviceadapter.configuration.EuropeanConfigurationDefaultsHelper.DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS;
+import static uk.gov.ida.matchingserviceadapter.configuration.EuropeanConfigurationDefaultsHelper.getDefaultAcceptableHubConnectorEntityIds;
 
 public class EuropeanIdentityConfiguration {
 
@@ -33,7 +33,7 @@ public class EuropeanIdentityConfiguration {
     private EidasMetadataConfiguration aggregatedMetadata;
 
     public List<String> getAllAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
-        Set<String> entityIds = new HashSet<>(DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS.getOrDefault(environment, new ArrayList<>()));
+        Set<String> entityIds = new HashSet<>(getDefaultAcceptableHubConnectorEntityIds(environment));
         Optional.ofNullable(hubConnectorEntityId).ifPresent(entityIds::add);
         Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
         return new ArrayList<>(entityIds);
