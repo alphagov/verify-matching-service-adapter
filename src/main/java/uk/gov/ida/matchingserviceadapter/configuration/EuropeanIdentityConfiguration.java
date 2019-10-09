@@ -38,8 +38,8 @@ public class EuropeanIdentityConfiguration {
 
     public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
         Set<String> entityIds = new HashSet<>(DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS.getOrDefault(environment, new ArrayList<>()));
-        Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
         Optional.ofNullable(hubConnectorEntityId).ifPresent(entityIds::add);
+        Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
         return new ArrayList<>(entityIds);
     }
 
