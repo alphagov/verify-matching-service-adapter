@@ -8,11 +8,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
-import org.opensaml.saml.saml2.core.impl.AttributeBuilder;
-import org.opensaml.saml.saml2.core.impl.AttributeStatementImpl;
-import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
-import org.opensaml.security.credential.CredentialResolver;
-import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
@@ -20,28 +15,21 @@ import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
 import uk.gov.ida.saml.core.test.OpenSamlXmlObjectFactory;
-import uk.gov.ida.saml.core.test.builders.AssertionBuilder;
 import uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
-import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
-import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
-import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -76,8 +64,6 @@ public class EidasAssertionServiceTest {
     private MetadataResolverRepository metadataResolverRepository;
 
     @Mock
-    private EidasMatchingDatasetUnmarshaller eidasMatchingDatasetUnmarshaller;
-    @Mock
     private EidasUnsignedMatchingDatasetUnmarshaller eidasUnsignedMatchingDatasetUnmarshaller;
 
     @Before
@@ -93,7 +79,7 @@ public class EidasAssertionServiceTest {
                 metadataResolverRepository,
                 Collections.singletonList(HUB_CONNECTOR_ENTITY_ID),
                 HUB_ENTITY_ID,
-                eidasMatchingDatasetUnmarshaller,
+                new EidasMatchingDatasetUnmarshaller(),
                 eidasUnsignedMatchingDatasetUnmarshaller
         );
         doNothing().when(instantValidator).validate(any(), any());
@@ -131,7 +117,6 @@ public class EidasAssertionServiceTest {
         Assertion cycle3Assertion = aCycle3DatasetAssertion("NI", "123456").buildUnencrypted();
         List<Assertion> assertions = asList( eidasAssertion, cycle3Assertion);
         AssertionData assertionData = eidasAssertionService.translate(assertions);
-
         assertThat(assertionData.getLevelOfAssurance()).isEqualTo(LEVEL_2);
         assertThat(assertionData.getMatchingDatasetIssuer()).isEqualTo(STUB_COUNTRY_ONE);
         assertThat(assertionData.getCycle3Data().get().getAttributes().get("NI")).isEqualTo("123456");
@@ -161,8 +146,6 @@ public class EidasAssertionServiceTest {
         Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
         unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
 
-       when(eidasUnsignedMatchingDatasetUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(null);
-
         List<Assertion> assertions = List.of(anEidasAssertion().addAttributeStatement(
                 new AttributeStatementBuilder()
                 .addAttribute(unsignedAssertions)
@@ -172,25 +155,22 @@ public class EidasAssertionServiceTest {
         verify(eidasUnsignedMatchingDatasetUnmarshaller).fromAssertion(any(Assertion.class));
     }
 
-    @Test
-    public void shouldUseMatchingDatasetUnmarshallerForUnsignedAssertions() {
-        Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
-        unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
-
-        when(eidasUnsignedMatchingDatasetUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(null);
-
-        List<Assertion> assertions = List.of(anEidasAssertion().addAttributeStatement(
-                new AttributeStatementBuilder()
-                        .addAttribute(unsignedAssertions)
-                        .build())
-                .buildUnencrypted());
-        eidasAssertionService.translate(assertions);
-    }
 
     @Test
     public void shouldUseEidasMatchingDatasetUnmarshallerForSignedAssertions() {
-
-        when(eidasMatchingDatasetUnmarshaller.fromAssertion(any(Assertion.class))).thenReturn(null);
+        EidasMatchingDatasetUnmarshaller eidasMatchingDatasetUnmarshaller = mock(EidasMatchingDatasetUnmarshaller.class);
+        eidasAssertionService = new EidasAssertionService(
+                instantValidator,
+                subjectValidator,
+                conditionsValidator,
+                hubSignatureValidator,
+                new Cycle3DatasetFactory(),
+                metadataResolverRepository,
+                Collections.singletonList(HUB_CONNECTOR_ENTITY_ID),
+                HUB_ENTITY_ID,
+                eidasMatchingDatasetUnmarshaller,
+                eidasUnsignedMatchingDatasetUnmarshaller
+        );
 
         List<Assertion> assertions = List.of(anEidasAssertion().buildUnencrypted());
         eidasAssertionService.translate(assertions);
