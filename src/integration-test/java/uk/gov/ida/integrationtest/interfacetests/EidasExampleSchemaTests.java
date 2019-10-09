@@ -69,7 +69,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                     .withConditions(
                         aConditions()
                         .validFor(Duration.standardMinutes(10))
-                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId(INTEGRATION))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getAllAcceptableHubConnectorEntityIds(INTEGRATION).stream().findFirst().get())
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
                     .withSignature(anEidasSignature())
@@ -100,7 +100,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                     .withConditions(
                         aConditions()
                         .validFor(Duration.standardMinutes(10))
-                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId(INTEGRATION))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getAllAcceptableHubConnectorEntityIds(INTEGRATION).stream().findFirst().get())
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
                     .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())
@@ -131,7 +131,7 @@ public class EidasExampleSchemaTests extends BaseTestToolInterfaceTest {
                     .withConditions(
                         aConditions()
                         .validFor(Duration.standardMinutes(10))
-                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getHubConnectorEntityId(INTEGRATION))
+                        .restrictedToAudience(appRule.getConfiguration().getEuropeanIdentity().getAllAcceptableHubConnectorEntityIds(INTEGRATION).stream().findFirst().get())
                         .build())
                     .withIssuer(anIssuer().withIssuerId(appRule.getCountryEntityId()).build())
                     .withSignature(aSignature().withSigningCredential(COUNTRY_SIGNING_CREDENTIAL).build())

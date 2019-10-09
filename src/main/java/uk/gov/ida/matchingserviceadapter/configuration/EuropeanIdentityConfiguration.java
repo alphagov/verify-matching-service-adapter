@@ -32,11 +32,7 @@ public class EuropeanIdentityConfiguration {
     @JsonProperty
     private EidasMetadataConfiguration aggregatedMetadata;
 
-    public String getHubConnectorEntityId(MatchingServiceAdapterEnvironment environment) {
-        return Optional.ofNullable(hubConnectorEntityId).orElse(getAcceptableHubConnectorEntityIds(environment).stream().findFirst().orElse(null));
-    }
-
-    public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
+    public List<String> getAllAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
         Set<String> entityIds = new HashSet<>(DEFAULT_ACCEPTABLE_HUB_CONNECTOR_ENTITY_IDS.getOrDefault(environment, new ArrayList<>()));
         Optional.ofNullable(hubConnectorEntityId).ifPresent(entityIds::add);
         Optional.ofNullable(acceptableHubConnectorEntityIds).ifPresent(entityIds::addAll);
