@@ -252,7 +252,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             Cycle3DatasetFactory cycle3DatasetFactory,
             MetadataResolverRepository eidasMetadataRepository,
             EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            @Named("AcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
+            @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
             @Named("HubEntityId") String hubEntityId
     ) {
         return new EidasAssertionService(instantValidator,
@@ -297,16 +297,9 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("HubConnectorEntityId")
-    public String getHubConnectorEntityId(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getHubConnectorEntityId() : "";
-    }
-
-    @Provides
-    @Singleton
-    @Named("AcceptableHubConnectorEntityIds")
+    @Named("AllAcceptableHubConnectorEntityIds")
     public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAcceptableHubConnectorEntityIds(configuration.getMetadataEnvironment()) : new ArrayList<>();
+        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAllAcceptableHubConnectorEntityIds(configuration.getMetadataEnvironment()) : new ArrayList<>();
     }
 
     @Provides
