@@ -60,6 +60,7 @@ returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
+  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
   aggregatedMetadata:
     trustAnchorUri: ${TRUST_ANCHOR_URI}
     metadataSourceUri: ${METADATA_SOURCE_URI}
