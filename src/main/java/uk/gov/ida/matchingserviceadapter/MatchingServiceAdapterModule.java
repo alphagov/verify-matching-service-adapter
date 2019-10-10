@@ -72,8 +72,6 @@ import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.validators.ResponseSizeValidator;
-import uk.gov.ida.saml.deserializers.validators.SizeValidator;
-import uk.gov.ida.saml.hub.validators.StringSizeValidator;
 import uk.gov.ida.saml.metadata.DisabledMetadataResolverRepository;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
