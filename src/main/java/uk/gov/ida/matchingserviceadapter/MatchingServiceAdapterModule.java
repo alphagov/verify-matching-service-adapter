@@ -71,7 +71,6 @@ import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
-import uk.gov.ida.saml.deserializers.validators.SizeValidator;
 import uk.gov.ida.saml.metadata.DisabledMetadataResolverRepository;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
@@ -186,12 +185,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public EidasUnsignedMatchingDatasetUnmarshaller getEidasUnsignedMatchingDatasetUnmarshaller(SecretKeyDecryptorFactory secretKeyDecryptorFactory) {
 
-        StringToOpenSamlObjectTransformer<Response> stringtoOpenSamlObjectTransformer = new CoreTransformersFactory().getStringtoOpenSamlObjectTransformer(new SizeValidator() {
-            @Override
-            public void validate(String input) {
-                // no-op
-            }
-        });
+        StringToOpenSamlObjectTransformer<Response> stringtoOpenSamlObjectTransformer = new CoreTransformersFactory().getStringtoOpenSamlObjectTransformer(input -> {});
 
         return new EidasUnsignedMatchingDatasetUnmarshaller(secretKeyDecryptorFactory, stringtoOpenSamlObjectTransformer);
     }
@@ -464,11 +458,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         Decrypter decrypter = new DecrypterFactory().createDecrypter(idaKeyStoreCredentialRetriever.getDecryptingCredentials());
         return new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter);
     }
-
-//    @Provides
-//    private SecretKeyEncrypter getSecretKeyEncrypter(KeyStoreBackedEncryptionCredentialResolver keyStoreBackedEncryptionCredentialResolver) {
-//        return new SecretKeyEncrypter(null);
-//    }
 
     @Provides
     @Singleton
