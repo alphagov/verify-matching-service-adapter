@@ -8,24 +8,34 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.security.credential.Credential;
+import org.opensaml.security.credential.CredentialResolver;
+import org.opensaml.security.credential.impl.StaticCredentialResolver;
+import org.opensaml.xmlsec.config.impl.DefaultSecurityConfigurationBootstrap;
+import org.opensaml.xmlsec.keyinfo.KeyInfoCredentialResolver;
+import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngine;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.IdaSamlBootstrap;
+import uk.gov.ida.saml.core.test.HardCodedKeyStore;
 import uk.gov.ida.saml.core.test.OpenSamlXmlObjectFactory;
+import uk.gov.ida.saml.core.test.TestEntityIds;
 import uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
+import uk.gov.ida.saml.security.SigningCredentialFactory;
 import uk.gov.ida.saml.security.validators.ValidatedAssertions;
 import uk.gov.ida.shared.utils.datetime.DateTimeFreezer;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +47,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.ida.matchingserviceadapter.services.AttributeQueryServiceTest.anEidasSignature;
 import static uk.gov.ida.saml.core.domain.AuthnContext.LEVEL_2;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_CONNECTOR_ENTITY_ID;
 import static uk.gov.ida.saml.core.test.TestEntityIds.HUB_ENTITY_ID;
@@ -142,6 +153,15 @@ public class EidasAssertionServiceTest {
     }
 
     @Test
+    public void shouldValidateSignatureOnSignedAssertion() {
+        ExplicitKeySignatureTrustEngine trustEngine = getExplicitKeySignatureTrustEngine();
+        when(metadataResolverRepository.getSignatureTrustEngine(TestEntityIds.STUB_COUNTRY_ONE)).thenReturn(Optional.of(trustEngine));
+        Assertion eidasAssertion = AttributeQueryServiceTest.anEidasAssertion("requestId", TestEntityIds.STUB_COUNTRY_ONE, anEidasSignature());
+        eidasAssertionService.validate("bob", List.of(eidasAssertion));
+        verify(metadataResolverRepository).getSignatureTrustEngine(TestEntityIds.STUB_COUNTRY_ONE);
+    }
+
+    @Test
     public void shouldUseMatchingUnsignedDatasetUnmarshallerForUnsignedAssertions() {
         Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
         unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
@@ -175,6 +195,13 @@ public class EidasAssertionServiceTest {
         List<Assertion> assertions = List.of(anEidasAssertion().buildUnencrypted());
         eidasAssertionService.translate(assertions);
         verify(eidasMatchingDatasetUnmarshaller).fromAssertion(any(Assertion.class));
+    }
+
+    private ExplicitKeySignatureTrustEngine getExplicitKeySignatureTrustEngine() {
+        List<Credential> credentials = new SigningCredentialFactory(new HardCodedKeyStore(TestEntityIds.HUB_ENTITY_ID)).getVerifyingCredentials(TestEntityIds.STUB_COUNTRY_ONE);
+        CredentialResolver credResolver = new StaticCredentialResolver(credentials);
+        KeyInfoCredentialResolver kiResolver = DefaultSecurityConfigurationBootstrap.buildBasicInlineKeyInfoCredentialResolver();
+        return new ExplicitKeySignatureTrustEngine(credResolver, kiResolver);
     }
 }
 
