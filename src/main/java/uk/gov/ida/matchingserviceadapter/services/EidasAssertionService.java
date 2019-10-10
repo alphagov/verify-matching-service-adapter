@@ -8,8 +8,11 @@ import uk.gov.ida.matchingserviceadapter.domain.AssertionData;
 import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
+import uk.gov.ida.saml.core.IdaConstants;
 import uk.gov.ida.saml.core.transformers.AuthnContextFactory;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.MatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
@@ -30,6 +33,7 @@ public class EidasAssertionService extends AssertionService {
     private final List<String> acceptableHubConnectorEntityIds;
     private final String hubEntityId;
     private final EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller;
+    private final EidasUnsignedMatchingDatasetUnmarshaller matchingUnsignedDatasetUnmarshaller;
     private final AuthnContextFactory authnContextFactory = new AuthnContextFactory();
 
     @Inject
@@ -41,13 +45,15 @@ public class EidasAssertionService extends AssertionService {
                                  MetadataResolverRepository metadataResolverRepository,
                                  @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
                                  String hubEntityId,
-                                 EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller) {
+                                 EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
+                                 EidasUnsignedMatchingDatasetUnmarshaller matchingUnsignedDatasetUnmarshaller) {
         super(instantValidator, subjectValidator, conditionsValidator, hubSignatureValidator, cycle3DatasetFactory);
         this.conditionsValidator = conditionsValidator;
         this.metadataResolverRepository = metadataResolverRepository;
         this.acceptableHubConnectorEntityIds = acceptableHubConnectorEntityIds;
         this.hubEntityId = hubEntityId;
         this.matchingDatasetUnmarshaller = matchingDatasetUnmarshaller;
+        this.matchingUnsignedDatasetUnmarshaller = matchingUnsignedDatasetUnmarshaller;
     }
 
     @Override
@@ -79,19 +85,39 @@ public class EidasAssertionService extends AssertionService {
         return new AssertionData(countryAssertion.getIssuer().getValue(),
             authnContextFactory.mapFromEidasToLoA(levelOfAssurance),
             getCycle3Data(cycle3Assertion),
-            matchingDatasetUnmarshaller.fromAssertion(countryAssertion));
+            getUnmarshaller(countryAssertion).fromAssertion(countryAssertion));
     }
 
-    private void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
-        metadataResolverRepository.getSignatureTrustEngine(assertion.getIssuer().getValue())
-            .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
-            .map(SamlMessageSignatureValidator::new)
-            .map(SamlAssertionsSignatureValidator::new)
-            .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
-            .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+    private MatchingDatasetUnmarshaller getUnmarshaller(Assertion countryAssertion) {
+        return isUnsigned(countryAssertion) ? matchingUnsignedDatasetUnmarshaller : matchingDatasetUnmarshaller;
+    }
+
+    protected void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
+        if (isSigned(assertion)) {
+            validateAssertionSignature(assertion);
+        }
+    }
+
+    private boolean isUnsigned(Assertion assertion) {
+        return assertion.getAttributeStatements().stream()
+                .flatMap(as -> as.getAttributes().stream())
+                .anyMatch(attribute -> IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME.equals(attribute.getName()));
+    }
+
+    private boolean isSigned(Assertion assertion) {
+        return !isUnsigned(assertion);
+    }
+
+    private void validateAssertionSignature(Assertion assertion) {
+        metadataResolverRepository.getSignatureTrustEngine(assertion.getIssuer().getValue())
+                .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
+                .map(SamlMessageSignatureValidator::new)
+                .map(SamlAssertionsSignatureValidator::new)
+                .orElseThrow(() -> new SamlResponseValidationException("Unable to find metadata resolver for entity Id " + assertion.getIssuer().getValue()))
+                .validate(singletonList(assertion), IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
     }
 
     public Boolean isCountryAssertion(Assertion assertion) {

@@ -11,6 +11,7 @@ import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
 import org.opensaml.saml.saml2.core.AttributeQuery;
+import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
@@ -64,10 +65,13 @@ import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
+import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
 import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
+import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
+import uk.gov.ida.saml.deserializers.validators.ResponseSizeValidator;
 import uk.gov.ida.saml.metadata.DisabledMetadataResolverRepository;
 import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
 import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
@@ -89,6 +93,8 @@ import uk.gov.ida.saml.security.MetadataBackedEncryptionCredentialResolver;
 import uk.gov.ida.saml.security.MetadataBackedSignatureValidator;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SamlMessageSignatureValidator;
+import uk.gov.ida.saml.security.SecretKeyDecryptorFactory;
+import uk.gov.ida.saml.security.SecretKeyEncrypter;
 import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgorithmValidator;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.truststore.KeyStoreLoader;
@@ -178,6 +184,19 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
+    public EidasUnsignedMatchingDatasetUnmarshaller getEidasUnsignedMatchingDatasetUnmarshaller(SecretKeyDecryptorFactory secretKeyDecryptorFactory) {
+        StringToOpenSamlObjectTransformer<Response> stringtoOpenSamlObjectTransformer = new CoreTransformersFactory().getStringtoOpenSamlObjectTransformer(new ResponseSizeValidator());
+        return new EidasUnsignedMatchingDatasetUnmarshaller(secretKeyDecryptorFactory, stringtoOpenSamlObjectTransformer);
+    }
+
+    @Provides
+    @Singleton
+    public SecretKeyDecryptorFactory getSecretKeyDecryptorFactory(IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever) {
+        return new SecretKeyDecryptorFactory(idaKeyStoreCredentialRetriever);
+    }
+
+    @Provides
+    @Singleton
     public VerifyMatchingDatasetUnmarshaller getVerifyMatchingDatasetUnmarshaller(AddressFactory addressFactory) {
         return new VerifyMatchingDatasetUnmarshaller(addressFactory);
     }
@@ -252,6 +271,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             Cycle3DatasetFactory cycle3DatasetFactory,
             MetadataResolverRepository eidasMetadataRepository,
             EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
+            EidasUnsignedMatchingDatasetUnmarshaller matchingUnsignedDatasetUnmarshaller,
             @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
             @Named("HubEntityId") String hubEntityId
     ) {
@@ -263,7 +283,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 eidasMetadataRepository,
                 acceptableHubConnectorEntityIds,
                 hubEntityId,
-                matchingDatasetUnmarshaller);
+                matchingDatasetUnmarshaller,
+                matchingUnsignedDatasetUnmarshaller);
     }
 
     @Provides
@@ -510,6 +531,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
         registerMetadataRefreshTask(environment, ofNullable(resolverRepository), Collections.unmodifiableCollection(resolverRepository.getMetadataResolvers().values()), "eidas-metadata");
         environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));
         return resolverRepository;
+    }
+
+    @Provides
+    @Singleton
+    private SecretKeyEncrypter getSecretKeyEncrypter(MetadataBackedEncryptionCredentialResolver encryptionCredentialResolver) {
+        return new SecretKeyEncrypter(encryptionCredentialResolver);
     }
 
     public static void registerMetadataRefreshTask(Environment environment, Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository, Collection<MetadataResolver> metadataResolvers, String name) {
