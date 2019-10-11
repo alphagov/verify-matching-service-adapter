@@ -86,6 +86,7 @@ import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.DecrypterFactory;
+import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
@@ -184,9 +185,12 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public EidasUnsignedMatchingDatasetUnmarshaller getEidasUnsignedMatchingDatasetUnmarshaller(SecretKeyDecryptorFactory secretKeyDecryptorFactory) {
+    public EidasUnsignedMatchingDatasetUnmarshaller getEidasUnsignedMatchingDatasetUnmarshaller(
+            SecretKeyDecryptorFactory secretKeyDecryptorFactory,
+            MetadataResolverRepository eidasMetadataResolverRepository) {
         StringToOpenSamlObjectTransformer<Response> stringtoOpenSamlObjectTransformer = new CoreTransformersFactory().getStringtoOpenSamlObjectTransformer(new ResponseSizeValidator());
-        return new EidasUnsignedMatchingDatasetUnmarshaller(secretKeyDecryptorFactory, stringtoOpenSamlObjectTransformer);
+        EidasValidatorFactory eidasValidatorFactory = new EidasValidatorFactory(eidasMetadataResolverRepository);
+        return new EidasUnsignedMatchingDatasetUnmarshaller(secretKeyDecryptorFactory, stringtoOpenSamlObjectTransformer, eidasValidatorFactory);
     }
 
     @Provides
