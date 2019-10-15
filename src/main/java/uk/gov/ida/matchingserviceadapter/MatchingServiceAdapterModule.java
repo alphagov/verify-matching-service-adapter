@@ -10,6 +10,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.encryption.Decrypter;
@@ -68,6 +69,7 @@ import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validation.assertion.ExceptionThrowingValidator;
 import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
@@ -187,10 +189,31 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public EidasUnsignedMatchingDatasetUnmarshaller getEidasUnsignedMatchingDatasetUnmarshaller(
             SecretKeyDecryptorFactory secretKeyDecryptorFactory,
-            MetadataResolverRepository eidasMetadataResolverRepository) {
+            MetadataResolverRepository eidasMetadataResolverRepository,
+            InstantValidator instantValidator,
+            SubjectValidator subjectValidator,
+            CountryConditionsValidator conditionsValidator,
+            @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds
+            ) {
         StringToOpenSamlObjectTransformer<Response> stringtoOpenSamlObjectTransformer = new CoreTransformersFactory().getStringtoOpenSamlObjectTransformer(new ResponseSizeValidator());
         EidasValidatorFactory eidasValidatorFactory = new EidasValidatorFactory(eidasMetadataResolverRepository);
-        return new EidasUnsignedMatchingDatasetUnmarshaller(secretKeyDecryptorFactory, stringtoOpenSamlObjectTransformer, eidasValidatorFactory);
+
+        ExceptionThrowingValidator<Assertion> eidasSamlValidator = a -> {
+            try {
+                instantValidator.validate(a.getIssueInstant(), "Country Assertion IssueInstant");
+                // FIXME: the expectedInResponseTo param is never used in the subjectValidator
+                subjectValidator.validate(a.getSubject(), a.getID());
+                conditionsValidator.validate(a.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
+            } catch (Exception e) {
+                throw new ExceptionThrowingValidator.ValidationException("Error validating assertion " + a.getID(), e);
+            }
+        };
+
+        return new EidasUnsignedMatchingDatasetUnmarshaller(
+                secretKeyDecryptorFactory,
+                stringtoOpenSamlObjectTransformer,
+                eidasValidatorFactory,
+                eidasSamlValidator);
     }
 
     @Provides

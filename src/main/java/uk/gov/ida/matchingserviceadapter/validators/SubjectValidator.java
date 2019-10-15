@@ -18,6 +18,7 @@ public class SubjectValidator {
         this.timeRestrictionValidator = timeRestrictionValidator;
     }
 
+    // FIXME: evaluate the expectedInResponseTo arg once Hub unsigned assertions PR supplies the correct value
     public void validate(Subject subject, String expectedInResponseTo) {
         if (subject == null) {
             throw new SamlResponseValidationException("Subject is missing from the assertion.");
