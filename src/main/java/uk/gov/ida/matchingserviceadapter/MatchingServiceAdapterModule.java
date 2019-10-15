@@ -69,6 +69,7 @@ import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.core.validation.assertion.ExceptionThrowingValidator;
 import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
@@ -204,7 +205,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
                 // FIXME: the expectedInResponseTo param is never used in the subjectValidator
                 subjectValidator.validate(a.getSubject(), a.getID());
                 conditionsValidator.validate(a.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
-            } catch (Exception e) {
+            } catch (SamlResponseValidationException e) {
                 throw new ExceptionThrowingValidator.ValidationException("Error validating assertion " + a.getID(), e);
             }
         };
