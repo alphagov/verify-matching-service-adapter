@@ -134,7 +134,7 @@ public class EidasAssertionServiceTest {
                         new AttributeStatementBuilder()
                                 .addAttribute(unsignedAssertions).build())
                 .buildUnencrypted();
-        eidasAssertionService.validate("bob", Arrays.asList(eidasUnsignedAssertion));
+        eidasAssertionService.validate("bob", asList(eidasUnsignedAssertion));
         verify(metadataResolverRepository, never()).getSignatureTrustEngine(any(String.class));
     }
 
@@ -147,7 +147,7 @@ public class EidasAssertionServiceTest {
                         new AttributeStatementBuilder()
                                 .addAttribute(unsignedAssertions).build())
                 .buildUnencrypted();
-        eidasAssertionService.validate("bob", Arrays.asList(eidasUnsignedAssertion));
+        eidasAssertionService.validate("bob", asList(eidasUnsignedAssertion));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class EidasAssertionServiceTest {
         Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
         unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
 
-        List<Assertion> assertions = Arrays.asList(anEidasAssertion().addAttributeStatement(
+        List<Assertion> assertions = asList(anEidasAssertion().addAttributeStatement(
                 new AttributeStatementBuilder()
                 .addAttribute(unsignedAssertions)
                         .build())
@@ -190,7 +190,7 @@ public class EidasAssertionServiceTest {
                 eidasUnsignedMatchingDatasetUnmarshaller
         );
 
-        List<Assertion> assertions = Arrays.asList(anEidasAssertion().buildUnencrypted());
+        List<Assertion> assertions = asList(anEidasAssertion().buildUnencrypted());
         eidasAssertionService.translate(assertions);
         verify(eidasMatchingDatasetUnmarshaller).fromAssertion(any(Assertion.class));
     }
