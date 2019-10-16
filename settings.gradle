@@ -1,5 +1,5 @@
 include 'verify-matching-service-test-tool'
 
 gradle.ext {
-    version_number = '4.1.0'
+    version_number = '4.2.0'
 }
