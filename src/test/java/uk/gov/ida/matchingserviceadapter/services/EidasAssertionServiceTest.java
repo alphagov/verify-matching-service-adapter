@@ -3,7 +3,6 @@ package uk.gov.ida.matchingserviceadapter.services;
 import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -27,6 +26,7 @@ import uk.gov.ida.saml.core.test.builders.AttributeStatementBuilder;
 import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
+import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.security.SamlAssertionsSignatureValidator;
 import uk.gov.ida.saml.security.SigningCredentialFactory;
@@ -44,7 +44,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -108,21 +107,6 @@ public class EidasAssertionServiceTest {
         DateTimeFreezer.unfreezeTime();
     }
 
-    //This Test would need to mock out a hierarchy of calls in the MetadataResolverRepository
-    //and would just be testing a bunch of wiring.
-    @Ignore
-    @Test
-    public void shouldCallValidatorsCorrectly() {
-
-        List<Assertion> assertions = asList(anEidasAssertion().buildUnencrypted());
-
-        eidasAssertionService.validate("requestId", assertions);
-        verify(instantValidator, times(1)).validate(any(), any());
-        verify(subjectValidator, times(1)).validate(any(), any());
-        verify(conditionsValidator, times(1)).validate(any(), any());
-        verify(hubSignatureValidator, times(1)).validate(any(), any());
-    }
-
     @Test
     public void shouldTranslateEidasAssertion() {
         Assertion eidasAssertion = anEidasAssertion().buildUnencrypted();
@@ -144,13 +128,26 @@ public class EidasAssertionServiceTest {
         unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
 
 
-        Assertion eidasUnisgnedAssertion = anEidasAssertion().withoutSigning()
+        Assertion eidasUnsignedAssertion = anEidasAssertion()
+                .withSignature(null)
                 .addAttributeStatement(
                         new AttributeStatementBuilder()
                                 .addAttribute(unsignedAssertions).build())
                 .buildUnencrypted();
-        eidasAssertionService.validate("bob", Arrays.asList(eidasUnisgnedAssertion));
+        eidasAssertionService.validate("bob", Arrays.asList(eidasUnsignedAssertion));
         verify(metadataResolverRepository, never()).getSignatureTrustEngine(any(String.class));
+    }
+
+    @Test(expected = SamlResponseValidationException.class)
+    public void shouldNotAllowSignedAssertionContainingEidasSamlResponseAttribute() {
+        Attribute unsignedAssertions = new OpenSamlXmlObjectFactory().createAttribute();
+        unsignedAssertions.setName(IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME);
+        Assertion eidasUnsignedAssertion = anEidasAssertion()
+                .addAttributeStatement(
+                        new AttributeStatementBuilder()
+                                .addAttribute(unsignedAssertions).build())
+                .buildUnencrypted();
+        eidasAssertionService.validate("bob", Arrays.asList(eidasUnsignedAssertion));
     }
 
     @Test
