@@ -82,36 +82,45 @@ public class EidasAssertionService extends AssertionService {
 
         AuthnStatement authnStatement = countryAssertion.getAuthnStatements().get(0);
         String levelOfAssurance = authnStatement.getAuthnContext().getAuthnContextClassRef().getAuthnContextClassRef();
-        return new AssertionData(countryAssertion.getIssuer().getValue(),
+        MatchingDatasetUnmarshaller unmarshaller = getUnmarshaller(countryAssertion);
+        return new AssertionData(
+                countryAssertion.getIssuer().getValue(),
             authnContextFactory.mapFromEidasToLoA(levelOfAssurance),
             getCycle3Data(cycle3Assertion),
-            getUnmarshaller(countryAssertion).fromAssertion(countryAssertion));
+            unmarshaller.fromAssertion(countryAssertion));
     }
 
     private MatchingDatasetUnmarshaller getUnmarshaller(Assertion countryAssertion) {
-        return isUnsigned(countryAssertion) ? matchingUnsignedDatasetUnmarshaller : matchingDatasetUnmarshaller;
+        if (containsUnsignedAssertionSamlResponse(countryAssertion)) {
+            return matchingUnsignedDatasetUnmarshaller;
+        } else {
+            return matchingDatasetUnmarshaller;
+        }
     }
 
     protected void validateCountryAssertion(Assertion assertion, String expectedInResponseTo) {
         instantValidator.validate(assertion.getIssueInstant(), "Country Assertion IssueInstant");
         subjectValidator.validate(assertion.getSubject(), expectedInResponseTo);
         conditionsValidator.validate(assertion.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
-        if (isSigned(assertion)) {
-            validateAssertionSignature(assertion);
-        }
+        validateAssertionSignature(assertion);
     }
 
-    private boolean isUnsigned(Assertion assertion) {
+    private boolean containsUnsignedAssertionSamlResponse(Assertion assertion) {
         return assertion.getAttributeStatements().stream()
                 .flatMap(as -> as.getAttributes().stream())
                 .anyMatch(attribute -> IdaConstants.Eidas_Attributes.UnsignedAssertions.EidasSamlResponse.NAME.equals(attribute.getName()));
     }
 
-    private boolean isSigned(Assertion assertion) {
-        return !isUnsigned(assertion);
-    }
-
     private void validateAssertionSignature(Assertion assertion) {
+
+        if (containsUnsignedAssertionSamlResponse(assertion)) {
+            if (assertion.getSignature() == null) {
+                return;
+            } else {
+                throw new SamlResponseValidationException("Assertion contains unsigned saml response but assertion is signed");
+            }
+        }
+
         metadataResolverRepository.getSignatureTrustEngine(assertion.getIssuer().getValue())
                 .map(MetadataBackedSignatureValidator::withoutCertificateChainValidation)
                 .map(SamlMessageSignatureValidator::new)
