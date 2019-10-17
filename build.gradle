@@ -36,6 +36,7 @@ ext {
 }
 
 group = "uk.gov.ida"
+project.version = "$gradle.ext.version_number-$build_number"
 
 def dependencyVersions = [
         opensaml:"$opensaml",
