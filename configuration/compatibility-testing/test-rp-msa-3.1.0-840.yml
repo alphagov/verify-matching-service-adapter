@@ -75,7 +75,7 @@ encryptionKeys:
       type: encoded
       key: ${ENCRYPTION_KEY}
 
-returnStackTraceInResponse: true
+returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: true
