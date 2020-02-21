@@ -48,7 +48,7 @@ metadata:
     timeToLive: 10m
     connectionTimeout: 4s
     retries: 3
-    keepAlive: 60s
+    keepAlive: 10s
     chunkedEncodingEnabled: false
     validateAfterInactivityPeriod: 5s
     tls:
@@ -95,7 +95,7 @@ europeanIdentity:
       cookiesEnabled: false
       connectionTimeout: 1s
       retries: 3
-      keepAlive: 60s
+      keepAlive: 10s
       chunkedEncodingEnabled: false
       validateAfterInactivityPeriod: 5s
       tls:
