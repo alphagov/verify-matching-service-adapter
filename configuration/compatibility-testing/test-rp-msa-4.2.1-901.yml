@@ -1,0 +1,98 @@
+# Config for MSA 4.2.1-901 deployed to staging on paas
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081
+
+matchingServiceAdapter:
+  entityId: http://www.test-rp-ms-${INDEX}.gov.uk/SAML2/MD
+  externalUrl: https://test-rp-msa-staging-backcompat-${INDEX}.cloudapps.digital/matching-service/POST
+
+localMatchingService:
+  matchUrl: http://test-rp-staging-backcompat-${INDEX}.apps.internal:8080/test-rp/matching-service/POST
+  accountCreationUrl: http://test-rp-staging-backcompat-${INDEX}.apps.internal:8080/test-rp/unknown-user/POST
+  client:
+    timeout: 60s
+    timeToLive: 10m
+    connectionTimeout: 4s
+    tls:
+      verifyHostname: false
+      trustSelfSignedCertificates: true
+
+hub:
+  ssoUrl: https://www.staging.signin.service.gov.uk/SAML2/SSO
+  republishHubCertificatesInLocalMetadata: true
+  hubEntityId: https://signin.service.gov.uk
+
+metadata:
+  url: https://www.staging.signin.service.gov.uk/SAML2/metadata/federation
+  trustStore:
+    path: test_ida_metadata.ts
+    password: puppet
+  environment: INTEGRATION
+  minRefreshDelay: 30000
+  maxRefreshDelay: 1800000
+  expectedEntityId: https://signin.service.gov.uk
+  client:
+    timeout: 60s
+    timeToLive: 10m
+    connectionTimeout: 4s
+    retries: 3
+    keepAlive: 10s
+    chunkedEncodingEnabled: false
+    validateAfterInactivityPeriod: 5s
+    tls:
+      protocol: TLSv1.2
+      verifyHostname: false
+      trustSelfSignedCertificates: true
+
+signingKeys:
+  primary:
+    publicKey:
+      type: encoded
+      cert: ${SIGNING_CERT}
+      name: http://www.test-rp-ms.gov.uk/SAML2/MD
+    privateKey:
+      type: encoded
+      key: ${SIGNING_KEY}
+
+encryptionKeys:
+  - publicKey:
+      type: encoded
+      cert: ${ENCRYPTION_CERT}
+      name: http://www.test-rp-ms.gov.uk/SAML2/MD
+    privateKey:
+      type: encoded
+      key: ${ENCRYPTION_KEY}
+
+returnStackTraceInErrorResponse: true
+
+europeanIdentity:
+  enabled: true
+  hubConnectorEntityId: https://hub-connector-eidas-staging.cloudapps.digital/metadata.xml
+  aggregatedMetadata:
+    trustAnchorUri: https://www.staging.signin.service.gov.uk/SAML2/metadata/trust-anchor
+    metadataSourceUri: https://www.staging.signin.service.gov.uk/SAML2/metadata/aggregator
+    trustStore:
+      path: test_ida_metadata.ts
+      password: puppet
+    minRefreshDelay: 5000
+    maxRefreshDelay: 600000
+    jerseyClientName: trust-anchor-client
+    client:
+      timeout: 2s
+      timeToLive: 10m
+      cookiesEnabled: false
+      connectionTimeout: 1s
+      retries: 3
+      keepAlive: 10s
+      chunkedEncodingEnabled: false
+      validateAfterInactivityPeriod: 5s
+      tls:
+        protocol: TLSv1.2
+        verifyHostname: false
+        trustSelfSignedCertificates: true

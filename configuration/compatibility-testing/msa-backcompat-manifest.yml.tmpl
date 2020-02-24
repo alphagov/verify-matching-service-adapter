@@ -1,0 +1,19 @@
+---
+# a templated cloud foundry manifest file for running supported MSA
+# versions in PaaS
+applications:
+  - name: test-rp-msa-backcompat-${INDEX}
+    routes:
+      - route: test-rp-msa-staging-backcompat-${INDEX}.cloudapps.digital
+      - route: test-rp-msa-staging-backcompat-${INDEX}.apps.internal
+    memory: 1G
+    buildpack: java_buildpack
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+ } }'
+      INDEX: ${INDEX}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      ENCRYPTION_CERT: ${ENCRYPTION_CERT}
+      SIGNING_KEY: ${SIGNING_KEY}
+      SIGNING_CERT: ${SIGNING_CERT}
+    services:
+      - logit-staging
