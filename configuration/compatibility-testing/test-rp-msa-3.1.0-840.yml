@@ -13,8 +13,8 @@ matchingServiceAdapter:
   externalUrl: https://test-rp-msa-staging-backcompat-${INDEX}.cloudapps.digital/matching-service/POST
 
 localMatchingService:
-  matchUrl: http://test-rp-staging-backcompat-${INDEX}.apps.internal:8080/test-rp/matching-service/POST
-  accountCreationUrl: http://test-rp-staging-backcompat-${INDEX}.apps.internal:8080/test-rp/unknown-user/POST
+  matchUrl: http://test-rp-staging.apps.internal:8080/test-rp/matching-service/POST
+  accountCreationUrl: http://test-rp-staging.apps.internal:8080/test-rp/unknown-user/POST
   client:
     timeout: 60s
     timeToLive: 10m
