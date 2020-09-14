@@ -2,6 +2,9 @@ MSA Release Notes
 =================
 
 ### Next
+* Add new G3 CAs to the production and test truststores, as well as new dev-pki CAs to the test truststores.
+* Various updates to allow the backwards compatibility tests to run.
+* UKCloud artifactory has been replaced with new JFrog SaaS artifactory.
 
 ### 4.2.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.1.0...4.2.1)
