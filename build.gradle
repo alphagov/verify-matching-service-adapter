@@ -41,10 +41,10 @@ project.version = "$gradle.ext.version_number-$build_number"
 def dependencyVersions = [
         opensaml:"$opensaml",
         dropwizard: '1.3.5',
-        ida_utils: '370',
+        ida_utils: '386',
         ida_test_utils: '44',
         dev_pki: '1.1.0-34',
-        saml_libs_version: "$opensaml-224"
+        saml_libs_version: "$opensaml-SNAPSHOT"
 ]
 
 repositories {
@@ -56,6 +56,7 @@ repositories {
         jcenter()
     }
     else {
+        mavenLocal()
         maven { url 'https://gds.jfrog.io/artifactory/allowed-repos' }
     }
 }
@@ -87,7 +88,8 @@ dependencies {
 
     ida "uk.gov.ida:saml-lib:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
-        "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils"
+        "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
+        "uk.gov.ida:common-utils:2.0.0-$dependencyVersions.ida_utils"
 
     compile configurations.dropwizard,
         configurations.ida,

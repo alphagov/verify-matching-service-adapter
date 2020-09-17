@@ -22,6 +22,8 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
 
     private final TrustStoreConfiguration idpTrustStore;
 
+    private TrustStoreConfiguration metadataTrustStore;
+
     @JsonCreator
     @SuppressWarnings("PMD.ExcessiveParameterList")
     public MatchingServiceAdapterMetadataConfiguration(
@@ -32,20 +34,20 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
         @JsonProperty("client") JerseyClientConfiguration client,
         @JsonProperty("jerseyClientName") String jerseyClientName,
         @JsonProperty("hubFederationId") String hubFederationId,
-        @JsonProperty("trustStore") TrustStoreConfiguration trustStore,
+        @JsonProperty("trustStore") TrustStoreConfiguration metadataTrustStore,
         @JsonProperty("hubTrustStore") TrustStoreConfiguration hubTrustStore,
         @JsonProperty("idpTrustStore") TrustStoreConfiguration idpTrustStore,
         @JsonProperty("environment") MatchingServiceAdapterEnvironment environment) {
 
-        super(uri, minRefreshDelay, maxRefreshDelay, expectedEntityId, client, jerseyClientName, hubFederationId, trustStore);
+        super(uri, minRefreshDelay, maxRefreshDelay, expectedEntityId, client, jerseyClientName, hubFederationId, metadataTrustStore);
 
-        if ((hubTrustStore == null || idpTrustStore == null) && environment == null) {
+        if ((hubTrustStore == null || idpTrustStore == null || metadataTrustStore == null) && environment == null) {
             throw new IllegalArgumentException(
-                    "Missing property 'environment' in the 'metadata' section of the config: set environment to either PRODUCTION or INTEGRATION to use the default 'hub' and 'idp' metadata truststores, " +
-                            "or override both by providing configuration for 'hubTrustStore' and 'idpTrustStore'");
+                    "Missing property 'environment' in the 'metadata' section of the config: set environment to either PRODUCTION or INTEGRATION to use the default 'hub', 'idp' or 'metadata' truststores, " +
+                            "or override all by providing configuration for 'hubTrustStore', 'idpTrustStore' and 'trustStore'");
         }
 
-
+        this.metadataTrustStore = metadataTrustStore;
         this.hubTrustStore = hubTrustStore;
         this.idpTrustStore = idpTrustStore;
         this.environment = Optional.ofNullable(environment).orElse(MatchingServiceAdapterEnvironment.INTEGRATION);
@@ -56,11 +58,18 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
     }
 
     @Override
+    public KeyStore getTrustStore() {
+        return metadataTrustStore == null ?
+                new DefaultTrustStoreConfiguration(environment, TrustStoreType.METADATA).getTrustStore() :
+                super.getTrustStore();
+    }
+
+    @Override
     public Optional<KeyStore> getHubTrustStore() {
         return Optional.of(
             validateTruststore(
                 Optional.ofNullable(hubTrustStore)
-                        .orElseGet(() -> new DefaultHubTrustStoreConfiguration(environment)).getTrustStore()));
+                        .orElseGet(() -> new DefaultTrustStoreConfiguration(environment, TrustStoreType.HUB)).getTrustStore()));
     }
 
     @Override
@@ -68,7 +77,7 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
         return Optional.of(
             validateTruststore(
                 Optional.ofNullable(idpTrustStore)
-                        .orElseGet(() -> new DefaultIdentityProviderTrustStoreConfiguration(environment)).getTrustStore()));
+                        .orElseGet(() -> new DefaultTrustStoreConfiguration(environment, TrustStoreType.IDP)).getTrustStore()));
     }
 
     private KeyStore validateTruststore(KeyStore trustStore) {

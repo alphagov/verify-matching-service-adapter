@@ -83,7 +83,25 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
     public MatchingServiceAdapterAppRule(boolean isCountryEnabled, ConfigOverride... otherConfigOverrides) {
         super(MatchingServiceAdapterApplication.class,
                 ResourceHelpers.resourceFilePath("verify-matching-service-adapter.yml"),
-                MatchingServiceAdapterAppRule.withDefaultOverrides(isCountryEnabled, otherConfigOverrides)
+                MatchingServiceAdapterAppRule.withDefaultOverrides(
+                        isCountryEnabled,
+                        true,
+                        otherConfigOverrides)
+        );
+    }
+
+    public MatchingServiceAdapterAppRule(
+            boolean isCountryEnabled,
+            String configFile,
+            boolean overrideTruststores,
+            ConfigOverride... otherConfigOverrides) {
+        super(MatchingServiceAdapterApplication.class,
+                ResourceHelpers.resourceFilePath(configFile),
+                MatchingServiceAdapterAppRule.withDefaultOverrides(
+                        isCountryEnabled,
+                        overrideTruststores,
+                        otherConfigOverrides
+                )
         );
     }
 
@@ -126,7 +144,10 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
         super.after();
     }
 
-    public static ConfigOverride[] withDefaultOverrides(boolean isCountryPresent, ConfigOverride... otherConfigOverrides) {
+    public static ConfigOverride[] withDefaultOverrides(
+            boolean isCountryPresent,
+            boolean overrideTruststores,
+            ConfigOverride... otherConfigOverrides) {
         List<ConfigOverride> overrides = Stream.of(
             ConfigOverride.config("returnStackTraceInResponse", "true"),
             ConfigOverride.config("clockSkewInSeconds", "60"),
@@ -144,19 +165,25 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
             ConfigOverride.config("signingKeys.secondary.privateKey.type", "encoded"),
             ConfigOverride.config("signingKeys.secondary.publicKey.type", "encoded"),
             ConfigOverride.config("signingKeys.secondary.publicKey.cert", getCertificate(TEST_RP_PUBLIC_SIGNING_CERT)),
-            ConfigOverride.config("metadata.trustStore.type", "file"),
-            ConfigOverride.config("metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
-            ConfigOverride.config("metadata.trustStore.password", metadataTrustStore.getPassword()),
-            ConfigOverride.config("metadata.hubTrustStore.type", "file"),
-            ConfigOverride.config("metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
-            ConfigOverride.config("metadata.hubTrustStore.password", hubTrustStore.getPassword()),
-            ConfigOverride.config("metadata.idpTrustStore.type", "file"),
-            ConfigOverride.config("metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
-            ConfigOverride.config("metadata.idpTrustStore.password", idpTrustStore.getPassword()),
             ConfigOverride.config("metadata.hubEntityId", HUB_ENTITY_ID),
             ConfigOverride.config("metadata.uri", "http://localhost:" + verifyMetadataServer.getPort() + VERIFY_METADATA_PATH),
             ConfigOverride.config("hub.hubEntityId", HUB_ENTITY_ID)
         ).collect(Collectors.toList());
+
+        if (overrideTruststores) {
+            List<ConfigOverride> trustStoreOverrides = Stream.of(
+                ConfigOverride.config("metadata.trustStore.type", "file"),
+                ConfigOverride.config("metadata.trustStore.path", metadataTrustStore.getAbsolutePath()),
+                ConfigOverride.config("metadata.trustStore.password", metadataTrustStore.getPassword()),
+                ConfigOverride.config("metadata.hubTrustStore.type", "file"),
+                ConfigOverride.config("metadata.hubTrustStore.path", hubTrustStore.getAbsolutePath()),
+                ConfigOverride.config("metadata.hubTrustStore.password", hubTrustStore.getPassword()),
+                ConfigOverride.config("metadata.idpTrustStore.type", "file"),
+                ConfigOverride.config("metadata.idpTrustStore.path", idpTrustStore.getAbsolutePath()),
+                ConfigOverride.config("metadata.idpTrustStore.password", idpTrustStore.getPassword())
+            ).collect(Collectors.toList());
+            overrides.addAll(trustStoreOverrides);
+        }
 
         if (isCountryPresent) {
             List<ConfigOverride> countryOverrides = Stream.of(

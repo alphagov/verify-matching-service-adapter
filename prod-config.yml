@@ -73,9 +73,12 @@ hub:
 metadata:
   environment: PRODUCTION
   url: https://www.signin.service.gov.uk/SAML2/metadata/federation
-  trustStore:
-    path: prod_ida_metadata.ts
-    password: puppet
+#  # Default trust stores are included. If you are using your own custom metadata truststore it
+#  # can be configured here
+#  trustStore:
+#    path: /path/to/truststore
+#    password: truststorePassword
+
 #  # Add the following configuration if you are running a proxy
 #  client:
 #    proxy:

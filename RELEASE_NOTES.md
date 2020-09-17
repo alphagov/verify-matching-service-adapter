@@ -2,7 +2,8 @@ MSA Release Notes
 =================
 
 ### Next
-* Add new G3 CAs to the production and test truststores, as well as new dev-pki CAs to the test truststores.
+* Add new G3 CAs to the production and test trust stores, as well as new dev-pki CAs to the test trust stores.
+* Default metadata trust stores are now used by default and no longer need configuring. The defaults can still be overridden. If you are not using custom trust stores you will need to remove the config to allow the defaults to work. See prod-config.yml or test-config.yml for details.
 * Various updates to allow the backwards compatibility tests to run.
 * UKCloud artifactory has been replaced with new JFrog SaaS artifactory.
 

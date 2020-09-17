@@ -12,7 +12,6 @@ import uk.gov.ida.matchingserviceadapter.domain.HealthCheckResponseFromMatchingS
 import uk.gov.ida.matchingserviceadapter.domain.MatchingServiceAssertion;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingService;
 import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromUnknownUserCreationService;
-import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.ResponseToElementTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.HealthCheckResponseFromMatchingServiceTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.MatchingServiceAssertionToAssertionTransformer;
 import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers.MatchingServiceAuthnStatementToAuthnStatementTransformer;
@@ -21,6 +20,7 @@ import uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.transformers.outbound.OutboundAssertionToSubjectTransformer;
+import uk.gov.ida.saml.core.transformers.outbound.ResponseToElementTransformer;
 import uk.gov.ida.saml.core.transformers.outbound.decorators.ResponseAssertionSigner;
 import uk.gov.ida.saml.core.transformers.outbound.decorators.ResponseSignatureCreator;
 import uk.gov.ida.saml.core.transformers.outbound.decorators.SamlResponseAssertionEncrypter;
