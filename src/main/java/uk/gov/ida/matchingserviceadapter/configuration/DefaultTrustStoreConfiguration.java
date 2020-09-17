@@ -20,8 +20,8 @@ public class DefaultTrustStoreConfiguration extends TrustStoreConfiguration {
 
     private final String trustStoreName;
 
-    public DefaultTrustStoreConfiguration(MatchingServiceAdapterEnvironment environment, TrustStoreType trustStoreType) {
-        this.trustStoreName = environment.getTrustStoreName(trustStoreType);
+    public DefaultTrustStoreConfiguration(String trustStoreName) {
+        this.trustStoreName = trustStoreName;
     }
 
     @Override

@@ -190,10 +190,6 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
                 ConfigOverride.config("europeanIdentity.hubConnectorEntityId", HUB_SECONDARY_ENTITY_ID),
                 ConfigOverride.config("europeanIdentity.enabled", "true"),
 
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
-                    ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.store", countryMetadataTrustStore.getAbsolutePath()),
-                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.trustStorePassword", countryMetadataTrustStore.getPassword()),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.minRefreshDelay", "60000"),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.maxRefreshDelay", "600000"),
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.jerseyClientName", "trust-anchor-client"),
@@ -212,6 +208,16 @@ public class MatchingServiceAdapterAppRule extends DropwizardAppRule<MatchingSer
                 ConfigOverride.config("europeanIdentity.aggregatedMetadata.client.tls.trustSelfSignedCertificates", "true")
             ).collect(Collectors.toList());
             overrides.addAll(countryOverrides);
+
+            if (overrideTruststores) {
+                List<ConfigOverride> countryTrustStoreOverrides = Stream.of(
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustAnchorUri", "http://localhost:" + trustAnchorServer.getPort() + TRUST_ANCHOR_PATH),
+                ConfigOverride.config("europeanIdentity.aggregatedMetadata.metadataSourceUri", "http://localhost:" + metadataAggregatorServer.getPort() + METADATA_SOURCE_PATH),
+                        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.store", countryMetadataTrustStore.getAbsolutePath()),
+                        ConfigOverride.config("europeanIdentity.aggregatedMetadata.trustStore.trustStorePassword", countryMetadataTrustStore.getPassword())
+                ).collect(Collectors.toList());
+                overrides.addAll(countryTrustStoreOverrides);
+            }
         }
 
         overrides.addAll(asList(otherConfigOverrides));

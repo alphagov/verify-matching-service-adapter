@@ -60,7 +60,7 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
     @Override
     public KeyStore getTrustStore() {
         return metadataTrustStore == null ?
-                new DefaultTrustStoreConfiguration(environment, TrustStoreType.METADATA).getTrustStore() :
+                new DefaultTrustStoreConfiguration(environment.getTrustStoreName(TrustStoreType.METADATA)).getTrustStore() :
                 super.getTrustStore();
     }
 
@@ -69,7 +69,7 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
         return Optional.of(
             validateTruststore(
                 Optional.ofNullable(hubTrustStore)
-                        .orElseGet(() -> new DefaultTrustStoreConfiguration(environment, TrustStoreType.HUB)).getTrustStore()));
+                        .orElseGet(() -> new DefaultTrustStoreConfiguration(environment.getTrustStoreName(TrustStoreType.HUB))).getTrustStore()));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class MatchingServiceAdapterMetadataConfiguration extends TrustStoreBacke
         return Optional.of(
             validateTruststore(
                 Optional.ofNullable(idpTrustStore)
-                        .orElseGet(() -> new DefaultTrustStoreConfiguration(environment, TrustStoreType.IDP)).getTrustStore()));
+                        .orElseGet(() -> new DefaultTrustStoreConfiguration(environment.getTrustStoreName(TrustStoreType.IDP))).getTrustStore()));
     }
 
     private KeyStore validateTruststore(KeyStore trustStore) {

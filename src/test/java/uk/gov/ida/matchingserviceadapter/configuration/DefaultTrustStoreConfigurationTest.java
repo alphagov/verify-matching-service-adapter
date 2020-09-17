@@ -3,8 +3,8 @@ package uk.gov.ida.matchingserviceadapter.configuration;
 import org.junit.Test;
 
 import java.security.KeyStoreException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,10 +12,9 @@ public class DefaultTrustStoreConfigurationTest {
     @Test
     public void getTrustStoreShouldReturnCorrectTrustStoreForIntegrationHub() throws KeyStoreException {
         DefaultTrustStoreConfiguration defaultIntegrationHubTrustStore = new DefaultTrustStoreConfiguration(
-                MatchingServiceAdapterEnvironment.INTEGRATION,
-                TrustStoreType.HUB
+                MatchingServiceAdapterEnvironment.INTEGRATION.getTrustStoreName(TrustStoreType.HUB)
         );
-        ArrayList<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
+        List<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
 
         assertThat(aliases).contains("test-root-ca");
         assertThat(aliases).contains("test-hub-ca");
@@ -24,10 +23,9 @@ public class DefaultTrustStoreConfigurationTest {
     @Test
     public void getTrustStoreShouldReturnCorrectTrustStoreForIntegrationIdp() throws KeyStoreException {
         DefaultTrustStoreConfiguration defaultIntegrationHubTrustStore = new DefaultTrustStoreConfiguration(
-                MatchingServiceAdapterEnvironment.INTEGRATION,
-                TrustStoreType.IDP
+                MatchingServiceAdapterEnvironment.INTEGRATION.getTrustStoreName(TrustStoreType.IDP)
         );
-        ArrayList<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
+        List<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
 
         assertThat(aliases).contains("test-root-ca");
         assertThat(aliases).contains("test-idp-ca");
@@ -36,10 +34,9 @@ public class DefaultTrustStoreConfigurationTest {
     @Test
     public void getTrustStoreShouldReturnCorrectTrustStoreForIntegrationMetadata() throws KeyStoreException {
         DefaultTrustStoreConfiguration defaultIntegrationHubTrustStore = new DefaultTrustStoreConfiguration(
-                MatchingServiceAdapterEnvironment.INTEGRATION,
-                TrustStoreType.METADATA
+                MatchingServiceAdapterEnvironment.INTEGRATION.getTrustStoreName(TrustStoreType.METADATA)
         );
-        ArrayList<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
+        List<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
 
         assertThat(aliases).contains("test-root-ca");
         assertThat(aliases).contains("metadata-ca");
@@ -48,10 +45,9 @@ public class DefaultTrustStoreConfigurationTest {
     @Test
     public void getTrustStoreShouldReturnCorrectTrustStoreForProductionHub() throws KeyStoreException {
         DefaultTrustStoreConfiguration defaultIntegrationHubTrustStore = new DefaultTrustStoreConfiguration(
-                MatchingServiceAdapterEnvironment.PRODUCTION,
-                TrustStoreType.HUB
+                MatchingServiceAdapterEnvironment.PRODUCTION.getTrustStoreName(TrustStoreType.HUB)
         );
-        ArrayList<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
+        List<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
 
         assertThat(aliases).contains("root-ca");
         assertThat(aliases).contains("hub-ca");
@@ -60,10 +56,9 @@ public class DefaultTrustStoreConfigurationTest {
     @Test
     public void getTrustStoreShouldReturnCorrectTrustStoreForProductionIdp() throws KeyStoreException {
         DefaultTrustStoreConfiguration defaultIntegrationHubTrustStore = new DefaultTrustStoreConfiguration(
-                MatchingServiceAdapterEnvironment.PRODUCTION,
-                TrustStoreType.IDP
+                MatchingServiceAdapterEnvironment.PRODUCTION.getTrustStoreName(TrustStoreType.IDP)
         );
-        ArrayList<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
+        List<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
 
         assertThat(aliases).contains("root-ca");
         assertThat(aliases).contains("idp-ca");
@@ -72,10 +67,9 @@ public class DefaultTrustStoreConfigurationTest {
     @Test
     public void getTrustStoreShouldReturnCorrectTrustStoreForProductionMetadata() throws KeyStoreException {
         DefaultTrustStoreConfiguration defaultIntegrationHubTrustStore = new DefaultTrustStoreConfiguration(
-                MatchingServiceAdapterEnvironment.PRODUCTION,
-                TrustStoreType.METADATA
+                MatchingServiceAdapterEnvironment.PRODUCTION.getTrustStoreName(TrustStoreType.METADATA)
         );
-        ArrayList<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
+        List<String> aliases = Collections.list(defaultIntegrationHubTrustStore.getTrustStore().aliases());
 
         assertThat(aliases).contains("root-ca");
         assertThat(aliases).contains("metadata-ca");
