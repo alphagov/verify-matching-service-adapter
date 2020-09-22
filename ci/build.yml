@@ -24,5 +24,32 @@ run:
     - -c
     - |
       cd msa
+
+      # If the version in `settings.gradle` has been bumped, ensure the Concourse version is in step
+      local_version=$(cat settings.gradle | grep -oP " *version_number = '\K[0-9]+\.[0-9]+\.[0-9]+(?=')")
+      remote_version=$(cat ../msa-version/number)
+
+      oIFS="$IFS"
+      IFS=.
+      set -- $local_version
+      local_major=$1
+      local_minor=$2
+      local_patch=$3
+
+      set -- $remote_version
+      remote_major=$1
+      remote_minor=$2
+      remote_patch=$3
+
+      IFS="$oIFS"
+
+      if [ "$local_major" -gt "$remote_major" ]; then
+        echo "$local_major"."$local_minor"."$local_patch" > ../msa-version/number
+      elif [ "$local_minor" -gt "$remote_minor" ]; then
+        echo "$remote_major"."$local_minor"."$local_patch" > ../msa-version/number
+      elif [ "$local_patch" -gt "$remote_patch" ]; then
+        echo "$remote_major"."$remote_minor"."$local_patch" > ../msa-version/number
+      fi
+
       ./gradlew distZip -Pversion=$(cat ../msa-version/number) --no-daemon
       cp build/distributions/msa-*.zip ../msa-artifact/
