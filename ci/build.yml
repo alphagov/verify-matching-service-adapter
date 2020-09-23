@@ -13,6 +13,7 @@ inputs:
 
 outputs:
   - name: msa-artifact
+  - name: msa-version
 
 caches:
   - path: ../../../root/.gradle/caches
