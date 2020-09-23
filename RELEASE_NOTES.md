@@ -2,6 +2,32 @@ MSA Release Notes
 =================
 
 ### Next
+* Breaking change for configuration. Default metadata trust stores are now used by default and no longer need configuring. The defaults can still be overridden. If you are not using custom trust stores you will need to remove the config to allow the defaults to work. In particular `test_ida_metadata.ts` and `prod_ida_metadata.ts` no longer exist. See below for config change details.
+* Breaking change for configuration. The `europeanIdentity.aggregatedMetadata` configuration now no longer requires values for `trustStore`, `trustAnchorUri` and `metadataSourceUri`. Default values are used instead when `europeanIdentity.aggregatedMetadata.environment` is specified as `PRODUCTION` or `INTEGRATION`. The default values can be overridden if desired. As above, `test_ida_metadata.ts` and `prod_ida_metadata.ts` no longer exist. See below for config change details.
+* Add new G3 CAs to the production and test trust stores, as well as new dev-pki CAs to the test trust stores.
+* Various updates to allow the backwards compatibility tests to run.
+* UKCloud artifactory has been replaced with new JFrog SaaS artifactory.
+
+#### Configuration change details
+```diff
+ metadata:
+   environment: INTEGRATION
+-  trustStore:
+-    path: test_ida_metadata.ts
+-    password: puppet
+
+ europeanIdentity:
+   enabled: true
+   aggregatedMetadata:
+     jerseyClientName: trust-anchor-client
++    # Choices are (INTEGRATION|PRODUCTION)
++    environment: INTEGRATION
+-    trustAnchorUri: https://www.integration.signin.service.gov.uk/SAML2/metadata/trust-anchor
+-    metadataSourceUri: https://www.integration.signin.service.gov.uk/SAML2/metadata/aggregator
+-    trustStore:
+-      path: test_ida_metadata.ts
+-      password: puppet
+```
 
 ### 4.2.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.1.0...4.2.1)

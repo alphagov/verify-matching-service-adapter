@@ -30,7 +30,7 @@ public class EuropeanIdentityConfiguration {
 
     @Valid
     @JsonProperty
-    private EidasMetadataConfiguration aggregatedMetadata;
+    private MatchingServiceAdapterEidasMetadataConfiguration aggregatedMetadata;
 
     public List<String> getAllAcceptableHubConnectorEntityIds(MatchingServiceAdapterEnvironment environment) {
         Set<String> entityIds = new HashSet<>(getDefaultAcceptableHubConnectorEntityIds(environment));
