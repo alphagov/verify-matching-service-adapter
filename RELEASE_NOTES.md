@@ -2,6 +2,9 @@ MSA Release Notes
 =================
 
 ### Next
+
+### 5.0.0
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.2.1...5.0.0)
 * Breaking change for configuration. Default metadata trust stores are now used by default and no longer need configuring. The defaults can still be overridden. If you are not using custom trust stores you will need to remove the config to allow the defaults to work. In particular `test_ida_metadata.ts` and `prod_ida_metadata.ts` no longer exist. See below for config change details.
 * Breaking change for configuration. The `europeanIdentity.aggregatedMetadata` configuration now no longer requires values for `trustStore`, `trustAnchorUri` and `metadataSourceUri`. Default values are used instead when `europeanIdentity.aggregatedMetadata.environment` is specified as `PRODUCTION` or `INTEGRATION`. The default values can be overridden if desired. As above, `test_ida_metadata.ts` and `prod_ida_metadata.ts` no longer exist. See below for config change details.
 * Add new G3 CAs to the production and test trust stores, as well as new dev-pki CAs to the test trust stores.
