@@ -27,7 +27,11 @@ run:
 
       # If the version in `settings.gradle` has been bumped, ensure the Concourse version is in step
       local_version=$(cat settings.gradle | grep -oP " *version_number = '\K[0-9]+\.[0-9]+\.[0-9]+(?=')")
-      remote_version=$(cat ../msa-version/number)
+      remote_version=$(cat ../msa-version/version)
+      remote_number=$(cat ../msa-version/number)
+      echo local version "$local_version"
+      echo remote version "$remote_version"
+      echo remote number "$remote_number"
 
       oIFS="$IFS"
       IFS=.
@@ -36,7 +40,7 @@ run:
       local_minor=$2
       local_patch=$3
 
-      set -- $remote_version
+      set -- $remote_number
       remote_major=$1
       remote_minor=$2
       remote_patch=$3
@@ -44,12 +48,12 @@ run:
       IFS="$oIFS"
 
       if [ "$local_major" -gt "$remote_major" ]; then
-        echo "$local_major"."$local_minor"."$local_patch" > ../msa-version/number
+        echo "$local_major"."$local_minor"."$local_patch" > ../msa-version/version
       elif [ "$local_minor" -gt "$remote_minor" ]; then
-        echo "$remote_major"."$local_minor"."$local_patch" > ../msa-version/number
+        echo "$remote_major"."$local_minor"."$local_patch" > ../msa-version/version
       elif [ "$local_patch" -gt "$remote_patch" ]; then
-        echo "$remote_major"."$remote_minor"."$local_patch" > ../msa-version/number
+        echo "$remote_major"."$remote_minor"."$local_patch" > ../msa-version/version
       fi
 
-      ./gradlew distZip -Pversion=$(cat ../msa-version/number) --no-daemon
+      ./gradlew distZip -Pversion=$(cat ../msa-version/version) --no-daemon
       cp build/distributions/msa-*.zip ../msa-artifact/
