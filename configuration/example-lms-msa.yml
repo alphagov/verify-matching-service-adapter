@@ -32,9 +32,6 @@ metadata:
   environment: ${ENVIRONMENT:-INTEGRATION}
   minRefreshDelay: 30000
   maxRefreshDelay: 1800000
-  trustStore:
-    path: ${METADATA_TRUSTSTORE_PATH}
-    password: ${METADATA_TRUSTSTORE_PASSWORD}
   expectedEntityId: ${METADATA_ENTITY_ID}
 
 signingKeys:
