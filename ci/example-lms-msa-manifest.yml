@@ -13,6 +13,4 @@ applications:
       LMS_URI: http://((lms_app)).apps.internal:8080
       SIGNIN_DOMAIN: www.((hub_env)).signin.service.gov.uk
       METADATA_ENTITY_ID: https://signin.service.gov.uk
-      METADATA_TRUSTSTORE_PATH: ((truststore_path))
-      METADATA_TRUSTSTORE_PASSWORD: ((truststore_password))
       EUROPEAN_IDENTITY_ENABLED: false

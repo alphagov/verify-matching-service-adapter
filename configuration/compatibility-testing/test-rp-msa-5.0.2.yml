@@ -1,4 +1,4 @@
-# Config for MSA 5.0.2-5.0.2 deployed to staging on paas
+# Config for MSA 5.0.2 deployed to staging on paas
 
 server:
   applicationConnectors:
