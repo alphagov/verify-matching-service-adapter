@@ -37,7 +37,7 @@ metadata:
 signingKeys:
   primary:
     publicKey:
-      type: x509
+      type: encoded
       cert: ${SIGNING_CERT}
       name: http://www.vsp-ms.gov.uk
     privateKey:
