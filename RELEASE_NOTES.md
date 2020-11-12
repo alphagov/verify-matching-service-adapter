@@ -3,6 +3,9 @@ MSA Release Notes
 
 ### Next
 
+### 6.0.0
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.0.0...6.0.0)
+
 ### 5.0.2
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.2.1...5.0.0)
 * Breaking change for configuration. Default metadata trust stores are now used by default and no longer need configuring. The defaults can still be overridden. If you are not using custom trust stores you will need to remove the config to allow the defaults to work. In particular `test_ida_metadata.ts` and `prod_ida_metadata.ts` no longer exist. See below for config change details.
