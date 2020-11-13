@@ -8,7 +8,7 @@ COPY build.gradle build.gradle
 COPY settings.gradle settings.gradle
 COPY publish.gradle publish.gradle
 
-RUN gradle install
+RUN gradle installDist
 
 COPY src/ src/
 COPY configuration/ configuration/
