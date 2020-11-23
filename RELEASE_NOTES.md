@@ -2,6 +2,8 @@ MSA Release Notes
 =================
 
 ### Next
+* Fixes an issue with trust anchors for eIDAS metadata resolvers not being updated when they changed at source. The MSA
+  will now update them without requiring a restart.
 
 ### 5.0.2
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.2.1...5.0.0)
