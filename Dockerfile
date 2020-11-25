@@ -1,4 +1,4 @@
-FROM gradle:4.7.0-jdk8 as build
+FROM gradle:6.7.0-jdk11 as build
 
 WORKDIR /msa
 USER root
@@ -19,7 +19,7 @@ RUN gradle installDist
 ENTRYPOINT ["gradle", "--no-daemon"]
 CMD ["tasks"]
 
-FROM openjdk:8-jre
+FROM openjdk:11.0.9.1-jre
 
 WORKDIR /msa
 
