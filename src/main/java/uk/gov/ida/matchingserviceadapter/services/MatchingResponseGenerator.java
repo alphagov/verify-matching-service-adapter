@@ -58,8 +58,9 @@ public class MatchingResponseGenerator {
                     matchingServiceAdapterConfiguration.getEntityId(),
                     requestId,
                     manifestVersionNumber,
-                    matchingServiceAdapterConfiguration.isEidasEnabled(),
-                    matchingServiceAdapterConfiguration.shouldSignWithSHA1());
+                    false,
+                    matchingServiceAdapterConfiguration.shouldSignWithSHA1(),
+                    matchingServiceAdapterConfiguration.isUniversalMatchingDataset());
 
         return ok()
                 .entity(soapMessageManager.wrapWithSoapEnvelope(

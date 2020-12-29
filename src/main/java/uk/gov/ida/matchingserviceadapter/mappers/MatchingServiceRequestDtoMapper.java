@@ -11,17 +11,17 @@ import uk.gov.ida.matchingserviceadapter.rest.matchingservice.VerifyMatchingData
 public class MatchingServiceRequestDtoMapper {
 
     private final MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper;
-    private final Boolean isEidasEnabled;
+    private final boolean universalMatchingDataset;
 
     public MatchingServiceRequestDtoMapper(
         MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
-        Boolean isEidasEnabled) {
+        boolean universalMatchingDataset) {
         this.matchingDatasetToMatchingDatasetDtoMapper = matchingDatasetToMatchingDatasetDtoMapper;
-        this.isEidasEnabled = isEidasEnabled;
+        this.universalMatchingDataset = universalMatchingDataset;
     }
 
     public MatchingServiceRequestDto map(String requestId, String hashedPid, AssertionData assertionData) {
-        if (isEidasEnabled) {
+        if (universalMatchingDataset) {
             UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(assertionData.getMatchingDataset());
             return new UniversalMatchingServiceRequestDto(
                     matchingDatasetDto,

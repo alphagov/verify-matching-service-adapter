@@ -7,7 +7,6 @@ import io.dropwizard.client.ssl.TlsConfiguration;
 import io.dropwizard.util.Duration;
 import uk.gov.ida.configuration.ServiceNameConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.AssertionLifetimeConfiguration;
-import uk.gov.ida.matchingserviceadapter.configuration.EuropeanIdentityConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.HubConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.KeyPairConfiguration;
 import uk.gov.ida.matchingserviceadapter.configuration.LocalMatchingServiceConfiguration;
@@ -68,7 +67,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
 
     @Valid
     @JsonProperty
-    private EuropeanIdentityConfiguration europeanIdentity;
+    private boolean legacyMatchingDataset = false;
 
     @NotNull
     @Valid
@@ -144,8 +143,8 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         return hub.getHubEntityId();
     }
 
-    public EuropeanIdentityConfiguration getEuropeanIdentity() {
-        return europeanIdentity;
+    public boolean isUniversalMatchingDataset() {
+        return ! legacyMatchingDataset;
     }
 
     public boolean shouldSignWithSHA1() {
@@ -169,10 +168,6 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         jerseyClientConfiguration.setTlsConfiguration(tlsConfiguration);
         jerseyClientConfiguration.setGzipEnabledForRequests(false);
         return jerseyClientConfiguration;
-    }
-
-    public boolean isEidasEnabled() {
-        return getEuropeanIdentity() != null && getEuropeanIdentity().isEnabled();
     }
 
     public MatchingServiceAdapterEnvironment getMetadataEnvironment() {

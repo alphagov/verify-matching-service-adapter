@@ -55,7 +55,8 @@ public abstract class BaseTestToolInterfaceTest {
 
     protected static ConfigOverride[] configRules = new ConfigOverride[] {
         ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:1234/match"),
-        ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:1234/user-account-creation")
+        ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:1234/user-account-creation"),
+        ConfigOverride.config("legacyMatchingDataset", "true")
     };
 
     @BeforeClass

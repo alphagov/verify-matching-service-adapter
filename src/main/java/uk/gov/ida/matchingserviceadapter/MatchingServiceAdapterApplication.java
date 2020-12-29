@@ -116,7 +116,7 @@ public class MatchingServiceAdapterApplication extends Application<MatchingServi
         environment.jersey().register(SamlOverSoapExceptionMapper.class);
         environment.jersey().register(ExceptionExceptionMapper.class);
 
-        registerMetadataRefreshTask(environment, Optional.empty(), ImmutableList.of(metadataResolverBundle.getMetadataResolver()), "metadata");
+        registerMetadataRefreshTask(environment, ImmutableList.of(metadataResolverBundle.getMetadataResolver()), "metadata");
 
         MatchingServiceAdapterHealthCheck healthCheck = new MatchingServiceAdapterHealthCheck();
         environment.healthChecks().register(healthCheck.getName(), healthCheck);

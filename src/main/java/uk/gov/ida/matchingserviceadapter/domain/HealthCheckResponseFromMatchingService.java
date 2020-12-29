@@ -9,8 +9,8 @@ import static java.text.MessageFormat.format;
 
 public class HealthCheckResponseFromMatchingService extends IdaMatchingServiceResponse {
     
-    public HealthCheckResponseFromMatchingService(String entityId, String healthCheckRequestId, String msaVersion, boolean eidasEnabled, boolean shouldSignWithSHA1) {
-        super(format("healthcheck-response-id-{0}-version-{1}-eidasenabled-{2}-shouldsignwithsha1-{3}", UUID.randomUUID(), msaVersion, eidasEnabled, shouldSignWithSHA1), healthCheckRequestId, entityId, DateTime.now());
+    public HealthCheckResponseFromMatchingService(String entityId, String healthCheckRequestId, String msaVersion, boolean eidasEnabled, boolean shouldSignWithSHA1, boolean universalMatchingDataset) {
+        super(format("healthcheck-response-id-{0}-version-{1}-eidasenabled-{2}-shouldsignwithsha1-{3}-universalMatchingDataset-{4}", UUID.randomUUID(), msaVersion, eidasEnabled, shouldSignWithSHA1, universalMatchingDataset), healthCheckRequestId, entityId, DateTime.now());
     }
 }
 
