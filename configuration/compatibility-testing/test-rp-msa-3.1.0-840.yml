@@ -49,6 +49,9 @@ metadata:
       protocol: TLSv1.2
       verifyHostname: false
       trustSelfSignedCertificates: true
+  hubTrustStore:
+    path: test_ida_hub_metadata.ts
+    password: bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh
 
 signingKeys:
   primary:
