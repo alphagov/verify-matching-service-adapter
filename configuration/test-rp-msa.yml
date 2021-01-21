@@ -15,7 +15,7 @@ logging:
     - type: console
 
 matchingServiceAdapter:
-  entityId: http://www.test-rp-ms.gov.uk/SAML2/MD
+  entityId: ${TEST_RP_MSA_ENTITY_ID:-http://www.test-rp-ms.gov.uk/SAML2/MD}
   externalUrl: ${TEST_RP_MSA_URL}
 
 localMatchingService:
