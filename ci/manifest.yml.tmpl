@@ -11,6 +11,7 @@ applications:
       CONFIG_FILE: /app/msa/test-rp-msa.yml
       LOG_LEVEL: INFO
       TEST_RP_MSA_URL: https://test-rp-msa-$ENV.cloudapps.digital/matching-service/POST
+      TEST_RP_MSA_ENTITY_ID: $TEST_RP_MSA_ENTITY_ID
       TEST_RP_ROUTE: http://test-rp-$ENV.apps.internal:8080
       METADATA_URL: $METADATA_URL
       SIGNIN_DOMAIN: $SIGNIN_DOMAIN
