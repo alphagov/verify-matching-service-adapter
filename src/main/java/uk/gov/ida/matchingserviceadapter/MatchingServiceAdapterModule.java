@@ -1,5 +1,6 @@
 package uk.gov.ida.matchingserviceadapter;
 
+import com.codahale.metrics.health.HealthCheck;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -76,16 +77,9 @@ import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
 import uk.gov.ida.saml.deserializers.validators.ResponseSizeValidator;
 import uk.gov.ida.saml.metadata.DisabledMetadataResolverRepository;
-import uk.gov.ida.saml.metadata.EidasMetadataConfiguration;
-import uk.gov.ida.saml.metadata.EidasMetadataResolverRepository;
-import uk.gov.ida.saml.metadata.EidasTrustAnchorHealthCheck;
-import uk.gov.ida.saml.metadata.EidasTrustAnchorResolver;
 import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
-import uk.gov.ida.saml.metadata.MetadataResolverConfigBuilder;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 import uk.gov.ida.saml.metadata.MetadataResolverRepository;
-import uk.gov.ida.saml.metadata.factories.DropwizardMetadataResolverFactory;
-import uk.gov.ida.saml.metadata.factories.MetadataSignatureTrustEngineFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.DecrypterFactory;
@@ -103,7 +97,6 @@ import uk.gov.ida.saml.security.validators.encryptedelementtype.EncryptionAlgori
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 import uk.gov.ida.truststore.KeyStoreLoader;
 
-import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.security.cert.CertificateException;
@@ -113,15 +106,12 @@ import java.io.PrintWriter;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Timer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Encryption;
 import static uk.gov.ida.common.shared.security.Certificate.KeyUse.Signing;
 
@@ -519,46 +509,14 @@ class MatchingServiceAdapterModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public Client getEidasMetadataJerseyClient(Environment environment, MatchingServiceAdapterConfiguration configuration) {
-        if (!configuration.isEidasEnabled()) return null;
-
-        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
-        return new JerseyClientBuilder(environment)
-                .using(metadataConfiguration.getJerseyClientConfiguration())
-                .build(metadataConfiguration.getJerseyClientName());
-    }
-
-    @Provides
-    @Singleton
-    public EidasTrustAnchorResolver getEidasTrustAnchorResolver(MatchingServiceAdapterConfiguration configuration, @Nullable Client client) {
-        if (!configuration.isEidasEnabled()) return null;
-
-        EidasMetadataConfiguration metadataConfiguration = configuration.getEuropeanIdentity().getAggregatedMetadata();
-        return new EidasTrustAnchorResolver(metadataConfiguration.getTrustAnchorUri(), client, metadataConfiguration.getTrustStore());
-    }
-
-    @Provides
-    @Singleton
-    public MetadataResolverRepository getEidasMetadataResolverRepository(
-            Environment environment,
-            MatchingServiceAdapterConfiguration configuration,
-            @Nullable EidasTrustAnchorResolver trustAnchorResolver,
-            @Nullable Client client
-    ) {
-        if (!configuration.isEidasEnabled()) return new DisabledMetadataResolverRepository();
-
-        EidasMetadataResolverRepository resolverRepository = new EidasMetadataResolverRepository(
-                trustAnchorResolver,
-                configuration.getEuropeanIdentity().getAggregatedMetadata(),
-                new DropwizardMetadataResolverFactory(),
-                new Timer(),
-                new MetadataSignatureTrustEngineFactory(),
-                new MetadataResolverConfigBuilder(),
-                client
-        );
-        registerMetadataRefreshTask(environment, ofNullable(resolverRepository), Collections.unmodifiableCollection(resolverRepository.getMetadataResolvers().values()), "eidas-metadata");
-        environment.healthChecks().register("TrustAnchorHealthCheck", new EidasTrustAnchorHealthCheck(resolverRepository));
-        return resolverRepository;
+    public MetadataResolverRepository getEidasMetadataResolverRepository(Environment environment) {
+        environment.healthChecks().register("TrustAnchorHealthCheck", new HealthCheck() {
+            @Override
+            protected Result check() {
+                return Result.healthy();
+            }
+        });
+        return new DisabledMetadataResolverRepository();
     }
 
     @Provides
@@ -567,7 +525,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
         return new SecretKeyEncrypter(encryptionCredentialResolver);
     }
 
-    public static void registerMetadataRefreshTask(Environment environment, Optional<EidasMetadataResolverRepository> eidasMetadataResolverRepository, Collection<MetadataResolver> metadataResolvers, String name) {
+    public static void registerMetadataRefreshTask(Environment environment, Collection<MetadataResolver> metadataResolvers, String name) {
         environment.admin().addTask(new Task(name + "-refresh") {
             @Override
             public void execute(ImmutableMultimap<String, String> parameters, PrintWriter output) throws Exception {
@@ -575,9 +533,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
                     if(metadataResolver instanceof AbstractReloadingMetadataResolver) {
                         ((AbstractReloadingMetadataResolver) metadataResolver).refresh();
                     }
-                }
-                if(eidasMetadataResolverRepository.isPresent()) {
-                    eidasMetadataResolverRepository.get().refresh();
                 }
             }
         });
