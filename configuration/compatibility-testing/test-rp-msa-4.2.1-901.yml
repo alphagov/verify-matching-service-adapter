@@ -82,26 +82,3 @@ returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: true
-  hubConnectorEntityId: https://hub-connector-eidas-staging.cloudapps.digital/metadata.xml
-  aggregatedMetadata:
-    trustAnchorUri: https://www.staging.signin.service.gov.uk/SAML2/metadata/trust-anchor
-    metadataSourceUri: https://www.staging.signin.service.gov.uk/SAML2/metadata/aggregator
-    trustStore:
-      path: test_ida_metadata.ts
-      password: puppet
-    minRefreshDelay: 5000
-    maxRefreshDelay: 600000
-    jerseyClientName: trust-anchor-client
-    client:
-      timeout: 2s
-      timeToLive: 10m
-      cookiesEnabled: false
-      connectionTimeout: 1s
-      retries: 3
-      keepAlive: 10s
-      chunkedEncodingEnabled: false
-      validateAfterInactivityPeriod: 5s
-      tls:
-        protocol: TLSv1.2
-        verifyHostname: false
-        trustSelfSignedCertificates: true

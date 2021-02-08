@@ -90,22 +90,6 @@ metadata:
 europeanIdentity:
   enabled: false
 
-  # Details about eIDAS metadata can be configured here
-  aggregatedMetadata:
-    jerseyClientName: trust-anchor-client
-    environment: PRODUCTION
-#      # Default trust stores are included. If you are using your own custom metadata truststore it
-#      # can be configured here
-#      trustStore:
-#        path: /path/to/truststore
-#        password: truststorePassword
-#    # Add the following configuration if you are running a proxy
-#    client:
-#      proxy:
-#        host: your-proxy-host
-#        port: 12345
-#        scheme: http
-
 ## Options to add additional logging. By default, logs will be output to console.
 ## See http://www.dropwizard.io/1.0.5/docs/manual/configuration.html#logging
 ## for more information.
