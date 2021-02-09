@@ -30,12 +30,6 @@ hub:
 metadata:
   url: ${METADATA_URL}
   environment: ${ENVIRONMENT:-INTEGRATION}
-  trustStore:
-    path: ${TRUSTSTORE_PATH}
-    password: ${TRUSTSTORE_PASSWORD}
-  minRefreshDelay: 30000
-  maxRefreshDelay: 1800000
-  expectedEntityId: ${METADATA_ENTITY_ID}
 
 signingKeys:
   primary:
