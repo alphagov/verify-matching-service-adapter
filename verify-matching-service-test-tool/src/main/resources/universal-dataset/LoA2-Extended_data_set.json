@@ -45,7 +45,7 @@
         "postCode": "GB1 2PP",
         "to": "%within405days-200days%",
         "uprn": "7D68E096-5510-B3844C0BA3FD",
-        "verified": true
+        "verified": false
       },
       {
         "from": "1980-05-24T00:00:00.000Z",
@@ -56,7 +56,7 @@
         "postCode": "GB1 2PP",
         "to": "1987-05-24T00:00:00.000Z",
         "uprn": "7D68E096-5510-B3844C0BA3FD",
-        "verified": true
+        "verified": false
       },
       {
         "from": "1987-05-24T00:00:00.000Z",
@@ -69,7 +69,7 @@
           "Europe"
         ],
         "to": "1989-05-24T00:00:00.000Z",
-        "verified": true
+        "verified": false
       }
     ],
     "dateOfBirth": {
@@ -78,22 +78,22 @@
     },
     "firstName": {
       "value": "Joe",
-      "verified": true
+      "verified": false
     },
     "gender": {
       "value": "MALE",
-      "verified": true
+      "verified": false
     },
     "middleNames": {
       "value": "Bob Rob",
-      "verified": true
+      "verified": false
     },
     "surnames": [
       {
         "from": "1980-05-24T00:00:00.000Z",
         "to": "1987-01-20T00:00:00.000Z",
         "value": "Fred",
-        "verified": true
+        "verified": false
       },
       {
         "from": "%yesterdayDate%",
@@ -116,7 +116,7 @@
         "from": "%within180days-101days%",
         "to": "%within180days-150days%",
         "value": "Simon",
-        "verified": true
+        "verified": false
       }
     ]
   }

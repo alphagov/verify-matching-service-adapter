@@ -58,6 +58,12 @@ public abstract class BaseTestToolInterfaceTest {
         ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:1234/user-account-creation")
     };
 
+    protected static ConfigOverride[] universalConfigRules = new ConfigOverride[] {
+            ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:1234/match"),
+            ConfigOverride.config("localMatchingService.accountCreationUrl", "http://localhost:1234/user-account-creation"),
+            ConfigOverride.config("europeanIdentity.enabled", "true")
+    };
+
     @BeforeClass
     public static void setUp() {
         stubFor(post("/match").willReturn(okJson("{\"result\": \"match\"}")));
