@@ -70,3 +70,22 @@ returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: true
+  hubConnectorEntityId: https://hub-connector-eidas-staging.cloudapps.digital/metadata.xml
+  aggregatedMetadata:
+    environment: INTEGRATION
+    minRefreshDelay: 5000
+    maxRefreshDelay: 600000
+    jerseyClientName: trust-anchor-client
+    client:
+      timeout: 2s
+      timeToLive: 10m
+      cookiesEnabled: false
+      connectionTimeout: 1s
+      retries: 3
+      keepAlive: 10s
+      chunkedEncodingEnabled: false
+      validateAfterInactivityPeriod: 5s
+      tls:
+        protocol: TLSv1.2
+        verifyHostname: false
+        trustSelfSignedCertificates: true
