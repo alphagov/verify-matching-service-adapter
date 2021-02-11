@@ -12,8 +12,6 @@ import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.ida.matchingserviceadapter.domain.AssertionClassification.MDS_ASSERTION;
-
 public class AttributeQueryService {
 
     private final AttributeQuerySignatureValidator attributeQuerySignatureValidator;
@@ -43,12 +41,6 @@ public class AttributeQueryService {
 
     public void validateAssertions(String expectedInResponseTo, List<Assertion> assertions) {
         verifyAssertionService.validate(expectedInResponseTo, assertions);
-    }
-
-    private boolean hasMdsAssertion(List<Assertion> assertions) {
-        return assertions.stream()
-                .map(assertionClassifier::getClassification)
-                .anyMatch(MDS_ASSERTION::equals);
     }
 
     public AssertionData getAssertionData(List<Assertion> decryptedAssertions) {
