@@ -2,8 +2,7 @@ MSA Release Notes
 =================
 
 ### Next
-* Fixes an issue with trust anchors for eIDAS metadata resolvers not being updated when they changed at source. The MSA
-  will now update them without requiring a restart.
+* [Removes matching from european identity schemes](doc/release-details/5.1.0.md), as the UK is longer part of the eIDAS regulation. If the configuration `europeanIdentity.enabled` is currently set to `true`, it must not be removed or changed.
 
 ### 5.0.2
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/4.2.1...5.0.0)
