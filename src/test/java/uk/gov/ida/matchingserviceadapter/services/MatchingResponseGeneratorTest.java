@@ -14,7 +14,6 @@ import uk.gov.ida.matchingserviceadapter.domain.OutboundResponseFromMatchingServ
 import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.shared.utils.manifest.ManifestReader;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.function.Function;
 
@@ -62,7 +61,7 @@ public class MatchingResponseGeneratorTest {
     public void shouldGenerateCorrectHealthCheckResponse() throws IOException {
         Element responseValue = mock(Element.class);
         when(manifestReader.getAttributeValueFor(any(), any())).thenReturn("VERSION");
-        when(matchingServiceConfiguration.isEidasEnabled()).thenReturn(true);
+        when(matchingServiceConfiguration.isUseUniversalMatchingDataset()).thenReturn(true);
         when(matchingServiceConfiguration.shouldSignWithSHA1()).thenReturn(true);
         when(matchingServiceConfiguration.getEntityId()).thenReturn(ENTITY_ID);
 

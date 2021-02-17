@@ -54,26 +54,3 @@ returnStackTraceInErrorResponse: true
 
 europeanIdentity:
   enabled: ${EUROPEAN_IDENTITY_ENABLED}
-  hubConnectorEntityId: ${HUB_CONNECTOR_ENTITY_ID}
-  aggregatedMetadata:
-    trustAnchorUri: ${TRUST_ANCHOR_URI}
-    metadataSourceUri: ${METADATA_SOURCE_URI}
-    trustStore:
-      path: ${TRUSTSTORE_PATH}
-      password: ${TRUSTSTORE_PASSWORD}
-    minRefreshDelay: 5000
-    maxRefreshDelay: 600000
-    jerseyClientName: trust-anchor-client
-    client:
-      timeout: 2s
-      timeToLive: 10m
-      cookiesEnabled: false
-      connectionTimeout: 1s
-      retries: 3
-      keepAlive: 60s
-      chunkedEncodingEnabled: false
-      validateAfterInactivityPeriod: 5s
-      tls:
-        protocol: TLSv1.2
-        verifyHostname: false
-        trustSelfSignedCertificates: true

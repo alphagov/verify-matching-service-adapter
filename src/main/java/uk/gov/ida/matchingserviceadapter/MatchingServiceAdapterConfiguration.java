@@ -171,7 +171,7 @@ public class MatchingServiceAdapterConfiguration extends Configuration implement
         return jerseyClientConfiguration;
     }
 
-    public boolean isEidasEnabled() {
+    public boolean isUseUniversalMatchingDataset() {
         return getEuropeanIdentity() != null && getEuropeanIdentity().isEnabled();
     }
 

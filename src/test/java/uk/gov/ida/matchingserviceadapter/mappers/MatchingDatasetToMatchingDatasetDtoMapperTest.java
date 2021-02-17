@@ -110,20 +110,4 @@ public class MatchingDatasetToMatchingDatasetDtoMapperTest {
         assertThat(matchingDatasetDto.getGender()).contains(new SimpleMdsValueDto<>(GenderDto.NOT_SPECIFIED, DEFAULT_FROM_DATE, null, false));
     }
 
-    @Test
-    public void shouldMapToUniversalMatchingDatasetDtoWithTypicalEidasDataset() {
-        LocalDate dob = new LocalDate(1970, 1, 2);
-        MatchingDataset matchingDataset = aMatchingDataset()
-                .addFirstname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Joe").withFrom(null).withVerifiedStatus(true).build())
-                .addSurname(SimpleMdsValueBuilder.<String>aCurrentSimpleMdsValue().withValue("Bloggs").withFrom(null).withVerifiedStatus(true).build())
-                .addDateOfBirth(SimpleMdsValueBuilder.<LocalDate>aCurrentSimpleMdsValue().withValue(dob).withFrom(null).withVerifiedStatus(true).build())
-                .build();
-
-        UniversalMatchingDatasetDto matchingDatasetDto = matchingDatasetToMatchingDatasetDtoMapper.mapToUniversalMatchingDatasetDto(matchingDataset);
-
-        // eIDAS matching datasets will never have a from or to date and will always be verified
-        assertThat(matchingDatasetDto.getFirstName()).contains(new TransliterableMdsValueDto("Joe", null, null, null, true));
-        assertThat(matchingDatasetDto.getSurnames()).containsOnly(new TransliterableMdsValueDto("Bloggs", null, null, null, true));
-        assertThat(matchingDatasetDto.getDateOfBirth()).contains(new SimpleMdsValueDto<>(dob, null, null, true));
-    }
 }

@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter;
 
-import com.codahale.metrics.health.HealthCheck;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -11,9 +10,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.joda.time.Duration;
 import org.opensaml.saml.metadata.resolver.MetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
-import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
-import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.encryption.Decrypter;
 import org.opensaml.saml.saml2.metadata.EntitiesDescriptor;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
@@ -52,13 +49,11 @@ import uk.gov.ida.matchingserviceadapter.rest.soap.SoapMessageManager;
 import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.saml.api.MsaTransformersFactory;
 import uk.gov.ida.matchingserviceadapter.services.AttributeQueryService;
-import uk.gov.ida.matchingserviceadapter.services.EidasAssertionService;
 import uk.gov.ida.matchingserviceadapter.services.MatchingResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.services.UnknownUserResponseGenerator;
 import uk.gov.ida.matchingserviceadapter.services.VerifyAssertionService;
 import uk.gov.ida.matchingserviceadapter.validators.AssertionTimeRestrictionValidator;
 import uk.gov.ida.matchingserviceadapter.validators.AttributeQuerySignatureValidator;
-import uk.gov.ida.matchingserviceadapter.validators.CountryConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.DateTimeComparator;
 import uk.gov.ida.matchingserviceadapter.validators.IdpConditionsValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
@@ -66,24 +61,15 @@ import uk.gov.ida.matchingserviceadapter.validators.SubjectValidator;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.api.CoreTransformersFactory;
 import uk.gov.ida.saml.core.domain.AddressFactory;
-import uk.gov.ida.saml.core.transformers.EidasMatchingDatasetUnmarshaller;
-import uk.gov.ida.saml.core.transformers.EidasUnsignedMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.VerifyMatchingDatasetUnmarshaller;
 import uk.gov.ida.saml.core.transformers.inbound.Cycle3DatasetFactory;
-import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
-import uk.gov.ida.saml.core.validation.assertion.ExceptionThrowingValidator;
 import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
-import uk.gov.ida.saml.deserializers.StringToOpenSamlObjectTransformer;
-import uk.gov.ida.saml.deserializers.validators.ResponseSizeValidator;
-import uk.gov.ida.saml.metadata.DisabledMetadataResolverRepository;
 import uk.gov.ida.saml.metadata.ExpiredCertificateMetadataFilter;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
-import uk.gov.ida.saml.metadata.MetadataResolverRepository;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 import uk.gov.ida.saml.security.DecrypterFactory;
-import uk.gov.ida.saml.security.EidasValidatorFactory;
 import uk.gov.ida.saml.security.EntityToEncryptForLocator;
 import uk.gov.ida.saml.security.IdaKeyStore;
 import uk.gov.ida.saml.security.IdaKeyStoreCredentialRetriever;
@@ -104,7 +90,6 @@ import javax.security.cert.X509Certificate;
 import javax.ws.rs.client.Client;
 import java.io.PrintWriter;
 import java.security.KeyPair;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -137,7 +122,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
         bind(SubjectValidator.class);
         bind(AudienceRestrictionValidator.class);
         bind(IdpConditionsValidator.class);
-        bind(CountryConditionsValidator.class);
 
         bind(PublicKeyInputStreamFactory.class).to(PublicKeyFileInputStreamFactory.class).in(Singleton.class);
         bind(AssertionLifetimeConfiguration.class).to(MatchingServiceAdapterConfiguration.class).in(Singleton.class);
@@ -168,43 +152,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public AddressFactory getAddressFactory() {
         return new AddressFactory();
-    }
-
-    @Provides
-    @Singleton
-    public EidasMatchingDatasetUnmarshaller getEidasMatchingDatasetUnmarshaller() {
-        return new EidasMatchingDatasetUnmarshaller();
-    }
-
-    @Provides
-    @Singleton
-    public EidasUnsignedMatchingDatasetUnmarshaller getEidasUnsignedMatchingDatasetUnmarshaller(
-            SecretKeyDecryptorFactory secretKeyDecryptorFactory,
-            MetadataResolverRepository eidasMetadataResolverRepository,
-            InstantValidator instantValidator,
-            SubjectValidator subjectValidator,
-            CountryConditionsValidator conditionsValidator,
-            @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds
-            ) {
-        StringToOpenSamlObjectTransformer<Response> stringtoOpenSamlObjectTransformer = new CoreTransformersFactory().getStringtoOpenSamlObjectTransformer(new ResponseSizeValidator());
-        EidasValidatorFactory eidasValidatorFactory = new EidasValidatorFactory(eidasMetadataResolverRepository);
-
-        ExceptionThrowingValidator<Assertion> eidasSamlValidator = a -> {
-            try {
-                instantValidator.validate(a.getIssueInstant(), "Country Assertion IssueInstant");
-                // FIXME: the expectedInResponseTo param is never used in the subjectValidator
-                subjectValidator.validate(a.getSubject(), a.getID());
-                conditionsValidator.validate(a.getConditions(), acceptableHubConnectorEntityIds.toArray(new String[0]));
-            } catch (SamlResponseValidationException e) {
-                throw new ExceptionThrowingValidator.ValidationException("Error validating assertion " + a.getID(), e);
-            }
-        };
-
-        return new EidasUnsignedMatchingDatasetUnmarshaller(
-                secretKeyDecryptorFactory,
-                stringtoOpenSamlObjectTransformer,
-                eidasValidatorFactory,
-                eidasSamlValidator);
     }
 
     @Provides
@@ -249,7 +196,7 @@ class MatchingServiceAdapterModule extends AbstractModule {
             MatchingDatasetToMatchingDatasetDtoMapper matchingDatasetToMatchingDatasetDtoMapper,
             MatchingServiceAdapterConfiguration configuration
     ) {
-        return new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, configuration.isEidasEnabled());
+        return new MatchingServiceRequestDtoMapper(matchingDatasetToMatchingDatasetDtoMapper, configuration.isUseUniversalMatchingDataset());
     }
 
     @Provides
@@ -272,37 +219,10 @@ class MatchingServiceAdapterModule extends AbstractModule {
             AttributeQuerySignatureValidator attributeQuerySignatureValidator,
             InstantValidator instantValidator,
             VerifyAssertionService verifyAssertionService,
-            EidasAssertionService eidasAssertionService,
             UserIdHashFactory userIdHashFactory,
             @Named("HubEntityId") String hubEntityId
     ) {
-        return new AttributeQueryService(attributeQuerySignatureValidator, instantValidator, verifyAssertionService, eidasAssertionService, userIdHashFactory, hubEntityId);
-    }
-
-    @Provides
-    @Singleton
-    public EidasAssertionService getCountryAssertionService(
-            InstantValidator instantValidator,
-            SubjectValidator subjectValidator,
-            CountryConditionsValidator conditionsValidator,
-            SamlAssertionsSignatureValidator hubSignatureValidator,
-            Cycle3DatasetFactory cycle3DatasetFactory,
-            MetadataResolverRepository eidasMetadataRepository,
-            EidasMatchingDatasetUnmarshaller matchingDatasetUnmarshaller,
-            EidasUnsignedMatchingDatasetUnmarshaller matchingUnsignedDatasetUnmarshaller,
-            @Named("AllAcceptableHubConnectorEntityIds") List<String> acceptableHubConnectorEntityIds,
-            @Named("HubEntityId") String hubEntityId
-    ) {
-        return new EidasAssertionService(instantValidator,
-                subjectValidator,
-                conditionsValidator,
-                hubSignatureValidator,
-                cycle3DatasetFactory,
-                eidasMetadataRepository,
-                acceptableHubConnectorEntityIds,
-                hubEntityId,
-                matchingDatasetUnmarshaller,
-                matchingUnsignedDatasetUnmarshaller);
+        return new AttributeQueryService(attributeQuerySignatureValidator, instantValidator, verifyAssertionService, userIdHashFactory, hubEntityId);
     }
 
     @Provides
@@ -332,13 +252,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Named("HubEntityId")
     public String getHubEntityId(MatchingServiceAdapterConfiguration configuration) {
         return configuration.getHubEntityId();
-    }
-
-    @Provides
-    @Singleton
-    @Named("AllAcceptableHubConnectorEntityIds")
-    public List<String> getAcceptableHubConnectorEntityIds(MatchingServiceAdapterConfiguration configuration) {
-        return configuration.isEidasEnabled() ? configuration.getEuropeanIdentity().getAllAcceptableHubConnectorEntityIds(configuration.getMetadataEnvironment()) : new ArrayList<>();
     }
 
     @Provides
@@ -462,8 +375,8 @@ class MatchingServiceAdapterModule extends AbstractModule {
     }
 
     @Provides
-    public AssertionDecrypter getAssertionDecrypter(IdaKeyStore eidasKeystore) {
-        IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(eidasKeystore);
+    public AssertionDecrypter getAssertionDecrypter(IdaKeyStore idaKeyStore) {
+        IdaKeyStoreCredentialRetriever idaKeyStoreCredentialRetriever = new IdaKeyStoreCredentialRetriever(idaKeyStore);
         Decrypter decrypter = new DecrypterFactory().createDecrypter(idaKeyStoreCredentialRetriever.getDecryptingCredentials());
         return new AssertionDecrypter(new EncryptionAlgorithmValidator(), decrypter);
     }
@@ -505,18 +418,6 @@ class MatchingServiceAdapterModule extends AbstractModule {
     @Singleton
     public Optional<MetadataResolverConfiguration> metadataConfiguration(MatchingServiceAdapterConfiguration msaConfiguration) {
         return msaConfiguration.getMetadataConfiguration();
-    }
-
-    @Provides
-    @Singleton
-    public MetadataResolverRepository getEidasMetadataResolverRepository(Environment environment) {
-        environment.healthChecks().register("TrustAnchorHealthCheck", new HealthCheck() {
-            @Override
-            protected Result check() {
-                return Result.healthy();
-            }
-        });
-        return new DisabledMetadataResolverRepository();
     }
 
     @Provides

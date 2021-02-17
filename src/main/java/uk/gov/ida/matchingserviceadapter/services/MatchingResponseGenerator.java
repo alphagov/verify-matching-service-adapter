@@ -58,7 +58,7 @@ public class MatchingResponseGenerator {
                     matchingServiceAdapterConfiguration.getEntityId(),
                     requestId,
                     manifestVersionNumber,
-                    matchingServiceAdapterConfiguration.isEidasEnabled(),
+                    matchingServiceAdapterConfiguration.isUseUniversalMatchingDataset(),
                     matchingServiceAdapterConfiguration.shouldSignWithSHA1());
 
         return ok()
