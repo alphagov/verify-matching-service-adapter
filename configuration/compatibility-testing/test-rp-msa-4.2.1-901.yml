@@ -30,9 +30,6 @@ hub:
 
 metadata:
   url: https://www.staging.signin.service.gov.uk/SAML2/metadata/federation
-  trustStore:
-    path: test_ida_metadata.ts
-    password: puppet
   environment: INTEGRATION
   minRefreshDelay: 30000
   maxRefreshDelay: 1800000
@@ -49,7 +46,7 @@ metadata:
       protocol: TLSv1.2
       verifyHostname: false
       trustSelfSignedCertificates: true
-  truststore:
+  trustStore:
     path: test_metadata_truststore.ts
     password: bj76LWZ+F5L1Biq4EZB+Ta7MUY4EQMgmZmqAHh
   hubTrustStore:
