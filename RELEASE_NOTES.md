@@ -2,7 +2,7 @@ MSA Release Notes
 =================
 
 ### Next
-
+* Use saml-libs release that removes eIDAS code
 ### 5.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.0.0...5.1.0)
 * [Removes matching from european identity schemes](doc/release-details/5.1.0.md), as the UK is longer part of the eIDAS regulation. If the configuration `europeanIdentity.enabled` is currently set to `true`, it must not be removed or changed.
