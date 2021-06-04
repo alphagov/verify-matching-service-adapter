@@ -1,4 +1,4 @@
-FROM ghcr.io/alphagov/verify/gradle:gradle-jdk11 as build
+FROM gradle:6.9.0-jdk11 as build
 
 WORKDIR /msa
 USER root
