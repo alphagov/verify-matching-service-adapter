@@ -1,4 +1,7 @@
-FROM gradle:6.9.0-jdk11 as build
+ARG registry_image_gradle=gradle:6.7.0-jdk11
+ARG registry_image_jdk=openjdk:11.0.11-jre
+
+FROM ${registry_image_gradle} as base-image
 
 WORKDIR /msa
 USER root
@@ -19,7 +22,7 @@ RUN gradle installDist
 ENTRYPOINT ["gradle", "--no-daemon"]
 CMD ["tasks"]
 
-FROM ghcr.io/alphagov/verify/java:openjdk-11
+FROM ${registry_image_jdk}
 
 WORKDIR /msa
 
