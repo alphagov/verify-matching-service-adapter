@@ -4,7 +4,7 @@ MSA Release Notes
 ### Next
 
 ### 5.1.1
-[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.0.0...5.1.1)
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.1.0...5.1.1)
 * Use saml-libs release that removes eIDAS code
 * Use Maven central for dependencies.
 * Update logback library to version 1.2.9
