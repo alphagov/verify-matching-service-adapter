@@ -46,6 +46,13 @@ configurations {
     ida_test
 }
 
+configurations.all {
+    resolutionStrategy {
+        force "ch.qos.logback:logback-classic:1.2.9"
+        force "ch.qos.logback:logback-access:1.2.9"
+    }
+}
+
 dependencies {
     dropwizard "io.dropwizard:dropwizard-core:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-util:$dependencyVersions.dropwizard",
