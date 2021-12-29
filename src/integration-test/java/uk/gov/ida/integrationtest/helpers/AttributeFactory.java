@@ -1,9 +1,10 @@
 package uk.gov.ida.integrationtest.helpers;
 
-import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.matchingserviceadapter.domain.UserAccountCreationAttribute;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
+
+import javax.inject.Inject;
 
 public class AttributeFactory {
 

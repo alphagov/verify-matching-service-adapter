@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,8 +45,6 @@ public class MatchingResponseGeneratorTest {
 
     @Before
     public void setUp() {
-        JerseyGuiceUtils.reset();
-
         matchingResponseGenerator = new MatchingResponseGenerator(
                 soapMessageManager,
                 responseElementTransformer,

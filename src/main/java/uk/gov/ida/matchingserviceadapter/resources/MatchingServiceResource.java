@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import uk.gov.ida.saml.core.validation.SamlTransformationErrorException;
 import uk.gov.ida.saml.deserializers.ElementToOpenSamlXMLObjectTransformer;
 import uk.gov.ida.saml.security.AssertionDecrypter;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

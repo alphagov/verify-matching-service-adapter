@@ -1,8 +1,9 @@
 package uk.gov.ida.matchingserviceadapter.domain;
 
-import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.Attribute;
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
+
+import javax.inject.Inject;
 
 public class AttributeQueryAttributeFactory {
 

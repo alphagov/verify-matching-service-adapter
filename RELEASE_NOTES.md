@@ -2,6 +2,7 @@ MSA Release Notes
 =================
 
 ### Next
+* Update Dropwizard to version 2.x
 
 ### 5.1.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.1.0...5.1.1)
@@ -68,9 +69,9 @@ MSA Release Notes
 * Allow `OneTimeUse` validation with eIDAS assertions. The MSA doesn't allow the use of the `OneTimeUse` attribute with assertions from IDPs, however there are some eIDAS countries that use it. The MSA will now accept eIDAS assertions with zero or one `OneTimeUse` elements.
 * Allow unsigned eIDAS assertions. The eIDAS specification does not require signed assertions, whereas the Verify specification does. Signed eIDAS assertions are still verified.
 * Added additional detail and stack trace to error responses. This is enabled by default but can be
-disabled by setting `returnStackTraceInErrorResponse: false` in configuration file.
+  disabled by setting `returnStackTraceInErrorResponse: false` in configuration file.
 * If multiple firstnames are provided by IDP, the MSA will select which one to pass to local matching service based
-on the following rules:
+  on the following rules:
     1. the verified current firstname
     1. if no verified firstname, then the first current is selected
     1. if no verified or current then the first provided by the IDP
@@ -88,12 +89,12 @@ on the following rules:
 ### 3.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.1.0)
 
-* Upgraded SAML libs version so that the MSA can support the ECDSA and RSASSA-PSS signing algorithms to fulfil the eIDAS cryptographic requirements as laid out in the ["eIDAS - Cryptographic requirements for the Interoperability Framework"](https://ec.europa.eu/cefdigital/wiki/download/attachments/46992719/eidas_-_crypto_requirements_for_the_eidas_interoperability_framework_v1.0.pdf?version=1&modificationDate=1497252920224&api=v2). 
+* Upgraded SAML libs version so that the MSA can support the ECDSA and RSASSA-PSS signing algorithms to fulfil the eIDAS cryptographic requirements as laid out in the ["eIDAS - Cryptographic requirements for the Interoperability Framework"](https://ec.europa.eu/cefdigital/wiki/download/attachments/46992719/eidas_-_crypto_requirements_for_the_eidas_interoperability_framework_v1.0.pdf?version=1&modificationDate=1497252920224&api=v2).
 * Upgraded to Dropwizard 1.3.5.
 * Extended the capability of the GOV.UK Verify Hub MSA health-check to return information on whether you:
-  * enabled `europeanIdentity` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#in-the-field-europeanidentity)
-  * are using SHA-256. By default, the MSA signs messages using SHA-256. To keep this setting, make sure `shouldSignWithSHA1` is set to `false` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#configure-the-matching-service-adapter).
- 
+    * enabled `europeanIdentity` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#in-the-field-europeanidentity)
+    * are using SHA-256. By default, the MSA signs messages using SHA-256. To keep this setting, make sure `shouldSignWithSHA1` is set to `false` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#configure-the-matching-service-adapter).
+
 ### 3.0.3
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.0.3)
 
@@ -164,9 +165,9 @@ on the following rules:
 11th September 2017 - v2.1.0-592
 * No longer allow MD5 digest and signature algorithms
 * Add address history as a user account creation attribute
- - Add ADDRESS_HISTORY to the UserAccountCreationAttribute enum and support for it in UserAccountCreationAttributeExtractor
- - If a transaction is configured with ADDRESS_HISTORY in its list of user account creation attributes, then the MSA will extract the user's full address history and return it to the hub as an "addresshistory" SAML attribute.
- - Address history will be added to the onboarding form at a later date for Relying Parties to request it.
+- Add ADDRESS_HISTORY to the UserAccountCreationAttribute enum and support for it in UserAccountCreationAttributeExtractor
+- If a transaction is configured with ADDRESS_HISTORY in its list of user account creation attributes, then the MSA will extract the user's full address history and return it to the hub as an "addresshistory" SAML attribute.
+- Address history will be added to the onboarding form at a later date for Relying Parties to request it.
 
 ### 2.0.0
 
@@ -191,23 +192,23 @@ Feb 22 2017 -- v.561
 
 Feb 7 2017 -- v.555
 * Simplified application configuration
- - Set defaults for many config options
- - Added localMatchingService section to group local matching service related config
-   - matchingServiceUri -> matchUrl
-   - unknownUserCreationServiceUri -> accountCreationUrl
-   - matchingServiceClient -> client
- - Added matchingServiceAdapterSection to group MSA related config and renamed the following keys
-   - matchingServiceAdapterLocation -> externalUrl
-   - entityId has now moved under matchingServiceAdapter
- - Added hub section to group hub related config
-   - requireHubCertificates -> republishHubCertificatesInLocalMetadataa
- - Renamed the following keys under created truststore section under metadata
-   - trustStorePath -> trustStore
-   - trustStorePassword -> password
- - Renamed publicKey keyUri -> certFile
- - Renamed privateKey keyUri -> keyFile
- - Renamed keyName -> name
- - Renamed storeUri -> path
+- Set defaults for many config options
+- Added localMatchingService section to group local matching service related config
+    - matchingServiceUri -> matchUrl
+    - unknownUserCreationServiceUri -> accountCreationUrl
+    - matchingServiceClient -> client
+- Added matchingServiceAdapterSection to group MSA related config and renamed the following keys
+    - matchingServiceAdapterLocation -> externalUrl
+    - entityId has now moved under matchingServiceAdapter
+- Added hub section to group hub related config
+    - requireHubCertificates -> republishHubCertificatesInLocalMetadataa
+- Renamed the following keys under created truststore section under metadata
+    - trustStorePath -> trustStore
+    - trustStorePassword -> password
+- Renamed publicKey keyUri -> certFile
+- Renamed privateKey keyUri -> keyFile
+- Renamed keyName -> name
+- Renamed storeUri -> path
 * The zip file now contains minimal configuration files for both test (test-config.yaml) and production (prod-config.yaml) and should work 'out of the box' with these files
 * Example config files contain comments to help guide the configuration of the MSA
 
@@ -223,36 +224,36 @@ November 16, 2016 -- v. 534
 * Added config property 'publicSecondaryEncryptionKeyConfiguration'. If the RP is currently using secondary keys they will need to add the corresponding keyUri and keyName to the config
 
 * Metadata is now retrieved by the MSA from the Verify hub's signed 'federation' metadata instead of the old 'sp' metadata
- - metadataUri is removed configuration.
- - Add metadata-block to configuration. See the official documentation for details: http://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html
-    for production the url is: https://www.signin.service.gov.uk/SAML2/metadata/federation
-    for integration the url is: https://www.integration.signin.service.gov.uk/SAML2/metadata/federation
+- metadataUri is removed configuration.
+- Add metadata-block to configuration. See the official documentation for details: http://alphagov.github.io/rp-onboarding-tech-docs/pages/msa/msaUse.html
+  for production the url is: https://www.signin.service.gov.uk/SAML2/metadata/federation
+  for integration the url is: https://www.integration.signin.service.gov.uk/SAML2/metadata/federation
 
 * The Metadata endpoint on the MSA (/matching-service/SAML2/metadata) now returns enough information for the RP service to only need to consume metadata from the MSA instead of directly from the Verify hub.
- - EntityDescriptor with entityID of the RP's matching service now contains an IDPSSODescriptor containing the matching service's signing cert. This exposes the MSA as an IDP to the RP - the final response to the RP service is generated by the MSA and it is effectively working as an IDP, this formalises that relationship.
+- EntityDescriptor with entityID of the RP's matching service now contains an IDPSSODescriptor containing the matching service's signing cert. This exposes the MSA as an IDP to the RP - the final response to the RP service is generated by the MSA and it is effectively working as an IDP, this formalises that relationship.
 
 * New requireHubCertificates configuration in the MSA's .yml file
- - Default is false, when enabled it re-publishes the Verify hub's EntityDescriptor in the MSA's metadata (i.e. for entityId https://signin.service.gov.uk).
+- Default is false, when enabled it re-publishes the Verify hub's EntityDescriptor in the MSA's metadata (i.e. for entityId https://signin.service.gov.uk).
 
 * New hubSSOUri configuration in the MSA's .yml file
- - The MSA's metadata contains an IDPSSODescriptor SingleSignOnService element which RP's can use to retrieve the location that AuthnRequests should be sent to, instead of retrieving that information from the metadata on hub. This is configured via the hubSSOUri property.
- - for production this is https://www.signin.service.gov.uk/SAML2/SSO
- - for integration this is https://www.integration.signin.service.gov.uk/SAML2/SSO
+- The MSA's metadata contains an IDPSSODescriptor SingleSignOnService element which RP's can use to retrieve the location that AuthnRequests should be sent to, instead of retrieving that information from the metadata on hub. This is configured via the hubSSOUri property.
+- for production this is https://www.signin.service.gov.uk/SAML2/SSO
+- for integration this is https://www.integration.signin.service.gov.uk/SAML2/SSO
 
 * Added support for sending metrics to Graphite.
- - Follow official Dropwizard configuration: http://www.dropwizard.io/0.9.1/docs/manual/configuration.html#graphite-reporter
+- Follow official Dropwizard configuration: http://www.dropwizard.io/0.9.1/docs/manual/configuration.html#graphite-reporter
 
 * Upgraded to Dropwizard 0.9.3
- - Remove acceptSelfSignedCerts from the configuration
- - Rename httpClient to matchingServiceClient in the configuration
+- Remove acceptSelfSignedCerts from the configuration
+- Rename httpClient to matchingServiceClient in the configuration
 
 February 10, 2016 -- v. 493
 * Added support for a secondary MSA signing certificate via the `publicSecondarySigningKeyConfiguration` property in the configuration.
 * To avoid downtime during signing key rotations, follow this procedure:
- - Add a `publicSecondarySigningKeyConfiguration`
- - Load the metadata produced by the MSA into the service endpoint (hub response consumer)
- - Update the `privateSigningKeyConfiguration` to sign using the new private key
- - Once the new key pair is in use everywhere, remove the old certificate key configuration.
+- Add a `publicSecondarySigningKeyConfiguration`
+- Load the metadata produced by the MSA into the service endpoint (hub response consumer)
+- Update the `privateSigningKeyConfiguration` to sign using the new private key
+- Once the new key pair is in use everywhere, remove the old certificate key configuration.
 * Metadata generated by the MSA at `/matching-service/SAML2/metadata` now includes the correct entityId
 * Added dependency on SAML-Security and reduced duplication of classes
 
@@ -274,12 +275,12 @@ Aug 12, 2015 -- v. 419
 
 Jul 28, 2015 -- v. 411
 * Upgrade version of Dropwizard to 0.8.2
- * Includes fix for stale keep-alive connections
+* Includes fix for stale keep-alive connections
 * Support for standard HTTP Proxies
- * Follow the official Oracle guide: http://docs.oracle.com/javase/7/docs/technotes/guides/net/proxies.html
+* Follow the official Oracle guide: http://docs.oracle.com/javase/7/docs/technotes/guides/net/proxies.html
 * Added MDC keys `messageId`, `entityId` and `logPrefix` to logback MDC to capture SAML message context
- * For `file` and `console` type logging appenders, we recommend you update your `logFormat` to include the `logPrefix` key, e.g. `'%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'`
- * For `logstash-file` and `logstash-syslog` type logging appenders, the new MDC keys will be automatically added to logstash output as extra columns
+* For `file` and `console` type logging appenders, we recommend you update your `logFormat` to include the `logPrefix` key, e.g. `'%-5p [%d{ISO8601,UTC}] %c: %X{logPrefix}%m%n%xEx'`
+* For `logstash-file` and `logstash-syslog` type logging appenders, the new MDC keys will be automatically added to logstash output as extra columns
 
 ~~~ Missing notes from wiki
 
@@ -307,3 +308,4 @@ Feb 3, 2014 -- v. 151
 * Added logLevel [TRACE|DEBUG|INFO|WARN|ERROR]
 * Added a HealthCheck and Graphite configuration to monitor MSA behaviour in production
 configuration.yml
+

@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.mappers;
 
-import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import uk.gov.ida.common.shared.security.IdGenerator;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
@@ -12,6 +11,8 @@ import uk.gov.ida.saml.core.domain.AssertionRestrictions;
 import uk.gov.ida.saml.core.domain.AuthnContext;
 import uk.gov.ida.saml.core.domain.MatchingServiceAuthnStatement;
 import uk.gov.ida.saml.core.domain.PersistentId;
+
+import javax.inject.Inject;
 
 import static java.util.Collections.emptyList;
 
