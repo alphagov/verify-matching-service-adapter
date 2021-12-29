@@ -1,9 +1,9 @@
 package uk.gov.ida.integrationtest;
 
 import io.dropwizard.testing.ConfigOverride;
-import org.junit.ClassRule;
-import org.junit.Test;
-import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppExtension;
 import uk.gov.ida.saml.metadata.MetadataResolverConfiguration;
 
 import java.security.KeyStoreException;
@@ -14,27 +14,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DefaultTrustStoreTest {
 
-    @ClassRule
-    public static final MatchingServiceAdapterAppRule prodMsaWithDefaultTruststoresApplicationRule = new MatchingServiceAdapterAppRule(
-            true,
+    @RegisterExtension
+    static MatchingServiceAdapterAppExtension prodMsaWithDefaultTruststoresApp = new MatchingServiceAdapterAppExtension(true,
             "verify-matching-service-adapter-default-truststores.yml",
             false,
-            ConfigOverride.config("metadata.environment", "PRODUCTION"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.environment", "PRODUCTION")
+            ConfigOverride.config("metadata.environment", "PRODUCTION")
     );
 
-    @ClassRule
-    public static final MatchingServiceAdapterAppRule integrationMsaWithDefaultTruststoresApplicationRule = new MatchingServiceAdapterAppRule(
+    @RegisterExtension
+    static MatchingServiceAdapterAppExtension integrationMsaWithDefaultTruststoresApp = new MatchingServiceAdapterAppExtension(
             true,
             "verify-matching-service-adapter-default-truststores.yml",
             false,
-            ConfigOverride.config("metadata.environment", "INTEGRATION"),
-            ConfigOverride.config("europeanIdentity.aggregatedMetadata.environment", "INTEGRATION")
+            ConfigOverride.config("metadata.environment", "INTEGRATION")
     );
 
     @Test
     public void prodTruststoresShouldContainCorrectCertificates() throws KeyStoreException {
-        MetadataResolverConfiguration metadataConfiguration = prodMsaWithDefaultTruststoresApplicationRule
+        MetadataResolverConfiguration metadataConfiguration = prodMsaWithDefaultTruststoresApp
                 .getConfiguration()
                 .getMetadataConfiguration()
                 .orElseThrow(
@@ -49,7 +46,7 @@ public class DefaultTrustStoreTest {
         List<String> idpAliases = Collections.list(metadataConfiguration
                 .getIdpTrustStore()
                 .orElseThrow(
-                    () -> new RuntimeException("No IDP trust store found")
+                        () -> new RuntimeException("No IDP trust store found")
                 ).aliases()
         );
         List<String> metadataAliases = Collections.list(metadataConfiguration
@@ -81,7 +78,7 @@ public class DefaultTrustStoreTest {
 
     @Test
     public void integrationTruststoresShouldContainCorrectCertificates() throws KeyStoreException {
-        MetadataResolverConfiguration metadataConfiguration = integrationMsaWithDefaultTruststoresApplicationRule
+        MetadataResolverConfiguration metadataConfiguration = integrationMsaWithDefaultTruststoresApp
                 .getConfiguration()
                 .getMetadataConfiguration()
                 .orElseThrow(

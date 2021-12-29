@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.repositories;
 
-import com.google.inject.Inject;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.resolver.ResolverException;
 import org.joda.time.DateTime;
@@ -28,6 +27,7 @@ import uk.gov.ida.matchingserviceadapter.exceptions.FederationMetadataLoadingExc
 import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.metadata.transformers.KeyDescriptorsUnmarshaller;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,10 +1,11 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormat;
 import uk.gov.ida.saml.core.validation.SamlResponseValidationException;
+
+import javax.inject.Inject;
 
 import static org.joda.time.DateTimeZone.UTC;
 import static org.joda.time.format.ISODateTimeFormat.dateHourMinuteSecond;

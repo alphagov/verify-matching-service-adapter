@@ -1,7 +1,6 @@
 package uk.gov.ida.matchingserviceadapter.exceptions;
 
 
-import com.squarespace.jersey2.guice.JerseyGuiceUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -17,10 +16,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExceptionExceptionMapperTest {
-
-    static {
-        JerseyGuiceUtils.reset();
-    }
 
     @Mock
     private MatchingServiceAdapterConfiguration configuration;

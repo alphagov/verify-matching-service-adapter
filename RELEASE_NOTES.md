@@ -5,6 +5,7 @@ MSA Release Notes
 * Use saml-libs release that removes eIDAS code
 * Use Maven central for dependencies.
 * Update logback library to version 1.2.9
+* Update Dropwizard to version 2.x
 
 ### 5.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.0.0...5.1.0)

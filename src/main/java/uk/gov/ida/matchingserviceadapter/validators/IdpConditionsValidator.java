@@ -1,12 +1,13 @@
 package uk.gov.ida.matchingserviceadapter.validators;
 
-import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.opensaml.saml.saml2.core.Conditions;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsElementMustNotBeNull;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainOneTimeUseElement;
 import uk.gov.ida.matchingserviceadapter.validators.validationrules.ConditionsShouldNotContainProxyRestrictionElement;
 import uk.gov.ida.saml.core.validation.conditions.AudienceRestrictionValidator;
+
+import javax.inject.Inject;
 
 public class IdpConditionsValidator implements ConditionsValidator {
 
