@@ -1,16 +1,5 @@
 apply plugin: "java"
-apply plugin: "jacoco"
 apply plugin: 'application'
-
-jacoco {
-    toolVersion = "0.8.2"
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
 
 ext {
     opensaml = '3.4.6'

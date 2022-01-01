@@ -3,6 +3,7 @@ MSA Release Notes
 
 ### Next
 * Update Dropwizard to version 2.x
+* Remove Codacy as a code analyser
 
 ### 5.1.1
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.1.0...5.1.1)
@@ -72,9 +73,9 @@ MSA Release Notes
   disabled by setting `returnStackTraceInErrorResponse: false` in configuration file.
 * If multiple firstnames are provided by IDP, the MSA will select which one to pass to local matching service based
   on the following rules:
-    1. the verified current firstname
-    1. if no verified firstname, then the first current is selected
-    1. if no verified or current then the first provided by the IDP
+  1. the verified current firstname
+  1. if no verified firstname, then the first current is selected
+  1. if no verified or current then the first provided by the IDP
 * When calling user account creation, if multiple current values exist for any attribute, the first verified value will be preferred over non-verified values.
 * Removed redundant header `ida-msa-version` from matching response.
 * Reduced Jersey clients `keepAlive` to 10 seconds. This is to prevent `NoHttpResponseException`'s being thrown due to servers having an `idleTimeout` of 30 seconds.
@@ -92,8 +93,8 @@ MSA Release Notes
 * Upgraded SAML libs version so that the MSA can support the ECDSA and RSASSA-PSS signing algorithms to fulfil the eIDAS cryptographic requirements as laid out in the ["eIDAS - Cryptographic requirements for the Interoperability Framework"](https://ec.europa.eu/cefdigital/wiki/download/attachments/46992719/eidas_-_crypto_requirements_for_the_eidas_interoperability_framework_v1.0.pdf?version=1&modificationDate=1497252920224&api=v2).
 * Upgraded to Dropwizard 1.3.5.
 * Extended the capability of the GOV.UK Verify Hub MSA health-check to return information on whether you:
-    * enabled `europeanIdentity` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#in-the-field-europeanidentity)
-    * are using SHA-256. By default, the MSA signs messages using SHA-256. To keep this setting, make sure `shouldSignWithSHA1` is set to `false` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#configure-the-matching-service-adapter).
+  * enabled `europeanIdentity` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#in-the-field-europeanidentity)
+  * are using SHA-256. By default, the MSA signs messages using SHA-256. To keep this setting, make sure `shouldSignWithSHA1` is set to `false` in your [MSA configuration](http://alphagov.github.io/rp-onboarding-tech-docs/pages/matching/matchingserviceadapter.html#configure-the-matching-service-adapter).
 
 ### 3.0.3
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/3.0.2...3.0.3)
@@ -194,17 +195,17 @@ Feb 7 2017 -- v.555
 * Simplified application configuration
 - Set defaults for many config options
 - Added localMatchingService section to group local matching service related config
-    - matchingServiceUri -> matchUrl
-    - unknownUserCreationServiceUri -> accountCreationUrl
-    - matchingServiceClient -> client
+  - matchingServiceUri -> matchUrl
+  - unknownUserCreationServiceUri -> accountCreationUrl
+  - matchingServiceClient -> client
 - Added matchingServiceAdapterSection to group MSA related config and renamed the following keys
-    - matchingServiceAdapterLocation -> externalUrl
-    - entityId has now moved under matchingServiceAdapter
+  - matchingServiceAdapterLocation -> externalUrl
+  - entityId has now moved under matchingServiceAdapter
 - Added hub section to group hub related config
-    - requireHubCertificates -> republishHubCertificatesInLocalMetadataa
+  - requireHubCertificates -> republishHubCertificatesInLocalMetadataa
 - Renamed the following keys under created truststore section under metadata
-    - trustStorePath -> trustStore
-    - trustStorePassword -> password
+  - trustStorePath -> trustStore
+  - trustStorePassword -> password
 - Renamed publicKey keyUri -> certFile
 - Renamed privateKey keyUri -> keyFile
 - Renamed keyName -> name
@@ -308,4 +309,3 @@ Feb 3, 2014 -- v. 151
 * Added logLevel [TRACE|DEBUG|INFO|WARN|ERROR]
 * Added a HealthCheck and Graphite configuration to monitor MSA behaviour in production
 configuration.yml
-
