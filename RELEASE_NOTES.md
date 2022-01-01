@@ -6,6 +6,7 @@ MSA Release Notes
 * Use Maven central for dependencies.
 * Update logback library to version 1.2.9
 * Update Dropwizard to version 2.x
+* Remove Codacy as a code analyser
 
 ### 5.1.0
 [View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.0.0...5.1.0)
