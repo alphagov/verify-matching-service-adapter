@@ -83,10 +83,9 @@ public class VerifyMatchingIntegrationTest {
     public static final HttpStubRule localMatchingService = new HttpStubRule();
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension(
-            ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH)
-    );
-
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder()
+            .otherConfigOverrides(ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH))
+            .build();
     private final String MATCHING_SERVICE_URI = "http://localhost:" + applicationRule.getLocalPort() + "/matching-service/POST";
     private Client client = JerseyClientBuilder.createClient();
 

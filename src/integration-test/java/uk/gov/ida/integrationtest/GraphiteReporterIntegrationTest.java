@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class GraphiteReporterIntegrationTest {
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension();
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder().build();
 
     @Test
     public void shouldBeAbleToCreateAGraphiteReporter() throws Exception {

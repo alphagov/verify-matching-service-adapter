@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MetadataRefreshTaskIntegrationTest {
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension EXT = new MatchingServiceAdapterAppExtension(true);
+    static MatchingServiceAdapterAppExtension EXT = new MatchingServiceAdapterAppExtension.Builder().build();
 
     @Test
     public void verifyFederationMetadataRefreshTaskWorks() {

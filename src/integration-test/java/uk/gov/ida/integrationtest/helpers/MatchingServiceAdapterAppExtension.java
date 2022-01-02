@@ -33,13 +33,14 @@ import uk.gov.ida.saml.core.test.builders.metadata.X509CertificateBuilder;
 import uk.gov.ida.saml.core.test.builders.metadata.X509DataBuilder;
 import uk.gov.ida.saml.metadata.test.factories.metadata.MetadataFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Throwables.propagate;
-import static java.util.Arrays.asList;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_ENCRYPTION_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PRIVATE_SIGNING_KEY;
 import static uk.gov.ida.saml.core.test.TestCertificateStrings.TEST_RP_MS_PUBLIC_SIGNING_CERT;
@@ -54,7 +55,6 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
     public static final String METADATA_PATH = "/uk/gov/ida/saml/metadata/federation";
 
     private static final HttpStubRule verifyMetadataServer = new HttpStubRule();
-    public static final HttpStubRule misconfiguredHubMetadataServer = new HttpStubRule();
 
     private static final KeyStoreResource metadataTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("metadataCA", CACertificates.TEST_METADATA_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
     private static final KeyStoreResource hubTrustStore = KeyStoreResourceBuilder.aKeyStoreResource().withCertificate("hubCA", CACertificates.TEST_CORE_CA).withCertificate("rootCA", CACertificates.TEST_ROOT_CA).build();
@@ -62,34 +62,57 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
 
     private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----\n";
     private static final String END_CERT = "\n-----END CERTIFICATE-----";
+    private final boolean misconfiguredHubMetadata;
 
-    public MatchingServiceAdapterAppExtension(boolean badMetadata) {
-        this(false, ConfigOverride.config("metadata.uri", "http://localhost:" + misconfiguredHubMetadataServer.getPort() + MatchingServiceAdapterAppExtension.METADATA_PATH));
+    public static class Builder {
+        private boolean misconfiguredHubMetadata;
+        private boolean isCountryEnabled;
+        private boolean overrideTruststores = true;
+        private String resourceFilePath = "verify-matching-service-adapter.yml";
+        private List<ConfigOverride> otherConfigOverrides = new ArrayList<ConfigOverride>();
+
+        public Builder misconfiguredHubMetadata() {
+            this.misconfiguredHubMetadata = true;
+            return this;
+        }
+
+        public Builder countryEnabled() {
+            this.isCountryEnabled = true;
+            return this;
+        }
+
+        public Builder overrideTruststores(boolean overrideTruststores) {
+            this.overrideTruststores = overrideTruststores;
+            return this;
+        }
+
+        public Builder otherConfigOverrides(ConfigOverride... otherConfigOverrides) {
+            this.otherConfigOverrides.addAll(Arrays.asList(otherConfigOverrides));
+            return this;
+        }
+
+        public Builder resourceFilePath(String resourceFilePath) {
+            this.resourceFilePath = resourceFilePath;
+            return this;
+        }
+
+        public MatchingServiceAdapterAppExtension build() {
+            return new MatchingServiceAdapterAppExtension(
+                    isCountryEnabled,
+                    this.resourceFilePath,
+                    this.overrideTruststores,
+                    this.misconfiguredHubMetadata,
+                    this.otherConfigOverrides
+            );
+        }
     }
 
-    public MatchingServiceAdapterAppExtension(Class<MatchingServiceAdapterApplication> applicationClass, String resourceFilePath, ConfigOverride[] defaultConfigOverrides) {
-        super(applicationClass, resourceFilePath, defaultConfigOverrides);
-    }
-
-    public MatchingServiceAdapterAppExtension(ConfigOverride... otherConfigOverrides) {
-        this(false, otherConfigOverrides);
-    }
-
-    public MatchingServiceAdapterAppExtension(boolean isCountryEnabled, ConfigOverride... otherConfigOverrides) {
-        super(MatchingServiceAdapterApplication.class,
-                ResourceHelpers.resourceFilePath("verify-matching-service-adapter.yml"),
-                MatchingServiceAdapterAppExtension.withDefaultOverrides(
-                        isCountryEnabled,
-                        true,
-                        otherConfigOverrides)
-        );
-    }
-
-    public MatchingServiceAdapterAppExtension(
+    private MatchingServiceAdapterAppExtension(
             boolean isCountryEnabled,
             String configFile,
             boolean overrideTruststores,
-            ConfigOverride... otherConfigOverrides) {
+            boolean misconfiguredHubMetadata,
+            List<ConfigOverride> otherConfigOverrides) {
         super(MatchingServiceAdapterApplication.class,
                 ResourceHelpers.resourceFilePath(configFile),
                 MatchingServiceAdapterAppExtension.withDefaultOverrides(
@@ -98,6 +121,7 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
                         otherConfigOverrides
                 )
         );
+        this.misconfiguredHubMetadata = misconfiguredHubMetadata;
     }
 
     @Override
@@ -113,11 +137,12 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
             InitializationService.initialize();
 
             verifyMetadataServer.reset();
-            verifyMetadataServer.register(VERIFY_METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, new MetadataFactory().defaultMetadata());
 
-            misconfiguredHubMetadataServer.reset();
-            String metadata = new MetadataFactory().metadata(Collections.singletonList(badHubEntityDescriptor()));
-            misconfiguredHubMetadataServer.register(METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, metadata);
+            String metadata = this.misconfiguredHubMetadata
+                    ? new MetadataFactory().metadata(Collections.singletonList(badHubEntityDescriptor()))
+                    : new MetadataFactory().defaultMetadata();
+
+            verifyMetadataServer.register(VERIFY_METADATA_PATH, 200, Constants.APPLICATION_SAMLMETADATA_XML, metadata);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -139,10 +164,10 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
 
     }
 
-    public static ConfigOverride[] withDefaultOverrides(
+    private synchronized static ConfigOverride[] withDefaultOverrides(
             boolean isCountryPresent,
             boolean overrideTruststores,
-            ConfigOverride... otherConfigOverrides) {
+            List<ConfigOverride> otherConfigOverrides) {
         List<ConfigOverride> overrides = Stream.of(
                 ConfigOverride.config("returnStackTraceInErrorResponse", "true"),
                 ConfigOverride.config("clockSkewInSeconds", "60"),
@@ -184,7 +209,7 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
             overrides.add(ConfigOverride.config("europeanIdentity.enabled", "true"));
         }
 
-        overrides.addAll(asList(otherConfigOverrides));
+        overrides.addAll(otherConfigOverrides);
 
         return overrides.toArray(new ConfigOverride[overrides.size()]);
     }
@@ -217,7 +242,6 @@ public class MatchingServiceAdapterAppExtension extends DropwizardAppExtension<M
             throw propagate(e);
         }
     }
-
 
 
 }
