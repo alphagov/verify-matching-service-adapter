@@ -15,19 +15,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DefaultTrustStoreTest {
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension prodMsaWithDefaultTruststoresApp = new MatchingServiceAdapterAppExtension(true,
-            "verify-matching-service-adapter-default-truststores.yml",
-            false,
-            ConfigOverride.config("metadata.environment", "PRODUCTION")
-    );
+    static MatchingServiceAdapterAppExtension prodMsaWithDefaultTruststoresApp = new MatchingServiceAdapterAppExtension.Builder()
+            .countryEnabled()
+            .resourceFilePath("verify-matching-service-adapter-default-truststores.yml")
+            .overrideTruststores(false)
+            .otherConfigOverrides(ConfigOverride.config("metadata.environment", "PRODUCTION"))
+            .build();
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension integrationMsaWithDefaultTruststoresApp = new MatchingServiceAdapterAppExtension(
-            true,
-            "verify-matching-service-adapter-default-truststores.yml",
-            false,
-            ConfigOverride.config("metadata.environment", "INTEGRATION")
-    );
+    static MatchingServiceAdapterAppExtension integrationMsaWithDefaultTruststoresApp = new MatchingServiceAdapterAppExtension.Builder()
+            .countryEnabled()
+            .resourceFilePath("verify-matching-service-adapter-default-truststores.yml")
+            .overrideTruststores(false)
+            .otherConfigOverrides(ConfigOverride.config("metadata.environment", "INTEGRATION"))
+            .build();
 
     @Test
     public void prodTruststoresShouldContainCorrectCertificates() throws KeyStoreException {

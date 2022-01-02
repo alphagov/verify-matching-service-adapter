@@ -33,11 +33,12 @@ public class MetadataIntegrationTest {
     private static final String MSA_ENCRYPTION_PRIMARY = "http://matching-service-encryption/primary";
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension(
-            ConfigOverride.config("signingKeys.primary.publicKey.name", MSA_SIGNING_PRIMARY),
-            ConfigOverride.config("signingKeys.secondary.publicKey.name", MSA_SIGNING_SECONDARY),
-            ConfigOverride.config("encryptionKeys[0].publicKey.name", MSA_ENCRYPTION_PRIMARY)
-    );
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder()
+            .otherConfigOverrides(
+                    ConfigOverride.config("signingKeys.primary.publicKey.name", MSA_SIGNING_PRIMARY),
+                    ConfigOverride.config("signingKeys.secondary.publicKey.name", MSA_SIGNING_SECONDARY),
+                    ConfigOverride.config("encryptionKeys[0].publicKey.name", MSA_ENCRYPTION_PRIMARY)
+            ).build();
 
 
     @Test

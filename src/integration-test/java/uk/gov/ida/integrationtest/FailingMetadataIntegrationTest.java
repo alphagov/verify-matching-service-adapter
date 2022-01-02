@@ -30,9 +30,9 @@ import static uk.gov.ida.saml.core.test.matchers.SignableSAMLObjectBaseMatcher.s
 public class FailingMetadataIntegrationTest {
 
     @RegisterExtension
-    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension(
-            true
-    );
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder()
+            .misconfiguredHubMetadata()
+            .build();
 
     private final String MATCHING_SERVICE_URI = "http://localhost:" + applicationRule.getLocalPort() + "/matching-service/POST";
     private final SignatureAlgorithm signatureAlgorithmForHub = new SignatureRSASHA1();
