@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.services;
 
-import com.google.inject.Inject;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AttributeQuery;
 import uk.gov.ida.matchingserviceadapter.domain.AssertionClassifier;
@@ -9,6 +8,7 @@ import uk.gov.ida.matchingserviceadapter.saml.UserIdHashFactory;
 import uk.gov.ida.matchingserviceadapter.validators.AttributeQuerySignatureValidator;
 import uk.gov.ida.matchingserviceadapter.validators.InstantValidator;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 

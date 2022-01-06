@@ -1,13 +1,8 @@
 package uk.gov.ida.integrationtest;
 
-import helpers.JerseyClientConfigurationBuilder;
-import io.dropwizard.client.JerseyClientBuilder;
-import io.dropwizard.client.JerseyClientConfiguration;
-import io.dropwizard.util.Duration;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppExtension;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -18,22 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MetadataRefreshTaskIntegrationTest {
 
-    private static Client client;
-
-    @ClassRule
-    public static MatchingServiceAdapterAppRule matchingServiceAdapterAppRule = new MatchingServiceAdapterAppRule(true);
-
-    @BeforeClass
-    public static void setUpClass() {
-        JerseyClientConfiguration jerseyClientConfiguration = JerseyClientConfigurationBuilder.aJerseyClientConfiguration().withTimeout(Duration.seconds(10)).build();
-        client = new JerseyClientBuilder(matchingServiceAdapterAppRule.getEnvironment()).using(jerseyClientConfiguration).build(MetadataRefreshTaskIntegrationTest.class.getSimpleName());
-    }
+    @RegisterExtension
+    static MatchingServiceAdapterAppExtension EXT = new MatchingServiceAdapterAppExtension.Builder().build();
 
     @Test
     public void verifyFederationMetadataRefreshTaskWorks() {
+        Client client = EXT.client();
         final Response response = client.target(UriBuilder.fromUri("http://localhost")
                 .path("/tasks/metadata-refresh")
-                .port(matchingServiceAdapterAppRule.getAdminPort())
+                .port(EXT.getAdminPort())
                 .build())
                 .request()
                 .post(Entity.text("refresh!"));

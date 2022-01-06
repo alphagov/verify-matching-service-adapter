@@ -1,10 +1,10 @@
 package uk.gov.ida.matchingserviceadapter.exceptions;
 
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
 
+import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

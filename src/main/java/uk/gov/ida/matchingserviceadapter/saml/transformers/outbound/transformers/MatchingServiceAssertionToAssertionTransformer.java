@@ -1,6 +1,5 @@
 package uk.gov.ida.matchingserviceadapter.saml.transformers.outbound.transformers;
 
-import com.google.inject.Inject;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -16,6 +15,7 @@ import uk.gov.ida.saml.core.OpenSamlXmlObjectFactory;
 import uk.gov.ida.saml.core.domain.MatchingServiceAuthnStatement;
 import uk.gov.ida.saml.core.transformers.outbound.OutboundAssertionToSubjectTransformer;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.function.Function;
 

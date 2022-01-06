@@ -1,19 +1,8 @@
 apply plugin: "java"
-apply plugin: "jacoco"
 apply plugin: 'application'
 
-jacoco {
-    toolVersion = "0.8.2"
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
-
 ext {
-    opensaml = '3.4.3'
+    opensaml = '3.4.6'
     build_number="$version"
 }
 
@@ -22,11 +11,13 @@ project.version = "$gradle.ext.version_number-$build_number"
 
 def dependencyVersions = [
         opensaml:"$opensaml",
-        dropwizard: '1.3.5',
-        ida_utils: '396',
-        ida_test_utils: '65',
-        dev_pki: '2.0.0-45',
-        saml_libs_version: "$opensaml-255"
+        dropwizard: '2.0.28',
+        ida_utils: '397',
+        ida_test_utils: '66',
+        dev_pki: '2.0.0-46',
+        saml_libs_version: "$opensaml-259",
+        glassfish_version:'2.6.1',
+        glassfish_jersey_version:'2.34'
 ]
 
 repositories {
@@ -47,6 +38,7 @@ configurations {
 }
 
 configurations.all {
+    exclude group:"javax.validation", module:"validation-api"
     resolutionStrategy {
         force "ch.qos.logback:logback-classic:1.2.9"
         force "ch.qos.logback:logback-access:1.2.9"
@@ -60,8 +52,10 @@ dependencies {
         "io.dropwizard:dropwizard-jersey:$dependencyVersions.dropwizard",
         'io.dropwizard.metrics:metrics-annotation:3.1.2',
         "io.dropwizard:dropwizard-client:$dependencyVersions.dropwizard",
-        'com.hubspot.dropwizard:dropwizard-guicier:1.0.0.6',
-        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
+        "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard",
+        "org.glassfish.hk2:guice-bridge:$dependencyVersions.glassfish_version",
+        "org.glassfish.jersey.inject:jersey-hk2:$dependencyVersions.glassfish_jersey_version",
+        "com.google.inject.extensions:guice-servlet:5.0.1"
 
     saml "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
         "org.opensaml:opensaml-security-api:$dependencyVersions.opensaml",
@@ -83,7 +77,7 @@ dependencies {
         'com.fasterxml.jackson.core:jackson-annotations:2.6.0',
         'com.fasterxml.jackson.core:jackson-databind:2.9.7',
         'com.google.guava:guava:18.0',
-        'com.google.inject:guice:3.0',
+        'com.google.inject:guice:5.0.1',
         'joda-time:joda-time:2.9',
         'org.slf4j:slf4j-api:1.7.21',
         'javax.ws.rs:javax.ws.rs-api:2.0.1',
@@ -91,8 +85,7 @@ dependencies {
         'commons-lang:commons-lang:2.6',
         'org.apache.ws.commons:ws-commons-util:1.0.1',
         'com.google.code.findbugs:annotations:3.0.0',
-        'xml-apis:xml-apis:1.0.b2',
-        'javax.xml.bind:jaxb-api:2.2.3',
+        'xml-apis:xml-apis:1.0.b2'
         configurations.saml   {
             exclude group: 'uk.gov.ida', module: 'dropwizard-saml'
         }
@@ -103,7 +96,8 @@ dependencies {
         "uk.gov.ida:verify-dev-pki:$dependencyVersions.dev_pki"
 
     testCompile configurations.ida_test,
-        'junit:junit:4.11',
+        "org.junit.jupiter:junit-jupiter-api:5.5.2",
+        "org.mockito:mockito-junit-jupiter:3.2.0",
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.assertj:assertj-core:3.9.1',
@@ -112,6 +106,8 @@ dependencies {
         'com.google.code.findbugs:jsr305:3.0.1',
         "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils",
         "com.github.tomakehurst:wiremock:2.10.1"
+
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
 }
 
 sourceSets {
@@ -190,6 +186,10 @@ task intTest(type: Test) {
     maxParallelForks = Integer.parseInt("${maxParallelForksEnvVarValue}")
     testClassesDirs = sourceSets.intTest.output.classesDirs
     classpath += sourceSets.intTest.runtimeClasspath
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
 }
 
 run {

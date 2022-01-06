@@ -8,10 +8,10 @@ import httpstub.HttpStubRule;
 import io.dropwizard.testing.ConfigOverride;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import uk.gov.ida.common.CommonUrls;
 import uk.gov.ida.common.ServiceNameDto;
-import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppExtension;
 import uk.gov.ida.matchingserviceadapter.resources.MatchingServiceResource;
 import uk.gov.ida.matchingserviceadapter.rest.MatchingServiceResponseDto;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
@@ -80,14 +80,12 @@ public class VerifyMatchingIntegrationTest {
     private static final String REQUEST_ID = "default-request-id";
     private static final String MATCHING_REQUEST_PATH = "/matching-request";
 
-    @ClassRule
     public static final HttpStubRule localMatchingService = new HttpStubRule();
 
-    @ClassRule
-    public static final MatchingServiceAdapterAppRule applicationRule = new MatchingServiceAdapterAppRule(
-            ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH)
-    );
-
+    @RegisterExtension
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder()
+            .otherConfigOverrides(ConfigOverride.config("localMatchingService.matchUrl", "http://localhost:" + localMatchingService.getPort() + MATCHING_REQUEST_PATH))
+            .build();
     private final String MATCHING_SERVICE_URI = "http://localhost:" + applicationRule.getLocalPort() + "/matching-service/POST";
     private Client client = JerseyClientBuilder.createClient();
 
@@ -103,7 +101,7 @@ public class VerifyMatchingIntegrationTest {
     @Mock
     private ArgumentCaptor<LoggingEvent> argumentCaptor = ArgumentCaptor.forClass(LoggingEvent.class);
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         localMatchingService.reset();
         localMatchingService.register(MATCHING_REQUEST_PATH, 200, "application/json", "{\"result\": \"match\"}");
@@ -111,7 +109,7 @@ public class VerifyMatchingIntegrationTest {
         logger.addAppender(appender);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         logger.detachAppender(appender);
     }
@@ -204,7 +202,7 @@ public class VerifyMatchingIntegrationTest {
                                 aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentVerifiedFirstName2")
                                         .withFrom(new DateTime(2015, 1, 30, 0, 0))
                                         .withVerified(true).build()).buildAsFirstname()
-                        ),false, REQUEST_ID)
+                        ), false, REQUEST_ID)
                 ), REQUEST_ID, HUB_ENTITY_ID))
                 .build();
         Response response = makeAttributeQueryRequest(MATCHING_SERVICE_URI, attributeQuery, signatureAlgorithmForHub, digestAlgorithmForHub, HUB_ENTITY_ID);
@@ -385,9 +383,9 @@ public class VerifyMatchingIntegrationTest {
 
     private Assertion aDefaultMatchingDatasetAssertion() {
         return aMatchingDatasetAssertion(asList(
-                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldSurname2").withFrom(new DateTime(1990, 1, 30, 0, 0)).withTo(new DateTime(2000, 1, 29, 0, 0)).withVerified(true).build()).buildAsSurname(),
-                aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentSurname").withVerified(true).build()).buildAsSurname(),
-                aPersonName_1_1().addValue(aPersonNameValue().withValue("OldSurname1").withFrom(new DateTime(2000, 1, 30, 0, 0)).withTo(new DateTime(2010, 1, 30, 0, 0)).withVerified(true).build()).buildAsSurname()
+                        aPersonName_1_1().addValue(aPersonNameValue().withValue("OldSurname2").withFrom(new DateTime(1990, 1, 30, 0, 0)).withTo(new DateTime(2000, 1, 29, 0, 0)).withVerified(true).build()).buildAsSurname(),
+                        aPersonName_1_1().addValue(aPersonNameValue().withValue("CurrentSurname").withVerified(true).build()).buildAsSurname(),
+                        aPersonName_1_1().addValue(aPersonNameValue().withValue("OldSurname1").withFrom(new DateTime(2000, 1, 30, 0, 0)).withTo(new DateTime(2010, 1, 30, 0, 0)).withVerified(true).build()).buildAsSurname()
                 ),
                 false, REQUEST_ID);
     }

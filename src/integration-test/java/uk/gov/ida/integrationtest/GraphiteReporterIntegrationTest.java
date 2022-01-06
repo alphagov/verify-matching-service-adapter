@@ -4,19 +4,17 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import org.junit.ClassRule;
-import org.junit.Test;
-import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppExtension;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 public class GraphiteReporterIntegrationTest {
 
-    @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> appRule = new MatchingServiceAdapterAppRule();
+    @RegisterExtension
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder().build();
 
     @Test
     public void shouldBeAbleToCreateAGraphiteReporter() throws Exception {

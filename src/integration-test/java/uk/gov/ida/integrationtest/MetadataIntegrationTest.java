@@ -1,12 +1,11 @@
 package uk.gov.ida.integrationtest;
 
 import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 import net.shibboleth.utilities.java.support.xml.BasicParserPool;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.opensaml.core.criterion.EntityIdCriterion;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.saml.common.xml.SAMLConstants;
@@ -16,8 +15,7 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml.saml2.metadata.IDPSSODescriptor;
 import org.opensaml.saml.saml2.metadata.KeyDescriptor;
 import org.opensaml.security.credential.UsageType;
-import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppRule;
-import uk.gov.ida.matchingserviceadapter.MatchingServiceAdapterConfiguration;
+import uk.gov.ida.integrationtest.helpers.MatchingServiceAdapterAppExtension;
 
 import java.util.List;
 import java.util.Map;
@@ -34,12 +32,13 @@ public class MetadataIntegrationTest {
     private static final String MSA_SIGNING_SECONDARY = "http://matching-service-signing/secondary";
     private static final String MSA_ENCRYPTION_PRIMARY = "http://matching-service-encryption/primary";
 
-    @ClassRule
-    public static final DropwizardAppRule<MatchingServiceAdapterConfiguration> applicationRule = new MatchingServiceAdapterAppRule(
-        ConfigOverride.config("signingKeys.primary.publicKey.name", MSA_SIGNING_PRIMARY),
-        ConfigOverride.config("signingKeys.secondary.publicKey.name", MSA_SIGNING_SECONDARY),
-        ConfigOverride.config("encryptionKeys[0].publicKey.name", MSA_ENCRYPTION_PRIMARY)
-    );
+    @RegisterExtension
+    static MatchingServiceAdapterAppExtension applicationRule = new MatchingServiceAdapterAppExtension.Builder()
+            .otherConfigOverrides(
+                    ConfigOverride.config("signingKeys.primary.publicKey.name", MSA_SIGNING_PRIMARY),
+                    ConfigOverride.config("signingKeys.secondary.publicKey.name", MSA_SIGNING_SECONDARY),
+                    ConfigOverride.config("encryptionKeys[0].publicKey.name", MSA_ENCRYPTION_PRIMARY)
+            ).build();
 
 
     @Test
