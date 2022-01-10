@@ -2,6 +2,9 @@ MSA Release Notes
 =================
 
 ### Next
+
+### 5.2.1
+[View Diff](https://github.com/alphagov/verify-matching-service-adapter/compare/5.2.0...5.2.1)
 * Import jersey-media-jaxb to allow local metadata XML to be serialised
 
 ### 5.2.0
