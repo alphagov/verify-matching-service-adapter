@@ -28,7 +28,7 @@ buildscript {
 
 ext {
     everitJsonSchemaVersion = '1.5.1'
-    commonsCliVersion = '1.4'
+    commonsCliVersion = '1.5.0'
     jerseyVersion = '2.26'
     jacksonVersion = '2.9.2'
     javaValidationVersion = '2.0.0.Final'
