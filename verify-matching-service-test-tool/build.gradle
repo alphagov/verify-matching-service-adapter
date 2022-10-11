@@ -31,7 +31,7 @@ ext {
     commonsCliVersion = '1.4'
     jerseyVersion = '2.26'
     jacksonVersion = '2.9.2'
-    javaValidationVersion = '2.0.0.Final'
+    javaValidationVersion = '2.0.1.Final'
     hamcrestVersion = '1.3'
     jUnitJupiterVersion = '5.0.1'
     jUnitPlatformLauncherVersion = '1.0.1'
