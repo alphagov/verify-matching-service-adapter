@@ -74,15 +74,13 @@ dependencies {
     compile configurations.dropwizard,
         configurations.ida,
         'javax.inject:javax.inject:1',
-        'javax.validation:validation-api:1.1.0.Final',
         'com.fasterxml.jackson.core:jackson-annotations:2.13.4',
         'com.fasterxml.jackson.core:jackson-databind:2.13.4',
-        'com.google.guava:guava:18.0',
-        'com.google.inject:guice:5.0.1',
+        'com.google.inject:guice:5.1.0',
         'joda-time:joda-time:2.9',
         'org.slf4j:slf4j-api:1.7.21',
         'javax.ws.rs:javax.ws.rs-api:2.0.1',
-        'commons-codec:commons-codec:1.10',
+        'commons-codec:commons-codec:1.15',
         'commons-lang:commons-lang:2.6',
         'org.apache.ws.commons:ws-commons-util:1.0.1',
         'com.google.code.findbugs:annotations:3.0.0',
@@ -97,18 +95,19 @@ dependencies {
         "uk.gov.ida:verify-dev-pki:$dependencyVersions.dev_pki"
 
     testCompile configurations.ida_test,
-        "org.junit.jupiter:junit-jupiter-api:5.5.2",
-        "org.mockito:mockito-junit-jupiter:3.2.0",
+        "org.junit.jupiter:junit-jupiter-api:5.9.1",
+        "org.mockito:mockito-junit-jupiter:3.8.0",
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
-        'org.assertj:assertj-core:3.9.1',
+        'org.assertj:assertj-core:3.23.1',
         'org.mockito:mockito-core:4.8.0',
-        'org.assertj:assertj-joda-time:1.1.0',
-        'com.google.code.findbugs:jsr305:3.0.1',
-        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils",
-        "com.github.tomakehurst:wiremock:2.10.1"
+        "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
 
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+    testCompile ("com.github.tomakehurst:wiremock:2.16.0") { transitive = false }
+
+
+
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
 }
 
 sourceSets {
