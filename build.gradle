@@ -50,7 +50,7 @@ dependencies {
         "io.dropwizard:dropwizard-util:$dependencyVersions.dropwizard",
         'io.dropwizard.metrics:metrics-healthchecks:3.1.2',
         "io.dropwizard:dropwizard-jersey:$dependencyVersions.dropwizard",
-        'io.dropwizard.metrics:metrics-annotation:3.1.2',
+        'io.dropwizard.metrics:metrics-annotation:4.2.12',
         "io.dropwizard:dropwizard-client:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard",
         "org.glassfish.hk2:guice-bridge:$dependencyVersions.glassfish_version",
