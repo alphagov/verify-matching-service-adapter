@@ -89,6 +89,8 @@ dependencies {
             exclude group: 'uk.gov.ida', module: 'dropwizard-saml'
         }
 
+    compile ("commons-collections:commons-collections:3.2.2") { force = true }
+
     runtime "io.dropwizard:dropwizard-metrics-graphite:$dependencyVersions.dropwizard"
 
     ida_test "uk.gov.ida:saml-test:$dependencyVersions.saml_libs_version",
