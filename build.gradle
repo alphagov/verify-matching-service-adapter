@@ -11,11 +11,11 @@ project.version = "$gradle.ext.version_number-$build_number"
 
 def dependencyVersions = [
         opensaml:"$opensaml",
-        dropwizard: '2.0.28',
-        ida_utils: '397',
-        ida_test_utils: '66',
+        dropwizard: '2.1.2',
+        ida_utils: '412',
+        ida_test_utils: '67',
         dev_pki: '2.0.0-46',
-        saml_libs_version: "$opensaml-259",
+        saml_libs_version: "$opensaml-275",
         glassfish_version:'2.6.1',
         glassfish_jersey_version:'2.34'
 ]
@@ -75,8 +75,8 @@ dependencies {
         configurations.ida,
         'javax.inject:javax.inject:1',
         'javax.validation:validation-api:1.1.0.Final',
-        'com.fasterxml.jackson.core:jackson-annotations:2.6.0',
-        'com.fasterxml.jackson.core:jackson-databind:2.9.7',
+        'com.fasterxml.jackson.core:jackson-annotations:2.13.4',
+        'com.fasterxml.jackson.core:jackson-databind:2.13.4',
         'com.google.guava:guava:18.0',
         'com.google.inject:guice:5.0.1',
         'joda-time:joda-time:2.9',
@@ -102,7 +102,7 @@ dependencies {
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.assertj:assertj-core:3.9.1',
-        'org.mockito:mockito-core:2.23.0',
+        'org.mockito:mockito-core:4.8.0',
         'org.assertj:assertj-joda-time:1.1.0',
         'com.google.code.findbugs:jsr305:3.0.1',
         "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils",
