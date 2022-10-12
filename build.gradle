@@ -41,7 +41,7 @@ configurations.all {
     exclude group:"javax.validation", module:"validation-api"
     resolutionStrategy {
         force "ch.qos.logback:logback-classic:1.2.9"
-        force "ch.qos.logback:logback-access:1.2.9"
+        force "ch.qos.logback:logback-access:1.4.4"
         force "org.apache.santuario:xmlsec:2.1.8"
         force "commons-collections:commons-collections:3.2.2"
     }
