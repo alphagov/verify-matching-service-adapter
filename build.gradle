@@ -73,7 +73,7 @@ dependencies {
         "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
         "uk.gov.ida:common-utils:2.0.0-$dependencyVersions.ida_utils"
 
-    compile configurations.dropwizard,
+    implementation configurations.dropwizard,
         configurations.ida,
         'javax.inject:javax.inject:1',
         'com.fasterxml.jackson.core:jackson-annotations:2.13.4',
@@ -96,7 +96,7 @@ dependencies {
     ida_test "uk.gov.ida:saml-test:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:verify-dev-pki:$dependencyVersions.dev_pki"
 
-    testCompile configurations.ida_test,
+    testImplementation configurations.ida_test,
         "org.junit.jupiter:junit-jupiter-api:5.9.1",
         "org.mockito:mockito-junit-jupiter:3.8.0",
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
@@ -105,7 +105,7 @@ dependencies {
         'org.mockito:mockito-core:4.8.0',
         "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
 
-    testCompile ("com.github.tomakehurst:wiremock:2.16.0") { transitive = false }
+    testImplementation ("com.github.tomakehurst:wiremock:2.16.0") { transitive = false }
 
 
 

@@ -59,7 +59,7 @@ sourceSets {
 }
 
 dependencies {
-    compile(
+    implementation(
             "org.glassfish.jersey.core:jersey-client:$jerseyVersion",
             "org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion",
             "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion",
@@ -75,9 +75,9 @@ dependencies {
             "org.apiguardian:apiguardian-api:$apiguardianVersion"
     )
 
-    runtime("org.junit.jupiter:junit-jupiter-engine:$jUnitJupiterVersion")
+    runtimeOnly("org.junit.jupiter:junit-jupiter-engine:$jUnitJupiterVersion")
 
-    testCompile("com.github.tomakehurst:wiremock:$wiremockVersion",
+    testImplementation("com.github.tomakehurst:wiremock:$wiremockVersion",
             "org.mockito:mockito-core:$mockitoVersion",
             "javax.xml.bind:jaxb-api:$jaxbapiVersion")
 }
