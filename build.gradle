@@ -79,7 +79,7 @@ dependencies {
         'com.fasterxml.jackson.core:jackson-annotations:2.13.4',
         'com.fasterxml.jackson.core:jackson-databind:2.13.4',
         'com.google.inject:guice:5.1.0',
-        'joda-time:joda-time:2.9',
+        'joda-time:joda-time:2.12.0',
         'org.slf4j:slf4j-api:1.7.21',
         'javax.ws.rs:javax.ws.rs-api:2.0.1',
         'commons-codec:commons-codec:1.15',
