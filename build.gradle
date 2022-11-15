@@ -102,7 +102,7 @@ dependencies {
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.assertj:assertj-core:3.23.1',
-        'org.mockito:mockito-core:4.8.0',
+        'org.mockito:mockito-core:4.9.0',
         "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
 
     testImplementation ("com.github.tomakehurst:wiremock:2.16.0") { transitive = false }
