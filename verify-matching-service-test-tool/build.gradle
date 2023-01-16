@@ -32,7 +32,7 @@ ext {
     jerseyVersion = '2.26'
     jacksonVersion = '2.9.2'
     javaValidationVersion = '2.0.0.Final'
-    hamcrestVersion = '1.3'
+    hamcrestVersion = '2.2'
     jUnitJupiterVersion = '5.9.2'
     jUnitPlatformLauncherVersion = '1.0.1'
     apiguardianVersion = '1.0.0'
