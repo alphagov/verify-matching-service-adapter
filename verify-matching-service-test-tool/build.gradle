@@ -33,11 +33,11 @@ ext {
     jacksonVersion = '2.9.2'
     javaValidationVersion = '2.0.0.Final'
     hamcrestVersion = '1.3'
-    jUnitJupiterVersion = '5.0.1'
+    jUnitJupiterVersion = '5.9.2'
     jUnitPlatformLauncherVersion = '1.9.2'
     apiguardianVersion = '1.0.0'
     wiremockVersion = '2.10.1'
-    mockitoVersion = '2.23.0'
+    mockitoVersion = '4.11.0'
     jaxbapiVersion = '2.2.9'
 }
 
