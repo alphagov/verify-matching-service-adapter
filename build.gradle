@@ -97,7 +97,7 @@ dependencies {
         "uk.gov.ida:verify-dev-pki:$dependencyVersions.dev_pki"
 
     testImplementation configurations.ida_test,
-        "org.junit.jupiter:junit-jupiter-api:5.9.1",
+        "org.junit.jupiter:junit-jupiter-api:5.9.2",
         "org.mockito:mockito-junit-jupiter:3.8.0",
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
@@ -109,7 +109,7 @@ dependencies {
 
 
 
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
 
 sourceSets {
