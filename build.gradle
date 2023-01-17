@@ -68,6 +68,12 @@ dependencies {
         "org.opensaml:opensaml-xmlsec-impl:$dependencyVersions.opensaml",
         'net.shibboleth.utilities:java-support:7.2.0'
 
+    constraints {
+        saml("org.bouncycastle:bcprov-jdk15on:1.67") {
+            because "opensaml:3.4.6 has a dep on bcprov-jdk15on:1.59 which is vulnerable to CVE-2018-1000180"
+        }
+    }
+
     ida "uk.gov.ida:saml-lib:$dependencyVersions.saml_libs_version",
         "uk.gov.ida:rest-utils:2.0.0-$dependencyVersions.ida_utils",
         "uk.gov.ida:security-utils:2.0.0-$dependencyVersions.ida_utils",
