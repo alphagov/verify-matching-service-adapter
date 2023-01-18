@@ -66,7 +66,7 @@ dependencies {
         "org.opensaml:opensaml-xmlsec-api:$dependencyVersions.opensaml",
         "org.opensaml:opensaml-saml-impl:$dependencyVersions.opensaml",
         "org.opensaml:opensaml-xmlsec-impl:$dependencyVersions.opensaml",
-        'net.shibboleth.utilities:java-support:7.2.0'
+        'net.shibboleth.utilities:java-support:8.4.0'
 
     constraints {
         saml("org.bouncycastle:bcprov-jdk15on:1.67") {
