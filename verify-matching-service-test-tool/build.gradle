@@ -37,7 +37,7 @@ ext {
     jUnitPlatformLauncherVersion = '1.9.2'
     apiguardianVersion = '1.0.0'
     wiremockVersion = '2.10.1'
-    mockitoVersion = '4.11.0'
+    mockitoVersion = '5.1.1'
     jaxbapiVersion = '2.2.9'
 }
 
