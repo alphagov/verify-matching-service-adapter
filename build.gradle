@@ -104,7 +104,7 @@ dependencies {
 
     testImplementation configurations.ida_test,
         "org.junit.jupiter:junit-jupiter-api:5.9.2",
-        "org.mockito:mockito-junit-jupiter:3.8.0",
+        "org.mockito:mockito-junit-jupiter:5.3.0",
         "io.dropwizard:dropwizard-testing:$dependencyVersions.dropwizard",
         "io.dropwizard:dropwizard-jackson:$dependencyVersions.dropwizard",
         'org.assertj:assertj-core:3.23.1',
