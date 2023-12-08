@@ -111,7 +111,7 @@ dependencies {
         'org.mockito:mockito-core:4.11.0',
         "uk.gov.ida:common-test-utils:2.0.0-$dependencyVersions.ida_test_utils"
 
-    testImplementation ("com.github.tomakehurst:wiremock:2.16.0") { transitive = false }
+    testImplementation ("com.github.tomakehurst:wiremock:3.0.1") { transitive = false }
 
 
 
