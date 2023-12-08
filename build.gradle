@@ -16,7 +16,7 @@ def dependencyVersions = [
         ida_test_utils: '67',
         dev_pki: '2.0.0-46',
         saml_libs_version: "$opensaml-275",
-        glassfish_version:'2.6.1',
+        glassfish_version:'3.0.5',
         glassfish_jersey_version:'2.34'
 ]
 
