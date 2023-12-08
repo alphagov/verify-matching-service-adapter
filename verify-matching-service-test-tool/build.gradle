@@ -30,7 +30,7 @@ ext {
     everitJsonSchemaVersion = '1.5.1'
     commonsCliVersion = '1.4'
     jerseyVersion = '2.26'
-    jacksonVersion = '2.9.2'
+    jacksonVersion = '2.16.0'
     javaValidationVersion = '2.0.0.Final'
     hamcrestVersion = '1.3'
     jUnitJupiterVersion = '5.9.2'
